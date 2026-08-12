@@ -28,3 +28,11 @@ class AgentRegistrationError(SupervisorError):
 
 class AgentNotFoundError(SupervisorError):
     pass
+
+
+class ProfileNotFoundError(SupervisorError):
+    pass
+
+
+class ProfileStateError(SupervisorError):
+    pass

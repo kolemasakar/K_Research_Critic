@@ -2,18 +2,24 @@ from __future__ import annotations
 
 from typing import Any
 
-from models import Task, utc_now
+from models import DomainAssessment, Task, utc_now
 
 from .exceptions import DuplicateTaskError, TaskNotFoundError
 
 
 class TaskManager:
-    """In-memory task registry used by the Phase 2 orchestration core."""
+    """In-memory task registry used by the orchestration core."""
 
     def __init__(self) -> None:
         self._tasks: dict[str, Task] = {}
 
-    def create_task(self, *, user_request: str, task_type: str, metadata: dict[str, Any] | None = None) -> Task:
+    def create_task(
+        self,
+        *,
+        user_request: str,
+        task_type: str,
+        metadata: dict[str, Any] | None = None,
+    ) -> Task:
         task = Task(user_request=user_request, task_type=task_type, metadata=metadata or {})
         self.add_task(task)
         return task
@@ -41,5 +47,16 @@ class TaskManager:
     def attach_workflow(self, task_id: str, workflow_run_id: str) -> Task:
         task = self.get_task(task_id)
         task.current_workflow_run_id = workflow_run_id
+        task.updated_at = utc_now()
+        return task
+
+    def apply_domain_assessment(self, task_id: str, assessment: DomainAssessment) -> Task:
+        task = self.get_task(task_id)
+        if assessment.task_id != task.task_id:
+            raise ValueError("DomainAssessment task_id must match Task task_id")
+        task.primary_domain = assessment.primary_domain
+        task.secondary_domains = list(assessment.secondary_domains)
+        task.task_type = assessment.task_type
+        task.risk_level = assessment.risk_level
         task.updated_at = utc_now()
         return task
