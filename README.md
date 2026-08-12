@@ -28,16 +28,19 @@ Phase 2 - Supervisor Foundation: COMPLETE.
 Phase 3 - Domain Resolver and CriticProfile Workflow: COMPLETE.
 Phase 4 - ResearchAgent MVP: COMPLETE.
 Phase 5 - Tools and Evidence Layer: COMPLETE.
+Phase 6 - CriticAgent MVP: COMPLETE.
 
 Next implementation phase:
 
 ```text
-Phase 6 - CriticAgent MVP
+Phase 7 - Autonomous Research-Critic Loop
 ```
 
-The repository now includes deterministic domain resolution, multi-domain detection, dynamic CriticProfile approval workflows, a generic ResearchAgent, structured ResearchResult output, provider-neutral web tool adapters, normalized tool errors, source metadata extraction, URL/source deduplication, source validation, reliability classification with explicit override support, bidirectional claim-to-source linking, citation management, and explicit partial/failure behavior.
+The repository now includes deterministic domain resolution, multi-domain detection, dynamic CriticProfile approval workflows, a generic ResearchAgent, structured ResearchResult output, provider-neutral web tool adapters, normalized tool errors, source metadata extraction, URL/source deduplication, source validation, reliability classification with explicit override support, bidirectional claim-to-source linking, citation management, and a generic profile-driven CriticAgent with independent verification, source authority and freshness checks, contradiction detection, missing-topic detection, machine-readable PASS/REVISE decisions, and explicit partial/failure behavior.
 
 Concrete external search/fetch providers remain pluggable behind the provider-neutral adapters rather than being embedded in agent logic.
+
+The Phase 6 CriticAgent uses conservative deterministic evidence-relation heuristics for the MVP. Semantic LLM-based verification remains a later enhancement and does not change the approved CriticProfile boundary.
 
 Hybrid semantic domain resolution is scheduled as a post-MVP enhancement after Phase 9. See `docs/HYBRID_RESOLVER_PLAN.md`.
 
