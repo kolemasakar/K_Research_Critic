@@ -299,6 +299,8 @@ Exit criteria:
 - the loop stops deterministically;
 - the final workflow state matches the acceptance result.
 
+Status: COMPLETE
+
 ## 11. Phase 8 - ReportGenerator and Final Artifacts
 
 Goal: produce final user-facing outputs.
