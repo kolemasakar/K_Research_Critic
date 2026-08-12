@@ -178,6 +178,8 @@ Exit criteria:
 - the agent does not directly bypass the tools layer;
 - revision input can produce a new draft version.
 
+Status: COMPLETE
+
 ## 8. Phase 5 - Tools and Evidence Layer
 
 Goal: isolate external information access and evidence handling.
@@ -353,6 +355,40 @@ Exit criteria:
 
 MVP boundary: Phase 9.
 
+## 12.1 Post-MVP Enhancement - Hybrid Domain Resolver
+
+Goal: improve domain classification semantically without expanding the initial MVP scope.
+
+Schedule: after Phase 9 End-to-End MVP and before or alongside later post-MVP platform work.
+
+Scope:
+
+- preserve the current rule-based resolver as deterministic fallback;
+- add provider-neutral LLMSemanticResolver;
+- implement HybridResolver conflict and merge policy;
+- preserve deterministic high-risk floors;
+- validate semantic output against DomainAssessment;
+- add classification confidence and uncertainty handling;
+- preserve the existing CriticProfile user approval boundary;
+- add fallback and disagreement tests.
+
+Primary document:
+
+```text
+HYBRID_RESOLVER_PLAN.md
+```
+
+Exit criteria:
+
+- semantic classification is schema validated;
+- deterministic fallback remains available;
+- risk cannot be silently reduced by semantic classification;
+- material conflicts are auditable;
+- existing Phase 3 approval semantics remain unchanged;
+- complete CI suite passes.
+
+Status: PLANNED
+
 ## 13. Phase 10 - Persistence and Audit
 
 Goal: preserve full execution history and enable recovery.
@@ -493,6 +529,7 @@ RESEARCH_WORKFLOW.md
 CONFIGURATION.md
 TEST_PLAN.md
 PROJECT_HISTORY.md
+HYBRID_RESOLVER_PLAN.md
 ```
 
 ## 19. Current Implementation Order
@@ -512,6 +549,12 @@ Phase 8 - ReportGenerator and Final Artifacts
 Phase 9 - End-to-End MVP
 ```
 
+Scheduled post-MVP enhancement:
+
+```text
+Hybrid Domain Resolver - see HYBRID_RESOLVER_PLAN.md
+```
+
 After MVP:
 
 ```text
@@ -529,4 +572,5 @@ Phase 13 - Modular Agent Platform
 - Supervisor owns workflow control, state, iteration limits, and finalization.
 - ResearchAgent and CriticAgent operate autonomously after profile approval.
 - MVP completion is defined at Phase 9.
+- Hybrid semantic domain resolution is scheduled after the End-to-End MVP and is not an MVP blocker.
 - Persistence, cost controls, CI hardening, and broader agent expansion follow the working MVP.
