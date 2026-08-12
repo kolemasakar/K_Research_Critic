@@ -29,14 +29,19 @@ Phase 3 - Domain Resolver and CriticProfile Workflow: COMPLETE.
 Phase 4 - ResearchAgent MVP: COMPLETE.
 Phase 5 - Tools and Evidence Layer: COMPLETE.
 Phase 6 - CriticAgent MVP: COMPLETE.
+Phase 7 - Autonomous Research-Critic Loop: COMPLETE.
 
 Next implementation phase:
 
 ```text
-Phase 7 - Autonomous Research-Critic Loop
+Phase 8 - ReportGenerator and Final Artifacts
 ```
 
-The repository now includes deterministic domain resolution, multi-domain detection, dynamic CriticProfile approval workflows, a generic ResearchAgent, structured ResearchResult output, provider-neutral web tool adapters, normalized tool errors, source metadata extraction, URL/source deduplication, source validation, reliability classification with explicit override support, bidirectional claim-to-source linking, citation management, and a generic profile-driven CriticAgent with independent verification, source authority and freshness checks, contradiction detection, missing-topic detection, machine-readable PASS/REVISE decisions, and explicit partial/failure behavior.
+The repository now includes deterministic domain resolution, multi-domain detection, dynamic CriticProfile approval workflows, a generic ResearchAgent, structured ResearchResult output, provider-neutral web tool adapters, normalized tool errors, source metadata extraction, URL/source deduplication, source validation, reliability classification with explicit override support, bidirectional claim-to-source linking, citation management, a generic profile-driven CriticAgent, and a Supervisor-owned autonomous Research-Critic revision loop.
+
+The Phase 7 loop versions research results by iteration, feeds structured CriticReview recommendations back to ResearchAgent, enforces the approved confidence threshold and max_iterations, rejects incomplete PARTIAL critic execution as an accepted PASS, records agent runs and completed iteration records, stops on accepted PASS, and terminates explicitly with FAILED or COMPLETED_WITH_LIMITATIONS where appropriate.
+
+Iteration and agent-run audit data is in-memory in the current MVP implementation. Durable restart-safe persistence remains scheduled for Phase 10.
 
 Concrete external search/fetch providers remain pluggable behind the provider-neutral adapters rather than being embedded in agent logic.
 
