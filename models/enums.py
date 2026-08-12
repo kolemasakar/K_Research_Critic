@@ -18,6 +18,25 @@ class TaskStatus(StrEnum):
     COMPLETED_WITH_LIMITATIONS = "COMPLETED_WITH_LIMITATIONS"
 
 
+class WorkflowStatus(StrEnum):
+    RUNNING = "RUNNING"
+    WAITING_FOR_USER = "WAITING_FOR_USER"
+    SUCCEEDED = "SUCCEEDED"
+    FAILED = "FAILED"
+    COMPLETED_WITH_LIMITATIONS = "COMPLETED_WITH_LIMITATIONS"
+
+
+class WorkflowType(StrEnum):
+    RESEARCH_CRITIC = "RESEARCH_CRITIC"
+
+
+class ActorType(StrEnum):
+    USER = "USER"
+    SUPERVISOR = "SUPERVISOR"
+    AGENT = "AGENT"
+    SYSTEM = "SYSTEM"
+
+
 class RiskLevel(StrEnum):
     LOW = "LOW"
     MEDIUM = "MEDIUM"

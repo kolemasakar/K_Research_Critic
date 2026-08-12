@@ -6,6 +6,7 @@ from typing import Any, Annotated
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from .enums import (
+    ActorType,
     AgentStatus,
     AgentType,
     ApprovalDecision,
@@ -23,13 +24,15 @@ from .enums import (
     SourceType,
     TaskStatus,
     VerificationStatus,
+    WorkflowStatus,
+    WorkflowType,
 )
 from .identifiers import IdPrefix, generate_id
-
 
 TaskId = Annotated[str, Field(pattern=r"^TASK_[A-Z0-9]+$")]
 RunId = Annotated[str, Field(pattern=r"^RUN_[A-Z0-9]+$")]
 WorkflowRunId = Annotated[str, Field(pattern=r"^WF_[A-Z0-9]+$")]
+TransitionId = Annotated[str, Field(pattern=r"^TRANSITION_[A-Z0-9]+$")]
 ProfileId = Annotated[str, Field(pattern=r"^PROFILE_[A-Z0-9]+$")]
 ClaimId = Annotated[str, Field(pattern=r"^CLAIM_[A-Z0-9]+$")]
 SourceId = Annotated[str, Field(pattern=r"^SOURCE_[A-Z0-9]+$")]
@@ -48,11 +51,7 @@ def utc_now() -> datetime:
 
 
 class ContractModel(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        validate_assignment=True,
-        str_strip_whitespace=True,
-    )
+    model_config = ConfigDict(extra="forbid", validate_assignment=True, str_strip_whitespace=True)
 
     @field_validator("*", mode="after")
     @classmethod
@@ -88,9 +87,7 @@ class Task(ContractModel):
 
 
 class DomainAssessment(ContractModel):
-    assessment_id: AssessmentId = Field(
-        default_factory=lambda: generate_id(IdPrefix.ASSESSMENT), frozen=True
-    )
+    assessment_id: AssessmentId = Field(default_factory=lambda: generate_id(IdPrefix.ASSESSMENT), frozen=True)
     task_id: TaskId = Field(frozen=True)
     primary_domain: NonEmptyText
     secondary_domains: list[str] = Field(default_factory=list)
@@ -104,15 +101,8 @@ class DomainAssessment(ContractModel):
 
 
 class CriticProfile(ContractModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        str_strip_whitespace=True,
-        frozen=True,
-    )
-
-    profile_id: ProfileId = Field(
-        default_factory=lambda: generate_id(IdPrefix.PROFILE), frozen=True
-    )
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, frozen=True)
+    profile_id: ProfileId = Field(default_factory=lambda: generate_id(IdPrefix.PROFILE), frozen=True)
     task_id: TaskId = Field(frozen=True)
     version: int = Field(default=1, ge=1)
     status: ProfileStatus = ProfileStatus.DRAFT
@@ -136,18 +126,13 @@ class CriticProfile(ContractModel):
 
     @model_validator(mode="after")
     def validate_approval_boundary(self) -> "CriticProfile":
-        if self.status == ProfileStatus.APPROVED:
-            if self.approved_at is None or not self.approved_by:
-                raise ValueError(
-                    "APPROVED CriticProfile requires approved_at and approved_by"
-                )
+        if self.status == ProfileStatus.APPROVED and (self.approved_at is None or not self.approved_by):
+            raise ValueError("APPROVED CriticProfile requires approved_at and approved_by")
         return self
 
 
 class UserApproval(ContractModel):
-    approval_id: ApprovalId = Field(
-        default_factory=lambda: generate_id(IdPrefix.APPROVAL), frozen=True
-    )
+    approval_id: ApprovalId = Field(default_factory=lambda: generate_id(IdPrefix.APPROVAL), frozen=True)
     task_id: TaskId = Field(frozen=True)
     approval_type: ApprovalType
     target_id: NonEmptyText
@@ -205,9 +190,7 @@ class Metrics(ContractModel):
 
 
 class AgentRunRequest(ContractModel):
-    request_id: RequestId = Field(
-        default_factory=lambda: generate_id(IdPrefix.REQUEST), frozen=True
-    )
+    request_id: RequestId = Field(default_factory=lambda: generate_id(IdPrefix.REQUEST), frozen=True)
     task_id: TaskId = Field(frozen=True)
     workflow_run_id: WorkflowRunId = Field(frozen=True)
     run_id: RunId = Field(default_factory=lambda: generate_id(IdPrefix.RUN), frozen=True)
@@ -277,9 +260,7 @@ class Claim(ContractModel):
 
 
 class Source(ContractModel):
-    source_id: SourceId = Field(
-        default_factory=lambda: generate_id(IdPrefix.SOURCE), frozen=True
-    )
+    source_id: SourceId = Field(default_factory=lambda: generate_id(IdPrefix.SOURCE), frozen=True)
     task_id: TaskId = Field(frozen=True)
     url: str | None = None
     title: NonEmptyText
@@ -303,9 +284,7 @@ class Source(ContractModel):
 
 
 class CriticReview(ContractModel):
-    review_id: ReviewId = Field(
-        default_factory=lambda: generate_id(IdPrefix.REVIEW), frozen=True
-    )
+    review_id: ReviewId = Field(default_factory=lambda: generate_id(IdPrefix.REVIEW), frozen=True)
     task_id: TaskId = Field(frozen=True)
     run_id: RunId = Field(frozen=True)
     profile_id: ProfileId = Field(frozen=True)
@@ -324,9 +303,7 @@ class CriticReview(ContractModel):
 
 
 class Artifact(ContractModel):
-    artifact_id: ArtifactId = Field(
-        default_factory=lambda: generate_id(IdPrefix.ARTIFACT), frozen=True
-    )
+    artifact_id: ArtifactId = Field(default_factory=lambda: generate_id(IdPrefix.ARTIFACT), frozen=True)
     task_id: TaskId = Field(frozen=True)
     workflow_run_id: WorkflowRunId = Field(frozen=True)
     artifact_type: ArtifactType
@@ -337,6 +314,49 @@ class Artifact(ContractModel):
     created_at: datetime = Field(default_factory=utc_now)
     checksum: NonEmptyText
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class WorkflowRun(ContractModel):
+    workflow_run_id: WorkflowRunId = Field(default_factory=lambda: generate_id(IdPrefix.WORKFLOW), frozen=True)
+    task_id: TaskId = Field(frozen=True)
+    workflow_type: WorkflowType = WorkflowType.RESEARCH_CRITIC
+    status: WorkflowStatus = WorkflowStatus.RUNNING
+    current_state: TaskStatus = TaskStatus.NEW
+    iteration: int = Field(default=0, ge=0)
+    max_iterations: int = Field(default=3, ge=1)
+    started_at: datetime = Field(default_factory=utc_now)
+    completed_at: datetime | None = None
+    agent_run_ids: list[RunId] = Field(default_factory=list)
+    transition_ids: list[TransitionId] = Field(default_factory=list)
+    final_decision: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_workflow_times(self) -> "WorkflowRun":
+        if self.completed_at is not None and self.completed_at < self.started_at:
+            raise ValueError("completed_at cannot be earlier than started_at")
+        if self.iteration > self.max_iterations:
+            raise ValueError("iteration cannot exceed max_iterations")
+        return self
+
+
+class StateTransition(ContractModel):
+    transition_id: TransitionId = Field(default_factory=lambda: generate_id(IdPrefix.TRANSITION), frozen=True)
+    task_id: TaskId = Field(frozen=True)
+    workflow_run_id: WorkflowRunId = Field(frozen=True)
+    from_state: TaskStatus
+    to_state: TaskStatus
+    trigger: NonEmptyText
+    reason: str | None = None
+    actor_type: ActorType
+    actor_id: str | None = None
+    created_at: datetime = Field(default_factory=utc_now)
+
+    @model_validator(mode="after")
+    def validate_state_change(self) -> "StateTransition":
+        if self.from_state == self.to_state:
+            raise ValueError("StateTransition requires different from_state and to_state")
+        return self
 
 
 ReviewResult = CriticReview

@@ -1,0 +1,45 @@
+from __future__ import annotations
+
+from typing import Any
+
+from models import Task, utc_now
+
+from .exceptions import DuplicateTaskError, TaskNotFoundError
+
+
+class TaskManager:
+    """In-memory task registry used by the Phase 2 orchestration core."""
+
+    def __init__(self) -> None:
+        self._tasks: dict[str, Task] = {}
+
+    def create_task(self, *, user_request: str, task_type: str, metadata: dict[str, Any] | None = None) -> Task:
+        task = Task(user_request=user_request, task_type=task_type, metadata=metadata or {})
+        self.add_task(task)
+        return task
+
+    def add_task(self, task: Task) -> None:
+        if task.task_id in self._tasks:
+            raise DuplicateTaskError(f"Task already exists: {task.task_id}")
+        self._tasks[task.task_id] = task
+
+    def get_task(self, task_id: str) -> Task:
+        try:
+            return self._tasks[task_id]
+        except KeyError as exc:
+            raise TaskNotFoundError(f"Unknown task_id: {task_id}") from exc
+
+    def list_tasks(self) -> list[Task]:
+        return list(self._tasks.values())
+
+    def set_active_profile(self, task_id: str, profile_id: str) -> Task:
+        task = self.get_task(task_id)
+        task.active_profile_id = profile_id
+        task.updated_at = utc_now()
+        return task
+
+    def attach_workflow(self, task_id: str, workflow_run_id: str) -> Task:
+        task = self.get_task(task_id)
+        task.current_workflow_run_id = workflow_run_id
+        task.updated_at = utc_now()
+        return task

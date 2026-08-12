@@ -8,6 +8,7 @@ class IdPrefix(StrEnum):
     TASK = "TASK"
     RUN = "RUN"
     WORKFLOW = "WF"
+    TRANSITION = "TRANSITION"
     PROFILE = "PROFILE"
     CLAIM = "CLAIM"
     SOURCE = "SOURCE"
@@ -21,12 +22,7 @@ class IdPrefix(StrEnum):
 
 
 def generate_id(prefix: IdPrefix | str) -> str:
-    """Return a collision-resistant, human-traceable identifier.
-
-    External IDs keep a stable semantic prefix and use a 16-character
-    uppercase hexadecimal suffix. Persistence may later enforce uniqueness.
-    """
-
+    """Return a collision-resistant, human-traceable identifier."""
     prefix_value = prefix.value if isinstance(prefix, IdPrefix) else str(prefix)
     normalized = prefix_value.strip().upper()
     if not normalized or not normalized.replace("_", "").isalnum():
