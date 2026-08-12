@@ -153,6 +153,8 @@ Exit criteria:
 - material amendments return to user approval;
 - multi-domain profiles are supported.
 
+Status: COMPLETE
+
 ## 7. Phase 4 - ResearchAgent MVP
 
 Goal: produce evidence-backed draft research results.
