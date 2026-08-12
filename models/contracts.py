@@ -104,6 +104,12 @@ class DomainAssessment(ContractModel):
 
 
 class CriticProfile(ContractModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        str_strip_whitespace=True,
+        frozen=True,
+    )
+
     profile_id: ProfileId = Field(
         default_factory=lambda: generate_id(IdPrefix.PROFILE), frozen=True
     )
