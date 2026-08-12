@@ -44,9 +44,9 @@ class ResearchResult(ContractModel):
         if self.claim_ids and self.claim_ids != embedded_claim_ids:
             raise ValueError("claim_ids must match embedded claims in order")
         if not self.source_ids:
-            self.source_ids = embedded_source_ids
+            object.__setattr__(self, "source_ids", embedded_source_ids)
         if not self.claim_ids:
-            self.claim_ids = embedded_claim_ids
+            object.__setattr__(self, "claim_ids", embedded_claim_ids)
 
         source_id_set = set(self.source_ids)
         for source in self.sources:
@@ -64,7 +64,7 @@ class ResearchResult(ContractModel):
         if self.change_log and self.changes_applied and self.change_log != self.changes_applied:
             raise ValueError("change_log and changes_applied must match when both are supplied")
         if not self.change_log and self.changes_applied:
-            self.change_log = list(self.changes_applied)
+            object.__setattr__(self, "change_log", list(self.changes_applied))
         if not self.changes_applied and self.change_log:
-            self.changes_applied = list(self.change_log)
+            object.__setattr__(self, "changes_applied", list(self.change_log))
         return self
