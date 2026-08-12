@@ -14,6 +14,11 @@ from .exceptions import (
 )
 from .profile_manager import ProfileManager
 from .profile_workflow import ProfileWorkflow
+from .research_critic_loop import (
+    ResearchCriticIteration,
+    ResearchCriticLoop,
+    ResearchCriticLoopOutcome,
+)
 from .state_machine import StateMachine
 from .task_manager import TaskManager
 from .workflow_engine import WorkflowEngine
@@ -29,6 +34,9 @@ __all__ = [
     "ProfileNotFoundError",
     "ProfileStateError",
     "ProfileWorkflow",
+    "ResearchCriticIteration",
+    "ResearchCriticLoop",
+    "ResearchCriticLoopOutcome",
     "StateMachine",
     "SupervisorError",
     "TaskManager",
