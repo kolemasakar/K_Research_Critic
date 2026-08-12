@@ -1,0 +1,101 @@
+schema_version: "1.0"
+
+environment: development
+
+runtime:
+  timezone: UTC
+  debug: false
+
+workflow:
+  max_iterations: 3
+  allow_completed_with_limitations: true
+  require_profile_approval: true
+  freeze_task_configuration: true
+  freeze_critic_profile: true
+
+agents:
+  research_agent:
+    enabled: true
+  critic_agent:
+    enabled: true
+  report_generator:
+    enabled: true
+
+models:
+  supervisor:
+    provider: null
+    model: null
+  domain_resolver:
+    provider: null
+    model: null
+  research_agent:
+    provider: null
+    model: null
+  critic_agent:
+    provider: null
+    model: null
+  report_generator:
+    provider: null
+    model: null
+
+tools:
+  web_search:
+    enabled: true
+    timeout_seconds: 30
+  web_fetch:
+    enabled: true
+    timeout_seconds: 30
+  source_validator:
+    enabled: true
+  citation_manager:
+    enabled: true
+
+research:
+  max_queries: 12
+  max_sources: 30
+  max_sources_per_query: 8
+  prefer_primary_sources: true
+  enable_cross_source_comparison: true
+  capture_publication_date: true
+  capture_access_time: true
+  deduplicate_sources: true
+
+critic:
+  max_verification_queries: 12
+  require_independent_search: true
+  require_claim_level_review: true
+  default_minimum_cross_checks: 2
+  default_confidence_threshold: 0.85
+  stop_on_critical_issue: false
+
+reports:
+  output_directory: output
+  final_report_suffix: FINAL_REPORT.md
+  review_protocol_suffix: REVIEW_PROTOCOL.md
+
+persistence:
+  backend: file
+  path: runtime
+
+logging:
+  level: INFO
+  directory: logs
+  console_enabled: true
+  file_enabled: true
+  include_task_id: true
+  include_run_id: true
+  redact_secrets: true
+
+retry:
+  max_attempts: 3
+  initial_delay_seconds: 1
+  max_delay_seconds: 8
+  backoff_multiplier: 2.0
+
+limits:
+  max_agent_runs: 20
+  max_search_calls: 30
+  max_fetch_calls: 60
+  max_sources: 40
+  max_runtime_seconds: 1800
+  max_output_size_bytes: 5000000
