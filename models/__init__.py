@@ -41,13 +41,14 @@ from .enums import (
     WorkflowType,
 )
 from .identifiers import IdPrefix, generate_id
+from .research import ResearchResult
 
 __all__ = [
     "ActorType", "AgentDefinition", "AgentResult", "AgentRunRequest", "AgentStatus", "AgentType",
     "ApprovalDecision", "ApprovalType", "Artifact", "ArtifactStatus", "ArtifactType", "Claim", "ClaimType",
     "CriticProfile", "CriticReview", "DomainAssessment", "ErrorRecord", "ErrorType", "ExecutionStatus",
-    "IdPrefix", "ImportanceLevel", "Metrics", "ProfileStatus", "ReliabilityClass", "ReviewDecision",
-    "ReviewResult", "RiskLevel", "Source", "SourceType", "StateTransition", "Task", "TaskStatus",
-    "UserApproval", "VerificationStatus", "WarningRecord", "WorkflowRun", "WorkflowStatus", "WorkflowType",
-    "generate_id", "utc_now",
+    "IdPrefix", "ImportanceLevel", "Metrics", "ProfileStatus", "ReliabilityClass", "ResearchResult",
+    "ReviewDecision", "ReviewResult", "RiskLevel", "Source", "SourceType", "StateTransition", "Task",
+    "TaskStatus", "UserApproval", "VerificationStatus", "WarningRecord", "WorkflowRun", "WorkflowStatus",
+    "WorkflowType", "generate_id", "utc_now",
 ]
