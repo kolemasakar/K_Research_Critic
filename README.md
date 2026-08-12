@@ -25,14 +25,18 @@ The CriticAgent is generic and receives a task-specific approved CriticProfile i
 Phase 0 - Repository Bootstrap: COMPLETE.
 Phase 1 - Core Domain Models and Contracts: COMPLETE.
 Phase 2 - Supervisor Foundation: COMPLETE.
+Phase 3 - Domain Resolver and CriticProfile Workflow: IN PROGRESS.
 
-Next implementation phase:
+Current implementation work:
 
 ```text
-Phase 3 - Domain Resolver and CriticProfile Workflow
+DomainResolver
+ProfileManager
+ProfileWorkflow
+CriticProfile approval and amendment gates
 ```
 
-The repository now contains architecture and contract documentation, development bootstrap configuration, validated Pydantic contract models, identifier generation, the Supervisor orchestration foundation, state transition audit records, workflow run tracking, AgentRegistry, and automated contract/orchestration tests. A runnable end-to-end application entry point is not implemented yet.
+A runnable end-to-end application entry point is not implemented yet.
 
 ## Repository Structure
 
