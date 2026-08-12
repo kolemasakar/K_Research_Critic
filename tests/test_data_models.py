@@ -6,7 +6,6 @@ from pydantic import ValidationError
 from models import (
     AgentDefinition,
     AgentResult,
-    AgentRunRequest,
     AgentType,
     Claim,
     ClaimType,
@@ -110,6 +109,13 @@ def test_approved_profile_is_valid_with_user_boundary() -> None:
     profile = make_profile(task, ProfileStatus.APPROVED)
     assert profile.status == ProfileStatus.APPROVED
     assert profile.approved_by == "USER"
+
+
+def test_critic_profile_is_immutable() -> None:
+    task = make_task()
+    profile = make_profile(task, ProfileStatus.APPROVED)
+    with pytest.raises(ValidationError):
+        profile.confidence_threshold = 0.8
 
 
 def test_claim_confidence_must_be_in_range() -> None:
