@@ -25,16 +25,15 @@ The CriticAgent is generic and receives a task-specific approved CriticProfile i
 Phase 0 - Repository Bootstrap: COMPLETE.
 Phase 1 - Core Domain Models and Contracts: COMPLETE.
 Phase 2 - Supervisor Foundation: COMPLETE.
-Phase 3 - Domain Resolver and CriticProfile Workflow: IN PROGRESS.
+Phase 3 - Domain Resolver and CriticProfile Workflow: COMPLETE.
 
-Current implementation work:
+Next implementation phase:
 
 ```text
-DomainResolver
-ProfileManager
-ProfileWorkflow
-CriticProfile approval and amendment gates
+Phase 4 - ResearchAgent MVP
 ```
+
+The repository now includes deterministic domain resolution, multi-domain detection, dynamic CriticProfile generation, explicit user approval/edit/rejection handling, immutable approved profiles, and approval-gated material profile amendments.
 
 A runnable end-to-end application entry point is not implemented yet.
 
