@@ -26,14 +26,19 @@ Phase 0 - Repository Bootstrap: COMPLETE.
 Phase 1 - Core Domain Models and Contracts: COMPLETE.
 Phase 2 - Supervisor Foundation: COMPLETE.
 Phase 3 - Domain Resolver and CriticProfile Workflow: COMPLETE.
+Phase 4 - ResearchAgent MVP: COMPLETE.
 
 Next implementation phase:
 
 ```text
-Phase 4 - ResearchAgent MVP
+Phase 5 - Tools and Evidence Layer
 ```
 
-The repository now includes deterministic domain resolution, multi-domain detection, dynamic CriticProfile generation, explicit user approval/edit/rejection handling, immutable approved profiles, and approval-gated material profile amendments.
+The repository now includes deterministic domain resolution, multi-domain detection, dynamic CriticProfile approval workflows, a generic ResearchAgent, structured ResearchResult output, claim-to-source validation, revision-feedback handling, provider-neutral research tool interfaces, and explicit partial/failure behavior.
+
+Concrete web_search/web_fetch adapters and evidence normalization are intentionally deferred to Phase 5.
+
+Hybrid semantic domain resolution is scheduled as a post-MVP enhancement after Phase 9. See `docs/HYBRID_RESOLVER_PLAN.md`.
 
 A runnable end-to-end application entry point is not implemented yet.
 
@@ -43,7 +48,7 @@ A runnable end-to-end application entry point is not implemented yet.
 agents/       agent implementations
 supervisor/   orchestration core
 models/       domain and transport models
-tools/        external capability adapters
+tools/        external capability adapters and interfaces
 prompts/      prompt assets
 config/       tracked non-secret configuration
 tests/        automated tests
@@ -122,6 +127,7 @@ docs/DATA_MODELS.md
 docs/RESEARCH_WORKFLOW.md
 docs/CONFIGURATION.md
 docs/TEST_PLAN.md
+docs/HYBRID_RESOLVER_PLAN.md
 ```
 
 ## Output Artifacts
