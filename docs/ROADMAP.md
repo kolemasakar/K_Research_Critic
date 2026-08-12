@@ -211,6 +211,8 @@ Exit criteria:
 - claims can be audited against source records;
 - source reliability rules can be overridden by CriticProfile.
 
+Status: COMPLETE
+
 ## 9. Phase 6 - CriticAgent MVP
 
 Goal: provide independent, profile-driven verification and critique.
