@@ -251,11 +251,17 @@ class EvidenceToolkit:
             result.append(hit)
         return result
 
-    def source_from_document(self, task_id: str, document: FetchedDocument) -> Source:
+    def source_from_document(
+        self,
+        task_id: str,
+        document: FetchedDocument,
+        *,
+        reliability_overrides: Mapping[SourceType | str, ReliabilityClass | str] | None = None,
+    ) -> Source:
         return self.metadata.to_source(
             task_id,
             document,
-            reliability_overrides=self.reliability_overrides,
+            reliability_overrides=reliability_overrides or self.reliability_overrides,
         )
 
     @staticmethod
