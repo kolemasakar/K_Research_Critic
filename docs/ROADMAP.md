@@ -45,7 +45,7 @@ Exit criteria:
 - secrets are excluded from Git;
 - the project can be cloned and prepared for development.
 
-Status: IN_PROGRESS
+Status: COMPLETE
 
 ## 4. Phase 1 - Core Domain Models and Contracts
 
