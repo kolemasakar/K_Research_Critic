@@ -15,14 +15,13 @@ from models import (
     ExecutionStatus,
     ImportanceLevel,
     Metrics,
-    ReliabilityClass,
     Source,
     VerificationStatus,
     WarningRecord,
     utc_now,
 )
 from models.research import ResearchResult
-from tools import FetchedDocument, ResearchTools, SearchHit
+from tools import EvidenceToolkit, FetchedDocument, ResearchTools, SearchHit
 
 from .base import Agent
 
@@ -30,17 +29,20 @@ from .base import Agent
 class ResearchAgent(Agent):
     """Generic evidence-oriented ResearchAgent with injected provider-neutral tools."""
 
-    def __init__(self, tools: ResearchTools) -> None:
+    def __init__(self, tools: ResearchTools, *, evidence: EvidenceToolkit | None = None) -> None:
         self.tools = tools
+        self.evidence = evidence or EvidenceToolkit()
         self._definition = AgentDefinition(
             agent_type=AgentType.RESEARCH,
             name="ResearchAgent",
-            version="1.0",
+            version="1.1",
             capabilities=[
                 "research_planning",
                 "web_research",
                 "source_collection",
+                "source_normalization",
                 "claim_extraction",
+                "citation_management",
                 "draft_generation",
                 "revision_feedback",
             ],
@@ -79,33 +81,30 @@ class ResearchAgent(Agent):
         queries = queries[:max_queries]
 
         hits: list[SearchHit] = []
-        seen_urls: set[str] = set()
         search_failures = 0
         for query in queries:
             try:
                 search_calls += 1
                 query_hits = self.tools.web_search(query, limit=max_sources_per_query)
-            except Exception as exc:  # Tool adapters normalize provider exceptions later in Phase 5.
+            except Exception as exc:
                 search_failures += 1
                 errors.append(
                     ErrorRecord(
                         error_code="WEB_SEARCH_FAILED",
                         error_type=ErrorType.TOOL_ERROR,
                         message=str(exc) or "web_search failed",
-                        recoverable=True,
+                        recoverable=getattr(exc, "retryable", True),
                         component="web_search",
                         run_id=request.run_id,
-                        details={"query": query},
+                        details={
+                            "query": query,
+                            "tool_code": getattr(exc, "code", None),
+                        },
                     )
                 )
                 continue
-            for hit in query_hits:
-                if hit.url in seen_urls:
-                    continue
-                seen_urls.add(hit.url)
-                hits.append(hit)
-                if len(hits) >= max_sources:
-                    break
+            hits.extend(query_hits)
+            hits = self.evidence.deduplicate_hits(hits)[:max_sources]
             if len(hits) >= max_sources:
                 break
 
@@ -132,16 +131,20 @@ class ResearchAgent(Agent):
                 fetch_calls += 1
                 document = self.tools.web_fetch(hit.url)
                 documents.append(document)
-            except Exception as exc:  # Keep useful evidence from other sources.
+            except Exception as exc:
                 errors.append(
                     ErrorRecord(
                         error_code="WEB_FETCH_FAILED",
                         error_type=ErrorType.TOOL_ERROR,
                         message=str(exc) or "web_fetch failed",
-                        recoverable=True,
+                        recoverable=getattr(exc, "retryable", True),
                         component="web_fetch",
                         run_id=request.run_id,
-                        details={"url": hit.url, "title": hit.title},
+                        details={
+                            "url": hit.url,
+                            "title": hit.title,
+                            "tool_code": getattr(exc, "code", None),
+                        },
                     )
                 )
                 warnings.append(
@@ -152,12 +155,32 @@ class ResearchAgent(Agent):
                         run_id=request.run_id,
                     )
                 )
+        documents = [item for item in self.evidence.deduplicate_hits(documents)]
+
+        overrides = request.constraints.get("source_reliability_overrides")
+        reliability_overrides = overrides if isinstance(overrides, dict) else None
 
         sources: list[Source] = []
         claims: list[Claim] = []
         for document in documents:
-            source = self._to_source(request, document)
+            source = self.evidence.source_from_document(
+                request.task_id,
+                document,
+                reliability_overrides=reliability_overrides,
+            )
+            validation = self.evidence.validator.validate(source)
+            if not validation.valid:
+                warnings.append(
+                    WarningRecord(
+                        warning_code="SOURCE_VALIDATION_ISSUE",
+                        message=f"Source {source.source_id} has validation issues: {', '.join(validation.issues)}",
+                        component="source_validator",
+                        run_id=request.run_id,
+                        details={"source_id": source.source_id, "issues": validation.issues},
+                    )
+                )
             sources.append(source)
+
             claim_text = self._extract_claim_text(document)
             if not claim_text:
                 continue
@@ -166,12 +189,12 @@ class ResearchAgent(Agent):
                 text=claim_text,
                 claim_type=ClaimType.FACT,
                 importance=ImportanceLevel.MEDIUM,
-                source_ids=[source.source_id],
-                confidence=self._confidence_for(source.reliability_class),
+                source_ids=[],
+                confidence=self.evidence.confidence_for(source.reliability_class),
                 verification_status=VerificationStatus.UNVERIFIED,
                 created_by_run_id=request.run_id,
             )
-            source.supports_claim_ids = [claim.claim_id]
+            self.evidence.linker.link(claim, [source])
             claims.append(claim)
 
         if not hits:
@@ -204,6 +227,7 @@ class ResearchAgent(Agent):
 
         findings = [claim.text for claim in claims]
         uncertainties = self._build_uncertainties(request, warnings)
+        limitations = list(dict.fromkeys(warning.message for warning in warnings))
         summary = self._build_summary(topic, findings)
         draft_report = self._build_draft(
             topic=topic,
@@ -221,6 +245,7 @@ class ResearchAgent(Agent):
             claims=claims,
             sources=sources,
             uncertainties=uncertainties,
+            limitations=limitations,
             draft_report=draft_report,
             changes_applied=changes_applied,
             search_queries=queries,
@@ -308,22 +333,6 @@ class ResearchAgent(Agent):
         return list(dict.fromkeys(queries)), changes_applied
 
     @staticmethod
-    def _to_source(request: AgentRunRequest, document: FetchedDocument) -> Source:
-        return Source(
-            task_id=request.task_id,
-            url=document.url,
-            title=document.title,
-            publisher=document.publisher,
-            publication_date=document.publication_date,
-            accessed_at=utc_now(),
-            source_type=document.source_type,
-            reliability_class=document.reliability_class,
-            primary_source=document.primary_source,
-            independence_group=document.independence_group,
-            notes=document.snippet,
-        )
-
-    @staticmethod
     def _extract_claim_text(document: FetchedDocument) -> str:
         candidate = (document.content or document.snippet or "").strip()
         if not candidate:
@@ -335,15 +344,6 @@ class ResearchAgent(Agent):
                 if head:
                     return head + separator.strip()
         return normalized[:1200]
-
-    @staticmethod
-    def _confidence_for(reliability: ReliabilityClass) -> float:
-        return {
-            ReliabilityClass.A: 0.90,
-            ReliabilityClass.B: 0.80,
-            ReliabilityClass.C: 0.65,
-            ReliabilityClass.D: 0.40,
-        }[reliability]
 
     @staticmethod
     def _build_uncertainties(
@@ -359,8 +359,8 @@ class ResearchAgent(Agent):
             return f"Research for '{topic}' produced no extractable claims."
         return " ".join(findings[:3])
 
-    @staticmethod
     def _build_draft(
+        self,
         *,
         topic: str,
         summary: str,
@@ -370,18 +370,16 @@ class ResearchAgent(Agent):
     ) -> str:
         lines = ["# Draft Research", "", f"Topic: {topic}", "", "## Summary", "", summary]
         lines.extend(["", "## Findings", ""])
+        source_map = {source.source_id: source for source in sources}
         if claims:
             for claim in claims:
-                refs = ", ".join(claim.source_ids)
-                lines.append(f"- {claim.text} [{refs}]")
+                citation = self.evidence.citations.cite_claim(claim, source_map)
+                lines.append(f"- {claim.text} {citation}".rstrip())
         else:
             lines.append("- No evidence-backed findings were produced.")
         lines.extend(["", "## Sources", ""])
-        if sources:
-            for source in sources:
-                lines.append(f"- {source.source_id}: {source.title} ({source.url or 'local source'})")
-        else:
-            lines.append("- No sources collected.")
+        bibliography = self.evidence.citations.bibliography(sources)
+        lines.append(bibliography or "- No sources collected.")
         if uncertainties:
             lines.extend(["", "## Uncertainties", ""])
             lines.extend(f"- {item}" for item in uncertainties)
