@@ -76,6 +76,8 @@ Exit criteria:
 - schemas have validation rules;
 - contract tests cover required fields and invalid input.
 
+Status: COMPLETE
+
 ## 5. Phase 2 - Supervisor Foundation
 
 Goal: implement the orchestration core without domain research logic.
