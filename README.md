@@ -23,14 +23,15 @@ The CriticAgent is generic and receives a task-specific approved CriticProfile i
 ## Current Status
 
 Phase 0 - Repository Bootstrap: COMPLETE.
+Phase 1 - Core Domain Models and Contracts: COMPLETE.
 
 Next implementation phase:
 
 ```text
-Phase 1 - Core Domain Models and Contracts
+Phase 2 - Supervisor Foundation
 ```
 
-The repository currently contains architecture and contract documentation plus the development bootstrap configuration. A runnable application entry point is not implemented yet.
+The repository now contains architecture and contract documentation, development bootstrap configuration, validated Pydantic contract models, identifier generation, and Phase 1 contract tests. A runnable end-to-end application entry point is not implemented yet.
 
 ## Repository Structure
 
