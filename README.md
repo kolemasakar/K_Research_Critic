@@ -50,8 +50,8 @@ Phase 11 - Configuration, Cost, Quality Controls    IN PROGRESS
   11.3 Provider / Model Factory                     COMPLETE
   11.4 Runtime Controls                             COMPLETE
   11.4A GPT Store-first Distribution Policy         COMPLETE
-  11.5 Usage, Cost, and Quality Metrics             NEXT
-  11.6 Logging / Secret Redaction                   PLANNED
+  11.5 Usage, Cost, and Quality Metrics             COMPLETE
+  11.6 Logging / Secret Redaction                   NEXT
   11.7 GPT Store Packaging / Publication Readiness  PLANNED
 ```
 
@@ -159,6 +159,16 @@ optional standalone provider/model factory
 
 The free Store path requires no `.env` secret.
 
+## Usage and Quality Metrics
+
+Phase 11.5 adds runtime-independent `TaskQualityMetrics` derived from existing workflow state rather than from new model calls. Metrics include iteration count, PASS/REVISE history, reliability scores, claim/source coverage, claim verification, unresolved claims, critical issues, contradictions, missing topics, agent-run counts, tool calls, warnings, errors, and retries.
+
+Quality metrics can be reconstructed from `TaskAuditSnapshot` after restart. The standalone audit CLI displays the key quality fields together with the persisted task audit.
+
+The GPT Store Edition does not request provider token or billing telemetry and does not create developer-funded API calls merely to collect metrics.
+
+Optional Standalone/API integrations may use `ProviderUsageRecord` and `MeteredOpenAISemanticDomainProvider` to capture API attempts and provider-reported token usage. Estimated cost is produced only when the provider exposes token counts and pricing is supplied explicitly. The metered provider is an opt-in standalone adapter; it is not the default GPT Store path and is not currently selected automatically by `build_domain_resolver()`.
+
 ## Optional Local / Standalone Setup
 
 The Python runtime is useful for engineering, automated tests, persistence validation, and optional external deployments.
@@ -203,6 +213,8 @@ The local CLI is an engineering/reference runtime, not the final GPT Store execu
 python -m scripts.audit_task --task-id TASK_EXAMPLE --database runtime/k_supervisor.db
 ```
 
+The audit output includes persisted workflow counts plus Phase 11.5 quality metrics such as final reliability, claim/source coverage, claim verification, unresolved issues, and search/fetch call totals.
+
 ## Repository Structure
 
 ```text
@@ -246,7 +258,8 @@ docs/GPT_STORE_DEPLOYMENT.md
 - The Python reference CLI still uses deterministic local corpus research rather than ChatGPT-native live tools.
 - CriticAgent's current Python implementation uses conservative deterministic evidence-relation heuristics rather than full semantic LLM fact checking.
 - Provider token/cost telemetry is only meaningful for optional standalone/API providers that expose it.
-- Store Edition must not assume access to provider token/cost data.
+- Store Edition does not assume access to provider token/cost data.
+- `MeteredOpenAISemanticDomainProvider` is currently opt-in and is not automatically selected by the provider factory.
 
 ## Output Artifacts
 
