@@ -51,8 +51,8 @@ Phase 11 - Configuration, Cost, Quality Controls    IN PROGRESS
   11.4 Runtime Controls                             COMPLETE
   11.4A GPT Store-first Distribution Policy         COMPLETE
   11.5 Usage, Cost, and Quality Metrics             COMPLETE
-  11.6 Logging / Secret Redaction                   NEXT
-  11.7 GPT Store Packaging / Publication Readiness  PLANNED
+  11.6 Logging / Secret Redaction                   COMPLETE
+  11.7 GPT Store Packaging / Publication Readiness  NEXT
 ```
 
 ## Logical Workflow
@@ -169,6 +169,18 @@ The GPT Store Edition does not request provider token or billing telemetry and d
 
 Optional Standalone/API integrations may use `ProviderUsageRecord` and `MeteredOpenAISemanticDomainProvider` to capture API attempts and provider-reported token usage. Estimated cost is produced only when the provider exposes token counts and pricing is supplied explicitly. The metered provider is an opt-in standalone adapter; it is not the default GPT Store path and is not currently selected automatically by `build_domain_resolver()`.
 
+## Logging and Sensitive-data Redaction
+
+Phase 11.6 adds a standalone `OperationalLogger` that writes structured UTF-8 JSONL events to `logs/k_supervisor.jsonl` by default. Runtime events correlate task, workflow, agent run, agent, and request identifiers without requiring raw task or report content in the log.
+
+`SensitiveDataRedactor` recursively removes configured RuntimeSecrets, secret-like fields, Bearer credentials, API-key patterns, JWT-like values, URI credentials, and common secret assignments. Private reasoning fields such as chain-of-thought or scratchpad content are removed before persistence.
+
+`logging.redact_secrets: true` is now a validated system invariant and cannot be disabled by a normal settings file.
+
+The GPT Store Edition does not require a private logging backend. Its audit equivalent is user-visible workflow state, CriticProfile approval, PASS/REVISE history, quality metrics, final/review artifacts, explicit limitations, and a user-controlled checkpoint artifact finalized in Phase 11.7.
+
+See `docs/LOGGING.md`.
+
 ## Optional Local / Standalone Setup
 
 The Python runtime is useful for engineering, automated tests, persistence validation, and optional external deployments.
@@ -205,7 +217,7 @@ Explicit non-interactive approval:
 python -m scripts.run_research --task "Explain software architecture behavior" --corpus examples/sample_corpus.json --approve-profile
 ```
 
-The local CLI is an engineering/reference runtime, not the final GPT Store execution surface.
+The local CLI is an engineering/reference runtime, not the final GPT Store execution surface. When file logging is enabled it also reports the sanitized operational JSONL path.
 
 ## Audit CLI
 
@@ -218,21 +230,22 @@ The audit output includes persisted workflow counts plus Phase 11.5 quality metr
 ## Repository Structure
 
 ```text
-agents/       agent implementations
-supervisor/   orchestration core
-persistence/  storage-neutral persistence and SQLite store
-providers/    optional concrete external provider adapters
-models/       domain and transport contracts
-tools/        external capability adapters and evidence utilities
-config/       tracked non-secret configuration
-prompts/      prompt assets
-tests/        automated tests
-scripts/      local commands and maintenance utilities
-examples/     deterministic sample inputs
-output/       generated standalone artifacts
-runtime/      local SQLite runtime data; ignored by Git
-logs/         standalone operational logs
-docs/         canonical project documentation
+agents/         agent implementations
+supervisor/     orchestration core
+persistence/    storage-neutral persistence and SQLite store
+providers/      optional concrete external provider adapters
+observability/  structured operational logging and redaction
+models/         domain and transport contracts
+tools/          external capability adapters and evidence utilities
+config/         tracked non-secret configuration
+prompts/        prompt assets
+tests/          automated tests
+scripts/        local commands and maintenance utilities
+examples/       deterministic sample inputs
+output/         generated standalone artifacts
+runtime/        local SQLite runtime data; ignored by Git
+logs/           standalone operational logs
+docs/           canonical project documentation
 ```
 
 ## Canonical Documentation
@@ -249,12 +262,14 @@ docs/TEST_PLAN.md
 docs/HYBRID_RESOLVER_PLAN.md
 docs/PERSISTENCE.md
 docs/GPT_STORE_DEPLOYMENT.md
+docs/LOGGING.md
 ```
 
 ## Current Known Boundaries
 
 - GPT Store packaging/instructions are not yet implemented; scheduled for Phase 11.7.
 - Store Edition has no mandatory private backend, so SQLite restart semantics do not directly apply inside ChatGPT.
+- Store Edition also has no mandatory private operational-log backend; its audit/checkpoint behavior is user-visible.
 - The Python reference CLI still uses deterministic local corpus research rather than ChatGPT-native live tools.
 - CriticAgent's current Python implementation uses conservative deterministic evidence-relation heuristics rather than full semantic LLM fact checking.
 - Provider token/cost telemetry is only meaningful for optional standalone/API providers that expose it.
