@@ -1,7 +1,7 @@
 # ROADMAP
 План поетапної реалізації K_Supervisor від базового каркаса до GPT Store-first мультиагентного продукту.
 
-Version: 1.2
+Version: 1.3
 Status: ACTIVE
 
 ## 1. Purpose
@@ -70,8 +70,8 @@ Status: IN PROGRESS
 11.4 Runtime Controls                            COMPLETE
 11.4A GPT Store-first Distribution Policy        COMPLETE
 11.5 Usage, Cost, and Quality Metrics            COMPLETE
-11.6 Logging / Sensitive-data Redaction          NEXT
-11.7 GPT Store Packaging / Publication Readiness PLANNED
+11.6 Logging / Sensitive-data Redaction          COMPLETE
+11.7 GPT Store Packaging / Publication Readiness NEXT
 ```
 
 ### 5.1 Steps 11.1-11.4A
@@ -117,19 +117,34 @@ GitHub Actions: 31664525682
 
 ### 5.3 Step 11.6 - Logging / Sensitive-data Redaction
 
-Status: NEXT
+Status: COMPLETE
 
-Scope:
+Delivered:
 
-- structured operational logging for the standalone runtime;
-- consistent task/workflow/run identifiers;
-- redaction of sensitive values and sensitive-looking fields;
-- no private reasoning in logs or artifacts;
-- Store Edition user-visible audit/checkpoint equivalents without a private backend.
+- `OperationalLogger` JSONL logging for the standalone/API reference runtime;
+- `OperationalLogContext` correlation using task_id, workflow_run_id, run_id, agent_id, and request_id;
+- `SensitiveDataRedactor` recursive configured-secret redaction;
+- redaction of secret-like fields and common credential patterns in free text;
+- explicit removal of chain-of-thought, scratchpad, and private-reasoning fields before persistence;
+- configuration invariant that prevents `logging.redact_secrets` from being disabled;
+- structured lifecycle/error events in the local end-to-end CLI;
+- no raw task text or report bodies in the default operational events;
+- GPT Store user-visible audit boundary defined without a mandatory private log backend;
+- `LOGGING.md` as the Phase 11.6 operational logging contract.
+
+The GPT Store path does not add an Action or external backend merely to collect operational telemetry. User-visible auditability comes from approved workflow state, PASS/REVISE history, quality metrics, final/review artifacts, explicit limitations, and the checkpoint mechanism finalized in Phase 11.7.
+
+Validation:
+
+```text
+Implementation: bd78027554474793647875341664db067d086d5f
+GitHub Actions: 31665219508
+149 tests passed
+```
 
 ### 5.4 Step 11.7 - GPT Store Packaging / Publication Readiness
 
-Status: PLANNED
+Status: NEXT
 
 Scope:
 
@@ -143,7 +158,7 @@ Scope:
 - confirm the core Store experience has no mandatory external backend;
 - re-check current Store publication requirements immediately before release.
 
-Phase 11 completes when 11.6 and 11.7 are complete and the full CI suite is green.
+Phase 11 completes when 11.7 is complete and the full CI suite is green.
 
 ## 6. Phase 12 - Test and CI Hardening
 
@@ -203,6 +218,7 @@ TEST_PLAN.md
 HYBRID_RESOLVER_PLAN.md
 PERSISTENCE.md
 GPT_STORE_DEPLOYMENT.md
+LOGGING.md
 ```
 
 ## 10. Current Implementation Order
@@ -211,9 +227,8 @@ GPT_STORE_DEPLOYMENT.md
 Phase 0-10                               COMPLETE
 Post-MVP Hybrid Domain Resolver         COMPLETE
 GPT Store-first Product Decision        COMPLETE
-Phase 11.1-11.5                         COMPLETE
-Phase 11.6                              NEXT
-Phase 11.7                              PLANNED
+Phase 11.1-11.6                         COMPLETE
+Phase 11.7                              NEXT
 Phase 12                                PLANNED
 Phase 13                                PLANNED
 ```
