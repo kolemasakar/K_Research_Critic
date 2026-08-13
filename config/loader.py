@@ -8,7 +8,7 @@ from typing import Mapping
 
 import yaml
 from dotenv import dotenv_values
-from pydantic import ValidationError
+from pydantic import SecretStr, ValidationError
 
 from .schema import AppSettings, RuntimeSecrets
 
@@ -81,8 +81,8 @@ def load_configuration(
     )
 
 
-def _secret_or_none(value: str | None) -> str | None:
+def _secret_or_none(value: str | None) -> SecretStr | None:
     if value is None:
         return None
     stripped = value.strip()
-    return stripped or None
+    return SecretStr(stripped) if stripped else None
