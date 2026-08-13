@@ -322,6 +322,8 @@ Exit criteria:
 - reports are readable without access to internal runtime state;
 - limitations are explicit when acceptance criteria are not fully met.
 
+Status: COMPLETE
+
 ## 12. Phase 9 - End-to-End MVP
 
 Goal: deliver the first complete usable system.
