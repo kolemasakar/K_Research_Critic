@@ -22,31 +22,60 @@ The CriticAgent is generic and receives a task-specific approved CriticProfile i
 
 ## Current Status
 
-Phase 0 - Repository Bootstrap: COMPLETE.
-Phase 1 - Core Domain Models and Contracts: COMPLETE.
-Phase 2 - Supervisor Foundation: COMPLETE.
-Phase 3 - Domain Resolver and CriticProfile Workflow: COMPLETE.
-Phase 4 - ResearchAgent MVP: COMPLETE.
-Phase 5 - Tools and Evidence Layer: COMPLETE.
-Phase 6 - CriticAgent MVP: COMPLETE.
-Phase 7 - Autonomous Research-Critic Loop: COMPLETE.
-Phase 8 - ReportGenerator and Final Artifacts: COMPLETE.
-Phase 9 - End-to-End MVP: COMPLETE.
-Post-MVP Hybrid Domain Resolver: COMPLETE.
+```text
+Phase 0  - Repository Bootstrap                         COMPLETE
+Phase 1  - Core Domain Models and Contracts             COMPLETE
+Phase 2  - Supervisor Foundation                        COMPLETE
+Phase 3  - Domain Resolver and CriticProfile Workflow   COMPLETE
+Phase 4  - ResearchAgent MVP                            COMPLETE
+Phase 5  - Tools and Evidence Layer                     COMPLETE
+Phase 6  - CriticAgent MVP                              COMPLETE
+Phase 7  - Autonomous Research-Critic Loop              COMPLETE
+Phase 8  - ReportGenerator and Final Artifacts          COMPLETE
+Phase 9  - End-to-End MVP                               COMPLETE
+Post-MVP - Hybrid Domain Resolver                       COMPLETE
+Phase 10 - Persistence and Audit                        COMPLETE
+```
 
-MVP boundary reached.
+The MVP boundary was reached at Phase 9. The current implementation also includes the scheduled Hybrid Domain Resolver enhancement and restart-safe SQLite persistence/audit support.
 
 Next implementation phase:
 
 ```text
-Phase 10 - Persistence and Audit
+Phase 11 - Configuration, Cost, and Quality Controls
 ```
 
-The repository now includes deterministic domain resolution, HybridResolver semantic merge support, multi-domain detection, dynamic CriticProfile approval workflows, a generic ResearchAgent, structured ResearchResult output, provider-neutral web tool adapters, normalized tool errors, source metadata extraction, URL/source deduplication, source validation, reliability classification with explicit override support, bidirectional claim-to-source linking, citation management, a generic profile-driven CriticAgent, a Supervisor-owned autonomous Research-Critic revision loop, ReportGenerator finalization, and a runnable Phase 9 application layer.
+## Implemented Workflow
 
-`KSupervisorApplication` composes task intake, domain assessment, CriticProfile review, explicit user approval, autonomous Research-Critic iterations, deterministic termination, and final artifact generation into one programmatic workflow. A custom domain resolver can now be injected at application construction without changing the rest of the workflow.
+```text
+User task
+   |
+   v
+Domain resolution
+   |
+   v
+CriticProfile proposal
+   |
+   v
+USER APPROVAL / EDIT / REJECT
+   |
+   v
+ResearchAgent
+   |
+   v
+CriticAgent
+   |
+   +---- REVISE ----> ResearchAgent
+   |
+   +---- PASS ------> ReportGenerator
+                         |
+                         +-- <TASK_ID>_FINAL_REPORT.md
+                         +-- <TASK_ID>_REVIEW_PROTOCOL.md
+```
 
-The Phase 9 application exposes explicit overall statuses:
+`KSupervisorApplication` composes task intake, domain assessment, CriticProfile review, explicit user approval, autonomous Research-Critic iterations, deterministic termination, final artifact generation, and optional persistence into one programmatic workflow.
+
+Overall application statuses are:
 
 ```text
 SUCCESS
@@ -54,36 +83,68 @@ LIMITATION
 FAILURE
 ```
 
-The built-in Phase 9 CLI uses `JsonCorpusProvider`, a deterministic local provider intended for a runnable MVP, reproducible integration tests, and offline evidence-corpus execution. It is not a live Internet search provider. Live external search/fetch providers remain pluggable through the existing `ResearchTools`, `WebSearchTool`, and `WebFetchTool` boundaries and are intentionally not hard-coded into agent logic.
+## Domain Resolution
 
-Hybrid domain resolution is now implemented through `DomainResolverProtocol`, `RuleBasedResolver`, `LLMSemanticResolver`, and `HybridResolver`. The semantic resolver is provider-neutral and requires structured `SemanticDomainResult` output. HybridResolver preserves deterministic fallback, prevents matched deterministic risk from being silently lowered, merges compatible multi-domain results, records material disagreements in uncertainty, and exposes `HybridResolutionAudit` without changing the stable `DomainAssessment` schema.
-
-`ProfileWorkflow` now uses `HybridResolver` by default. When no semantic provider is configured, the deterministic Phase 3 `DomainResolver` result is returned unchanged. A semantic provider can be injected through `LLMSemanticResolver`; no vendor LLM SDK is embedded in Supervisor. The bundled CLI therefore remains deterministic until a semantic provider is explicitly wired.
-
-Tracked resolver defaults are declared in `config/settings.yaml`, including hybrid mode, semantic enablement, minimum semantic confidence, high-risk agreement behavior, and deterministic fallback. Central provider/model factory wiring remains scheduled for the later configuration-control phase.
-
-The Phase 6 CriticAgent still uses conservative deterministic evidence-relation heuristics for the MVP. Semantic LLM-based verification remains a later enhancement and does not change the approved CriticProfile boundary.
-
-Iteration, agent-run, profile, resolver-audit, and artifact data is currently in-memory. Durable restart-safe persistence is the scope of Phase 10.
-
-See `docs/HYBRID_RESOLVER_PLAN.md` for the completed HybridResolver design and validation record.
-
-## Repository Structure
+Hybrid domain resolution is implemented through:
 
 ```text
-agents/       agent implementations
-supervisor/   orchestration core
-models/       domain and transport models
-tools/        external capability adapters and evidence utilities
-prompts/      prompt assets
-config/       tracked non-secret configuration
-tests/        automated tests
-scripts/      runnable local commands and maintenance scripts
-examples/     deterministic sample inputs
-output/       generated user-facing artifacts
-logs/         runtime logs
-docs/         project specifications and standards
+DomainResolverProtocol
+  |
+  +-- RuleBasedResolver
+  +-- LLMSemanticResolver
+  +-- HybridResolver
 ```
+
+The semantic resolver is provider-neutral and validates structured `SemanticDomainResult` output before merge. HybridResolver preserves deterministic fallback, prevents matched deterministic risk from being silently lowered, merges compatible multi-domain results, records material disagreements, and exposes `HybridResolutionAudit` without changing the stable `DomainAssessment` schema.
+
+`ProfileWorkflow` uses `HybridResolver` by default. When no semantic provider is configured, the deterministic Phase 3 result is returned unchanged. A concrete LLM provider is intentionally not hard-coded into Supervisor; provider/model factory wiring is scheduled for Phase 11.
+
+## Persistence and Audit
+
+Phase 10 adds a storage-neutral `PersistenceStore` boundary and a SQLite implementation:
+
+```text
+persistence/
+  base.py
+  sqlite_store.py
+```
+
+Default local database:
+
+```text
+runtime/k_supervisor.db
+```
+
+The SQLite store persists validated JSON snapshots for:
+
+```text
+tasks
+workflow_runs
+state_transitions
+agent_runs
+domain_assessments
+critic_profiles
+user_approvals
+research_results
+claims
+sources
+reviews
+artifacts
+```
+
+Persistence is write-through at Supervisor orchestration boundaries. Agent business logic does not import or depend on SQLite APIs.
+
+`TaskAuditSnapshot` reconstructs the persisted history of one task after process restart. Approved CriticProfiles retain their exact identifiers, version, approval metadata, and immutable content.
+
+Restart recovery is intentionally conservative. Automatic continuation is supported from explicit safe checkpoints:
+
+```text
+PROFILE_REVIEW_REQUIRED
+PROFILE_APPROVED
+REVISE_REQUIRED
+```
+
+Terminal tasks remain fully auditable after restart. Automatic mid-step replay is not performed from `RESEARCHING`, `DRAFT_READY`, or `REVIEWING`, because the last external agent/tool side effect may be ambiguous. This avoids duplicate or uncertain execution.
 
 ## Local Development Setup
 
@@ -94,26 +155,16 @@ git clone https://github.com/kolemasakar/K_Supervisor.git
 cd K_Supervisor
 ```
 
-Create a virtual environment:
+Create and activate a virtual environment, then install dependencies:
 
 ```text
 python -m venv .venv
-```
-
-Windows activation:
-
-```text
 .venv\Scripts\activate
-```
-
-Install dependencies:
-
-```text
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-Create a local environment file:
+Create local environment configuration:
 
 ```text
 copy .env.example .env
@@ -125,35 +176,33 @@ Run tests:
 python -m pytest
 ```
 
-## End-to-End MVP CLI
+## End-to-End CLI
 
-The default CLI requires an explicit CriticProfile approval action before autonomous execution:
+The bundled CLI uses `JsonCorpusProvider`, a deterministic local provider intended for reproducible integration tests and offline evidence-corpus execution. It is not a live Internet search provider. Live external search/fetch providers remain pluggable through provider-neutral tool boundaries.
+
+Interactive profile approval:
 
 ```text
 python -m scripts.run_research --task "Explain software architecture behavior" --corpus examples/sample_corpus.json
 ```
 
-The CLI prints the DomainAssessment and CriticProfile proposal and then requests one of:
-
-```text
-approve
-edit
-reject
-```
-
-For a non-interactive run, explicit approval can be supplied as part of the command invocation:
+Non-interactive explicit approval:
 
 ```text
 python -m scripts.run_research --task "Explain software architecture behavior" --corpus examples/sample_corpus.json --approve-profile
 ```
 
-Profile edits can be supplied together with explicit approval:
+Use a custom SQLite audit database:
+
+```text
+python -m scripts.run_research --task "Explain software architecture behavior" --corpus examples/sample_corpus.json --approve-profile --database runtime/custom.db
+```
+
+Profile edits can be supplied with explicit approval:
 
 ```text
 python -m scripts.run_research --task "Explain software architecture behavior" --corpus examples/sample_corpus.json --approve-profile --profile-edits '{"critic_role":"Independent software reviewer"}'
 ```
-
-The sample corpus is synthetic and exists only to validate the workflow. It must not be treated as factual research evidence.
 
 CLI exit codes:
 
@@ -164,9 +213,19 @@ CLI exit codes:
 4  profile rejected or explicit approval not supplied
 ```
 
+## Audit CLI
+
+A persisted task can be inspected after process restart:
+
+```text
+python -m scripts.audit_task --task-id TASK_EXAMPLE --database runtime/k_supervisor.db
+```
+
+The audit command reports task/workflow status and persisted counts for transitions, profiles, approvals, agent runs, research results, claims, sources, reviews, and artifacts.
+
 ## Local Corpus Format
 
-`JsonCorpusProvider` accepts either a JSON list of documents or an object with a `documents` list. Each document follows the provider-neutral `FetchedDocument` contract. Example:
+`JsonCorpusProvider` accepts either a JSON list of documents or an object with a `documents` list. Example:
 
 ```json
 {
@@ -185,7 +244,26 @@ CLI exit codes:
 }
 ```
 
-For high-risk profiles, provide enough independent authoritative sources to satisfy the approved cross-check requirements.
+The sample corpus is synthetic and must not be treated as factual research evidence.
+
+## Repository Structure
+
+```text
+agents/       agent implementations
+supervisor/   orchestration core
+persistence/  storage-neutral persistence boundary and SQLite store
+models/       domain and transport models
+tools/        external capability adapters and evidence utilities
+prompts/      prompt assets
+config/       tracked non-secret configuration
+tests/        automated tests
+scripts/      runnable local commands and maintenance scripts
+examples/     deterministic sample inputs
+output/       generated user-facing artifacts
+runtime/      local SQLite runtime data; ignored by Git
+logs/         runtime logs
+docs/         project specifications and standards
+```
 
 ## Configuration
 
@@ -195,13 +273,15 @@ Tracked runtime defaults:
 config/settings.yaml
 ```
 
-Local secrets and environment-specific values:
+Current persistence defaults:
 
 ```text
-.env
+backend: sqlite
+path: runtime/k_supervisor.db
+schema_version: "1"
 ```
 
-Never commit `.env` or real secret values.
+Local secrets and environment-specific values belong in `.env`. Never commit `.env` or real secret values.
 
 ## Documentation
 
@@ -217,15 +297,24 @@ docs/RESEARCH_WORKFLOW.md
 docs/CONFIGURATION.md
 docs/TEST_PLAN.md
 docs/HYBRID_RESOLVER_PLAN.md
+docs/PERSISTENCE.md
 ```
+
+## Current Known Boundaries
+
+- The bundled research CLI still uses the deterministic local corpus provider rather than live Internet search.
+- A concrete semantic LLM provider is not wired by default; provider/model configuration is scheduled for Phase 11.
+- CriticAgent still uses conservative deterministic evidence-relation heuristics rather than full LLM semantic fact checking.
+- Recovery does not automatically replay ambiguous mid-agent states.
+- Configuration snapshots, model/cost controls, and full role-based provider factories are Phase 11 scope.
 
 ## Output Artifacts
 
-The complete MVP workflow generates:
+The complete workflow generates:
 
 ```text
 <TASK_ID>_FINAL_REPORT.md
 <TASK_ID>_REVIEW_PROTOCOL.md
 ```
 
-Generated runtime files are not committed by default.
+Generated runtime files and SQLite databases are not committed by default.

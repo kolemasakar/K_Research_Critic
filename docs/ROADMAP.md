@@ -8,19 +8,20 @@ Status: ACTIVE
 
 This roadmap defines the implementation sequence for K_Supervisor.
 
-The roadmap follows the approved ARCHITECTURE.md and keeps the initial MVP focused on one complete autonomous research and critique workflow while preserving a generic multi-agent foundation.
+The roadmap follows the approved architecture and keeps the first product workflow focused on one complete research and independent critique pipeline while preserving a generic multi-agent foundation.
 
 ## 2. Delivery Principles
 
-- Build the orchestration core before adding domain complexity.
+- Build orchestration before domain complexity.
 - Keep Supervisor independent from domain-specific research and critique logic.
-- Use explicit contracts between components.
+- Use explicit validated contracts between components.
 - Require user approval of CriticProfile before autonomous execution.
 - Keep CriticAgent generic and dynamically configured per task.
-- Preserve task_id and run_id across all workflow stages.
-- Add persistence and auditability without coupling agents to storage implementation.
-- Complete one end-to-end MVP before adding advanced parallel orchestration.
-- Keep all project documentation compliant with PROJECT_FILE_STANDARD.md.
+- Preserve task_id and run_id across workflow stages.
+- Keep agents independent from storage implementation.
+- Preserve auditability and explicit failure states.
+- Complete one end-to-end MVP before advanced platform expansion.
+- Keep documentation compliant with PROJECT_FILE_STANDARD.md.
 
 ## 3. Phase 0 - Repository Bootstrap
 
@@ -28,15 +29,10 @@ Goal: establish a clean project foundation.
 
 Scope:
 
-- create and validate the repository structure;
-- maintain docs/, agents/, supervisor/, tools/, models/, config/, prompts/, tests/, scripts/, output/, and logs/;
-- maintain PROJECT_FILE_STANDARD.md;
-- maintain ARCHITECTURE.md;
-- add ROADMAP.md;
-- prepare .env.example;
-- prepare requirements.txt or equivalent dependency definition;
-- verify .gitignore coverage;
-- define minimal local run instructions.
+- create repository structure;
+- establish docs/, agents/, supervisor/, tools/, models/, config/, prompts/, tests/, scripts/, output/, and logs/;
+- add project documentation;
+- prepare `.env.example`, dependency definition, `.gitignore`, and local run instructions.
 
 Exit criteria:
 
@@ -53,15 +49,14 @@ Goal: define stable machine-readable contracts before workflow implementation.
 
 Scope:
 
-- define Task model;
-- define AgentResult model;
-- define CriticProfile model;
-- define Claim model;
-- define Source model;
-- define ReviewResult model;
-- define Artifact metadata model;
-- define task_id and run_id generation rules;
-- define common status and error structures.
+- Task;
+- AgentRunRequest and AgentResult;
+- CriticProfile;
+- Claim and Source;
+- CriticReview;
+- WorkflowRun and StateTransition;
+- Artifact metadata;
+- common identifiers, statuses, errors, warnings, and metrics.
 
 Primary documents:
 
@@ -72,9 +67,9 @@ DATA_MODELS.md
 
 Exit criteria:
 
-- all initial components can exchange structured data without ad hoc dictionaries;
-- schemas have validation rules;
-- contract tests cover required fields and invalid input.
+- components exchange validated contracts rather than ad hoc dictionaries;
+- invalid contract input is rejected;
+- IDs and approval boundaries are explicit.
 
 Status: COMPLETE
 
@@ -84,17 +79,16 @@ Goal: implement the orchestration core without domain research logic.
 
 Scope:
 
-- implement Task Manager;
-- implement State Machine;
-- implement Workflow Engine skeleton;
-- implement Agent Registry;
-- implement run tracking;
-- implement explicit workflow transitions;
-- implement iteration counters;
-- implement failure states;
-- implement termination handling.
+- TaskManager;
+- StateMachine;
+- WorkflowEngine;
+- AgentRegistry;
+- run tracking;
+- explicit state transitions;
+- iteration counters;
+- failure and termination handling.
 
-Initial states:
+Core task states:
 
 ```text
 NEW
@@ -104,6 +98,7 @@ PROFILE_APPROVED
 RESEARCHING
 DRAFT_READY
 REVIEWING
+REVISE_REQUIRED
 APPROVED
 FINALIZING
 FINALIZED
@@ -114,10 +109,10 @@ COMPLETED_WITH_LIMITATIONS
 
 Exit criteria:
 
-- Supervisor can move a mock task through the complete state machine;
+- mock workflow traverses the state machine;
 - invalid transitions are rejected;
-- state changes are recorded;
-- Supervisor does not contain research or critique logic.
+- state changes are auditable;
+- Supervisor contains no research or critique logic.
 
 Status: COMPLETE
 
@@ -127,16 +122,15 @@ Goal: implement dynamic critic configuration with mandatory user approval.
 
 Scope:
 
-- implement DomainResolver;
-- detect primary and secondary domains;
-- detect task type;
-- estimate risk level;
-- propose source classes and verification criteria;
-- generate a draft CriticProfile;
-- present the draft profile to the user;
-- support user approval and editing;
-- freeze the approved profile for the current task_id;
-- detect material profile amendment requirements.
+- DomainResolver;
+- primary and secondary domain detection;
+- task type and risk level;
+- source classes and verification criteria;
+- CriticProfile draft generation;
+- explicit user approve/edit/reject boundary;
+- approved profile immutability;
+- material amendment detection;
+- multi-domain profiles.
 
 Required interaction rule:
 
@@ -148,10 +142,9 @@ Critic executes.
 
 Exit criteria:
 
-- no autonomous Research-Critic workflow starts without PROFILE_APPROVED;
-- approved CriticProfile is immutable for normal agent execution;
-- material amendments return to user approval;
-- multi-domain profiles are supported.
+- autonomous Research-Critic execution cannot start without PROFILE_APPROVED;
+- approved CriticProfile is immutable for normal execution;
+- material amendments return to user approval.
 
 Status: COMPLETE
 
@@ -161,22 +154,20 @@ Goal: produce evidence-backed draft research results.
 
 Scope:
 
-- implement generic ResearchAgent;
-- decompose the user task;
-- generate a search plan;
-- use tools layer for web research;
-- collect sources;
-- extract claims;
-- record uncertainty;
-- create a draft report representation;
-- accept structured revision feedback from CriticAgent.
+- generic ResearchAgent;
+- task decomposition;
+- search plan generation;
+- source collection;
+- Claim extraction;
+- uncertainty and limitation tracking;
+- draft report representation;
+- structured revision input from CriticAgent.
 
 Exit criteria:
 
-- ResearchAgent can complete a research task with structured claims and sources;
-- every important claim can reference source_ids;
-- the agent does not directly bypass the tools layer;
-- revision input can produce a new draft version.
+- ResearchResult contains structured claims and sources;
+- important claims reference source IDs;
+- revision feedback can produce a new iteration.
 
 Status: COMPLETE
 
@@ -186,52 +177,50 @@ Goal: isolate external information access and evidence handling.
 
 Scope:
 
-- implement web_search abstraction;
-- implement web_fetch abstraction;
-- implement source metadata extraction;
-- implement source deduplication;
-- implement citation management;
-- implement source reliability classification support;
-- implement claim-to-source linking;
-- implement access time and publication date handling where available.
+- provider-neutral web_search and web_fetch boundaries;
+- source metadata extraction;
+- source normalization and deduplication;
+- citation management;
+- source reliability classification;
+- Claim-Source linking;
+- publication/access time handling.
 
-Default source classes:
+Default reliability classes:
 
 ```text
-A - primary or official source
-B - authoritative independent source
-C - secondary source
-D - weak or unverified source
+A - primary or official
+B - authoritative independent
+C - secondary
+D - weak or unverified
 ```
 
 Exit criteria:
 
-- agents use common tools instead of embedded web logic;
+- agents use common tool boundaries;
 - duplicate sources are normalized;
-- claims can be audited against source records;
-- source reliability rules can be overridden by CriticProfile.
+- evidence is auditable at claim level;
+- reliability policy can be influenced by CriticProfile.
 
 Status: COMPLETE
 
 ## 9. Phase 6 - CriticAgent MVP
 
-Goal: provide independent, profile-driven verification and critique.
+Goal: provide independent profile-driven verification and critique.
 
 Scope:
 
-- implement generic CriticAgent;
-- load the approved CriticProfile;
-- independently verify key claims;
-- perform separate web research where required;
-- assess source authority and freshness;
-- detect unsupported claims;
-- detect contradictions;
-- identify missing important topics;
-- evaluate whether conclusions follow from evidence;
-- return PASS or REVISE;
-- return structured improvement requests.
+- generic CriticAgent;
+- approved CriticProfile loading;
+- independent verification research;
+- source authority/freshness review;
+- unsupported claim detection;
+- contradiction detection;
+- missing topic detection;
+- conclusion/evidence consistency checks;
+- machine-readable PASS or REVISE;
+- structured improvement requests.
 
-Initial result contract:
+Initial critic result shape:
 
 ```json
 {
@@ -248,10 +237,10 @@ Initial result contract:
 
 Exit criteria:
 
-- CriticAgent behavior changes according to CriticProfile;
-- literary, medical, technical, and multi-domain test profiles can use the same agent implementation;
-- CriticAgent performs independent verification rather than only text editing;
-- PASS and REVISE decisions are machine-readable.
+- behavior changes according to CriticProfile;
+- one implementation supports literary, medical, technical, and multi-domain profiles;
+- independent verification is performed;
+- PASS/REVISE is machine-readable.
 
 Status: COMPLETE
 
@@ -262,13 +251,13 @@ Goal: complete the main autonomous multi-agent workflow.
 Scope:
 
 - connect ResearchAgent and CriticAgent through Supervisor;
-- pass structured review feedback to ResearchAgent;
-- version draft results by iteration;
+- pass CriticReview feedback to the next ResearchAgent iteration;
+- version research results by iteration;
 - enforce max_iterations;
-- enforce minimum reliability threshold;
-- stop on PASS when acceptance criteria are satisfied;
+- enforce reliability threshold;
+- stop on accepted PASS;
 - terminate explicitly on unrecoverable failure;
-- support COMPLETED_WITH_LIMITATIONS when useful output exists but full acceptance is not reached.
+- support COMPLETED_WITH_LIMITATIONS.
 
 Workflow:
 
@@ -294,10 +283,9 @@ RESEARCHING APPROVED
 
 Exit criteria:
 
-- no user interaction is required during normal revision cycles;
+- normal revision cycles require no user interaction;
 - all iterations are auditable;
-- the loop stops deterministically;
-- the final workflow state matches the acceptance result.
+- loop termination is deterministic.
 
 Status: COMPLETE
 
@@ -307,20 +295,19 @@ Goal: produce final user-facing outputs.
 
 Scope:
 
-- implement ReportGenerator;
-- generate <TASK_ID>_FINAL_REPORT.md;
-- generate <TASK_ID>_REVIEW_PROTOCOL.md;
-- use UTF-8 for work-result artifacts;
-- include sources and uncertainty in FINAL_REPORT;
-- include iteration summary, critic decisions, improvements, and limitations in REVIEW_PROTOCOL;
-- exclude hidden chain-of-thought and private model reasoning.
+- ReportGenerator;
+- `<TASK_ID>_FINAL_REPORT.md`;
+- `<TASK_ID>_REVIEW_PROTOCOL.md`;
+- UTF-8 work-result artifacts;
+- source and uncertainty reporting;
+- iteration/review/limitation summary;
+- no hidden chain-of-thought/private reasoning in artifacts.
 
 Exit criteria:
 
-- both required artifacts are created from the same task_id;
-- artifact metadata records final task status;
-- reports are readable without access to internal runtime state;
-- limitations are explicit when acceptance criteria are not fully met.
+- both artifacts use the same task_id;
+- artifact metadata records final state and checksum;
+- reports are usable without internal runtime state.
 
 Status: COMPLETE
 
@@ -336,29 +323,29 @@ CLI or equivalent local command
 
 Scope:
 
-- accept a user research task;
+- accept a user task;
 - generate CriticProfile proposal;
-- receive user approval or edits;
-- run autonomous Research-Critic iterations;
-- finalize the task;
-- generate both output documents;
-- provide explicit success, limitation, or failure status.
+- receive explicit user approval or edits;
+- execute autonomous Research-Critic iterations;
+- finalize accepted or limited results;
+- generate both final artifacts;
+- expose SUCCESS, LIMITATION, or FAILURE.
 
-Required test scenarios:
+Required scenarios:
 
-- literary analysis task;
-- medical knowledge research task;
-- geodesy or construction technical task;
+- literary analysis;
+- medical knowledge research;
+- geodesy/construction technical research;
 - multi-domain task;
-- forced max_iterations case;
-- tool failure case;
-- material CriticProfile amendment case.
+- max_iterations;
+- tool failure;
+- material CriticProfile amendment.
 
 Exit criteria:
 
-- all primary workflows pass end-to-end tests;
-- MVP produces repeatable outputs;
-- failure paths do not terminate silently;
+- primary workflows pass E2E tests;
+- output is repeatable with deterministic local provider;
+- failure paths are explicit;
 - user interaction occurs only at defined approval boundaries.
 
 MVP boundary: Phase 9.
@@ -367,20 +354,18 @@ Status: COMPLETE
 
 ## 12.1 Post-MVP Enhancement - Hybrid Domain Resolver
 
-Goal: improve domain classification semantically without expanding the initial MVP scope.
-
-Schedule: after Phase 9 End-to-End MVP and before later post-MVP platform work.
+Goal: improve domain classification semantically while preserving deterministic safety and the existing approval boundary.
 
 Scope:
 
-- preserve the current rule-based resolver as deterministic fallback;
+- preserve RuleBasedResolver;
 - add provider-neutral LLMSemanticResolver;
-- implement HybridResolver conflict and merge policy;
-- preserve deterministic high-risk floors;
+- implement HybridResolver merge/conflict policy;
+- preserve deterministic risk floors;
 - validate semantic output before merge;
-- add classification confidence and uncertainty handling;
-- preserve the existing CriticProfile user approval boundary;
-- add fallback and disagreement tests.
+- confidence and uncertainty handling;
+- fallback and fail-closed modes;
+- preserve CriticProfile user approval semantics.
 
 Primary document:
 
@@ -392,108 +377,152 @@ Exit criteria:
 
 - semantic classification is schema validated;
 - deterministic fallback remains available;
-- risk cannot be silently reduced by semantic classification;
+- deterministic matched risk cannot be silently lowered;
 - material conflicts are auditable;
-- existing Phase 3 approval semantics remain unchanged;
-- complete CI suite passes.
+- DomainAssessment schema and approval boundary remain stable.
 
 Status: COMPLETE
 
 ## 13. Phase 10 - Persistence and Audit
 
-Goal: preserve full execution history and enable recovery.
+Goal: preserve execution history and enable restart-safe audit/recovery.
 
 Scope:
 
-- implement persistence abstraction;
-- add SQLite as the initial persistent store unless another decision supersedes it;
-- store tasks;
-- store workflow runs;
-- store agent runs;
-- store critic profiles and amendments;
-- store claims and sources;
-- store reviews;
-- store artifact metadata;
-- support restart and recovery where practical.
+- implement storage-neutral PersistenceStore protocol;
+- implement SQLitePersistenceStore;
+- persist Task;
+- persist WorkflowRun and StateTransition;
+- persist AgentResult;
+- persist DomainAssessment;
+- persist CriticProfile versions and UserApproval;
+- persist ResearchResult, Claim, and Source;
+- persist CriticReview;
+- persist Artifact metadata;
+- provide TaskAuditSnapshot;
+- provide conservative restart recovery;
+- add persisted-task audit CLI.
 
-Candidate tables:
+Initial SQLite tables:
 
 ```text
+schema_meta
 tasks
 workflow_runs
+state_transitions
 agent_runs
+domain_assessments
 critic_profiles
+user_approvals
+research_results
 claims
 sources
 reviews
 artifacts
 ```
 
+Safe automatic recovery checkpoints:
+
+```text
+PROFILE_REVIEW_REQUIRED
+PROFILE_APPROVED
+REVISE_REQUIRED
+```
+
+Automatic mid-step replay is intentionally not performed from `RESEARCHING`, `DRAFT_READY`, or `REVIEWING` because an unfinished external side effect may be ambiguous.
+
+Primary document:
+
+```text
+PERSISTENCE.md
+```
+
 Exit criteria:
 
-- a completed task can be audited after process restart;
-- approved CriticProfile can be reconstructed exactly;
-- agent business logic does not depend directly on SQLite APIs.
+- completed tasks are auditable after process restart;
+- approved CriticProfile reconstructs exactly;
+- safe workflow checkpoints can be restored and continued;
+- persistence writes are idempotent by stable ID;
+- agent business logic has no direct SQLite dependency;
+- full CI suite passes.
+
+Implementation validation:
+
+```text
+Commit: 24377e5370b60efd92e86bae8229d200b72bedb3
+GitHub Actions run: 31658626453
+119 tests passed
+```
+
+Status: COMPLETE
 
 ## 14. Phase 11 - Configuration, Cost, and Quality Controls
 
-Goal: make runtime behavior controlled and measurable.
+Goal: make runtime behavior controlled, provider-configurable, and measurable.
 
 Scope:
 
-- centralize settings in config/settings.yaml;
-- configure max_iterations;
-- configure reliability thresholds;
-- configure source limits;
-- configure search call limits;
+- central configuration loader and validation;
+- use `config/settings.yaml` as tracked defaults;
+- environment and secret loading;
+- freeze effective task configuration snapshot;
+- configure max_iterations and resource limits;
+- configure reliability thresholds and source/search limits;
 - configure timeouts and retries;
 - configure model selection by role;
-- track token and API usage where supported;
+- add provider factories/adapters for configured model roles;
+- wire a concrete semantic LLM provider without embedding vendor code in Supervisor;
+- track token/API usage where providers expose it;
+- record estimated cost;
 - record quality metrics;
-- add logging policy.
+- implement logging policy and secret redaction.
 
 Exit criteria:
 
 - operational limits are configuration-driven;
-- model selection can change without modifying agent code;
-- usage and quality metrics are available per task and run.
+- model/provider selection changes without editing agent business logic;
+- effective task configuration is auditable and frozen;
+- usage/cost/quality metrics are available per task/run where supported;
+- concrete semantic resolver provider can be selected through configuration;
+- full CI suite passes.
+
+Status: PLANNED
 
 ## 15. Phase 12 - Test and CI Hardening
 
-Goal: establish a stable engineering workflow in GitHub.
+Goal: establish a hardened engineering workflow in GitHub.
 
 Scope:
 
-- unit tests;
-- contract tests;
-- state machine tests;
-- profile approval tests;
-- domain resolver tests;
-- agent integration tests;
-- end-to-end tests;
+- broaden unit/contract/integration/E2E coverage;
 - linting;
 - type checks;
-- GitHub Actions CI;
-- branch and pull request checks.
+- coverage/reporting policy;
+- GitHub Actions maintenance;
+- branch/PR checks;
+- dependency and CI-action maintenance.
 
 Exit criteria:
 
-- required checks run automatically on changes;
+- required checks run automatically;
 - contract regressions are detected;
-- critical workflow paths have automated coverage.
+- critical workflow paths have automated coverage;
+- CI configuration uses supported action/runtime versions.
+
+Status: PLANNED
 
 ## 16. Phase 13 - Modular Agent Platform
 
-Goal: evolve K_Supervisor beyond the initial research workflow.
+Goal: evolve K_Supervisor beyond the first research workflow.
 
 Scope:
 
 - formalize capability discovery in AgentRegistry;
-- allow Supervisor to select agents by required capability;
-- add new generic agents through the common Agent Interface;
+- select agents by capability;
+- add generic agents through Agent Interface;
 - support additional workflow definitions;
-- support multiple critic instances when required;
-- support domain-specific profiles without domain-specific Supervisor code.
+- support multiple critic instances where required;
+- keep Supervisor independent from domain-specific agent code.
 
 Possible future agents:
 
@@ -508,13 +537,15 @@ PlanningAgent
 
 Exit criteria:
 
-- a new agent can be registered without redesigning Supervisor core;
+- new agents register without redesigning Supervisor core;
 - unrelated agents do not require modification;
-- workflow definitions can reference capabilities rather than hard-coded classes.
+- workflows reference capabilities rather than hard-coded classes.
+
+Status: PLANNED
 
 ## 17. Deferred Capabilities
 
-The following are intentionally deferred until the core platform is stable:
+The following remain outside the current core platform scope until separate architectural decisions are approved:
 
 ```text
 Web UI
@@ -526,67 +557,65 @@ automatic agent generation
 large-scale workflow scheduling
 ```
 
-These items require separate architectural decisions before implementation.
+## 18. Project Documents
 
-## 18. Planned Project Documents
-
-Documentation should be developed in this order unless implementation needs require adjustment:
+Current canonical documents include:
 
 ```text
+PROJECT_FILE_STANDARD.md
+ARCHITECTURE.md
+ROADMAP.md
 AGENT_INTERFACE.md
 DATA_MODELS.md
 RESEARCH_WORKFLOW.md
 CONFIGURATION.md
 TEST_PLAN.md
-PROJECT_HISTORY.md
 HYBRID_RESOLVER_PLAN.md
+PERSISTENCE.md
 ```
+
+`PROJECT_HISTORY.md` remains a planned historical consolidation document when required.
 
 ## 19. Current Implementation Order
 
-Completed MVP sequence:
+Completed sequence:
 
 ```text
-Phase 0 - Repository Bootstrap                 COMPLETE
-Phase 1 - Core Domain Models and Contracts    COMPLETE
-Phase 2 - Supervisor Foundation               COMPLETE
-Phase 3 - Domain Resolver and CriticProfile Workflow COMPLETE
-Phase 4 - ResearchAgent MVP                   COMPLETE
-Phase 5 - Tools and Evidence Layer            COMPLETE
-Phase 6 - CriticAgent MVP                     COMPLETE
-Phase 7 - Autonomous Research-Critic Loop     COMPLETE
-Phase 8 - ReportGenerator and Final Artifacts COMPLETE
-Phase 9 - End-to-End MVP                      COMPLETE
-```
-
-Completed post-MVP enhancement:
-
-```text
-Hybrid Domain Resolver                        COMPLETE
+Phase 0  - Repository Bootstrap                         COMPLETE
+Phase 1  - Core Domain Models and Contracts             COMPLETE
+Phase 2  - Supervisor Foundation                        COMPLETE
+Phase 3  - Domain Resolver and CriticProfile Workflow   COMPLETE
+Phase 4  - ResearchAgent MVP                            COMPLETE
+Phase 5  - Tools and Evidence Layer                     COMPLETE
+Phase 6  - CriticAgent MVP                              COMPLETE
+Phase 7  - Autonomous Research-Critic Loop              COMPLETE
+Phase 8  - ReportGenerator and Final Artifacts          COMPLETE
+Phase 9  - End-to-End MVP                               COMPLETE
+Post-MVP - Hybrid Domain Resolver                       COMPLETE
+Phase 10 - Persistence and Audit                        COMPLETE
 ```
 
 Next implementation phase:
 
 ```text
-Phase 10 - Persistence and Audit
+Phase 11 - Configuration, Cost, and Quality Controls
 ```
 
 Later phases:
 
 ```text
-Phase 11 - Configuration, Cost, and Quality Controls
 Phase 12 - Test and CI Hardening
 Phase 13 - Modular Agent Platform
 ```
 
 ## 20. Roadmap Decision Summary
 
-- The first product goal is one complete research and independent critique workflow.
-- CriticProfile approval is a mandatory user-controlled gate before autonomous execution.
-- CriticAgent remains generic and receives dynamic domain configuration.
-- Supervisor owns workflow control, state, iteration limits, and finalization.
+- The first product workflow is a complete research and independent critique pipeline.
+- CriticProfile approval is a mandatory user-controlled gate.
+- CriticAgent remains generic and profile-driven.
+- Supervisor owns workflow state, iteration limits, recovery, and finalization.
 - ResearchAgent and CriticAgent operate autonomously after profile approval.
 - MVP completion is defined at Phase 9 and is complete.
-- Hybrid semantic domain resolution is implemented with deterministic fallback and an unchanged user approval boundary.
-- Phase 10 - Persistence and Audit is the next implementation phase.
-- Cost controls, CI hardening, and broader agent expansion follow the persistence layer.
+- Hybrid domain resolution is complete with deterministic fallback and unchanged approval semantics.
+- Phase 10 durable SQLite persistence and restart-safe audit/recovery are complete.
+- Phase 11 is next and will add centralized configuration, provider wiring, cost controls, and quality metrics.
