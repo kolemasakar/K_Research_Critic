@@ -176,6 +176,8 @@ class AppSettings(FrozenSettingsModel):
             raise ValueError("freeze_task_configuration is a system invariant and must remain true")
         if not self.workflow.freeze_critic_profile:
             raise ValueError("freeze_critic_profile is a system invariant and must remain true")
+        if not self.logging.redact_secrets:
+            raise ValueError("logging.redact_secrets is a system invariant and must remain true")
         if self.research.max_sources > self.limits.max_sources:
             raise ValueError("research.max_sources cannot exceed limits.max_sources")
         if self.research.max_sources_per_query > self.research.max_sources:
