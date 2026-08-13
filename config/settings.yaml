@@ -6,6 +6,15 @@ runtime:
   timezone: UTC
   debug: false
 
+distribution:
+  primary_channel: chatgpt_store
+  free_user_compatible: true
+  developer_api_key_required: false
+  model_policy: user_plan
+  recommended_model: null
+  allow_user_model_switch: true
+  external_backend_required: false
+
 workflow:
   max_iterations: 3
   allow_completed_with_limitations: true

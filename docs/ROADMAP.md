@@ -1,94 +1,52 @@
 # ROADMAP
-План поетапної реалізації K_Supervisor від базового каркаса до розширюваної мультиагентної платформи.
+План поетапної реалізації K_Supervisor від базового каркаса до GPT Store-first мультиагентного продукту.
 
-Version: 1.0
+Version: 1.1
 Status: ACTIVE
 
 ## 1. Purpose
 
 This roadmap defines the implementation sequence for K_Supervisor.
 
-The roadmap follows the approved architecture and keeps the first product workflow focused on one complete research and independent critique pipeline while preserving a generic multi-agent foundation.
+The completed core is a research and independent critique workflow. The primary public product target is now a GPT Store Edition that preserves the same workflow semantics without requiring a developer API key or mandatory external backend.
 
 ## 2. Delivery Principles
 
 - Build orchestration before domain complexity.
-- Keep Supervisor independent from domain-specific research and critique logic.
-- Use explicit validated contracts between components.
+- Keep Supervisor independent from domain research/critique logic.
+- Use explicit validated contracts.
 - Require user approval of CriticProfile before autonomous execution.
-- Keep CriticAgent generic and dynamically configured per task.
-- Preserve task_id and run_id across workflow stages.
+- Keep CriticAgent generic and profile-driven.
+- Preserve task_id/run_id semantics and explicit state transitions.
 - Keep agents independent from storage implementation.
 - Preserve auditability and explicit failure states.
-- Complete one end-to-end MVP before advanced platform expansion.
+- Keep the free GPT Store core independent from developer-funded API calls.
+- Do not pin a ChatGPT model identifier as a core dependency.
 - Keep documentation compliant with PROJECT_FILE_STANDARD.md.
 
 ## 3. Phase 0 - Repository Bootstrap
 
-Goal: establish a clean project foundation.
+Goal: establish the project foundation.
 
-Scope:
-
-- create repository structure;
-- establish docs/, agents/, supervisor/, tools/, models/, config/, prompts/, tests/, scripts/, output/, and logs/;
-- add project documentation;
-- prepare `.env.example`, dependency definition, `.gitignore`, and local run instructions.
-
-Exit criteria:
-
-- repository structure is stable;
-- required project documentation exists;
-- secrets are excluded from Git;
-- the project can be cloned and prepared for development.
+Delivered: repository structure, docs, environment template, dependencies, ignored runtime data, and local setup.
 
 Status: COMPLETE
 
 ## 4. Phase 1 - Core Domain Models and Contracts
 
-Goal: define stable machine-readable contracts before workflow implementation.
+Goal: define stable machine-readable contracts.
 
-Scope:
-
-- Task;
-- AgentRunRequest and AgentResult;
-- CriticProfile;
-- Claim and Source;
-- CriticReview;
-- WorkflowRun and StateTransition;
-- Artifact metadata;
-- common identifiers, statuses, errors, warnings, and metrics.
-
-Primary documents:
-
-```text
-AGENT_INTERFACE.md
-DATA_MODELS.md
-```
-
-Exit criteria:
-
-- components exchange validated contracts rather than ad hoc dictionaries;
-- invalid contract input is rejected;
-- IDs and approval boundaries are explicit.
+Delivered: Task, AgentRunRequest/AgentResult, CriticProfile, Claim, Source, CriticReview, WorkflowRun, StateTransition, Artifact, identifiers, statuses, errors, warnings, and metrics.
 
 Status: COMPLETE
 
 ## 5. Phase 2 - Supervisor Foundation
 
-Goal: implement the orchestration core without domain research logic.
+Goal: implement orchestration without domain logic.
 
-Scope:
+Delivered: TaskManager, StateMachine, WorkflowEngine, AgentRegistry, run tracking, state transitions, iteration counters, failure/termination handling.
 
-- TaskManager;
-- StateMachine;
-- WorkflowEngine;
-- AgentRegistry;
-- run tracking;
-- explicit state transitions;
-- iteration counters;
-- failure and termination handling.
-
-Core task states:
+Core states:
 
 ```text
 NEW
@@ -107,32 +65,15 @@ MAX_ITERATIONS_REACHED
 COMPLETED_WITH_LIMITATIONS
 ```
 
-Exit criteria:
-
-- mock workflow traverses the state machine;
-- invalid transitions are rejected;
-- state changes are auditable;
-- Supervisor contains no research or critique logic.
-
 Status: COMPLETE
 
 ## 6. Phase 3 - Domain Resolver and CriticProfile Workflow
 
-Goal: implement dynamic critic configuration with mandatory user approval.
+Goal: dynamic critic configuration with mandatory user approval.
 
-Scope:
+Delivered: domain/task/risk assessment, multi-domain support, CriticProfile generation, approve/edit/reject gate, immutable approved profiles, material amendment flow.
 
-- DomainResolver;
-- primary and secondary domain detection;
-- task type and risk level;
-- source classes and verification criteria;
-- CriticProfile draft generation;
-- explicit user approve/edit/reject boundary;
-- approved profile immutability;
-- material amendment detection;
-- multi-domain profiles.
-
-Required interaction rule:
+Required rule:
 
 ```text
 Supervisor proposes.
@@ -140,34 +81,13 @@ User approves or edits.
 Critic executes.
 ```
 
-Exit criteria:
-
-- autonomous Research-Critic execution cannot start without PROFILE_APPROVED;
-- approved CriticProfile is immutable for normal execution;
-- material amendments return to user approval.
-
 Status: COMPLETE
 
 ## 7. Phase 4 - ResearchAgent MVP
 
 Goal: produce evidence-backed draft research results.
 
-Scope:
-
-- generic ResearchAgent;
-- task decomposition;
-- search plan generation;
-- source collection;
-- Claim extraction;
-- uncertainty and limitation tracking;
-- draft report representation;
-- structured revision input from CriticAgent.
-
-Exit criteria:
-
-- ResearchResult contains structured claims and sources;
-- important claims reference source IDs;
-- revision feedback can produce a new iteration.
+Delivered: research planning, source collection, Claim extraction, uncertainty/limitation tracking, draft generation, structured revision feedback handling.
 
 Status: COMPLETE
 
@@ -175,17 +95,9 @@ Status: COMPLETE
 
 Goal: isolate external information access and evidence handling.
 
-Scope:
+Delivered: provider-neutral web_search/web_fetch, metadata extraction, normalization/deduplication, reliability classes, Claim-Source linking, citations, freshness metadata.
 
-- provider-neutral web_search and web_fetch boundaries;
-- source metadata extraction;
-- source normalization and deduplication;
-- citation management;
-- source reliability classification;
-- Claim-Source linking;
-- publication/access time handling.
-
-Default reliability classes:
+Default reliability:
 
 ```text
 A - primary or official
@@ -194,72 +106,23 @@ C - secondary
 D - weak or unverified
 ```
 
-Exit criteria:
-
-- agents use common tool boundaries;
-- duplicate sources are normalized;
-- evidence is auditable at claim level;
-- reliability policy can be influenced by CriticProfile.
-
 Status: COMPLETE
 
 ## 9. Phase 6 - CriticAgent MVP
 
-Goal: provide independent profile-driven verification and critique.
+Goal: independent profile-driven verification and critique.
 
-Scope:
-
-- generic CriticAgent;
-- approved CriticProfile loading;
-- independent verification research;
-- source authority/freshness review;
-- unsupported claim detection;
-- contradiction detection;
-- missing topic detection;
-- conclusion/evidence consistency checks;
-- machine-readable PASS or REVISE;
-- structured improvement requests.
-
-Initial critic result shape:
-
-```json
-{
-  "decision": "PASS | REVISE",
-  "reliability_score": 0.0,
-  "critical_issues": [],
-  "unsupported_claims": [],
-  "weak_sources": [],
-  "contradictions": [],
-  "missing_topics": [],
-  "recommended_changes": []
-}
-```
-
-Exit criteria:
-
-- behavior changes according to CriticProfile;
-- one implementation supports literary, medical, technical, and multi-domain profiles;
-- independent verification is performed;
-- PASS/REVISE is machine-readable.
+Delivered: generic CriticAgent, independent verification search, source authority/freshness checks, unsupported claims, contradictions, missing topics, evidence consistency, machine-readable PASS/REVISE.
 
 Status: COMPLETE
 
 ## 10. Phase 7 - Autonomous Research-Critic Loop
 
-Goal: complete the main autonomous multi-agent workflow.
+Goal: connect ResearchAgent and CriticAgent through Supervisor.
 
-Scope:
+Delivered: autonomous revision cycles, structured feedback propagation, iteration versioning, max_iterations, threshold enforcement, deterministic stop, failure and COMPLETED_WITH_LIMITATIONS paths.
 
-- connect ResearchAgent and CriticAgent through Supervisor;
-- pass CriticReview feedback to the next ResearchAgent iteration;
-- version research results by iteration;
-- enforce max_iterations;
-- enforce reliability threshold;
-- stop on accepted PASS;
-- terminate explicitly on unrecoverable failure;
-- support COMPLETED_WITH_LIMITATIONS.
-
-Workflow:
+Logical workflow:
 
 ```text
 PROFILE_APPROVED
@@ -281,33 +144,20 @@ REVISE  PASS
 RESEARCHING APPROVED
 ```
 
-Exit criteria:
-
-- normal revision cycles require no user interaction;
-- all iterations are auditable;
-- loop termination is deterministic.
-
 Status: COMPLETE
 
 ## 11. Phase 8 - ReportGenerator and Final Artifacts
 
 Goal: produce final user-facing outputs.
 
-Scope:
+Delivered:
 
-- ReportGenerator;
-- `<TASK_ID>_FINAL_REPORT.md`;
-- `<TASK_ID>_REVIEW_PROTOCOL.md`;
-- UTF-8 work-result artifacts;
-- source and uncertainty reporting;
-- iteration/review/limitation summary;
-- no hidden chain-of-thought/private reasoning in artifacts.
+```text
+<TASK_ID>_FINAL_REPORT.md
+<TASK_ID>_REVIEW_PROTOCOL.md
+```
 
-Exit criteria:
-
-- both artifacts use the same task_id;
-- artifact metadata records final state and checksum;
-- reports are usable without internal runtime state.
+Artifacts include evidence/uncertainty/review status and exclude hidden chain-of-thought.
 
 Status: COMPLETE
 
@@ -315,38 +165,7 @@ Status: COMPLETE
 
 Goal: deliver the first complete usable system.
 
-Initial interface:
-
-```text
-CLI or equivalent local command
-```
-
-Scope:
-
-- accept a user task;
-- generate CriticProfile proposal;
-- receive explicit user approval or edits;
-- execute autonomous Research-Critic iterations;
-- finalize accepted or limited results;
-- generate both final artifacts;
-- expose SUCCESS, LIMITATION, or FAILURE.
-
-Required scenarios:
-
-- literary analysis;
-- medical knowledge research;
-- geodesy/construction technical research;
-- multi-domain task;
-- max_iterations;
-- tool failure;
-- material CriticProfile amendment.
-
-Exit criteria:
-
-- primary workflows pass E2E tests;
-- output is repeatable with deterministic local provider;
-- failure paths are explicit;
-- user interaction occurs only at defined approval boundaries.
+Delivered: local CLI, explicit CriticProfile approval/edit/reject, autonomous loop, final artifacts, SUCCESS/LIMITATION/FAILURE, deterministic E2E scenarios.
 
 MVP boundary: Phase 9.
 
@@ -354,18 +173,9 @@ Status: COMPLETE
 
 ## 12.1 Post-MVP Enhancement - Hybrid Domain Resolver
 
-Goal: improve domain classification semantically while preserving deterministic safety and the existing approval boundary.
+Goal: improve classification while preserving deterministic safety.
 
-Scope:
-
-- preserve RuleBasedResolver;
-- add provider-neutral LLMSemanticResolver;
-- implement HybridResolver merge/conflict policy;
-- preserve deterministic risk floors;
-- validate semantic output before merge;
-- confidence and uncertainty handling;
-- fallback and fail-closed modes;
-- preserve CriticProfile user approval semantics.
+Delivered: RuleBasedResolver, LLMSemanticResolver, HybridResolver, semantic schema validation, confidence/fallback/fail-closed behavior, deterministic risk floors, conflict audit, unchanged user approval boundary.
 
 Primary document:
 
@@ -373,55 +183,15 @@ Primary document:
 HYBRID_RESOLVER_PLAN.md
 ```
 
-Exit criteria:
-
-- semantic classification is schema validated;
-- deterministic fallback remains available;
-- deterministic matched risk cannot be silently lowered;
-- material conflicts are auditable;
-- DomainAssessment schema and approval boundary remain stable.
-
 Status: COMPLETE
 
 ## 13. Phase 10 - Persistence and Audit
 
-Goal: preserve execution history and enable restart-safe audit/recovery.
+Goal: preserve execution history and restart-safe recovery.
 
-Scope:
+Delivered: storage-neutral PersistenceStore, SQLitePersistenceStore, write-through persistence for task/workflow/profile/evidence/review/artifact records, TaskAuditSnapshot, conservative recovery, audit CLI.
 
-- implement storage-neutral PersistenceStore protocol;
-- implement SQLitePersistenceStore;
-- persist Task;
-- persist WorkflowRun and StateTransition;
-- persist AgentResult;
-- persist DomainAssessment;
-- persist CriticProfile versions and UserApproval;
-- persist ResearchResult, Claim, and Source;
-- persist CriticReview;
-- persist Artifact metadata;
-- provide TaskAuditSnapshot;
-- provide conservative restart recovery;
-- add persisted-task audit CLI.
-
-Initial SQLite tables:
-
-```text
-schema_meta
-tasks
-workflow_runs
-state_transitions
-agent_runs
-domain_assessments
-critic_profiles
-user_approvals
-research_results
-claims
-sources
-reviews
-artifacts
-```
-
-Safe automatic recovery checkpoints:
+Safe automatic checkpoints:
 
 ```text
 PROFILE_REVIEW_REQUIRED
@@ -429,22 +199,13 @@ PROFILE_APPROVED
 REVISE_REQUIRED
 ```
 
-Automatic mid-step replay is intentionally not performed from `RESEARCHING`, `DRAFT_READY`, or `REVIEWING` because an unfinished external side effect may be ambiguous.
+Ambiguous mid-agent states are not auto-replayed.
 
 Primary document:
 
 ```text
 PERSISTENCE.md
 ```
-
-Exit criteria:
-
-- completed tasks are auditable after process restart;
-- approved CriticProfile reconstructs exactly;
-- safe workflow checkpoints can be restored and continued;
-- persistence writes are idempotent by stable ID;
-- agent business logic has no direct SQLite dependency;
-- full CI suite passes.
 
 Implementation validation:
 
@@ -456,61 +217,133 @@ GitHub Actions run: 31658626453
 
 Status: COMPLETE
 
-## 14. Phase 11 - Configuration, Cost, and Quality Controls
+## 14. Product Distribution Decision - GPT Store First
 
-Goal: make runtime behavior controlled, provider-configurable, and measurable.
+Goal: define the primary public delivery model before completing Phase 11.
+
+Decision:
+
+```text
+Primary channel: chatgpt_store
+Free-user compatible: yes
+Developer API key required: no
+Model policy: user_plan
+Pinned/recommended model dependency: none
+User model switching: allowed when the plan exposes alternatives
+Mandatory external backend: no
+```
+
+The existing Python/SQLite/provider implementation is retained as an optional standalone/API edition and engineering reference runtime.
+
+Primary document:
+
+```text
+GPT_STORE_DEPLOYMENT.md
+```
+
+Required consequences:
+
+- Store Edition uses ChatGPT-managed models/capabilities;
+- model names may change without changing core workflow contracts;
+- Free users use the model/capabilities available to their account;
+- paid users may switch to additional available models;
+- no developer-funded OpenAI API call is required for the free core path;
+- SQLite/provider secrets remain optional standalone infrastructure;
+- cross-chat Store recovery must use an explicit checkpoint artifact unless a future backend is separately approved.
+
+Status: COMPLETE
+
+## 15. Phase 11 - Configuration, Cost, and Quality Controls
+
+Goal: make runtime behavior controlled, deployment-aware, measurable, and compatible with GPT Store-first distribution.
 
 Scope:
 
-- central configuration loader and validation;
-- use `config/settings.yaml` as tracked defaults;
-- environment and secret loading;
-- freeze effective task configuration snapshot;
-- configure max_iterations and resource limits;
-- configure reliability thresholds and source/search limits;
-- configure timeouts and retries;
-- configure model selection by role;
-- add provider factories/adapters for configured model roles;
-- wire a concrete semantic LLM provider without embedding vendor code in Supervisor;
-- track token/API usage where providers expose it;
-- record estimated cost;
-- record quality metrics;
-- implement logging policy and secret redaction.
+- central configuration loader/validation;
+- tracked settings plus environment handling;
+- immutable effective task configuration snapshot;
+- workflow/research/critic/resource limits;
+- timeouts and retries;
+- provider/model isolation for optional standalone execution;
+- GPT Store distribution invariants;
+- usage/cost/quality metrics according to runtime capability;
+- logging/redaction;
+- GPT Store packaging/publication readiness.
 
 Implementation steps:
 
 ```text
-11.1 Configuration Core                       COMPLETE
-11.2 Task Configuration Snapshot              COMPLETE
-11.3 Provider / Model Factory                 COMPLETE
-11.4 Runtime Controls                         COMPLETE
-11.5 Usage, Cost, and Quality Metrics         NEXT
-11.6 Logging / Secret Redaction / Finalization PLANNED
+11.1 Configuration Core                         COMPLETE
+11.2 Task Configuration Snapshot                COMPLETE
+11.3 Provider / Model Factory                   COMPLETE
+     Standalone OpenAI adapter remains OPTIONAL
+     GPT Store model policy = user_plan          COMPLETE
+11.4 Runtime Controls                           COMPLETE
+11.4A GPT Store-first Distribution Policy       COMPLETE
+11.5 Usage, Cost, and Quality Metrics           NEXT
+11.6 Logging / Secret Redaction                 PLANNED
+11.7 GPT Store Packaging / Publication Readiness PLANNED
 ```
 
-Implemented through 11.4:
+Implemented through 11.4A:
 
-- frozen typed settings and explicit configuration invariants;
-- tracked defaults plus environment/secret loading;
-- immutable secret-free task configuration snapshots created after CriticProfile approval;
-- snapshot persistence through Task audit metadata and restart-safe reconstruction;
-- profile-amendment snapshots preserve the original active task settings even after restart and global configuration changes;
-- role-based domain resolver factory;
-- concrete OpenAI semantic domain provider adapter behind the provider-neutral resolver boundary;
-- semantic provider remains disabled in tracked defaults until provider/model/API key are explicitly configured;
-- frozen research and critic limits are passed into agent execution;
-- search/fetch enablement, call budgets, timeout, retry/backoff, runtime ceiling checks, and final artifact size limits are enforced.
+- frozen typed settings and explicit invariants;
+- tracked defaults plus optional environment secrets;
+- immutable secret-free task configuration snapshots;
+- restart-safe snapshot reconstruction;
+- role-based provider factory for optional standalone runtime;
+- concrete OpenAI semantic adapter retained as optional standalone capability;
+- frozen research/critic limits and runtime controls;
+- GPT Store is now the tracked primary distribution channel;
+- Store defaults prohibit mandatory developer API key/backend and prohibit pinned model identifiers;
+- Store defaults use user-plan model policy and permit user model switching.
 
-Exit criteria:
+### Step 11.5 - Usage, Cost, and Quality Metrics
 
-- operational limits are configuration-driven;
-- model/provider selection changes without editing agent business logic;
-- effective task configuration is auditable and frozen;
-- usage/cost/quality metrics are available per task/run where supported;
-- concrete semantic resolver provider can be selected through configuration;
+GPT Store Edition:
+
+- record workflow quality metrics that can be derived from K_Supervisor state/artifacts;
+- record iteration count, PASS/REVISE history, reliability scores, unresolved issues, source/claim coverage;
+- do not assume access to provider token counts or developer API cost telemetry.
+
+Standalone/API Edition:
+
+- additionally capture API calls, input/output tokens, and estimated cost where providers expose them and pricing configuration is available.
+
+The Store free path must not create developer-funded API usage merely to collect metrics.
+
+### Step 11.6 - Logging / Secret Redaction
+
+- finalize structured operational logging for standalone runtime;
+- redact all configured secret values and secret-like fields;
+- keep private chain-of-thought out of logs/artifacts;
+- define Store Edition user-visible audit/checkpoint equivalents without requiring a private backend.
+
+### Step 11.7 - GPT Store Packaging / Publication Readiness
+
+- create Custom GPT instruction package;
+- define conversation starters and Store description;
+- map research tools to ChatGPT built-in capabilities;
+- implement/define conversation-local state and checkpoint artifact behavior;
+- validate fresh-chat recovery;
+- validate Free-plan execution;
+- validate paid-plan model switching;
+- ensure no Action/external backend is required for core functionality;
+- verify current OpenAI GPT Store publication requirements immediately before release.
+
+Exit criteria for Phase 11:
+
+- operational limits are configuration-driven where runtime exposes them;
+- GPT Store defaults validate without any developer secret;
+- model/provider selection does not require editing agent business logic;
+- effective standalone task configuration remains frozen/auditable;
+- quality metrics are available in both editions at the level their runtime exposes;
+- token/cost metrics are optional standalone telemetry only;
+- secrets are redacted;
+- Store packaging is ready for publication testing;
 - full CI suite passes.
 
-Interim validation through Step 11.4:
+Interim validation before GPT Store policy update:
 
 ```text
 Implementation commit: fc64e407a2f69179e69fe4df9d3b1562a725886e
@@ -521,41 +354,33 @@ GitHub Actions run: 31661584051
 
 Status: IN PROGRESS
 
-## 15. Phase 12 - Test and CI Hardening
+## 16. Phase 12 - Test and CI Hardening
 
-Goal: establish a hardened engineering workflow in GitHub.
+Goal: establish a hardened engineering workflow.
 
 Scope:
 
 - broaden unit/contract/integration/E2E coverage;
-- linting;
-- type checks;
+- linting and type checks;
 - coverage/reporting policy;
 - GitHub Actions maintenance;
 - branch/PR checks;
-- dependency and CI-action maintenance.
-
-Exit criteria:
-
-- required checks run automatically;
-- contract regressions are detected;
-- critical workflow paths have automated coverage;
-- CI configuration uses supported action/runtime versions.
+- dependency/action maintenance;
+- Store packaging regression tests where practical.
 
 Status: PLANNED
 
-## 16. Phase 13 - Modular Agent Platform
+## 17. Phase 13 - Modular Agent Platform
 
-Goal: evolve K_Supervisor beyond the first research workflow.
+Goal: evolve beyond the first research workflow.
 
 Scope:
 
-- formalize capability discovery in AgentRegistry;
-- select agents by capability;
-- add generic agents through Agent Interface;
-- support additional workflow definitions;
-- support multiple critic instances where required;
-- keep Supervisor independent from domain-specific agent code.
+- capability discovery in AgentRegistry;
+- capability-based agent selection;
+- additional workflow definitions;
+- multiple critic instances where needed;
+- Supervisor remains independent from domain-specific code.
 
 Possible future agents:
 
@@ -568,31 +393,24 @@ LegalAgent
 PlanningAgent
 ```
 
-Exit criteria:
-
-- new agents register without redesigning Supervisor core;
-- unrelated agents do not require modification;
-- workflows reference capabilities rather than hard-coded classes.
-
 Status: PLANNED
 
-## 17. Deferred Capabilities
+## 18. Deferred Capabilities
 
-The following remain outside the current core platform scope until separate architectural decisions are approved:
+Deferred until separate approval:
 
 ```text
-Web UI
+custom Web UI
 distributed execution
 complex parallel orchestration
 vector database
 complex long-term memory
 automatic agent generation
 large-scale workflow scheduling
+mandatory external backend for GPT Store Edition
 ```
 
-## 18. Project Documents
-
-Current canonical documents include:
+## 19. Canonical Project Documents
 
 ```text
 PROJECT_FILE_STANDARD.md
@@ -605,53 +423,44 @@ CONFIGURATION.md
 TEST_PLAN.md
 HYBRID_RESOLVER_PLAN.md
 PERSISTENCE.md
+GPT_STORE_DEPLOYMENT.md
 ```
 
-`PROJECT_HISTORY.md` remains a planned historical consolidation document when required.
+## 20. Current Implementation Order
 
-## 19. Current Implementation Order
-
-Completed sequence:
+Completed:
 
 ```text
-Phase 0  - Repository Bootstrap                         COMPLETE
-Phase 1  - Core Domain Models and Contracts             COMPLETE
-Phase 2  - Supervisor Foundation                        COMPLETE
-Phase 3  - Domain Resolver and CriticProfile Workflow   COMPLETE
-Phase 4  - ResearchAgent MVP                            COMPLETE
-Phase 5  - Tools and Evidence Layer                     COMPLETE
-Phase 6  - CriticAgent MVP                              COMPLETE
-Phase 7  - Autonomous Research-Critic Loop              COMPLETE
-Phase 8  - ReportGenerator and Final Artifacts          COMPLETE
-Phase 9  - End-to-End MVP                               COMPLETE
-Post-MVP - Hybrid Domain Resolver                       COMPLETE
-Phase 10 - Persistence and Audit                        COMPLETE
+Phase 0-10                                      COMPLETE
+Post-MVP Hybrid Domain Resolver                COMPLETE
+GPT Store-first Distribution Decision          COMPLETE
+Phase 11.1-11.4A                               COMPLETE
 ```
 
-Current implementation phase:
+Current:
 
 ```text
-Phase 11 - Configuration, Cost, and Quality Controls    IN PROGRESS
-11.1-11.4                                               COMPLETE
-11.5 Usage, Cost, and Quality Metrics                   NEXT
+Phase 11.5 - Usage, Cost, and Quality Metrics  NEXT
 ```
 
-Later phases:
+Later:
 
 ```text
-Phase 12 - Test and CI Hardening
-Phase 13 - Modular Agent Platform
+Phase 11.6 - Logging / Secret Redaction
+Phase 11.7 - GPT Store Packaging / Publication Readiness
+Phase 12   - Test and CI Hardening
+Phase 13   - Modular Agent Platform
 ```
 
-## 20. Roadmap Decision Summary
+## 21. Roadmap Decision Summary
 
-- The first product workflow is a complete research and independent critique pipeline.
-- CriticProfile approval is a mandatory user-controlled gate.
-- CriticAgent remains generic and profile-driven.
-- Supervisor owns workflow state, iteration limits, recovery, and finalization.
-- ResearchAgent and CriticAgent operate autonomously after profile approval.
-- MVP completion is defined at Phase 9 and is complete.
-- Hybrid domain resolution is complete with deterministic fallback and unchanged approval semantics.
-- Phase 10 durable SQLite persistence and restart-safe audit/recovery are complete.
-- Phase 11 is in progress: configuration core, frozen task snapshots, provider/model wiring, concrete semantic provider selection, and runtime controls are complete through Step 11.4.
-- Phase 11.5 will add usage, cost, and quality metrics; Phase 11.6 will finalize logging and secret redaction.
+- The first complete research/critic MVP is finished.
+- CriticProfile approval remains mandatory.
+- Hybrid resolver and SQLite persistence are complete for the Python reference runtime.
+- GPT Store Edition is the primary public product target.
+- The Store core requires no developer API key and no mandatory external backend.
+- The Store model is selected by ChatGPT/user plan rather than pinned in K_Supervisor.
+- Paid users may use additional model choices when available.
+- Existing provider/API code is retained as optional standalone infrastructure.
+- Phase 11.5 must distinguish workflow quality metrics from provider token/cost telemetry.
+- Phase 11.7 will package the approved workflow for GPT Store publication testing.

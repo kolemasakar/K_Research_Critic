@@ -29,6 +29,13 @@ def test_tracked_settings_load_into_frozen_validated_schema() -> None:
     assert loaded.settings.workflow.max_iterations == 3
     assert loaded.settings.persistence.backend == "sqlite"
     assert loaded.settings.persistence.path == "runtime/k_supervisor.db"
+    assert loaded.settings.distribution.primary_channel == "chatgpt_store"
+    assert loaded.settings.distribution.free_user_compatible is True
+    assert loaded.settings.distribution.developer_api_key_required is False
+    assert loaded.settings.distribution.model_policy == "user_plan"
+    assert loaded.settings.distribution.recommended_model is None
+    assert loaded.settings.distribution.allow_user_model_switch is True
+    assert loaded.settings.distribution.external_backend_required is False
     assert len(loaded.fingerprint) == 64
 
     with pytest.raises(Exception):
@@ -66,6 +73,41 @@ def test_env_file_secrets_load_and_process_environment_has_precedence(tmp_path: 
     assert loaded.secrets.search_api_key.get_secret_value() == "file-search"
     assert "process-secret" not in loaded.secrets.model_dump_json()
     assert "file-search" not in loaded.secrets.model_dump_json()
+
+
+def test_gpt_store_defaults_need_no_runtime_secret() -> None:
+    loaded = load_configuration(TRACKED_SETTINGS, env_path=None, environ={})
+
+    assert loaded.settings.distribution.primary_channel == "chatgpt_store"
+    assert loaded.secrets.openai_api_key is None
+    assert loaded.secrets.search_api_key is None
+    assert loaded.secrets.database_url is None
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("free_user_compatible", False, "free_user_compatible"),
+        ("developer_api_key_required", True, "developer API key"),
+        ("model_policy", "configured_api", "model_policy=user_plan"),
+        ("recommended_model", "pinned-model", "must not pin"),
+        ("allow_user_model_switch", False, "allow user model switching"),
+        ("external_backend_required", True, "external backend"),
+    ],
+)
+def test_gpt_store_distribution_invariants_are_enforced(
+    tmp_path: Path,
+    field: str,
+    value: object,
+    message: str,
+) -> None:
+    def mutate(data):
+        data["distribution"][field] = value
+
+    path = write_settings(tmp_path, mutate)
+
+    with pytest.raises(ConfigurationError, match=message):
+        load_configuration(path, env_path=None, environ={})
 
 
 def test_unknown_configuration_fields_are_rejected(tmp_path: Path) -> None:

@@ -1,5 +1,5 @@
 from .loader import ConfigurationError, LoadedConfiguration, load_configuration
-from .schema import AppSettings, RuntimeSecrets
+from .schema import AppSettings, DistributionSettings, RuntimeSecrets
 from .snapshot import (
     TaskConfigurationSnapshot,
     create_task_configuration_snapshot,
@@ -10,6 +10,7 @@ from .snapshot import (
 __all__ = [
     "AppSettings",
     "ConfigurationError",
+    "DistributionSettings",
     "LoadedConfiguration",
     "RuntimeSecrets",
     "TaskConfigurationSnapshot",

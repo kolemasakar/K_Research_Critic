@@ -1,7 +1,7 @@
 # ARCHITECTURE
-Короткий опис архітектури K_Supervisor, основних компонентів та принципів їх взаємодії.
+Короткий опис архітектури K_Supervisor, основних компонентів, workflow та моделей розгортання.
 
-Version: 1.0
+Version: 1.1
 Status: ACTIVE
 
 ## 1. Purpose
@@ -10,22 +10,68 @@ K_Supervisor is a reusable multi-agent orchestration system.
 
 Its core responsibility is to accept a user task, configure the required agent roles, coordinate autonomous agent interaction, control quality gates, and produce final artifacts.
 
-The initial workflow focuses on research and independent critique, but the architecture must support adding new agent types without redesigning the Supervisor core.
+The initial product workflow is research plus independent critique. The architecture remains extensible for additional agents and workflows.
 
 ## 2. Core Principles
 
 - Supervisor coordinates work but does not perform domain research or critique itself.
-- Each agent has one clear primary responsibility.
-- Agents communicate through explicit structured contracts.
-- Every task has a stable task_id.
-- Every agent execution has a stable run_id.
-- Workflow state transitions must be explicit and auditable.
-- Agent behavior is configured dynamically for the current task.
-- The system must support adding agents without changing unrelated agents.
-- User participation is required for critic profile approval before autonomous execution begins.
-- After profile approval, the Research-Critic loop runs without additional user involvement unless the approved profile must materially change.
+- Agents communicate through explicit validated contracts.
+- Every task has a stable task_id and every agent execution has a stable run_id.
+- Workflow transitions are explicit and auditable.
+- CriticAgent is generic and receives a task-specific CriticProfile.
+- User approval of CriticProfile is mandatory before autonomous execution.
+- Approved profiles are immutable unless a material amendment is separately approved.
+- Research-Critic revision cycles are autonomous after approval.
+- Evidence, uncertainty, limitations, and final status remain explicit.
+- Execution status, critic decision, task state, and workflow state remain separate concepts.
+- Hidden chain-of-thought/private reasoning is never persisted as an artifact.
 
-## 3. High-Level Architecture
+## 3. Product Distribution Decision
+
+K_Supervisor is GPT Store-first.
+
+The primary public edition is a Custom GPT distributed through ChatGPT. It is designed to work without a developer-owned OpenAI API key, without a mandatory external backend, and without a pinned model identifier.
+
+Primary policy:
+
+```text
+channel: chatgpt_store
+free_user_compatible: true
+developer_api_key_required: false
+model_policy: user_plan
+recommended_model: null
+allow_user_model_switch: true
+external_backend_required: false
+```
+
+The platform supplies the model available to the user. Users with additional model choices may switch to another model exposed by their ChatGPT plan. K_Supervisor workflow semantics must not depend on a specific named ChatGPT model.
+
+The canonical deployment policy is specified in `GPT_STORE_DEPLOYMENT.md`.
+
+## 4. Deployment Profiles
+
+K_Supervisor has two deployment profiles built around the same logical workflow contracts.
+
+```text
+K_Supervisor Core
+  |
+  +-- GPT Store Edition       PRIMARY
+  |     - runs inside ChatGPT
+  |     - ChatGPT-managed model
+  |     - no developer API key
+  |     - no mandatory backend
+  |     - built-in ChatGPT capabilities where available
+  |
+  +-- Standalone/API Edition  OPTIONAL
+        - Python runtime
+        - SQLite persistence
+        - provider/model factory
+        - provider secrets only when a selected provider requires them
+```
+
+The optional standalone/API edition exists for local engineering, automated tests, server integrations, and future products. It must not become a dependency of the free GPT Store core experience.
+
+## 5. High-Level Logical Architecture
 
 ```text
 USER
@@ -57,99 +103,61 @@ ReportGenerator
   +-- REVIEW_PROTOCOL
 ```
 
-## 4. Supervisor Responsibilities
+Deployment infrastructure may differ, but these logical roles and boundaries remain stable.
+
+## 6. Supervisor Responsibilities
 
 Supervisor is responsible for:
 
-- receiving a user task;
+- receiving the user task;
 - creating task_id;
-- analyzing the task domain and task type;
-- generating a draft critic profile;
-- presenting the critic profile to the user for approval or editing;
-- freezing the approved critic profile for the current task;
+- analyzing task domain/type;
+- generating a draft CriticProfile;
+- presenting the profile for explicit user approval/edit/reject;
+- freezing the approved profile;
 - selecting and launching agents;
-- passing structured context and results between agents;
-- controlling workflow state;
-- controlling iteration limits;
+- passing structured context/results between agents;
+- controlling workflow state and iteration limits;
+- enforcing configured limits and termination rules;
 - handling recoverable and unrecoverable failures;
-- applying termination criteria;
 - triggering final artifact generation.
 
 Supervisor must not perform domain research, fact checking, or domain critique directly.
 
-## 5. Dynamic Agent Configuration
+## 7. Dynamic Agent Configuration
 
-A core architectural rule is:
+Core rule:
 
 ```text
 Agent = generic capability + dynamically assigned task/domain profile
 ```
 
-The system should avoid creating hard-coded agents such as:
+The system avoids hard-coded domain critic classes such as `MedicalCriticAgent` or `GeodesyCriticAgent`. One generic CriticAgent receives the approved task-specific CriticProfile.
 
-```text
-MedicalCriticAgent
-GeodesyCriticAgent
-LiteraryCriticAgent
-ConstructionCriticAgent
-```
+## 8. Domain Resolution
 
-Instead, one generic CriticAgent receives a task-specific profile before execution.
-
-The same principle may later be applied to ResearchAgent and other reusable agents.
-
-## 6. Domain Resolver
-
-DomainResolver analyzes the user task and identifies:
+Domain resolution identifies:
 
 - primary domain;
 - secondary domains;
 - task type;
-- likely risk level;
-- relevant standards or source classes;
-- whether the task is multi-domain.
+- risk level;
+- relevant source classes/standards;
+- multi-domain requirements.
 
-Examples of domains include:
+Current implementation supports deterministic RuleBasedResolver plus provider-neutral LLMSemanticResolver and HybridResolver.
 
-```text
-literary_analysis
-medicine
-geodesy
-construction
-military
-finance
-law
-software_engineering
-```
+HybridResolver preserves deterministic fallback and risk floors, validates semantic results, and surfaces material disagreement for user review.
 
-The domain list is not closed and must be extensible.
+In the GPT Store edition, semantic reasoning is supplied by the ChatGPT runtime and must not require a developer API secret. The existing OpenAI API adapter remains optional for standalone/API execution.
 
-## 7. Critic Profile Generation and User Approval
+## 9. CriticProfile and User Approval
 
-Before the autonomous workflow starts, Supervisor must generate a draft CriticProfile and present it to the user.
+Before autonomous execution, Supervisor generates a CriticProfile draft and presents it to the user.
 
-The user may:
+The user may approve, edit, or reject it.
 
-- approve it unchanged;
-- add evaluation criteria;
-- remove evaluation criteria;
-- modify source requirements;
-- modify strictness or risk level;
-- add task-specific requirements.
-
-Only an approved profile may be used by CriticAgent.
-
-The required interaction rule is:
-
-```text
-Supervisor proposes.
-User approves or edits.
-Critic executes.
-```
-
-## 8. CriticProfile Model
-
-The profile should support at least the following fields:
+The profile includes at least:
 
 ```text
 profile_id
@@ -169,68 +177,38 @@ special_user_requirements
 status
 ```
 
-Recommended profile states:
+Required interaction rule:
 
 ```text
-DRAFT
-REVIEW_REQUIRED
-APPROVED
-REJECTED
+Supervisor proposes.
+User approves or edits.
+Critic executes.
 ```
 
-## 9. Profile Freeze Rule
+Only an APPROVED profile may be used by CriticAgent.
 
-After user approval, the CriticProfile is frozen for the current task_id.
+## 10. Profile Freeze Rule
 
-CriticAgent must not independently change:
+After approval, CriticProfile is frozen for the current task.
 
-- assigned domain;
-- evaluation criteria;
-- evidence thresholds;
-- source hierarchy;
-- standards;
-- confidence threshold.
+CriticAgent must not independently change assigned domain, evaluation criteria, evidence thresholds, source hierarchy, standards, or confidence threshold.
 
-If research reveals a materially new domain or requirement, Supervisor may generate a proposed profile amendment.
+If research reveals a materially new requirement, Supervisor may propose an amended profile. The amendment becomes active only after explicit user approval.
 
-A material amendment requires user approval before it becomes active.
+## 11. Multi-Domain Support
 
-## 10. Multi-Domain Profiles
+A task may require multiple domains, for example geodetic monitoring of structural deformation.
 
-A task may require more than one domain.
+One CriticProfile may contain multiple domains and grouped criteria. Future workflows may assign multiple critic instances through the same Agent Interface without redesigning Supervisor.
 
-Example:
-
-```text
-Geodetic monitoring of structural deformation
-```
-
-Possible profile:
-
-```text
-domains:
-- geodesy
-- structural_engineering
-```
-
-Evaluation criteria may be grouped by domain while still being executed by one CriticAgent.
-
-If future complexity requires it, Supervisor may assign multiple specialized critic instances through the same Agent Interface.
-
-## 11. Agent Registry
-
-Supervisor must not hard-code all agent implementations into workflow logic.
-
-An AgentRegistry provides discoverable agent capabilities.
+## 12. Agent Registry and Interface
 
 Initial registry:
 
 ```text
-AgentRegistry
-|
-+-- ResearchAgent
-+-- CriticAgent
-+-- ReportGenerator
+ResearchAgent
+CriticAgent
+ReportGenerator
 ```
 
 Future examples:
@@ -244,74 +222,41 @@ LegalAgent
 PlanningAgent
 ```
 
-Adding a new agent should not require changes to unrelated agents.
-
-## 12. Agent Interface
-
-All executable agents should follow a common logical contract.
-
-Minimum execution context:
+Logical execution contract:
 
 ```text
-agent_id
-agent_type
-task_id
-run_id
-input
-context
-profile
-status
-result
-errors
-metadata
+run(request) -> AgentResult
 ```
 
-Logical operation:
+Detailed contracts are defined in `AGENT_INTERFACE.md` and `DATA_MODELS.md`.
 
-```text
-run(task, context, profile) -> AgentResult
-```
+## 13. ResearchAgent
 
-The detailed contract will be specified in AGENT_INTERFACE.md.
+ResearchAgent:
 
-## 13. ResearchAgent Responsibilities
+- decomposes the task;
+- builds a search strategy;
+- collects sources and evidence;
+- extracts claims;
+- records uncertainty/limitations;
+- creates a draft report;
+- revises output from structured CriticAgent feedback.
 
-ResearchAgent is responsible for:
+ResearchAgent is not the final verifier of its own conclusions.
 
-- decomposing the task;
-- building a search strategy;
-- collecting information;
-- collecting sources;
-- extracting claims;
-- identifying uncertainty;
-- creating a draft report;
-- revising the report in response to structured CriticAgent feedback.
+## 14. CriticAgent
 
-ResearchAgent is not the final authority on the reliability of its own conclusions.
+CriticAgent performs independent verification under the approved CriticProfile.
 
-## 14. CriticAgent Responsibilities
+It evaluates source authority/freshness, unsupported claims, contradictions, missing topics, conclusion/evidence consistency, and returns a machine-readable PASS or REVISE decision with structured recommendations.
 
-CriticAgent is responsible for independent verification and critique according to the approved CriticProfile.
-
-It must be able to:
-
-- perform independent web research;
-- verify important claims;
-- assess source quality;
-- check freshness where relevant;
-- detect unsupported claims;
-- detect contradictions;
-- identify missing important topics;
-- assess whether conclusions follow from evidence;
-- return PASS or REVISE with structured feedback.
-
-CriticAgent must not be limited to editing ResearchAgent wording.
+CriticAgent is not limited to wording edits.
 
 ## 15. Evidence Layer
 
-Claims and sources should be represented separately from the final prose report.
+Claims and sources are represented separately from prose.
 
-Suggested Claim model:
+Claim baseline:
 
 ```text
 claim_id
@@ -321,7 +266,7 @@ confidence
 verification_status
 ```
 
-Suggested Source model:
+Source baseline:
 
 ```text
 source_id
@@ -334,24 +279,18 @@ source_type
 reliability_class
 ```
 
-This allows the system to verify evidence at claim level instead of only reviewing finished prose.
-
-## 16. Source Reliability Classes
-
-A default source hierarchy may use:
+Default reliability classes:
 
 ```text
-A - primary or official source
-B - authoritative independent source
-C - secondary source
-D - weak or unverified source
+A - primary or official
+B - authoritative independent
+C - secondary
+D - weak or unverified
 ```
 
-The CriticProfile may override or refine this hierarchy for a specific domain.
+CriticProfile may strengthen or refine evidence requirements.
 
-## 17. Research-Critic Workflow
-
-The approved initial workflow is:
+## 16. Research-Critic Workflow
 
 ```text
 NEW
@@ -362,34 +301,34 @@ PROFILE_GENERATING
  v
 PROFILE_REVIEW_REQUIRED
  |
- +-- user edit --> PROFILE_GENERATING
+ +-- user edit/reject --> PROFILE_GENERATING
  |
- +-- user approval --> PROFILE_APPROVED
-                         |
-                         v
-                    RESEARCHING
-                         |
-                         v
-                    DRAFT_READY
-                         |
-                         v
-                     REVIEWING
-                         |
-              +----------+----------+
-              |                     |
-           REVISE                  PASS
-              |                     |
-              v                     v
-         RESEARCHING             APPROVED
-                                    |
-                                    v
-                               FINALIZING
-                                    |
-                                    v
-                                FINALIZED
+ +-- user approval ----> PROFILE_APPROVED
+                           |
+                           v
+                      RESEARCHING
+                           |
+                           v
+                      DRAFT_READY
+                           |
+                           v
+                       REVIEWING
+                           |
+                +----------+----------+
+                |                     |
+             REVISE                  PASS
+                |                     |
+                v                     v
+          REVISE_REQUIRED          APPROVED
+                |                     |
+                v                     v
+           RESEARCHING            FINALIZING
+                                      |
+                                      v
+                                  FINALIZED
 ```
 
-Additional terminal or exceptional states:
+Additional terminal/exception states:
 
 ```text
 FAILED
@@ -397,239 +336,129 @@ MAX_ITERATIONS_REACHED
 COMPLETED_WITH_LIMITATIONS
 ```
 
-## 18. Autonomous Interaction Boundary
+## 17. Autonomous Interaction Boundary
 
-User interaction is required before PROFILE_APPROVED.
+User interaction is required before PROFILE_APPROVED and again only for material profile amendments or unrecoverable ambiguity that cannot be resolved internally.
 
-After PROFILE_APPROVED, ResearchAgent and CriticAgent interact autonomously under Supervisor control.
+Normal Research-Critic revision cycles require no user intervention.
 
-Normal revision cycles must not require user intervention.
+## 18. Critic Result Contract
 
-User interaction is required again only if:
-
-- the task scope materially changes;
-- the required critic domain materially changes;
-- Supervisor proposes a material amendment to the approved profile;
-- an unrecoverable ambiguity cannot be resolved internally.
-
-## 19. Critic Result Contract
-
-CriticAgent should return a structured result similar to:
+Baseline review result:
 
 ```json
 {
   "decision": "PASS | REVISE",
   "reliability_score": 0.0,
   "critical_issues": [],
-  "unsupported_claims": [],
-  "weak_sources": [],
+  "unsupported_claim_ids": [],
+  "weak_source_ids": [],
   "contradictions": [],
   "missing_topics": [],
   "recommended_changes": []
 }
 ```
 
-The exact schema will be finalized in DATA_MODELS.md or AGENT_INTERFACE.md.
+AgentResult.status remains separate from CriticReview.decision.
 
-## 20. Termination Rules
+## 19. Termination Rules
 
-The Research-Critic loop may terminate when:
+The loop stops when:
 
-- CriticAgent returns PASS;
-- no critical issues remain;
-- the configured reliability threshold is met;
+- accepted PASS meets the approved reliability threshold;
 - max_iterations is reached;
 - an unrecoverable failure occurs.
 
-Reaching max_iterations must not automatically imply successful verification.
+Reaching max_iterations is not successful verification. If useful output exists but full acceptance is not reached, Supervisor may finish as `COMPLETED_WITH_LIMITATIONS`.
 
-If useful output exists but acceptance criteria are not fully met, the task may end as:
+## 20. ReportGenerator
 
-```text
-COMPLETED_WITH_LIMITATIONS
-```
-
-## 21. ReportGenerator
-
-ReportGenerator creates final user-facing artifacts from approved or explicitly limited results.
-
-Initial artifacts:
+ReportGenerator creates:
 
 ```text
 <TASK_ID>_FINAL_REPORT.md
 <TASK_ID>_REVIEW_PROTOCOL.md
 ```
 
-Both are work-result files and use UTF-8 by default according to PROJECT_FILE_STANDARD.md.
+Reports include evidence references, uncertainty, significant review issues, applied changes, unresolved limitations, and final status. They must not contain hidden chain-of-thought/private reasoning.
 
-FINAL_REPORT should contain the consolidated result, evidence references, uncertainty, and conclusions.
+## 21. Tools Layer
 
-REVIEW_PROTOCOL should contain a concise audit of:
-
-- iteration count;
-- critic decisions and scores;
-- significant issues found;
-- changes applied;
-- unresolved limitations;
-- final status.
-
-It must not contain private chain-of-thought or hidden model reasoning.
-
-## 22. Tools Layer
-
-External capabilities should be exposed through a tools layer instead of being implemented directly inside agents.
-
-Examples:
+External capabilities are isolated behind provider-neutral boundaries, including:
 
 ```text
-tools/
-|
-+-- web_search
-+-- web_fetch
-+-- source_validator
-+-- citation_manager
+web_search
+web_fetch
+source_validator
+citation_manager
 ```
 
-This allows tools to be replaced, tested, limited, or extended independently from agent logic.
+GPT Store Edition should prefer built-in ChatGPT capabilities where available. Standalone/API Edition may use injected provider adapters.
 
-## 23. Configuration
+## 22. Configuration
 
-Project runtime configuration should be centralized.
-
-Initial location:
+Tracked defaults live in:
 
 ```text
 config/settings.yaml
 ```
 
-Typical settings:
+Configuration includes workflow, distribution policy, models, tools, research, critic, reports, persistence, logging, retry, and limits.
+
+The GPT Store distribution policy is a system invariant in tracked defaults: no required developer API key, no required external backend, user-plan model selection, and no pinned model identifier.
+
+Provider secrets remain optional standalone/API configuration and are never part of persisted task configuration snapshots.
+
+## 23. Persistence
+
+Persistence is isolated behind a dedicated boundary.
+
+Standalone/API Edition currently provides SQLite persistence for tasks, workflows, profiles, claims, sources, reviews, agent results, and artifacts.
+
+GPT Store Edition cannot depend on that server-side SQLite runtime. Its baseline continuity model is conversation-local state plus explicit checkpoint/recovery artifacts for cross-chat continuation.
+
+## 24. Failure Handling
+
+Supervisor handles at least model/tool timeout, malformed output, unavailable source, repeated results, resource limit, tool exception, agent exception, and unrecoverable ambiguity.
+
+Recoverable failures follow retry policy. Unrecoverable failures produce explicit task status.
+
+## 25. Extensibility
+
+New agents implement the Agent Interface, register through AgentRegistry, and become available to workflow definitions without requiring unrelated agents to change.
+
+## 26. MVP and Product Boundary
+
+The completed Python MVP includes Supervisor, Task Manager, Domain Resolver, Profile Manager, State Machine, Agent Registry, Workflow Engine, ResearchAgent, CriticAgent, Tools Layer, Evidence Model, ReportGenerator, CLI, and SQLite persistence.
+
+The primary public product target is now the GPT Store Edition. Packaging/publication work must preserve the completed core workflow while adapting execution state, tools, and model selection to ChatGPT-native capabilities.
+
+## 27. Deferred Capabilities
+
+Deferred until separate architectural decisions:
 
 ```text
-max_iterations
-minimum_reliability_score
-max_sources
-max_search_calls
-timeouts
-models
-logging
-```
-
-Secrets must be stored outside tracked configuration, typically in .env or a secret manager.
-
-Secrets must not be committed to Git.
-
-## 24. Persistence
-
-The architecture must isolate persistence behind a dedicated layer.
-
-MVP may initially use structured files or JSON where appropriate.
-
-A later persistent store may use SQLite with entities such as:
-
-```text
-tasks
-agent_runs
-workflow_runs
-critic_profiles
-claims
-sources
-reviews
-artifacts
-```
-
-Changing the persistence implementation should not require changing agent business logic.
-
-## 25. Failure Handling
-
-Supervisor must handle at least:
-
-- LLM timeout;
-- web tool failure;
-- malformed agent output;
-- unavailable source;
-- duplicate or repeated results;
-- iteration limit exceeded;
-- tool exception;
-- agent exception.
-
-Recoverable failures should be retried or routed according to policy.
-
-Unrecoverable failures must produce an explicit task status instead of silent termination.
-
-## 26. Extensibility
-
-A new agent should become available by:
-
-```text
-New Agent
-   |
-   v
-implements Agent Interface
-   |
-   v
-registered in Agent Registry
-   |
-   v
-available to Supervisor
-```
-
-Adding a new agent must not require modifying ResearchAgent or CriticAgent unless their explicit contract changes.
-
-## 27. MVP Boundary
-
-Initial MVP includes:
-
-```text
-Supervisor
-Task Manager
-Domain Resolver
-Profile Manager
-State Machine
-Agent Registry
-Workflow Engine
-ResearchAgent
-CriticAgent
-Tools Layer
-Evidence Model
-ReportGenerator
-CLI
-```
-
-Initial MVP excludes:
-
-```text
-Web UI
-distributed agent execution
+custom Web UI
+distributed execution
 complex parallel orchestration
 vector database
-automatic agent generation
 complex long-term memory
+automatic agent generation
+large-scale workflow scheduling
+mandatory external backend for Store Edition
 ```
 
-## 28. Planned Architecture Documents
+## 28. Architecture Decision Summary
 
-The following project documents are expected after this architecture is accepted:
-
-```text
-ROADMAP.md
-AGENT_INTERFACE.md
-DATA_MODELS.md
-RESEARCH_WORKFLOW.md
-CONFIGURATION.md
-TEST_PLAN.md
-```
-
-## 29. Architecture Decision Summary
-
-The approved foundational decisions are:
-
-- K_Supervisor is a generic multi-agent orchestration platform.
-- Supervisor controls workflow but does not replace domain agents.
-- CriticAgent is generic and dynamically configured per task.
-- Supervisor generates a draft CriticProfile from the task domain.
-- User approval or editing of CriticProfile is mandatory before autonomous execution.
-- The approved profile is frozen for the task unless a material amendment is separately approved.
-- Multi-domain critic profiles are supported.
-- Research-Critic interaction becomes autonomous after profile approval.
-- Final output includes a consolidated report and a concise review protocol.
-- The architecture must remain extensible for future agents and workflows.
+- K_Supervisor remains a generic multi-agent orchestration platform.
+- Supervisor coordinates but does not replace domain agents.
+- CriticAgent remains generic and profile-driven.
+- CriticProfile approval is mandatory and approved profiles are frozen.
+- Multi-domain profiles are supported.
+- Research-Critic interaction is autonomous after approval.
+- Final output contains a consolidated report and review protocol.
+- GPT Store Edition is the primary public distribution target.
+- GPT Store Edition requires no developer API key and no mandatory backend.
+- GPT Store Edition uses the model available to the user's ChatGPT plan; paid users may select additional available models.
+- No concrete ChatGPT model identifier is a core architectural dependency.
+- The existing Python/SQLite/provider stack is retained as an optional standalone/API edition and engineering reference runtime.

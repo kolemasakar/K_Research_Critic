@@ -1,42 +1,32 @@
 # CONFIGURATION
-Документ визначає правила конфігурації K_Supervisor, пріоритети параметрів, секрети, ліміти та відтворюваність запусків.
+Документ визначає конфігурацію K_Supervisor для GPT Store-first продукту та optional standalone/API runtime.
 
-Version: 1.0
+Version: 1.1
 Status: ACTIVE
 
 ## 1. Purpose
 
-This document defines the configuration model for K_Supervisor.
-
-Configuration must support:
-
-- predictable runtime behavior;
-- environment separation;
-- task-level customization;
-- dynamic agent profiles;
-- resource and cost controls;
-- reproducible workflow runs;
-- secure secret handling;
-- future provider replacement without redesigning agent logic.
+K_Supervisor configuration must support predictable runtime behavior, explicit approval boundaries, reproducibility, provider isolation, resource controls, and two deployment profiles without making the free GPT Store edition depend on developer secrets.
 
 ## 2. Configuration Principles
 
 - Configuration is centralized and explicit.
-- Secrets are never stored in tracked project files.
-- Runtime defaults must be separated from task-specific behavior.
-- User-approved CriticProfile values are authoritative for critique behavior within the current task.
-- Configuration used by an active task is frozen as a task configuration snapshot.
-- Changes to configuration must not silently alter an already running task.
-- Agents receive only the configuration fields required for their execution.
-- Provider-specific settings must be isolated from domain logic.
-- Invalid configuration must fail early with a clear error.
+- System invariants cannot be weakened by normal settings.
+- User-approved CriticProfile values are authoritative for critique behavior.
+- Active task configuration is frozen and auditable.
+- Provider-specific settings remain outside agent business logic.
+- Invalid configuration fails early.
+- GPT Store Edition must not require a developer API key or mandatory external backend.
+- Standalone/API provider secrets remain optional and untracked.
+- No named ChatGPT model is a core workflow dependency.
 
 ## 3. Configuration Layers
 
-K_Supervisor uses the following logical configuration layers:
-
 ```text
 SYSTEM INVARIANTS
+       |
+       v
+PRODUCT DISTRIBUTION POLICY
        |
        v
 PROJECT DEFAULTS
@@ -48,47 +38,68 @@ ENVIRONMENT CONFIGURATION
 TASK CONFIGURATION
        |
        v
-USER-APPROVED AGENT PROFILE
+USER-APPROVED CRITIC PROFILE
        |
        v
 EXECUTION SNAPSHOT
 ```
 
-The layers have different responsibilities and must not be merged into one unrestricted settings object.
+## 4. Product Distribution Policy
 
-## 4. System Invariants
+Tracked configuration includes a `distribution` section.
 
-System invariants are mandatory rules that normal configuration cannot override.
+Primary defaults:
 
-Examples:
+```yaml
+distribution:
+  primary_channel: chatgpt_store
+  free_user_compatible: true
+  developer_api_key_required: false
+  model_policy: user_plan
+  recommended_model: null
+  allow_user_model_switch: true
+  external_backend_required: false
+```
 
-- required identifiers must be present;
-- secrets must not be written to reports or logs;
+For `primary_channel: chatgpt_store`, these values are treated as configuration invariants.
+
+`recommended_model: null` means K_Supervisor does not pin a model identifier. ChatGPT supplies a model available to the current user, and users may switch when their plan exposes additional choices.
+
+The detailed product policy is defined in `GPT_STORE_DEPLOYMENT.md`.
+
+## 5. System Invariants
+
+System invariants include:
+
 - CriticAgent cannot start without an APPROVED CriticProfile;
-- approved profile changes require a new profile version and user approval;
-- private chain-of-thought must not be persisted in review artifacts;
-- invalid state transitions are rejected;
-- configuration schemas must validate before execution.
+- approved profile changes require a new version and user approval;
+- workflow state transitions must validate;
+- hidden chain-of-thought/private reasoning must not be persisted;
+- task configuration is frozen before autonomous execution;
+- secret values must not enter reports, snapshots, or logs;
+- GPT Store Edition cannot require a developer API key;
+- GPT Store Edition cannot require an external backend;
+- GPT Store Edition uses `model_policy: user_plan`;
+- GPT Store Edition allows user model switching when available;
+- GPT Store Edition does not pin `recommended_model`.
 
-System invariants are implemented in code and documented in project specifications.
+## 6. Project Defaults
 
-## 5. Project Defaults
-
-The main tracked runtime configuration file is:
+Tracked defaults live in:
 
 ```text
 config/settings.yaml
 ```
 
-It contains non-secret defaults for the project.
-
-Typical sections:
+Main sections:
 
 ```text
 runtime
+distribution
 workflow
 agents
 models
+resolver
 tools
 research
 critic
@@ -99,17 +110,9 @@ retry
 limits
 ```
 
-The repository should also provide a safe reference configuration when useful:
+## 7. Environments
 
-```text
-config/settings.example.yaml
-```
-
-## 6. Environment Configuration
-
-Environment-specific values must not require editing project source code.
-
-Supported environments should initially include:
+Supported environments:
 
 ```text
 development
@@ -117,43 +120,21 @@ test
 production
 ```
 
-The active environment may be selected through an environment variable or explicit startup parameter.
-
-Example:
+The environment may be selected with:
 
 ```text
 K_SUPERVISOR_ENV=development
 ```
 
-Environment selection may affect:
+Environment changes must not weaken system invariants.
 
-- log level;
-- persistence location;
-- provider endpoints;
-- test mocks;
-- resource limits;
-- model configuration;
-- debug behavior.
+## 8. Secrets
 
-It must not silently weaken system invariants.
+### GPT Store Edition
 
-## 7. Secrets
+No developer-owned secret is required for the core public GPT Store experience.
 
-Secrets must be stored outside tracked configuration.
-
-Local development may use:
-
-```text
-.env
-```
-
-The repository may contain only:
-
-```text
-.env.example
-```
-
-Typical secret variables may include:
+The Store edition does not require:
 
 ```text
 OPENAI_API_KEY
@@ -161,218 +142,165 @@ SEARCH_API_KEY
 DATABASE_URL
 ```
 
-Actual provider names may vary as tools are added.
+### Standalone/API Edition
+
+Optional standalone/server integrations may use `.env` or a platform secret manager.
+
+Typical optional variables:
+
+```text
+OPENAI_API_KEY
+SEARCH_API_KEY
+DATABASE_URL
+```
 
 Rules:
 
-- `.env` must be excluded by `.gitignore`;
-- secret values must never be committed;
-- secret values must never be written to FINAL_REPORT or REVIEW_PROTOCOL;
-- logs must redact secret-like values;
-- missing required secrets must produce an explicit startup or tool error;
-- production deployments should use the hosting platform secret manager where available.
+- `.env` is untracked;
+- secrets are never committed;
+- secrets are never copied into TaskConfigurationSnapshot;
+- secrets are never written to FINAL_REPORT or REVIEW_PROTOCOL;
+- operational logs must redact secret-like values;
+- a missing secret is an error only when a selected standalone provider explicitly requires it.
 
-## 8. Configuration Precedence
+## 9. Configuration Precedence
 
-For normal overridable runtime settings, precedence is:
+For legally overridable runtime settings:
 
 ```text
 1. System invariants
 2. Explicit allowed execution override
-3. Task-specific configuration
-4. Environment-specific configuration
+3. Frozen task configuration
+4. Environment configuration
 5. Project defaults
 6. Built-in fallback
 ```
 
-Higher levels override lower levels only when the field is defined as overridable.
+CriticProfile is separate. A user-approved profile overrides generated draft values for that task only, and no configuration layer may silently modify it.
 
-CriticProfile is handled separately:
+## 10. Task Configuration
 
-```text
-User-approved CriticProfile
-    overrides generated CriticProfile draft
-    for the current task only.
-```
-
-No configuration layer may silently modify an APPROVED CriticProfile.
-
-## 9. Task Configuration
-
-Each task may define operational requirements separate from the user request text.
-
-Suggested TaskConfiguration fields:
-
-```text
-language
-output_format
-max_iterations
-max_sources
-max_search_calls
-timeout_seconds
-research_depth
-report_detail_level
-freshness_requirement
-allowed_tools
-```
-
-Task configuration is validated before the workflow starts.
+Task-level operational settings may include language, output format, max_iterations, source/search limits, timeout, allowed tools, and report detail.
 
 Task configuration does not replace CriticProfile.
 
-## 10. CriticProfile Configuration Boundary
+## 11. CriticProfile Boundary
 
-CriticProfile controls critique semantics for one task.
+CriticProfile controls critique semantics for one task and includes domain, subdomains, task type, risk level, critic role, evaluation criteria, preferred source types, required cross-checks, standards, evidence level, freshness requirement, confidence threshold, and special user requirements.
 
-It may contain:
+Supervisor generates a draft. The user approves or edits it. Approved profile content is frozen.
+
+## 12. Research Configuration
+
+Current research settings include:
 
 ```text
-domain
-subdomains
-task_type
-risk_level
-critic_role
-evaluation_criteria
-preferred_source_types
-required_cross_checks
-standards
-minimum_evidence_level
-freshness_requirement
-confidence_threshold
-special_user_requirements
+max_queries
+max_sources
+max_sources_per_query
+prefer_primary_sources
+enable_cross_source_comparison
+capture_publication_date
+capture_access_time
+deduplicate_sources
 ```
 
-Supervisor generates a DRAFT profile.
+## 13. Critic Configuration
 
-The user approves or edits it.
-
-After approval:
+Current critic settings include:
 
 ```text
-profile.status = APPROVED
+max_verification_queries
+max_verification_sources_per_claim
+require_independent_search
+require_claim_level_review
+default_minimum_cross_checks
+default_confidence_threshold
+stop_on_critical_issue
 ```
 
-The approved profile is frozen for the current task.
+Domain-specific criteria belong in CriticProfile, not hard-coded global settings.
 
-Configuration files may define profile generation defaults, but they must not replace user approval.
+## 14. Workflow Configuration
 
-## 11. Research Configuration
+Required workflow invariants remain:
 
-ResearchAgent defaults may include:
-
-```text
-research:
-  max_queries
-  max_sources
-  max_sources_per_query
-  prefer_primary_sources
-  enable_cross_source_comparison
-  capture_publication_date
-  capture_access_time
-  deduplicate_sources
-```
-
-Research configuration controls execution strategy, not factual conclusions.
-
-## 12. Critic Configuration
-
-Global CriticAgent execution defaults may include:
-
-```text
-critic:
-  max_verification_queries
-  require_independent_search
-  require_claim_level_review
-  default_minimum_cross_checks
-  default_confidence_threshold
-  stop_on_critical_issue
-```
-
-Domain-specific critique criteria belong in CriticProfile rather than hard-coded global configuration.
-
-## 13. Workflow Configuration
-
-Initial workflow settings may include:
-
-```text
+```yaml
 workflow:
-  max_iterations
-  allow_completed_with_limitations
-  require_profile_approval
-  freeze_task_configuration
-  freeze_critic_profile
+  require_profile_approval: true
+  freeze_task_configuration: true
+  freeze_critic_profile: true
 ```
 
-Required MVP defaults should preserve:
+`max_iterations` and limitation policy are configuration-driven.
+
+## 15. Model Configuration
+
+### GPT Store Edition
+
+The Store edition uses:
 
 ```text
-require_profile_approval: true
-freeze_task_configuration: true
-freeze_critic_profile: true
+model_policy: user_plan
+recommended_model: null
 ```
 
-## 14. Model Configuration
+This layer does not choose or call a model through a developer API. The ChatGPT runtime provides the model available to the user. Paid users may switch to additional models when the platform exposes them.
 
-Model selection must be configurable by role rather than embedded directly in agent source code.
+Workflow behavior must remain valid across supported model choices.
 
-Suggested logical mapping:
+### Standalone/API Edition
+
+The existing `models` role mapping remains available for optional external runtime use:
 
 ```text
-models:
-  supervisor
-  domain_resolver
-  research_agent
-  critic_agent
-  report_generator
+supervisor
+domain_resolver
+research_agent
+critic_agent
+report_generator
 ```
 
-Each role configuration may include:
+A role may define provider, model, reasoning level, temperature, max output tokens, and timeout.
+
+The provider factory translates these settings without changing Agent Interface contracts.
+
+The OpenAI semantic adapter implemented in Phase 11.3 is an optional standalone/API adapter, not a dependency of GPT Store Edition.
+
+## 16. Resolver Configuration
+
+Resolver settings include:
 
 ```text
-provider
-model
-reasoning_level
-temperature
-max_output_tokens
-timeout_seconds
+mode: rules | semantic | hybrid
+semantic_enabled
+minimum_semantic_confidence
+require_agreement_for_high_risk
+fallback_to_rules
 ```
 
-Only supported fields for the selected provider should be passed to the provider adapter.
+The Python reference runtime currently requires provider/model configuration when its external semantic adapter is enabled.
 
-Model replacement must not change the Agent Interface.
+GPT Store packaging must instead map semantic reasoning to the host ChatGPT runtime without requiring a developer secret.
 
-## 15. Tool Configuration
+## 17. Tool Configuration
 
-Tools must be configurable independently from agents.
+Tools are configured independently from agents.
 
-Suggested structure:
+Current logical tools:
 
 ```text
-tools:
-  web_search
-  web_fetch
-  source_validator
-  citation_manager
+web_search
+web_fetch
+source_validator
+citation_manager
 ```
 
-Per-tool configuration may include:
+GPT Store Edition should use built-in ChatGPT capabilities where available. Standalone/API Edition may inject external tool providers.
 
-```text
-enabled
-provider
-timeout_seconds
-max_calls
-retry_policy
-rate_limit
-```
+## 18. Resource Limits
 
-Agents must not bypass tool limits defined by Supervisor.
-
-## 16. Resource Limits
-
-The system must support explicit limits to prevent uncontrolled execution.
-
-Initial configurable limits should include:
+Current limits include:
 
 ```text
 max_iterations
@@ -381,385 +309,163 @@ max_search_calls
 max_fetch_calls
 max_sources
 max_runtime_seconds
-max_output_size
+max_output_size_bytes
 ```
 
-Future versions may add:
+Future standalone limits may include token and cost ceilings where provider metering exists.
+
+A reached limit produces an explicit workflow outcome rather than silent termination.
+
+## 19. Retry and Timeout Policy
+
+Retry settings are centralized:
 
 ```text
-max_tokens
-max_cost_per_task
-max_parallel_agents
+max_attempts
+initial_delay_seconds
+max_delay_seconds
+backoff_multiplier
 ```
 
-When a limit is reached, Supervisor must create an explicit workflow event and decide whether the task becomes:
+Timeouts and call budgets are enforced by runtime controls in the Python reference runtime.
+
+The Store edition cannot assume access to provider-level retry/token telemetry that ChatGPT does not expose to the GPT configuration itself.
+
+## 20. Logging
+
+Operational logs may include task_id, workflow_run_id, run_id, agent_id, and request_id where the runtime exposes them.
+
+Logs must not contain secrets or hidden chain-of-thought.
+
+Server-side file logging applies only to standalone/API execution. Store Edition relies on ChatGPT conversation/runtime behavior and explicit user-facing checkpoint artifacts rather than a private server log dependency.
+
+## 21. Persistence
+
+Standalone/API Edition currently supports:
 
 ```text
-COMPLETED_WITH_LIMITATIONS
-FAILED
+backend: sqlite
+path: runtime/k_supervisor.db
 ```
 
-according to workflow rules.
+Agents do not depend directly on SQLite.
 
-## 17. Retry Configuration
+GPT Store Edition has no mandatory server persistence. Baseline state is conversation-local. Cross-chat continuation must use explicit checkpoint/recovery artifacts until a separately approved backend design exists.
 
-Retry behavior must be centralized.
+## 22. Report Configuration
 
-Suggested fields:
-
-```text
-retry:
-  max_attempts
-  initial_delay_seconds
-  max_delay_seconds
-  backoff_multiplier
-  retryable_error_types
-```
-
-Retries are appropriate for transient failures such as:
-
-- temporary provider errors;
-- network timeouts;
-- temporary tool unavailability;
-- rate limiting where retry is permitted.
-
-Retries must not hide deterministic validation failures.
-
-## 18. Timeout Configuration
-
-Timeouts should be defined separately for:
-
-```text
-agent_execution
-web_search
-web_fetch
-model_request
-workflow_total
-```
-
-A timeout must produce a structured ErrorRecord.
-
-Timeout handling must not leave the workflow in an undefined state.
-
-## 19. Logging Configuration
-
-Suggested logging settings:
-
-```text
-logging:
-  level
-  format
-  directory
-  console_enabled
-  file_enabled
-  include_task_id
-  include_run_id
-  redact_secrets
-```
-
-Required identifiers in operational logs should include when available:
-
-```text
-task_id
-workflow_run_id
-run_id
-agent_id
-request_id
-```
-
-Logs are operational artifacts and must not contain private chain-of-thought.
-
-## 20. Persistence Configuration
-
-Persistence must be selected through configuration rather than agent logic.
-
-Initial options may include:
-
-```text
-persistence:
-  backend: file
-  path: runtime/
-```
-
-Later:
-
-```text
-persistence:
-  backend: sqlite
-  path: runtime/k_supervisor.db
-```
-
-Agents must not require knowledge of the selected persistence backend.
-
-## 21. Artifact Configuration
-
-Final artifact behavior may be configured through:
-
-```text
-reports:
-  output_directory
-  final_report_enabled
-  review_protocol_enabled
-  include_sources
-  include_limitations
-  encoding
-```
-
-For research workflow outputs:
-
-```text
-encoding: UTF-8
-```
-
-File naming must follow PROJECT_FILE_STANDARD.md.
-
-Typical outputs:
+Final research artifacts remain UTF-8:
 
 ```text
 <TASK_ID>_FINAL_REPORT.md
 <TASK_ID>_REVIEW_PROTOCOL.md
 ```
 
-## 22. Language Configuration
+Standalone runtime writes files to the configured output directory. GPT Store Edition may present or generate equivalent user-facing artifacts using ChatGPT-native capabilities.
 
-The user-facing output language may be defined per task.
+## 23. Freshness and Risk
 
-Example:
+Freshness requirements and risk levels may influence generated CriticProfile defaults, evidence thresholds, required cross-checks, and source hierarchy.
 
-```text
-language: uk
-```
+Risk does not replace domain-specific criteria.
 
-The research source language may differ from the final output language.
+## 24. Task Configuration Snapshot
 
-The system should not restrict research only to sources written in the output language unless the task explicitly requires it.
+Before autonomous execution in the Python reference runtime, Supervisor creates an immutable secret-free TaskConfigurationSnapshot containing effective settings, environment, schema version, approved profile identity/version, and a configuration fingerprint.
 
-## 23. Freshness Configuration
+Global changes affect new tasks only. Profile amendments create a superseding snapshot without silently changing previously frozen task settings.
 
-Freshness requirements may be task-specific and domain-specific.
+The `distribution` policy is included in the effective settings and therefore auditable.
 
-Possible values may include:
+## 25. GPT Store Snapshot Equivalent
 
-```text
-ANY
-CURRENT_WHERE_RELEVANT
-RECENT
-STRICT_DATE_RANGE
-```
+The Store edition cannot depend on the Python SQLite snapshot implementation.
 
-A strict date range should include explicit start and end values.
-
-CriticProfile may strengthen freshness requirements for the current task.
-
-## 24. Risk Level Configuration
-
-Suggested generic risk levels:
+Its functional equivalent must preserve at least:
 
 ```text
-LOW
-MEDIUM
-HIGH
-CRITICAL
+task identity
+approved CriticProfile
+active workflow state
+iteration number
+current research result
+current CriticReview
+important limitations
+configuration/distribution policy version
 ```
 
-Risk level may influence generated profile defaults such as:
+For cross-chat recovery, this state should be serialized into an explicit checkpoint artifact that the user can carry into a fresh conversation.
 
-- evidence threshold;
-- preferred source hierarchy;
-- required cross-check count;
-- tolerance for unresolved contradictions;
-- freshness strictness.
+## 26. Validation
 
-Risk level must not substitute for domain-specific review criteria.
+Configuration validation includes required fields, enums, numeric ranges, resource consistency, provider compatibility, tool availability, approval state, and distribution invariants.
 
-## 25. Configuration Snapshot
+For GPT Store defaults, validation rejects attempts to require a developer API key, pin a model, disable free-user compatibility, disable user model switching, or require an external backend.
 
-Before autonomous execution starts, Supervisor must create a task configuration snapshot.
+## 27. Schema Version
 
-The snapshot should include references or resolved values for:
+Current tracked schema version:
 
 ```text
-task_id
-workflow configuration
-agent role configuration
-tool limits
-model role configuration
-approved CriticProfile version
-active environment
-configuration schema version
-created_at
+1.0
 ```
 
-Secret values must not be copied into the persisted snapshot.
+Breaking schema changes require explicit migration or compatibility handling.
 
-The snapshot must remain immutable for the active task.
-
-This rule supports reproducibility and auditability.
-
-## 26. Runtime Configuration Changes
-
-Changes to global configuration affect new tasks only by default.
-
-An active task continues using its frozen configuration snapshot.
-
-A running task may receive an explicit amendment only through Supervisor and only for fields that are legally mutable.
-
-A material CriticProfile amendment requires user approval.
-
-## 27. Configuration Validation
-
-Configuration must be validated before use.
-
-Validation includes:
-
-- required fields;
-- allowed enum values;
-- numeric ranges;
-- path validity;
-- provider configuration compatibility;
-- tool availability;
-- positive resource limits;
-- profile approval state;
-- incompatible setting combinations.
-
-Invalid configuration must fail before launching the affected agent where possible.
-
-## 28. Configuration Schema Version
-
-Configuration must carry a schema version.
-
-Example:
-
-```text
-configuration_schema_version: 1
-```
-
-Schema changes that break compatibility require an explicit migration or compatibility layer.
-
-## 29. Example settings.yaml Skeleton
+## 28. Current settings.yaml Distribution Block
 
 ```yaml
-configuration_schema_version: 1
-
-environment: development
-
-workflow:
-  max_iterations: 3
-  allow_completed_with_limitations: true
-  require_profile_approval: true
-  freeze_task_configuration: true
-  freeze_critic_profile: true
-
-research:
-  max_queries: 10
-  max_sources: 30
-  prefer_primary_sources: true
-  enable_cross_source_comparison: true
-  deduplicate_sources: true
-
-critic:
-  require_independent_search: true
-  require_claim_level_review: true
-  default_minimum_cross_checks: 2
-  default_confidence_threshold: 0.85
-
-limits:
-  max_agent_runs: 20
-  max_search_calls: 30
-  max_fetch_calls: 60
-  max_runtime_seconds: 1800
-
-logging:
-  level: INFO
-  console_enabled: true
-  file_enabled: true
-  redact_secrets: true
-
-persistence:
-  backend: file
-  path: runtime/
-
-reports:
-  output_directory: output/
-  final_report_enabled: true
-  review_protocol_enabled: true
-  include_sources: true
-  include_limitations: true
-  encoding: UTF-8
+distribution:
+  primary_channel: chatgpt_store
+  free_user_compatible: true
+  developer_api_key_required: false
+  model_policy: user_plan
+  recommended_model: null
+  allow_user_model_switch: true
+  external_backend_required: false
 ```
 
-Values in this example are initial defaults only and may be revised during implementation and testing.
+## 29. .env.example Policy
 
-## 30. .env.example Skeleton
+`.env.example` may list optional standalone/API variable names but must state that the GPT Store Edition needs no developer-owned secret.
 
-The tracked `.env.example` should contain variable names only.
+## 30. Audit Requirements
 
-Example:
+For each standalone task, audit should identify configuration schema version, environment, approved CriticProfile version, distribution policy, model role settings, tool limits, and workflow limits without exposing secrets.
+
+For Store Edition, equivalent user-visible auditability is provided through workflow/report/checkpoint artifacts rather than mandatory private backend telemetry.
+
+## 31. Phase 11 Metrics Boundary
+
+Usage/cost/quality metrics must respect deployment capabilities.
 
 ```text
-OPENAI_API_KEY=
-SEARCH_API_KEY=
-K_SUPERVISOR_ENV=development
+GPT Store Edition:
+  - workflow quality metrics
+  - iteration/review outcomes
+  - source/claim coverage
+  - no assumed provider token/cost telemetry
+
+Standalone/API Edition:
+  - all workflow quality metrics
+  - provider API calls where exposed
+  - input/output tokens where exposed
+  - estimated cost where pricing data is configured
 ```
 
-No real credentials are allowed.
+The free Store experience must not require developer-funded API usage for metrics collection.
 
-## 31. Ownership of Configuration
+## 32. Acceptance Criteria
 
-Supervisor owns resolved workflow configuration.
+Configuration is compliant when:
 
-ProfileManager owns lifecycle management of agent profiles.
-
-Provider adapters own provider-specific parameter translation.
-
-Agents consume validated configuration but do not own global configuration state.
-
-## 32. Audit Requirements
-
-For each task, the system should be able to determine:
-
-- which configuration schema version was used;
-- which environment was active;
-- which CriticProfile version was approved;
-- which model roles were selected;
-- which tool limits were active;
-- which workflow limits were active.
-
-Audit data must not expose secret values.
-
-## 33. MVP Configuration Boundary
-
-The MVP configuration implementation must support at minimum:
-
-```text
-config/settings.yaml
-.env
-.env.example
-environment selection
-workflow limits
-research limits
-critic execution defaults
-model role configuration
-tool limits
-logging configuration
-artifact output configuration
-configuration validation
-immutable task configuration snapshot
-```
-
-Advanced centralized configuration services and remote configuration are outside the MVP.
-
-## 34. Acceptance Criteria
-
-CONFIGURATION implementation is compliant when:
-
-- project defaults load from a tracked configuration file;
-- secrets load from an untracked source;
-- invalid configuration is rejected explicitly;
-- user-approved CriticProfile remains authoritative for critique semantics;
-- configuration used by an active task is frozen;
-- active tasks are not silently changed by later global edits;
-- agents receive validated role-specific configuration;
-- tool and workflow resource limits are enforceable;
-- audit records identify the effective configuration without storing secrets;
-- configuration changes do not require rewriting agent business logic.
+- tracked defaults validate;
+- GPT Store is the primary channel;
+- Store defaults require no developer secret or backend;
+- no ChatGPT model identifier is pinned as a core dependency;
+- users may switch models when their plan allows it;
+- standalone provider/model adapters remain optional;
+- approved CriticProfile remains authoritative;
+- active standalone task settings are frozen and auditable;
+- runtime limits are enforceable where the execution environment exposes them;
+- secret values never enter tracked configuration, snapshots, reports, or logs.

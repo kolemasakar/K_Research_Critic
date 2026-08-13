@@ -14,6 +14,18 @@ class RuntimeSettings(FrozenSettingsModel):
     debug: bool = False
 
 
+class DistributionSettings(FrozenSettingsModel):
+    """Product distribution policy kept separate from executable provider configuration."""
+
+    primary_channel: Literal["chatgpt_store", "standalone_api"] = "chatgpt_store"
+    free_user_compatible: bool = True
+    developer_api_key_required: bool = False
+    model_policy: Literal["user_plan", "configured_api"] = "user_plan"
+    recommended_model: str | None = None
+    allow_user_model_switch: bool = True
+    external_backend_required: bool = False
+
+
 class WorkflowSettings(FrozenSettingsModel):
     max_iterations: int = Field(ge=1)
     allow_completed_with_limitations: bool = True
@@ -142,6 +154,7 @@ class AppSettings(FrozenSettingsModel):
     schema_version: str
     environment: Literal["development", "test", "production"]
     runtime: RuntimeSettings
+    distribution: DistributionSettings
     workflow: WorkflowSettings
     agents: AgentsSettings
     models: ModelsSettings
@@ -180,6 +193,28 @@ class AppSettings(FrozenSettingsModel):
             if not role.provider or not role.model:
                 raise ValueError(
                     "semantic resolver requires models.domain_resolver.provider and model"
+                )
+
+        if self.distribution.primary_channel == "chatgpt_store":
+            if not self.distribution.free_user_compatible:
+                raise ValueError("chatgpt_store distribution must remain free_user_compatible")
+            if self.distribution.developer_api_key_required:
+                raise ValueError(
+                    "chatgpt_store distribution must not require a developer API key"
+                )
+            if self.distribution.model_policy != "user_plan":
+                raise ValueError("chatgpt_store distribution requires model_policy=user_plan")
+            if self.distribution.recommended_model is not None:
+                raise ValueError(
+                    "chatgpt_store distribution must not pin a recommended model identifier"
+                )
+            if not self.distribution.allow_user_model_switch:
+                raise ValueError(
+                    "chatgpt_store distribution must allow user model switching when available"
+                )
+            if self.distribution.external_backend_required:
+                raise ValueError(
+                    "chatgpt_store distribution must not require an external backend"
                 )
         return self
 
