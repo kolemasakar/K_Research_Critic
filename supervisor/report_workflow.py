@@ -5,6 +5,7 @@ from typing import Any
 
 from agents import Agent
 from models import AgentResult, AgentRunRequest, AgentType, Artifact, ExecutionStatus, TaskStatus
+from persistence import PersistenceStore
 
 from .exceptions import ProfileStateError
 from .research_critic_loop import ResearchCriticLoopOutcome
@@ -13,7 +14,7 @@ from .workflow_engine import WorkflowEngine
 
 @dataclass(frozen=True)
 class ReportWorkflowOutcome:
-    """Structured result of Phase 8 artifact generation and finalization."""
+    """Structured result of final artifact generation and finalization."""
 
     task_id: str
     final_state: TaskStatus
@@ -24,11 +25,18 @@ class ReportWorkflowOutcome:
 class ReportWorkflow:
     """Supervisor-owned finalization boundary around ReportGenerator."""
 
-    def __init__(self, workflow_engine: WorkflowEngine, report_generator: Agent) -> None:
+    def __init__(
+        self,
+        workflow_engine: WorkflowEngine,
+        report_generator: Agent,
+        *,
+        persistence: PersistenceStore | None = None,
+    ) -> None:
         if report_generator.definition.agent_type != AgentType.REPORT_GENERATOR:
             raise ValueError("report_generator must expose AgentType.REPORT_GENERATOR")
         self.workflow_engine = workflow_engine
         self.report_generator = report_generator
+        self.persistence = persistence or workflow_engine.persistence
 
     def finalize(
         self,
@@ -83,6 +91,8 @@ class ReportWorkflow:
         )
         result = self.report_generator.run(request)
         self.workflow_engine.record_agent_run(task_id, result.run_id)
+        if self.persistence is not None:
+            self.persistence.save_agent_result(result)
 
         if result.status == ExecutionStatus.FAILED:
             if task.status == TaskStatus.FINALIZING:
@@ -96,9 +106,16 @@ class ReportWorkflow:
             )
 
         artifacts = tuple(Artifact.model_validate(item) for item in result.payload.get("artifacts", []))
+        if self.persistence is not None:
+            for artifact in artifacts:
+                self.persistence.save_artifact(artifact)
+
         if len(artifacts) != 2:
             if task.status == TaskStatus.FINALIZING:
-                self.workflow_engine.fail_task(task_id, reason="ReportGenerator did not return both required artifacts")
+                self.workflow_engine.fail_task(
+                    task_id,
+                    reason="ReportGenerator did not return both required artifacts",
+                )
             return ReportWorkflowOutcome(
                 task_id=task_id,
                 final_state=self.workflow_engine.task_manager.get_task(task_id).status,

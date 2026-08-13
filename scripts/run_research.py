@@ -5,19 +5,32 @@ import json
 from pathlib import Path
 from typing import Any
 
+from persistence import SQLitePersistenceStore
 from supervisor import KSupervisorApplication, MVPStatus
 from tools import JsonCorpusProvider, ResearchToolset, WebFetchTool, WebSearchTool
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Run the K_Supervisor Phase 9 end-to-end MVP.")
+    parser = argparse.ArgumentParser(description="Run the K_Supervisor end-to-end workflow.")
     parser.add_argument("--task", help="Research task. If omitted, it is requested interactively.")
     parser.add_argument("--task-type", default="auto")
-    parser.add_argument("--corpus", required=True, help="UTF-8 JSON evidence corpus used by the local MVP provider.")
+    parser.add_argument(
+        "--corpus",
+        required=True,
+        help="UTF-8 JSON evidence corpus used by the local MVP provider.",
+    )
     parser.add_argument("--output-directory", default="output")
+    parser.add_argument("--database", default="runtime/k_supervisor.db")
     parser.add_argument("--max-iterations", type=int, default=3)
-    parser.add_argument("--approve-profile", action="store_true", help="Treat this command invocation as explicit profile approval.")
-    parser.add_argument("--profile-edits", help="JSON object of CriticProfile edits applied before explicit approval.")
+    parser.add_argument(
+        "--approve-profile",
+        action="store_true",
+        help="Treat this command invocation as explicit profile approval.",
+    )
+    parser.add_argument(
+        "--profile-edits",
+        help="JSON object of CriticProfile edits applied before explicit approval.",
+    )
     parser.add_argument("--special-requirement", action="append", default=[])
     parser.add_argument("--required-topic", action="append", default=[])
     parser.add_argument("--search-query", action="append", default=[])
@@ -43,11 +56,18 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: cannot load corpus: {exc}")
         return 1
 
+    try:
+        persistence = SQLitePersistenceStore(args.database)
+    except (OSError, ValueError) as exc:
+        print(f"ERROR: cannot initialize persistence: {exc}")
+        return 1
+
     tools = ResearchToolset(WebSearchTool(provider), WebFetchTool(provider))
     app = KSupervisorApplication(
         tools,
         output_directory=Path(args.output_directory),
         default_max_iterations=args.max_iterations,
+        persistence=persistence,
     )
     prepared = app.prepare_task(
         task_text,
@@ -87,6 +107,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     print(f"MVP status: {outcome.status.value}")
     print(f"Final task state: {outcome.final_state.value}")
+    print(f"Audit database: {args.database}")
     for path in outcome.artifact_paths:
         print(f"Artifact: {path}")
 
@@ -120,7 +141,10 @@ def _interactive_profile_gate(
         try:
             action = input("CriticProfile action [approve/edit/reject]: ").strip().casefold()
         except EOFError:
-            print("ERROR: explicit CriticProfile approval is required. Use --approve-profile for non-interactive runs.")
+            print(
+                "ERROR: explicit CriticProfile approval is required. "
+                "Use --approve-profile for non-interactive runs."
+            )
             return False
         if action in {"approve", "a"}:
             app.approve_profile(task_id, approved_by="CLI_USER", edits=initial_edits)

@@ -33,7 +33,9 @@ class ProfileWorkflow:
     ) -> None:
         self.workflow_engine = workflow_engine
         self.domain_resolver = domain_resolver or HybridResolver()
-        self.profile_manager = profile_manager or ProfileManager()
+        self.profile_manager = profile_manager or ProfileManager(
+            persistence=workflow_engine.persistence
+        )
 
     def generate_profile(
         self,

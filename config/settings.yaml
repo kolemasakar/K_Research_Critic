@@ -81,8 +81,9 @@ reports:
   review_protocol_suffix: REVIEW_PROTOCOL.md
 
 persistence:
-  backend: file
-  path: runtime
+  backend: sqlite
+  path: runtime/k_supervisor.db
+  schema_version: "1"
 
 logging:
   level: INFO

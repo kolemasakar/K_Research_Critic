@@ -24,6 +24,7 @@ from .hybrid_resolver import (
 )
 from .profile_manager import ProfileManager
 from .profile_workflow import ProfileWorkflow
+from .recovery import RecoveryOutcome, RuntimeRecoveryService
 from .report_workflow import ReportWorkflow, ReportWorkflowOutcome
 from .research_critic_loop import (
     ResearchCriticIteration,
@@ -55,12 +56,14 @@ __all__ = [
     "ProfileNotFoundError",
     "ProfileStateError",
     "ProfileWorkflow",
+    "RecoveryOutcome",
     "ReportWorkflow",
     "ReportWorkflowOutcome",
     "ResearchCriticIteration",
     "ResearchCriticLoop",
     "ResearchCriticLoopOutcome",
     "RuleBasedResolver",
+    "RuntimeRecoveryService",
     "SemanticDomainProvider",
     "SemanticDomainResult",
     "SemanticResolutionError",

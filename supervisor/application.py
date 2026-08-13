@@ -7,10 +7,12 @@ from typing import Any
 
 from agents import CriticAgent, ReportGenerator, ResearchAgent
 from models import CriticProfile, DomainAssessment, ExecutionStatus, Task, TaskStatus, UserApproval
+from persistence import PersistenceStore, TaskAuditSnapshot
 from tools import ResearchTools
 
 from .hybrid_resolver import DomainResolverProtocol
 from .profile_workflow import ProfileWorkflow
+from .recovery import RecoveryOutcome, RuntimeRecoveryService
 from .report_workflow import ReportWorkflow, ReportWorkflowOutcome
 from .research_critic_loop import ResearchCriticLoop, ResearchCriticLoopOutcome
 from .workflow_engine import WorkflowEngine
@@ -33,7 +35,7 @@ class PreparedTask:
 
 @dataclass(frozen=True)
 class MVPOutcome:
-    """Structured end-to-end result exposed by the Phase 9 application layer."""
+    """Structured end-to-end result exposed by the application layer."""
 
     task_id: str
     status: MVPStatus
@@ -59,10 +61,25 @@ class KSupervisorApplication:
         default_max_iterations: int = 3,
         workflow_engine: WorkflowEngine | None = None,
         domain_resolver: DomainResolverProtocol | None = None,
+        persistence: PersistenceStore | None = None,
     ) -> None:
         if default_max_iterations <= 0:
             raise ValueError("default_max_iterations must be greater than zero")
-        self.workflow_engine = workflow_engine or WorkflowEngine()
+
+        if workflow_engine is None:
+            workflow_engine = WorkflowEngine(persistence=persistence)
+        elif (
+            persistence is not None
+            and workflow_engine.persistence is not None
+            and workflow_engine.persistence is not persistence
+        ):
+            raise ValueError("Application and WorkflowEngine must use the same persistence store")
+        elif persistence is not None and workflow_engine.persistence is None:
+            workflow_engine.persistence = persistence
+            workflow_engine.task_manager.persistence = persistence
+
+        self.workflow_engine = workflow_engine
+        self.persistence = persistence or workflow_engine.persistence
         self.profile_workflow = ProfileWorkflow(
             self.workflow_engine,
             domain_resolver=domain_resolver,
@@ -75,8 +92,13 @@ class KSupervisorApplication:
             self.profile_workflow.profile_manager,
             self.research_agent,
             self.critic_agent,
+            persistence=self.persistence,
         )
-        self.report_workflow = ReportWorkflow(self.workflow_engine, self.report_generator)
+        self.report_workflow = ReportWorkflow(
+            self.workflow_engine,
+            self.report_generator,
+            persistence=self.persistence,
+        )
         self.default_max_iterations = default_max_iterations
         self._register_agents()
 
@@ -142,6 +164,22 @@ class KSupervisorApplication:
             changes=changes,
             reason=reason,
         )
+
+    def recover_task(self, task_id: str) -> RecoveryOutcome:
+        if self.persistence is None:
+            raise RuntimeError("Task recovery requires a configured persistence store")
+        service = RuntimeRecoveryService(self.persistence)
+        return service.restore(
+            task_id,
+            workflow_engine=self.workflow_engine,
+            profile_manager=self.profile_workflow.profile_manager,
+            research_critic_loop=self.research_critic_loop,
+        )
+
+    def audit_task(self, task_id: str) -> TaskAuditSnapshot:
+        if self.persistence is None:
+            raise RuntimeError("Task audit requires a configured persistence store")
+        return self.persistence.load_task_audit(task_id)
 
     def run_to_completion(
         self,

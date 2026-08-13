@@ -18,6 +18,7 @@ from models import (
     ReviewDecision,
     TaskStatus,
 )
+from persistence import PersistenceStore
 
 from .exceptions import ProfileStateError
 from .profile_manager import ProfileManager
@@ -37,7 +38,7 @@ class ResearchCriticIteration:
 
 @dataclass(frozen=True)
 class ResearchCriticLoopOutcome:
-    """Structured Phase 7 outcome returned when the autonomous loop stops."""
+    """Structured outcome returned when the autonomous loop stops."""
 
     task_id: str
     workflow_run_id: str
@@ -63,6 +64,8 @@ class ResearchCriticLoop:
         profile_manager: ProfileManager,
         research_agent: Agent,
         critic_agent: Agent,
+        *,
+        persistence: PersistenceStore | None = None,
     ) -> None:
         if research_agent.definition.agent_type != AgentType.RESEARCH:
             raise ValueError("research_agent must expose AgentType.RESEARCH")
@@ -72,6 +75,7 @@ class ResearchCriticLoop:
         self.profile_manager = profile_manager
         self.research_agent = research_agent
         self.critic_agent = critic_agent
+        self.persistence = persistence or workflow_engine.persistence
         self._iterations: dict[str, list[ResearchCriticIteration]] = {}
         self._agent_results: dict[str, AgentResult] = {}
 
@@ -133,6 +137,8 @@ class ResearchCriticLoop:
             )
             if research_result is None:
                 return self._outcome(task_id)
+            if self.persistence is not None:
+                self.persistence.save_research_result(research_result)
 
             self.workflow_engine.transition(
                 task_id,
@@ -174,6 +180,8 @@ class ResearchCriticLoop:
             )
             if critic_review is None:
                 return self._outcome(task_id)
+            if self.persistence is not None:
+                self.persistence.save_critic_review(critic_review)
 
             iteration_record = ResearchCriticIteration(
                 iteration=iteration,
@@ -214,6 +222,44 @@ class ResearchCriticLoop:
 
     def get_agent_result(self, run_id: str) -> AgentResult:
         return self._agent_results[run_id]
+
+    def restore_history(
+        self,
+        task_id: str,
+        *,
+        agent_results: list[AgentResult],
+        research_results: list[ResearchResult],
+        reviews: list[CriticReview],
+    ) -> None:
+        """Rebuild completed iteration history from persisted contracts."""
+        for result in agent_results:
+            if result.task_id == task_id:
+                self._agent_results[result.run_id] = result
+
+        research_by_iteration = {
+            item.iteration: item for item in research_results if item.task_id == task_id
+        }
+        review_by_iteration = {
+            item.iteration: item for item in reviews if item.task_id == task_id
+        }
+        restored: list[ResearchCriticIteration] = []
+        for iteration in sorted(set(research_by_iteration) & set(review_by_iteration)):
+            research = research_by_iteration[iteration]
+            review = review_by_iteration[iteration]
+            research_agent_result = self._agent_results.get(research.run_id)
+            critic_agent_result = self._agent_results.get(review.run_id)
+            if research_agent_result is None or critic_agent_result is None:
+                continue
+            restored.append(
+                ResearchCriticIteration(
+                    iteration=iteration,
+                    research_agent_result=research_agent_result,
+                    research_result=research,
+                    critic_agent_result=critic_agent_result,
+                    critic_review=review,
+                )
+            )
+        self._iterations[task_id] = restored
 
     def _active_profile(self, task_id: str) -> CriticProfile:
         task = self.workflow_engine.task_manager.get_task(task_id)
@@ -261,6 +307,8 @@ class ResearchCriticLoop:
     def _record_agent_result(self, task_id: str, result: AgentResult) -> None:
         self._agent_results[result.run_id] = result
         self.workflow_engine.record_agent_run(task_id, result.run_id)
+        if self.persistence is not None:
+            self.persistence.save_agent_result(result)
 
     def _parse_research_result(
         self,

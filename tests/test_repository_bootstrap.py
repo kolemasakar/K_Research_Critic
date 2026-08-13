@@ -18,6 +18,7 @@ REQUIRED_PATHS = (
     "supervisor",
     "tools",
     "models",
+    "persistence",
     "prompts",
     "config",
     "tests",

@@ -9,6 +9,7 @@ from models import (
     WorkflowType,
     utc_now,
 )
+from persistence import PersistenceStore
 
 from .agent_registry import AgentRegistry
 from .exceptions import WorkflowAlreadyActiveError, WorkflowNotFoundError
@@ -17,25 +18,80 @@ from .task_manager import TaskManager
 
 
 class WorkflowEngine:
-    """Phase 2 orchestration skeleton with auditable in-memory run tracking."""
+    """Supervisor orchestration core with optional write-through persistence."""
 
-    def __init__(self, *, task_manager: TaskManager | None = None, state_machine: StateMachine | None = None, agent_registry: AgentRegistry | None = None) -> None:
-        self.task_manager = task_manager or TaskManager()
+    def __init__(
+        self,
+        *,
+        task_manager: TaskManager | None = None,
+        state_machine: StateMachine | None = None,
+        agent_registry: AgentRegistry | None = None,
+        persistence: PersistenceStore | None = None,
+    ) -> None:
+        if task_manager is None:
+            task_manager = TaskManager(persistence=persistence)
+        elif (
+            persistence is not None
+            and task_manager.persistence is not None
+            and task_manager.persistence is not persistence
+        ):
+            raise ValueError("TaskManager and WorkflowEngine must use the same persistence store")
+        elif persistence is not None and task_manager.persistence is None:
+            task_manager.persistence = persistence
+
+        self.task_manager = task_manager
+        self.persistence = persistence or task_manager.persistence
         self.state_machine = state_machine or StateMachine()
         self.agent_registry = agent_registry or AgentRegistry()
         self._runs: dict[str, WorkflowRun] = {}
         self._transitions: dict[str, StateTransition] = {}
 
-    def start_workflow(self, task_id: str, *, max_iterations: int = 3, workflow_type: WorkflowType = WorkflowType.RESEARCH_CRITIC) -> WorkflowRun:
+    def start_workflow(
+        self,
+        task_id: str,
+        *,
+        max_iterations: int = 3,
+        workflow_type: WorkflowType = WorkflowType.RESEARCH_CRITIC,
+    ) -> WorkflowRun:
         task = self.task_manager.get_task(task_id)
         if task.current_workflow_run_id is not None:
             existing = self._runs.get(task.current_workflow_run_id)
-            if existing is not None and existing.status in {WorkflowStatus.RUNNING, WorkflowStatus.WAITING_FOR_USER}:
-                raise WorkflowAlreadyActiveError(f"Task already has active workflow: {existing.workflow_run_id}")
-        run = WorkflowRun(task_id=task.task_id, workflow_type=workflow_type, current_state=task.status, max_iterations=max_iterations)
+            if existing is not None and existing.status in {
+                WorkflowStatus.RUNNING,
+                WorkflowStatus.WAITING_FOR_USER,
+            }:
+                raise WorkflowAlreadyActiveError(
+                    f"Task already has active workflow: {existing.workflow_run_id}"
+                )
+        run = WorkflowRun(
+            task_id=task.task_id,
+            workflow_type=workflow_type,
+            current_state=task.status,
+            max_iterations=max_iterations,
+        )
         self._runs[run.workflow_run_id] = run
         self.task_manager.attach_workflow(task.task_id, run.workflow_run_id)
+        self._persist_workflow(run)
         return run
+
+    def restore_workflow(
+        self,
+        workflow_run: WorkflowRun,
+        *,
+        transitions: list[StateTransition] | None = None,
+    ) -> WorkflowRun:
+        task = self.task_manager.get_task(workflow_run.task_id)
+        if (
+            task.current_workflow_run_id is not None
+            and task.current_workflow_run_id != workflow_run.workflow_run_id
+        ):
+            raise ValueError("Persisted Task and WorkflowRun reference different workflow IDs")
+        self._runs[workflow_run.workflow_run_id] = workflow_run
+        for transition in transitions or []:
+            if transition.workflow_run_id != workflow_run.workflow_run_id:
+                raise ValueError("StateTransition belongs to another workflow")
+            self._transitions[transition.transition_id] = transition
+        return workflow_run
 
     def get_workflow(self, workflow_run_id: str) -> WorkflowRun:
         try:
@@ -53,38 +109,114 @@ class WorkflowEngine:
         run = self.get_workflow(workflow_run_id)
         return [self._transitions[item] for item in run.transition_ids]
 
-    def transition(self, task_id: str, to_state: TaskStatus, *, trigger: str, reason: str | None = None, actor_type: ActorType = ActorType.SUPERVISOR, actor_id: str | None = "SUPERVISOR") -> StateTransition:
+    def transition(
+        self,
+        task_id: str,
+        to_state: TaskStatus,
+        *,
+        trigger: str,
+        reason: str | None = None,
+        actor_type: ActorType = ActorType.SUPERVISOR,
+        actor_id: str | None = "SUPERVISOR",
+    ) -> StateTransition:
         task = self.task_manager.get_task(task_id)
         run = self.get_task_workflow(task_id)
         from_state, applied_state = self.state_machine.transition(task, to_state)
-        record = StateTransition(task_id=task.task_id, workflow_run_id=run.workflow_run_id, from_state=from_state, to_state=applied_state, trigger=trigger, reason=reason, actor_type=actor_type, actor_id=actor_id)
+        record = StateTransition(
+            task_id=task.task_id,
+            workflow_run_id=run.workflow_run_id,
+            from_state=from_state,
+            to_state=applied_state,
+            trigger=trigger,
+            reason=reason,
+            actor_type=actor_type,
+            actor_id=actor_id,
+        )
         self._transitions[record.transition_id] = record
         run.transition_ids = [*run.transition_ids, record.transition_id]
         run.current_state = applied_state
         self._sync_workflow_status(run, applied_state)
+        self.task_manager.persist_task(task_id)
+        if self.persistence is not None:
+            self.persistence.save_state_transition(record)
+        self._persist_workflow(run)
         return record
 
-    def start_research_iteration(self, task_id: str, *, actor_type: ActorType = ActorType.SUPERVISOR, actor_id: str | None = "SUPERVISOR") -> StateTransition:
+    def start_research_iteration(
+        self,
+        task_id: str,
+        *,
+        actor_type: ActorType = ActorType.SUPERVISOR,
+        actor_id: str | None = "SUPERVISOR",
+    ) -> StateTransition:
         task = self.task_manager.get_task(task_id)
         run = self.get_task_workflow(task_id)
         if task.status not in {TaskStatus.PROFILE_APPROVED, TaskStatus.REVISE_REQUIRED}:
-            return self.transition(task_id, TaskStatus.RESEARCHING, trigger="research_iteration_requested", reason="Research iteration requested from current workflow state", actor_type=actor_type, actor_id=actor_id)
+            return self.transition(
+                task_id,
+                TaskStatus.RESEARCHING,
+                trigger="research_iteration_requested",
+                reason="Research iteration requested from current workflow state",
+                actor_type=actor_type,
+                actor_id=actor_id,
+            )
         if run.iteration >= run.max_iterations:
-            return self.transition(task_id, TaskStatus.MAX_ITERATIONS_REACHED, trigger="iteration_limit_reached", reason=f"Maximum iterations reached: {run.max_iterations}", actor_type=actor_type, actor_id=actor_id)
+            return self.transition(
+                task_id,
+                TaskStatus.MAX_ITERATIONS_REACHED,
+                trigger="iteration_limit_reached",
+                reason=f"Maximum iterations reached: {run.max_iterations}",
+                actor_type=actor_type,
+                actor_id=actor_id,
+            )
         run.iteration += 1
-        return self.transition(task_id, TaskStatus.RESEARCHING, trigger="research_iteration_started", reason=f"Starting research iteration {run.iteration}", actor_type=actor_type, actor_id=actor_id)
+        self._persist_workflow(run)
+        return self.transition(
+            task_id,
+            TaskStatus.RESEARCHING,
+            trigger="research_iteration_started",
+            reason=f"Starting research iteration {run.iteration}",
+            actor_type=actor_type,
+            actor_id=actor_id,
+        )
 
     def record_agent_run(self, task_id: str, run_id: str) -> WorkflowRun:
         run = self.get_task_workflow(task_id)
         if run_id not in run.agent_run_ids:
             run.agent_run_ids = [*run.agent_run_ids, run_id]
+            self._persist_workflow(run)
         return run
 
-    def fail_task(self, task_id: str, *, reason: str, actor_type: ActorType = ActorType.SYSTEM, actor_id: str | None = "SYSTEM") -> StateTransition:
-        return self.transition(task_id, TaskStatus.FAILED, trigger="workflow_failure", reason=reason, actor_type=actor_type, actor_id=actor_id)
+    def fail_task(
+        self,
+        task_id: str,
+        *,
+        reason: str,
+        actor_type: ActorType = ActorType.SYSTEM,
+        actor_id: str | None = "SYSTEM",
+    ) -> StateTransition:
+        return self.transition(
+            task_id,
+            TaskStatus.FAILED,
+            trigger="workflow_failure",
+            reason=reason,
+            actor_type=actor_type,
+            actor_id=actor_id,
+        )
 
     def complete_with_limitations(self, task_id: str, *, reason: str) -> StateTransition:
-        return self.transition(task_id, TaskStatus.COMPLETED_WITH_LIMITATIONS, trigger="completed_with_limitations", reason=reason, actor_type=ActorType.SUPERVISOR, actor_id="SUPERVISOR")
+        return self.transition(
+            task_id,
+            TaskStatus.COMPLETED_WITH_LIMITATIONS,
+            trigger="completed_with_limitations",
+            reason=reason,
+            actor_type=ActorType.SUPERVISOR,
+            actor_id="SUPERVISOR",
+        )
+
+    def _persist_workflow(self, run: WorkflowRun) -> None:
+        if self.persistence is not None:
+            self.persistence.save_workflow_run(run)
 
     @staticmethod
     def _sync_workflow_status(run: WorkflowRun, state: TaskStatus) -> None:

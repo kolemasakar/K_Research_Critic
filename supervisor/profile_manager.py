@@ -12,12 +12,13 @@ from models import (
     UserApproval,
     utc_now,
 )
+from persistence import PersistenceStore
 
 from .exceptions import ProfileNotFoundError, ProfileStateError
 
 
 class ProfileManager:
-    """In-memory CriticProfile lifecycle manager with explicit user approval."""
+    """CriticProfile lifecycle manager with optional write-through persistence."""
 
     MATERIAL_FIELDS = frozenset(
         {
@@ -37,7 +38,8 @@ class ProfileManager:
         }
     )
 
-    def __init__(self) -> None:
+    def __init__(self, persistence: PersistenceStore | None = None) -> None:
+        self.persistence = persistence
         self._profiles: dict[str, CriticProfile] = {}
         self._pending_profile_by_task: dict[str, str] = {}
         self._approvals: list[UserApproval] = []
@@ -47,6 +49,8 @@ class ProfileManager:
     def record_assessment(self, assessment: DomainAssessment) -> None:
         self._assessments[assessment.assessment_id] = assessment
         self._latest_assessment_by_task[assessment.task_id] = assessment.assessment_id
+        if self.persistence is not None:
+            self.persistence.save_domain_assessment(assessment)
 
     def get_latest_assessment(self, task_id: str) -> DomainAssessment:
         assessment_id = self._latest_assessment_by_task.get(task_id)
@@ -80,6 +84,7 @@ class ProfileManager:
         )
         self._profiles[profile.profile_id] = profile
         self._pending_profile_by_task[profile.task_id] = profile.profile_id
+        self._persist_profile(profile)
         return profile
 
     def get_profile(self, profile_id: str) -> CriticProfile:
@@ -101,6 +106,7 @@ class ProfileManager:
         reviewed = self._rebuild(profile, status=ProfileStatus.REVIEW_REQUIRED)
         self._profiles[profile_id] = reviewed
         self._pending_profile_by_task[reviewed.task_id] = reviewed.profile_id
+        self._persist_profile(reviewed)
         return reviewed
 
     def edit_pending(self, profile_id: str, changes: dict[str, Any]) -> CriticProfile:
@@ -112,6 +118,7 @@ class ProfileManager:
             raise ProfileStateError(f"Unsupported profile fields: {sorted(unknown)}")
         edited = self._rebuild(profile, **changes)
         self._profiles[profile_id] = edited
+        self._persist_profile(edited)
         return edited
 
     def approve(
@@ -146,9 +153,16 @@ class ProfileManager:
         self._profiles[profile_id] = approved
         self._approvals.append(approval)
         self._pending_profile_by_task.pop(approved.task_id, None)
+        self._persist_profile(approved)
+        self._persist_approval(approval)
         return approved, approval
 
-    def reject(self, profile_id: str, *, reason: str | None = None) -> tuple[CriticProfile, UserApproval]:
+    def reject(
+        self,
+        profile_id: str,
+        *,
+        reason: str | None = None,
+    ) -> tuple[CriticProfile, UserApproval]:
         profile = self.get_profile(profile_id)
         if profile.status != ProfileStatus.REVIEW_REQUIRED:
             raise ProfileStateError("CriticProfile must be REVIEW_REQUIRED before rejection")
@@ -168,9 +182,15 @@ class ProfileManager:
         self._profiles[profile_id] = rejected
         self._approvals.append(approval)
         self._pending_profile_by_task.pop(rejected.task_id, None)
+        self._persist_profile(rejected)
+        self._persist_approval(approval)
         return rejected, approval
 
-    def propose_amendment(self, approved_profile_id: str, changes: dict[str, Any]) -> CriticProfile:
+    def propose_amendment(
+        self,
+        approved_profile_id: str,
+        changes: dict[str, Any],
+    ) -> CriticProfile:
         current = self.get_profile(approved_profile_id)
         if current.status != ProfileStatus.APPROVED:
             raise ProfileStateError("Only an APPROVED profile can be amended")
@@ -196,7 +216,40 @@ class ProfileManager:
         amendment = CriticProfile(**values)
         self._profiles[amendment.profile_id] = amendment
         self._pending_profile_by_task[amendment.task_id] = amendment.profile_id
+        self._persist_profile(amendment)
         return amendment
+
+    def restore_records(
+        self,
+        *,
+        assessments: list[DomainAssessment],
+        profiles: list[CriticProfile],
+        approvals: list[UserApproval],
+    ) -> None:
+        """Restore persisted profile state without creating new lifecycle events."""
+        for assessment in sorted(assessments, key=lambda item: item.created_at):
+            self._assessments[assessment.assessment_id] = assessment
+            self._latest_assessment_by_task[assessment.task_id] = assessment.assessment_id
+
+        for profile in sorted(
+            profiles,
+            key=lambda item: (item.task_id, item.version, item.created_at),
+        ):
+            self._profiles[profile.profile_id] = profile
+
+        existing_approval_ids = {item.approval_id for item in self._approvals}
+        for approval in sorted(approvals, key=lambda item: item.created_at):
+            if approval.approval_id not in existing_approval_ids:
+                self._approvals.append(approval)
+                existing_approval_ids.add(approval.approval_id)
+
+        by_task: dict[str, list[CriticProfile]] = {}
+        for profile in profiles:
+            if profile.status in {ProfileStatus.DRAFT, ProfileStatus.REVIEW_REQUIRED}:
+                by_task.setdefault(profile.task_id, []).append(profile)
+        for task_id, pending in by_task.items():
+            latest = max(pending, key=lambda item: (item.version, item.created_at))
+            self._pending_profile_by_task[task_id] = latest.profile_id
 
     def is_material_change(self, profile: CriticProfile, changes: dict[str, Any]) -> bool:
         for field, value in changes.items():
@@ -206,6 +259,14 @@ class ProfileManager:
 
     def get_approvals(self, task_id: str) -> list[UserApproval]:
         return [approval for approval in self._approvals if approval.task_id == task_id]
+
+    def _persist_profile(self, profile: CriticProfile) -> None:
+        if self.persistence is not None:
+            self.persistence.save_critic_profile(profile)
+
+    def _persist_approval(self, approval: UserApproval) -> None:
+        if self.persistence is not None:
+            self.persistence.save_user_approval(approval)
 
     @staticmethod
     def _rebuild(profile: CriticProfile, **changes: Any) -> CriticProfile:
@@ -222,7 +283,10 @@ class ProfileManager:
     @staticmethod
     def _cross_checks(risk: RiskLevel) -> list[str]:
         if risk == RiskLevel.CRITICAL:
-            return ["primary or official source where available", "two independent confirmations for critical claims"]
+            return [
+                "primary or official source where available",
+                "two independent confirmations for critical claims",
+            ]
         if risk == RiskLevel.HIGH:
             return ["two independent confirmations for high-impact claims"]
         if risk == RiskLevel.MEDIUM:
