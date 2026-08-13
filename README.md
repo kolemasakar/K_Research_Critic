@@ -1,12 +1,20 @@
-# K_Supervisor
-Базовий опис K_Supervisor як GPT Store-first мультиагентної системи для дослідження та незалежної перевірки.
+# K-Research & Critic
+Базовий опис K-Research & Critic як GPT Store-first мультиагентної системи для дослідження та незалежної перевірки.
 
-Version: 0.4
+Version: 0.5
 Status: DEVELOPMENT
 
 ## Overview
 
-K_Supervisor is a reusable multi-agent orchestration system.
+K-Research & Critic is the public GPT Store product built on the reusable K_Supervisor multi-agent orchestration system.
+
+Stable technical identifiers remain:
+
+```text
+Repository / engineering core: K_Supervisor
+Checkpoint marker: K_SUPERVISOR_CHECKPOINT
+Public GPT Store name: K-Research & Critic
+```
 
 Core rule:
 
@@ -20,7 +28,7 @@ The first product workflow combines ResearchAgent, independent CriticAgent revie
 
 ## Primary Product Target
 
-K_Supervisor is GPT Store-first.
+K-Research & Critic is GPT Store-first.
 
 Primary public edition:
 
