@@ -1,7 +1,7 @@
 # ROADMAP
 План поетапної реалізації K_Supervisor від базового каркаса до GPT Store-first мультиагентного продукту.
 
-Version: 1.3
+Version: 1.4
 Status: ACTIVE
 
 ## 1. Purpose
@@ -57,11 +57,16 @@ mandatory external backend: no
 
 The existing Python/provider runtime is retained as optional standalone infrastructure and as the engineering reference implementation.
 
-Primary document: `GPT_STORE_DEPLOYMENT.md`.
+Primary documents:
+
+```text
+GPT_STORE_DEPLOYMENT.md
+GPT_STORE_PACKAGE.md
+```
 
 ## 5. Phase 11 - Configuration, Cost, and Quality Controls
 
-Status: IN PROGRESS
+Status: COMPLETE
 
 ```text
 11.1 Configuration Core                          COMPLETE
@@ -71,7 +76,7 @@ Status: IN PROGRESS
 11.4A GPT Store-first Distribution Policy        COMPLETE
 11.5 Usage, Cost, and Quality Metrics            COMPLETE
 11.6 Logging / Sensitive-data Redaction          COMPLETE
-11.7 GPT Store Packaging / Publication Readiness NEXT
+11.7 GPT Store Packaging / Publication Readiness COMPLETE
 ```
 
 ### 5.1 Steps 11.1-11.4A
@@ -104,8 +109,6 @@ Delivered:
 - quality fields in the persisted-task audit CLI;
 - optional standalone provider telemetry for usage counts and cost estimation when source data is available.
 
-The GPT Store path derives quality metrics from existing workflow state and does not make additional external calls merely to calculate those metrics. Standalone provider telemetry is optional and does not affect Store workflow semantics.
-
 Validation:
 
 ```text
@@ -121,18 +124,14 @@ Status: COMPLETE
 
 Delivered:
 
-- `OperationalLogger` JSONL logging for the standalone/API reference runtime;
-- `OperationalLogContext` correlation using task_id, workflow_run_id, run_id, agent_id, and request_id;
-- `SensitiveDataRedactor` recursive configured-secret redaction;
-- redaction of secret-like fields and common credential patterns in free text;
-- explicit removal of chain-of-thought, scratchpad, and private-reasoning fields before persistence;
-- configuration invariant that prevents `logging.redact_secrets` from being disabled;
-- structured lifecycle/error events in the local end-to-end CLI;
-- no raw task text or report bodies in the default operational events;
-- GPT Store user-visible audit boundary defined without a mandatory private log backend;
-- `LOGGING.md` as the Phase 11.6 operational logging contract.
-
-The GPT Store path does not add an Action or external backend merely to collect operational telemetry. User-visible auditability comes from approved workflow state, PASS/REVISE history, quality metrics, final/review artifacts, explicit limitations, and the checkpoint mechanism finalized in Phase 11.7.
+- `OperationalLogger` JSONL logging for standalone/API runtime;
+- correlation identifiers for task/workflow/agent runs;
+- `SensitiveDataRedactor` for configured and secret-like values;
+- private-reasoning field removal before persistence;
+- mandatory `logging.redact_secrets` invariant;
+- structured CLI lifecycle/error events;
+- Store user-visible audit boundary without a private backend;
+- `LOGGING.md` as the logging contract.
 
 Validation:
 
@@ -144,35 +143,56 @@ GitHub Actions: 31665219508
 
 ### 5.4 Step 11.7 - GPT Store Packaging / Publication Readiness
 
+Status: COMPLETE
+
+Delivered:
+
+- `gpt_store/manifest.yaml` with name, description, conversation starters, model policy, capability mapping, and release invariants;
+- `prompts/GPT_STORE_INSTRUCTIONS.md` as the Builder-ready instruction package;
+- Web search and Code Interpreter & Data Analysis mapped as built-in capabilities;
+- Apps, Actions, external backend, developer API key, and pinned model excluded from the core Store package;
+- explicit logical Supervisor -> Research -> Critic role separation inside one ChatGPT runtime;
+- mandatory CriticProfile APPROVE/EDIT/REJECT gate preserved;
+- `K_SUPERVISOR_CHECKPOINT` schema v1.0 for cross-chat continuation;
+- safe checkpoint boundaries and conservative recovery rules;
+- synthetic checkpoint example and Pydantic validation contract;
+- `scripts/validate_store_package.py` static release validator;
+- Preview test matrix and Free/paid account manual release matrix;
+- current OpenAI GPT creation/publication requirements re-checked on 2026-08-13;
+- `GPT_STORE_PACKAGE.md` as the operator publication specification.
+
+Release state:
+
+```text
+ready_for_manual_publication_test
+```
+
+This state means repository packaging and CI are complete. It does not mean the Custom GPT has already been published. GPT Builder Preview, real Free-account use, paid-account model switching, Builder Profile/category/policy checks, and the final Publish action remain manual release operations in ChatGPT.
+
+Validation:
+
+```text
+Validated head: fb0d84468dddab88f15f425fda217cbabe1b057f
+GitHub Actions: 31666028204
+156 tests passed
+```
+
+Phase 11 is COMPLETE because the package is ready for publication testing and no developer-funded API/backend is required by the public core.
+
+## 6. Phase 12 - Test and CI Hardening
+
 Status: NEXT
 
 Scope:
 
-- create the Custom GPT instruction package;
-- define description and conversation starters;
-- map research behavior to built-in ChatGPT capabilities;
-- define conversation-local state and checkpoint behavior;
-- validate fresh-chat recovery;
-- validate Free-plan execution;
-- validate paid-plan model switching;
-- confirm the core Store experience has no mandatory external backend;
-- re-check current Store publication requirements immediately before release.
-
-Phase 11 completes when 11.7 is complete and the full CI suite is green.
-
-## 6. Phase 12 - Test and CI Hardening
-
-Status: PLANNED
-
-Scope:
-
-- broader contract, integration, and E2E coverage;
+- broaden unit/contract/integration/E2E coverage;
 - linting and type checks;
-- coverage policy;
-- CI workflow maintenance;
+- coverage/reporting policy;
+- GitHub Actions maintenance;
 - branch/PR checks;
-- dependency maintenance;
-- Store packaging regression checks where practical.
+- dependency/action maintenance;
+- Store packaging regression checks;
+- release-gate automation where it can be tested without pretending to perform ChatGPT UI/account validation.
 
 ## 7. Phase 13 - Modular Agent Platform
 
@@ -218,6 +238,7 @@ TEST_PLAN.md
 HYBRID_RESOLVER_PLAN.md
 PERSISTENCE.md
 GPT_STORE_DEPLOYMENT.md
+GPT_STORE_PACKAGE.md
 LOGGING.md
 ```
 
@@ -227,8 +248,7 @@ LOGGING.md
 Phase 0-10                               COMPLETE
 Post-MVP Hybrid Domain Resolver         COMPLETE
 GPT Store-first Product Decision        COMPLETE
-Phase 11.1-11.6                         COMPLETE
-Phase 11.7                              NEXT
-Phase 12                                PLANNED
+Phase 11                                COMPLETE
+Phase 12                                NEXT
 Phase 13                                PLANNED
 ```
