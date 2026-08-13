@@ -38,6 +38,13 @@ models:
     provider: null
     model: null
 
+resolver:
+  mode: hybrid
+  semantic_enabled: false
+  minimum_semantic_confidence: 0.70
+  require_agreement_for_high_risk: true
+  fallback_to_rules: true
+
 tools:
   web_search:
     enabled: true

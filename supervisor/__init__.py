@@ -13,6 +13,15 @@ from .exceptions import (
     WorkflowAlreadyActiveError,
     WorkflowNotFoundError,
 )
+from .hybrid_resolver import (
+    DomainResolverProtocol,
+    HybridResolutionAudit,
+    HybridResolver,
+    LLMSemanticResolver,
+    SemanticDomainProvider,
+    SemanticDomainResult,
+    SemanticResolutionError,
+)
 from .profile_manager import ProfileManager
 from .profile_workflow import ProfileWorkflow
 from .report_workflow import ReportWorkflow, ReportWorkflowOutcome
@@ -25,14 +34,20 @@ from .state_machine import StateMachine
 from .task_manager import TaskManager
 from .workflow_engine import WorkflowEngine
 
+RuleBasedResolver = DomainResolver
+
 __all__ = [
     "AgentNotFoundError",
     "AgentRegistrationError",
     "AgentRegistry",
     "DomainResolver",
+    "DomainResolverProtocol",
     "DuplicateTaskError",
+    "HybridResolutionAudit",
+    "HybridResolver",
     "InvalidStateTransitionError",
     "KSupervisorApplication",
+    "LLMSemanticResolver",
     "MVPOutcome",
     "MVPStatus",
     "PreparedTask",
@@ -45,6 +60,10 @@ __all__ = [
     "ResearchCriticIteration",
     "ResearchCriticLoop",
     "ResearchCriticLoopOutcome",
+    "RuleBasedResolver",
+    "SemanticDomainProvider",
+    "SemanticDomainResult",
+    "SemanticResolutionError",
     "StateMachine",
     "SupervisorError",
     "TaskManager",

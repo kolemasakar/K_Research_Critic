@@ -9,6 +9,7 @@ from agents import CriticAgent, ReportGenerator, ResearchAgent
 from models import CriticProfile, DomainAssessment, ExecutionStatus, Task, TaskStatus, UserApproval
 from tools import ResearchTools
 
+from .hybrid_resolver import DomainResolverProtocol
 from .profile_workflow import ProfileWorkflow
 from .report_workflow import ReportWorkflow, ReportWorkflowOutcome
 from .research_critic_loop import ResearchCriticLoop, ResearchCriticLoopOutcome
@@ -48,7 +49,7 @@ class MVPOutcome:
 
 
 class KSupervisorApplication:
-    """Compose the approved Phase 0-8 components into one end-to-end MVP workflow."""
+    """Compose the approved components into one end-to-end workflow."""
 
     def __init__(
         self,
@@ -57,11 +58,15 @@ class KSupervisorApplication:
         output_directory: str | Path = "output",
         default_max_iterations: int = 3,
         workflow_engine: WorkflowEngine | None = None,
+        domain_resolver: DomainResolverProtocol | None = None,
     ) -> None:
         if default_max_iterations <= 0:
             raise ValueError("default_max_iterations must be greater than zero")
         self.workflow_engine = workflow_engine or WorkflowEngine()
-        self.profile_workflow = ProfileWorkflow(self.workflow_engine)
+        self.profile_workflow = ProfileWorkflow(
+            self.workflow_engine,
+            domain_resolver=domain_resolver,
+        )
         self.research_agent = ResearchAgent(tools)
         self.critic_agent = CriticAgent(tools)
         self.report_generator = ReportGenerator(output_directory)

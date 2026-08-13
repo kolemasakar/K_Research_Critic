@@ -4,8 +4,8 @@ from typing import Any
 
 from models import ActorType, ApprovalDecision, CriticProfile, DomainAssessment, TaskStatus, UserApproval
 
-from .domain_resolver import DomainResolver
 from .exceptions import ProfileStateError
+from .hybrid_resolver import DomainResolverProtocol, HybridResolver
 from .profile_manager import ProfileManager
 from .workflow_engine import WorkflowEngine
 
@@ -28,11 +28,11 @@ class ProfileWorkflow:
         self,
         workflow_engine: WorkflowEngine,
         *,
-        domain_resolver: DomainResolver | None = None,
+        domain_resolver: DomainResolverProtocol | None = None,
         profile_manager: ProfileManager | None = None,
     ) -> None:
         self.workflow_engine = workflow_engine
-        self.domain_resolver = domain_resolver or DomainResolver()
+        self.domain_resolver = domain_resolver or HybridResolver()
         self.profile_manager = profile_manager or ProfileManager()
 
     def generate_profile(
