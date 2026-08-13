@@ -42,13 +42,14 @@ from .enums import (
 )
 from .identifiers import IdPrefix, generate_id
 from .research import ResearchResult
+from .telemetry import ProviderUsageRecord, TaskQualityMetrics
 
 __all__ = [
     "ActorType", "AgentDefinition", "AgentResult", "AgentRunRequest", "AgentStatus", "AgentType",
     "ApprovalDecision", "ApprovalType", "Artifact", "ArtifactStatus", "ArtifactType", "Claim", "ClaimType",
     "CriticProfile", "CriticReview", "DomainAssessment", "ErrorRecord", "ErrorType", "ExecutionStatus",
-    "IdPrefix", "ImportanceLevel", "Metrics", "ProfileStatus", "ReliabilityClass", "ResearchResult",
-    "ReviewDecision", "ReviewResult", "RiskLevel", "Source", "SourceType", "StateTransition", "Task",
-    "TaskStatus", "UserApproval", "VerificationStatus", "WarningRecord", "WorkflowRun", "WorkflowStatus",
-    "WorkflowType", "generate_id", "utc_now",
+    "IdPrefix", "ImportanceLevel", "Metrics", "ProfileStatus", "ProviderUsageRecord", "ReliabilityClass",
+    "ResearchResult", "ReviewDecision", "ReviewResult", "RiskLevel", "Source", "SourceType", "StateTransition",
+    "Task", "TaskQualityMetrics", "TaskStatus", "UserApproval", "VerificationStatus", "WarningRecord",
+    "WorkflowRun", "WorkflowStatus", "WorkflowType", "generate_id", "utc_now",
 ]

@@ -22,6 +22,7 @@ from .hybrid_resolver import (
     SemanticDomainResult,
     SemanticResolutionError,
 )
+from .metrics import collect_quality_metrics, collect_quality_metrics_from_audit
 from .profile_manager import ProfileManager
 from .profile_workflow import ProfileWorkflow
 from .provider_factory import (
@@ -82,4 +83,6 @@ __all__ = [
     "WorkflowEngine",
     "WorkflowNotFoundError",
     "build_domain_resolver",
+    "collect_quality_metrics",
+    "collect_quality_metrics_from_audit",
 ]
