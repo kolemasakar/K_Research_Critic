@@ -24,7 +24,7 @@ class TaskAuditSnapshot:
     """Restart-safe persisted view of one task and its execution history."""
 
     task: Task
-    workflow_run: WorkflowRun | None
+    workflow_run: WorkflowRun | None = None
     transitions: tuple[StateTransition, ...] = ()
     domain_assessments: tuple[DomainAssessment, ...] = ()
     critic_profiles: tuple[CriticProfile, ...] = ()
