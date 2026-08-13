@@ -1,7 +1,7 @@
 # K_Supervisor
 Базовий опис K_Supervisor як GPT Store-first мультиагентної системи для дослідження та незалежної перевірки.
 
-Version: 0.2
+Version: 0.3
 Status: DEVELOPMENT
 
 ## Overview
@@ -20,7 +20,7 @@ The first product workflow combines ResearchAgent, independent CriticAgent revie
 
 ## Primary Product Target
 
-K_Supervisor is now **GPT Store-first**.
+K_Supervisor is **GPT Store-first**.
 
 Primary public edition:
 
@@ -37,14 +37,14 @@ GPT Store Edition
 
 The current Python/SQLite/provider implementation remains available as an optional **Standalone/API Edition** and engineering reference runtime. It is not a dependency of the free GPT Store core path.
 
-See `docs/GPT_STORE_DEPLOYMENT.md`.
+See `docs/GPT_STORE_DEPLOYMENT.md` and `docs/GPT_STORE_PACKAGE.md`.
 
 ## Current Status
 
 ```text
 Phase 0-10                                           COMPLETE
 Post-MVP Hybrid Domain Resolver                     COMPLETE
-Phase 11 - Configuration, Cost, Quality Controls    IN PROGRESS
+Phase 11 - Configuration, Cost, Quality Controls    COMPLETE
   11.1 Configuration Core                           COMPLETE
   11.2 Task Configuration Snapshot                  COMPLETE
   11.3 Provider / Model Factory                     COMPLETE
@@ -52,8 +52,17 @@ Phase 11 - Configuration, Cost, Quality Controls    IN PROGRESS
   11.4A GPT Store-first Distribution Policy         COMPLETE
   11.5 Usage, Cost, and Quality Metrics             COMPLETE
   11.6 Logging / Secret Redaction                   COMPLETE
-  11.7 GPT Store Packaging / Publication Readiness  NEXT
+  11.7 GPT Store Packaging / Publication Readiness  COMPLETE
+Phase 12 - Test and CI Hardening                    NEXT
 ```
+
+Store package release state:
+
+```text
+ready_for_manual_publication_test
+```
+
+This means the repository package is ready for GPT Builder Preview and real Free/paid account release checks. It does **not** mean the GPT is already published in the GPT Store.
 
 ## Logical Workflow
 
@@ -83,11 +92,49 @@ CriticAgent
                          +-- <TASK_ID>_REVIEW_PROTOCOL.md
 ```
 
-The same logical workflow is preserved across Store and standalone editions.
+The same logical workflow is preserved across Store and standalone editions. In the Store Edition, Research and Critic are separated logical passes inside one ChatGPT runtime rather than process-isolated model instances.
+
+## GPT Store Package
+
+The publication package is tracked in the repository:
+
+```text
+gpt_store/manifest.yaml
+prompts/GPT_STORE_INSTRUCTIONS.md
+gpt_store/checkpoint.py
+gpt_store/checkpoint_example.json
+scripts/validate_store_package.py
+docs/GPT_STORE_PACKAGE.md
+```
+
+Static validation:
+
+```text
+python -m scripts.validate_store_package
+python -m pytest
+```
+
+Builder configuration from the manifest:
+
+```text
+Name: K_Supervisor
+Recommended model: unset
+Model policy: user_plan
+Web search: enabled
+Code Interpreter & Data Analysis: enabled
+Image generation: disabled
+Apps: disabled
+Actions: disabled
+Knowledge files required: no
+Developer API key: no
+External backend: no
+```
+
+The actual GPT Store publication action and real Free/paid account tests are manual release operations in ChatGPT.
 
 ## Distribution and Model Policy
 
-Tracked defaults in `config/settings.yaml` now include:
+Tracked defaults in `config/settings.yaml` include:
 
 ```yaml
 distribution:
@@ -118,7 +165,7 @@ HybridResolver preserves deterministic fallback, risk floors, semantic schema va
 
 For the Python reference runtime, Phase 11.3 includes an optional `OpenAISemanticDomainProvider` behind the provider-neutral boundary. That adapter may require `OPENAI_API_KEY` when explicitly selected for standalone/API execution.
 
-For the GPT Store Edition, semantic reasoning must use the ChatGPT host runtime and must not require a developer secret.
+For the GPT Store Edition, semantic reasoning uses the ChatGPT host runtime and requires no developer secret.
 
 ## Persistence and Recovery
 
@@ -138,7 +185,21 @@ PROFILE_APPROVED
 REVISE_REQUIRED
 ```
 
-GPT Store Edition does not depend on private server-side SQLite. Baseline state is conversation-local. Cross-chat continuity is planned through an explicit checkpoint/recovery artifact during Store packaging.
+GPT Store Edition does not depend on private server-side SQLite. Each separate GPT conversation starts fresh, so cross-chat continuity is implemented with the explicit user-controlled `K_SUPERVISOR_CHECKPOINT` contract.
+
+Safe Store checkpoint states:
+
+```text
+PROFILE_REVIEW_REQUIRED
+PROFILE_APPROVED
+REVISE_REQUIRED
+APPROVED
+FINALIZED
+COMPLETED_WITH_LIMITATIONS
+FAILED
+```
+
+Ambiguous mid-agent states are not replayed automatically.
 
 ## Configuration and Runtime Controls
 
@@ -167,7 +228,7 @@ Quality metrics can be reconstructed from `TaskAuditSnapshot` after restart. The
 
 The GPT Store Edition does not request provider token or billing telemetry and does not create developer-funded API calls merely to collect metrics.
 
-Optional Standalone/API integrations may use `ProviderUsageRecord` and `MeteredOpenAISemanticDomainProvider` to capture API attempts and provider-reported token usage. Estimated cost is produced only when the provider exposes token counts and pricing is supplied explicitly. The metered provider is an opt-in standalone adapter; it is not the default GPT Store path and is not currently selected automatically by `build_domain_resolver()`.
+Optional Standalone/API integrations may use `ProviderUsageRecord` and `MeteredOpenAISemanticDomainProvider` to capture API attempts and provider-reported token usage. Estimated cost is produced only when the provider exposes token counts and pricing is supplied explicitly. The metered provider is opt-in and is not the default GPT Store path.
 
 ## Logging and Sensitive-data Redaction
 
@@ -175,9 +236,9 @@ Phase 11.6 adds a standalone `OperationalLogger` that writes structured UTF-8 JS
 
 `SensitiveDataRedactor` recursively removes configured RuntimeSecrets, secret-like fields, Bearer credentials, API-key patterns, JWT-like values, URI credentials, and common secret assignments. Private reasoning fields such as chain-of-thought or scratchpad content are removed before persistence.
 
-`logging.redact_secrets: true` is now a validated system invariant and cannot be disabled by a normal settings file.
+`logging.redact_secrets: true` is a validated system invariant and cannot be disabled by a normal settings file.
 
-The GPT Store Edition does not require a private logging backend. Its audit equivalent is user-visible workflow state, CriticProfile approval, PASS/REVISE history, quality metrics, final/review artifacts, explicit limitations, and a user-controlled checkpoint artifact finalized in Phase 11.7.
+The GPT Store Edition does not require a private logging backend. Its audit equivalent is user-visible workflow state, CriticProfile approval, PASS/REVISE history, quality metrics, final/review artifacts, explicit limitations, and the checkpoint artifact.
 
 See `docs/LOGGING.md`.
 
@@ -197,15 +258,9 @@ python -m pytest
 
 `.env` is optional and is needed only when a selected standalone integration requires a secret.
 
-Example template:
-
-```text
-copy .env.example .env
-```
-
 ## End-to-End Local CLI
 
-The bundled CLI currently uses `JsonCorpusProvider`, a deterministic local corpus provider for reproducible tests/offline execution.
+The bundled CLI uses `JsonCorpusProvider`, a deterministic local corpus provider for reproducible tests/offline execution.
 
 ```text
 python -m scripts.run_research --task "Explain software architecture behavior" --corpus examples/sample_corpus.json
@@ -217,15 +272,13 @@ Explicit non-interactive approval:
 python -m scripts.run_research --task "Explain software architecture behavior" --corpus examples/sample_corpus.json --approve-profile
 ```
 
-The local CLI is an engineering/reference runtime, not the final GPT Store execution surface. When file logging is enabled it also reports the sanitized operational JSONL path.
+The local CLI is an engineering/reference runtime, not the GPT Store execution surface.
 
 ## Audit CLI
 
 ```text
 python -m scripts.audit_task --task-id TASK_EXAMPLE --database runtime/k_supervisor.db
 ```
-
-The audit output includes persisted workflow counts plus Phase 11.5 quality metrics such as final reliability, claim/source coverage, claim verification, unresolved issues, and search/fetch call totals.
 
 ## Repository Structure
 
@@ -235,12 +288,13 @@ supervisor/     orchestration core
 persistence/    storage-neutral persistence and SQLite store
 providers/      optional concrete external provider adapters
 observability/  structured operational logging and redaction
+gpt_store/      GPT Store manifest and checkpoint contract
 models/         domain and transport contracts
 tools/          external capability adapters and evidence utilities
 config/         tracked non-secret configuration
-prompts/        prompt assets
+prompts/        GPT Store and future prompt assets
 tests/          automated tests
-scripts/        local commands and maintenance utilities
+scripts/        local commands and package validators
 examples/       deterministic sample inputs
 output/         generated standalone artifacts
 runtime/        local SQLite runtime data; ignored by Git
@@ -262,19 +316,30 @@ docs/TEST_PLAN.md
 docs/HYBRID_RESOLVER_PLAN.md
 docs/PERSISTENCE.md
 docs/GPT_STORE_DEPLOYMENT.md
+docs/GPT_STORE_PACKAGE.md
 docs/LOGGING.md
 ```
 
 ## Current Known Boundaries
 
-- GPT Store packaging/instructions are not yet implemented; scheduled for Phase 11.7.
-- Store Edition has no mandatory private backend, so SQLite restart semantics do not directly apply inside ChatGPT.
-- Store Edition also has no mandatory private operational-log backend; its audit/checkpoint behavior is user-visible.
+- The repository package is ready for manual GPT Builder Preview/publication testing but has not been published automatically.
+- Live Free-account execution and paid-account model-switch behavior must be verified in real ChatGPT accounts before public release.
+- Store Edition has no mandatory private backend, SQLite, or private operational-log dependency.
+- Each separate Custom GPT conversation starts fresh; cross-chat continuation depends on the explicit checkpoint artifact.
 - The Python reference CLI still uses deterministic local corpus research rather than ChatGPT-native live tools.
-- CriticAgent's current Python implementation uses conservative deterministic evidence-relation heuristics rather than full semantic LLM fact checking.
+- CriticAgent's Python reference implementation uses conservative deterministic evidence-relation heuristics rather than full semantic LLM fact checking.
 - Provider token/cost telemetry is only meaningful for optional standalone/API providers that expose it.
-- Store Edition does not assume access to provider token/cost data.
-- `MeteredOpenAISemanticDomainProvider` is currently opt-in and is not automatically selected by the provider factory.
+- `MeteredOpenAISemanticDomainProvider` remains opt-in and is not automatically selected by the provider factory.
+
+## Validation
+
+Phase 11.7 static validation:
+
+```text
+Validated head: fb0d84468dddab88f15f425fda217cbabe1b057f
+GitHub Actions: 31666028204
+156 tests passed
+```
 
 ## Output Artifacts
 
@@ -285,4 +350,4 @@ Logical workflow outputs remain:
 <TASK_ID>_REVIEW_PROTOCOL.md
 ```
 
-Store packaging will define the equivalent ChatGPT-native artifact and checkpoint experience without requiring an external service.
+The GPT Store instructions define the equivalent ChatGPT-native final report/review protocol and the `K_SUPERVISOR_CHECKPOINT` continuity artifact without requiring an external service.
