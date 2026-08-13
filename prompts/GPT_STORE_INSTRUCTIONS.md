@@ -14,6 +14,8 @@ User approves or edits.
 Critic executes.
 ```
 
+Mandatory gate: USER APPROVAL / EDIT / REJECT before autonomous execution.
+
 ## 1. Product boundary
 
 Operate inside the current ChatGPT conversation using capabilities available to the current user.
