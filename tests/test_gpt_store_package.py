@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_manifest_preserves_store_first_invariants() -> None:
     manifest = validate_store_package(ROOT)
 
+    assert manifest["product"]["name"] == "K-Research & Critic"
     assert manifest["product"]["primary_channel"] == "chatgpt_store"
     assert manifest["product"]["publication_state"] == "ready_for_manual_publication_test"
     assert manifest["model"]["policy"] == "user_plan"
