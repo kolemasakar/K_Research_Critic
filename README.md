@@ -35,14 +35,19 @@ Phase 8  - ReportGenerator and Final Artifacts          COMPLETE
 Phase 9  - End-to-End MVP                               COMPLETE
 Post-MVP - Hybrid Domain Resolver                       COMPLETE
 Phase 10 - Persistence and Audit                        COMPLETE
+Phase 11 - Configuration, Cost, and Quality Controls    IN PROGRESS
+           11.1 Configuration Core                      COMPLETE
+           11.2 Task Configuration Snapshot             COMPLETE
+           11.3 Provider / Model Factory                COMPLETE
+           11.4 Runtime Controls                        COMPLETE
 ```
 
-The MVP boundary was reached at Phase 9. The current implementation also includes the scheduled Hybrid Domain Resolver enhancement and restart-safe SQLite persistence/audit support.
+The MVP boundary was reached at Phase 9. The current implementation also includes the scheduled Hybrid Domain Resolver enhancement, restart-safe SQLite persistence/audit support, centralized validated configuration, frozen task configuration snapshots, configurable semantic provider wiring, and runtime resource controls.
 
-Next implementation phase:
+Next implementation step:
 
 ```text
-Phase 11 - Configuration, Cost, and Quality Controls
+Phase 11.5 - Usage, Cost, and Quality Metrics
 ```
 
 ## Implemented Workflow
@@ -73,7 +78,7 @@ CriticAgent
                          +-- <TASK_ID>_REVIEW_PROTOCOL.md
 ```
 
-`KSupervisorApplication` composes task intake, domain assessment, CriticProfile review, explicit user approval, autonomous Research-Critic iterations, deterministic termination, final artifact generation, and optional persistence into one programmatic workflow.
+`KSupervisorApplication` composes task intake, domain assessment, CriticProfile review, explicit user approval, autonomous Research-Critic iterations, deterministic termination, final artifact generation, optional persistence, frozen task configuration, and runtime controls into one programmatic workflow.
 
 Overall application statuses are:
 
@@ -97,7 +102,7 @@ DomainResolverProtocol
 
 The semantic resolver is provider-neutral and validates structured `SemanticDomainResult` output before merge. HybridResolver preserves deterministic fallback, prevents matched deterministic risk from being silently lowered, merges compatible multi-domain results, records material disagreements, and exposes `HybridResolutionAudit` without changing the stable `DomainAssessment` schema.
 
-`ProfileWorkflow` uses `HybridResolver` by default. When no semantic provider is configured, the deterministic Phase 3 result is returned unchanged. A concrete LLM provider is intentionally not hard-coded into Supervisor; provider/model factory wiring is scheduled for Phase 11.
+Phase 11.3 adds a provider/model factory plus a concrete `OpenAISemanticDomainProvider`. Vendor-specific request logic remains outside Supervisor workflow code. The tracked configuration still keeps semantic resolution disabled by default, so normal repository tests and the bundled CLI remain deterministic until a provider/model and runtime API key are explicitly configured.
 
 ## Persistence and Audit
 
@@ -145,6 +150,29 @@ REVISE_REQUIRED
 ```
 
 Terminal tasks remain fully auditable after restart. Automatic mid-step replay is not performed from `RESEARCHING`, `DRAFT_READY`, or `REVIEWING`, because the last external agent/tool side effect may be ambiguous. This avoids duplicate or uncertain execution.
+
+## Phase 11 Configuration and Runtime Controls
+
+Phase 11.1-11.4 are implemented.
+
+Tracked defaults load from `config/settings.yaml`; environment values and local secrets load separately. Configuration models are frozen and reject unknown fields or attempts to disable system approval invariants.
+
+After explicit CriticProfile approval, Supervisor creates an immutable, secret-free `TaskConfigurationSnapshot`. The snapshot records the effective settings, environment, schema version, approved profile identity, and configuration fingerprint. It is persisted through Task metadata, survives SQLite restart/recovery, and remains unchanged if global configuration changes while the task is active. A later approved CriticProfile amendment creates a new snapshot record that supersedes the previous record while preserving the original task settings.
+
+Configured runtime controls now enforce:
+
+```text
+research query/source limits
+critic verification limits
+web_search and web_fetch enablement
+search/fetch call budgets
+tool timeouts
+retry attempts and backoff
+total runtime ceiling checks
+final artifact output-size limit
+```
+
+These controls are derived from the frozen task configuration rather than from mutable global settings during autonomous execution.
 
 ## Local Development Setup
 
@@ -252,6 +280,7 @@ The sample corpus is synthetic and must not be treated as factual research evide
 agents/       agent implementations
 supervisor/   orchestration core
 persistence/  storage-neutral persistence boundary and SQLite store
+providers/    concrete external model/provider adapters
 models/       domain and transport models
 tools/        external capability adapters and evidence utilities
 prompts/      prompt assets
@@ -283,6 +312,8 @@ schema_version: "1"
 
 Local secrets and environment-specific values belong in `.env`. Never commit `.env` or real secret values.
 
+Semantic domain resolution can be enabled explicitly through the domain-resolver model role and `OPENAI_API_KEY`. The tracked default remains disabled.
+
 ## Documentation
 
 Canonical project documents:
@@ -303,10 +334,10 @@ docs/PERSISTENCE.md
 ## Current Known Boundaries
 
 - The bundled research CLI still uses the deterministic local corpus provider rather than live Internet search.
-- A concrete semantic LLM provider is not wired by default; provider/model configuration is scheduled for Phase 11.
+- The concrete semantic OpenAI provider is selectable but remains disabled in tracked defaults until provider/model settings and an API key are supplied.
 - CriticAgent still uses conservative deterministic evidence-relation heuristics rather than full LLM semantic fact checking.
 - Recovery does not automatically replay ambiguous mid-agent states.
-- Configuration snapshots, model/cost controls, and full role-based provider factories are Phase 11 scope.
+- Token/API usage, estimated cost, quality metrics, and the finalized logging/redaction layer remain Phase 11.5-11.6 scope.
 
 ## Output Artifacts
 

@@ -477,6 +477,30 @@ Scope:
 - record quality metrics;
 - implement logging policy and secret redaction.
 
+Implementation steps:
+
+```text
+11.1 Configuration Core                       COMPLETE
+11.2 Task Configuration Snapshot              COMPLETE
+11.3 Provider / Model Factory                 COMPLETE
+11.4 Runtime Controls                         COMPLETE
+11.5 Usage, Cost, and Quality Metrics         NEXT
+11.6 Logging / Secret Redaction / Finalization PLANNED
+```
+
+Implemented through 11.4:
+
+- frozen typed settings and explicit configuration invariants;
+- tracked defaults plus environment/secret loading;
+- immutable secret-free task configuration snapshots created after CriticProfile approval;
+- snapshot persistence through Task audit metadata and restart-safe reconstruction;
+- profile-amendment snapshots preserve the original active task settings even after restart and global configuration changes;
+- role-based domain resolver factory;
+- concrete OpenAI semantic domain provider adapter behind the provider-neutral resolver boundary;
+- semantic provider remains disabled in tracked defaults until provider/model/API key are explicitly configured;
+- frozen research and critic limits are passed into agent execution;
+- search/fetch enablement, call budgets, timeout, retry/backoff, runtime ceiling checks, and final artifact size limits are enforced.
+
 Exit criteria:
 
 - operational limits are configuration-driven;
@@ -486,7 +510,16 @@ Exit criteria:
 - concrete semantic resolver provider can be selected through configuration;
 - full CI suite passes.
 
-Status: PLANNED
+Interim validation through Step 11.4:
+
+```text
+Implementation commit: fc64e407a2f69179e69fe4df9d3b1562a725886e
+Snapshot restart hardening: 5482ac0c5fe2aa294a94585aef8d147d08c19e62
+GitHub Actions run: 31661584051
+134 tests passed
+```
+
+Status: IN PROGRESS
 
 ## 15. Phase 12 - Test and CI Hardening
 
@@ -595,10 +628,12 @@ Post-MVP - Hybrid Domain Resolver                       COMPLETE
 Phase 10 - Persistence and Audit                        COMPLETE
 ```
 
-Next implementation phase:
+Current implementation phase:
 
 ```text
-Phase 11 - Configuration, Cost, and Quality Controls
+Phase 11 - Configuration, Cost, and Quality Controls    IN PROGRESS
+11.1-11.4                                               COMPLETE
+11.5 Usage, Cost, and Quality Metrics                   NEXT
 ```
 
 Later phases:
@@ -618,4 +653,5 @@ Phase 13 - Modular Agent Platform
 - MVP completion is defined at Phase 9 and is complete.
 - Hybrid domain resolution is complete with deterministic fallback and unchanged approval semantics.
 - Phase 10 durable SQLite persistence and restart-safe audit/recovery are complete.
-- Phase 11 is next and will add centralized configuration, provider wiring, cost controls, and quality metrics.
+- Phase 11 is in progress: configuration core, frozen task snapshots, provider/model wiring, concrete semantic provider selection, and runtime controls are complete through Step 11.4.
+- Phase 11.5 will add usage, cost, and quality metrics; Phase 11.6 will finalize logging and secret redaction.
