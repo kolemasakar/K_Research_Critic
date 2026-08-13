@@ -81,7 +81,7 @@ class TaskManager:
         task_id: str,
         snapshot: TaskConfigurationSnapshot,
     ) -> Task:
-        """Append an immutable configuration snapshot without mutating historical snapshots."""
+        """Append a profile-linked snapshot while preserving the task's frozen settings."""
         task = self.get_task(task_id)
         if snapshot.task_id != task_id:
             raise ValueError("TaskConfigurationSnapshot task_id must match Task task_id")
@@ -96,8 +96,19 @@ class TaskManager:
         latest = existing[-1] if existing else None
         if latest is None and snapshot.supersedes_snapshot_id is not None:
             raise ValueError("Initial configuration snapshot cannot supersede another snapshot")
-        if latest is not None and snapshot.supersedes_snapshot_id != latest.snapshot_id:
-            raise ValueError("New configuration snapshot must supersede the current snapshot")
+        if latest is not None:
+            if snapshot.supersedes_snapshot_id != latest.snapshot_id:
+                raise ValueError("New configuration snapshot must supersede the current snapshot")
+            snapshot = TaskConfigurationSnapshot(
+                task_id=task_id,
+                configuration_schema_version=latest.configuration_schema_version,
+                environment=latest.environment,
+                settings_fingerprint=latest.settings_fingerprint,
+                effective_settings=latest.effective_settings,
+                approved_profile_id=snapshot.approved_profile_id,
+                approved_profile_version=snapshot.approved_profile_version,
+                supersedes_snapshot_id=latest.snapshot_id,
+            )
 
         serialized = [item.model_dump(mode="json") for item in existing]
         serialized.append(snapshot.model_dump(mode="json"))
