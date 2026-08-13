@@ -369,7 +369,7 @@ Status: COMPLETE
 
 Goal: improve domain classification semantically without expanding the initial MVP scope.
 
-Schedule: after Phase 9 End-to-End MVP and before or alongside later post-MVP platform work.
+Schedule: after Phase 9 End-to-End MVP and before later post-MVP platform work.
 
 Scope:
 
@@ -377,7 +377,7 @@ Scope:
 - add provider-neutral LLMSemanticResolver;
 - implement HybridResolver conflict and merge policy;
 - preserve deterministic high-risk floors;
-- validate semantic output against DomainAssessment;
+- validate semantic output before merge;
 - add classification confidence and uncertainty handling;
 - preserve the existing CriticProfile user approval boundary;
 - add fallback and disagreement tests.
@@ -397,7 +397,7 @@ Exit criteria:
 - existing Phase 3 approval semantics remain unchanged;
 - complete CI suite passes.
 
-Status: PLANNED
+Status: COMPLETE
 
 ## 13. Phase 10 - Persistence and Audit
 
@@ -544,7 +544,7 @@ HYBRID_RESOLVER_PLAN.md
 
 ## 19. Current Implementation Order
 
-MVP development sequence:
+Completed MVP sequence:
 
 ```text
 Phase 0 - Repository Bootstrap                 COMPLETE
@@ -559,16 +559,21 @@ Phase 8 - ReportGenerator and Final Artifacts COMPLETE
 Phase 9 - End-to-End MVP                      COMPLETE
 ```
 
-Next scheduled post-MVP enhancement:
+Completed post-MVP enhancement:
 
 ```text
-Hybrid Domain Resolver - see HYBRID_RESOLVER_PLAN.md
+Hybrid Domain Resolver                        COMPLETE
 ```
 
-After the scheduled Hybrid Domain Resolver enhancement:
+Next implementation phase:
 
 ```text
 Phase 10 - Persistence and Audit
+```
+
+Later phases:
+
+```text
 Phase 11 - Configuration, Cost, and Quality Controls
 Phase 12 - Test and CI Hardening
 Phase 13 - Modular Agent Platform
@@ -581,6 +586,7 @@ Phase 13 - Modular Agent Platform
 - CriticAgent remains generic and receives dynamic domain configuration.
 - Supervisor owns workflow control, state, iteration limits, and finalization.
 - ResearchAgent and CriticAgent operate autonomously after profile approval.
-- MVP completion is defined at Phase 9 and is now complete.
-- Hybrid semantic domain resolution is the next scheduled post-MVP enhancement.
-- Persistence, cost controls, CI hardening, and broader agent expansion follow the working MVP and the scheduled Hybrid Domain Resolver enhancement.
+- MVP completion is defined at Phase 9 and is complete.
+- Hybrid semantic domain resolution is implemented with deterministic fallback and an unchanged user approval boundary.
+- Phase 10 - Persistence and Audit is the next implementation phase.
+- Cost controls, CI hardening, and broader agent expansion follow the persistence layer.
