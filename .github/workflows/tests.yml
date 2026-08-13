@@ -8,72 +8,82 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: tests-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  pytest:
-    name: Tests / Python ${{ matrix.python-version }}
+  test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.13", "3.14"]
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
-          cache-dependency-path: requirements.txt
 
-      - name: Install runtime test dependencies
+      - name: Install project dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Show environment
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          python --version
+          python -m pytest --version
 
-      - name: Run full pytest suite
+      - name: Run tests
         run: python -m pytest -q
 
   quality:
-    name: Quality gates
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.13"
           cache: pip
-          cache-dependency-path: |
-            requirements.txt
-            requirements-dev.txt
 
-      - name: Install development dependencies
+      - name: Install project and quality dependencies
         run: |
-          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
           python -m pip install -r requirements-dev.txt
 
-      - name: Ruff correctness lint
-        run: python -m ruff check . --select E9,F63,F7,F82
+      - name: Dependency integrity
+        run: python -m pip check
 
-      - name: Mypy typed boundary check
-        run: python -m mypy models config gpt_store
-
-      - name: Validate repository policy
+      - name: Repository policy validation
         run: python -m scripts.validate_repository
 
-      - name: Validate GPT Store package
-        run: python -m scripts.validate_store_package
+      - name: Ruff
+        run: python -m ruff check agents config models persistence supervisor tools tests
 
-      - name: Run coverage gate
-        run: python -m pytest --cov --cov-report=term-missing --cov-fail-under=70
+      - name: Mypy
+        run: python -m mypy agents config models persistence supervisor tools
+
+      - name: Coverage
+        run: >-
+          python -m pytest -q tests
+          --cov=agents
+          --cov=config
+          --cov=models
+          --cov=persistence
+          --cov=supervisor
+          --cov=tools
+          --cov-report=term-missing
+          --cov-fail-under=70

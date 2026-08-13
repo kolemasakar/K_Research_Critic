@@ -1,0 +1,168 @@
+{
+  "schema_version": "1.0",
+  "description": "Deterministic offline reference benchmark for K_Supervisor quality regression.",
+  "tasks": [
+    {
+      "benchmark_id": "REF_LITERARY_001",
+      "request": "Analyze the literary novel narrative voice and interpretation.",
+      "expected_domain": "literary_analysis",
+      "expected_status": "SUCCESS",
+      "max_iterations": 2,
+      "expected_iterations": 1,
+      "minimum_reliability_score": 0.75,
+      "minimum_sources": 1,
+      "minimum_claims": 1,
+      "research_constraints": {
+        "max_queries": 1,
+        "max_sources": 1,
+        "max_sources_per_query": 1
+      }
+    },
+    {
+      "benchmark_id": "REF_SOFTWARE_001",
+      "request": "Assess software architecture separation between orchestration and provider adapters.",
+      "expected_domain": "software_engineering",
+      "expected_status": "SUCCESS",
+      "max_iterations": 2,
+      "expected_iterations": 1,
+      "minimum_reliability_score": 0.80,
+      "minimum_sources": 1,
+      "minimum_claims": 1,
+      "research_constraints": {
+        "max_queries": 1,
+        "max_sources": 1,
+        "max_sources_per_query": 1
+      }
+    },
+    {
+      "benchmark_id": "REF_MEDICINE_001",
+      "request": "Assess current medical treatment guidance and patient safety evidence.",
+      "expected_domain": "medicine",
+      "expected_status": "SUCCESS",
+      "max_iterations": 2,
+      "expected_iterations": 1,
+      "minimum_reliability_score": 0.95,
+      "minimum_sources": 1,
+      "minimum_claims": 1,
+      "research_constraints": {
+        "max_queries": 1,
+        "max_sources": 1,
+        "max_sources_per_query": 1
+      }
+    },
+    {
+      "benchmark_id": "REF_GEODESY_001",
+      "request": "Evaluate GNSS RTK surveying accuracy and coordinate reference-system evidence.",
+      "expected_domain": "geodesy",
+      "expected_status": "SUCCESS",
+      "max_iterations": 2,
+      "expected_iterations": 1,
+      "minimum_reliability_score": 0.90,
+      "minimum_sources": 1,
+      "minimum_claims": 1,
+      "research_constraints": {
+        "max_queries": 1,
+        "max_sources": 1,
+        "max_sources_per_query": 1
+      }
+    }
+  ],
+  "documents": [
+    {
+      "url": "https://benchmark.example/literary-a",
+      "title": "Reference Literary Evidence A",
+      "publisher": "Reference Literary Archive A",
+      "snippet": "Literary novel narrative voice evidence for deterministic benchmark validation.",
+      "publication_date": "2026-08-01",
+      "source_type": "PRIMARY_DOCUMENT",
+      "reliability_class": "A",
+      "primary_source": true,
+      "independence_group": "literary-a",
+      "content": "Narrative voice in the reference novel uses first-person perspective to shape the reader's interpretation of memory and identity. The fixture is synthetic and exists only for deterministic validation."
+    },
+    {
+      "url": "https://benchmark.example/literary-b",
+      "title": "Reference Literary Evidence B",
+      "publisher": "Reference Literary Archive B",
+      "snippet": "Independent literary novel narrative voice confirmation for benchmark validation.",
+      "publication_date": "2026-08-01",
+      "source_type": "PRIMARY_DOCUMENT",
+      "reliability_class": "A",
+      "primary_source": true,
+      "independence_group": "literary-b",
+      "content": "Narrative voice in the reference novel uses first-person perspective to shape the reader's interpretation of memory and identity. This independent synthetic fixture cross-checks the same reference claim."
+    },
+    {
+      "url": "https://benchmark.example/software-a",
+      "title": "Reference Software Architecture Evidence A",
+      "publisher": "Reference Engineering Source A",
+      "snippet": "Software architecture orchestration and provider adapter separation benchmark evidence.",
+      "publication_date": "2026-08-01",
+      "source_type": "OFFICIAL",
+      "reliability_class": "A",
+      "primary_source": true,
+      "independence_group": "software-a",
+      "content": "Software architecture separates orchestration, domain logic, and provider adapters to reduce coupling and improve testability. The fixture is synthetic and exists only for deterministic validation."
+    },
+    {
+      "url": "https://benchmark.example/software-b",
+      "title": "Reference Software Architecture Evidence B",
+      "publisher": "Reference Engineering Source B",
+      "snippet": "Independent software architecture provider adapter separation benchmark evidence.",
+      "publication_date": "2026-08-01",
+      "source_type": "OFFICIAL",
+      "reliability_class": "A",
+      "primary_source": true,
+      "independence_group": "software-b",
+      "content": "Software architecture separates orchestration, domain logic, and provider adapters to reduce coupling and improve testability. This independent synthetic fixture cross-checks the same reference claim."
+    },
+    {
+      "url": "https://benchmark.example/medicine-a",
+      "title": "Reference Medical Guidance Evidence A",
+      "publisher": "Reference Clinical Source A",
+      "snippet": "Current medical treatment guidance and patient safety benchmark evidence.",
+      "publication_date": "2026-08-01",
+      "source_type": "OFFICIAL",
+      "reliability_class": "A",
+      "primary_source": true,
+      "independence_group": "medicine-a",
+      "content": "Current clinical guidance requires evidence-based evaluation and patient-safety checks before treatment recommendations are accepted. The fixture is synthetic and exists only for deterministic validation."
+    },
+    {
+      "url": "https://benchmark.example/medicine-b",
+      "title": "Reference Medical Guidance Evidence B",
+      "publisher": "Reference Clinical Source B",
+      "snippet": "Independent current medical treatment guidance and patient safety benchmark evidence.",
+      "publication_date": "2026-08-01",
+      "source_type": "OFFICIAL",
+      "reliability_class": "A",
+      "primary_source": true,
+      "independence_group": "medicine-b",
+      "content": "Current clinical guidance requires evidence-based evaluation and patient-safety checks before treatment recommendations are accepted. This independent synthetic fixture cross-checks the same reference claim."
+    },
+    {
+      "url": "https://benchmark.example/geodesy-a",
+      "title": "Reference GNSS RTK Geodesy Evidence A",
+      "publisher": "Reference Survey Standard A",
+      "snippet": "GNSS RTK surveying accuracy and coordinate reference-system benchmark evidence.",
+      "publication_date": "2026-08-01",
+      "source_type": "STANDARD",
+      "reliability_class": "A",
+      "primary_source": true,
+      "independence_group": "geodesy-a",
+      "content": "GNSS RTK surveying accuracy depends on reference-system correctness, correction quality, observation conditions, and validated measurement procedures. The fixture is synthetic and exists only for deterministic validation."
+    },
+    {
+      "url": "https://benchmark.example/geodesy-b",
+      "title": "Reference GNSS RTK Geodesy Evidence B",
+      "publisher": "Reference Survey Standard B",
+      "snippet": "Independent GNSS RTK surveying accuracy and coordinate reference-system benchmark evidence.",
+      "publication_date": "2026-08-01",
+      "source_type": "STANDARD",
+      "reliability_class": "A",
+      "primary_source": true,
+      "independence_group": "geodesy-b",
+      "content": "GNSS RTK surveying accuracy depends on reference-system correctness, correction quality, observation conditions, and validated measurement procedures. This independent synthetic fixture cross-checks the same reference claim."
+    }
+  ]
+}
