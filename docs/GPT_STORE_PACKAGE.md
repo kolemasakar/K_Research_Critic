@@ -1,12 +1,12 @@
 # GPT_STORE_PACKAGE
-Документ визначає пакет, налаштування та ручні release-gates для публікації K_Supervisor у GPT Store.
+Документ визначає пакет, налаштування та ручні release-gates для публікації K-Research & Critic у GPT Store.
 
-Version: 1.0
+Version: 1.1
 Status: ACTIVE
 
 ## 1. Purpose
 
-This document is the operator-facing packaging specification for the public K_Supervisor Custom GPT.
+This document is the operator-facing packaging specification for the public K-Research & Critic Custom GPT.
 
 The package is designed for the GPT Store-first product decision:
 
@@ -40,7 +40,7 @@ Use these values from `gpt_store/manifest.yaml`.
 ### Name
 
 ```text
-K_Supervisor
+K-Research & Critic
 ```
 
 ### Description
@@ -88,7 +88,7 @@ Use the four starters from the manifest:
 Research this topic and build the CriticProfile for my approval before you start.
 Compare two technologies using independent sources and show unresolved risks.
 Verify this claim, including evidence that supports or contradicts it.
-Resume a K_Supervisor task from a checkpoint I will paste.
+Resume a K-Research & Critic task from a checkpoint I will paste.
 ```
 
 ## 5. Store Workflow Mapping
