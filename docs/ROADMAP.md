@@ -1,7 +1,7 @@
 # ROADMAP
 План поетапної реалізації K_Supervisor від базового каркаса до GPT Store-first мультиагентного продукту.
 
-Version: 1.4
+Version: 1.5
 Status: ACTIVE
 
 ## 1. Purpose
@@ -16,6 +16,7 @@ This roadmap records the approved implementation order for K_Supervisor. The pri
 - Research-Critic revision cycles are autonomous after approval.
 - Contracts, task states, evidence, limitations, and failures remain explicit.
 - The public Store workflow must not depend on a fixed model identifier or a mandatory external service.
+- Private chain-of-thought is never required for auditability.
 - Project documentation follows PROJECT_FILE_STANDARD.md.
 
 ## 3. Completed Core
@@ -36,7 +37,7 @@ Phase 10 Persistence and Audit                        COMPLETE
 
 MVP boundary: Phase 9.
 
-The post-MVP Hybrid Domain Resolver enhancement is also COMPLETE.
+The post-MVP Hybrid Domain Resolver enhancement is COMPLETE.
 
 Phase 10 includes storage-neutral persistence, SQLite reference storage, TaskAuditSnapshot, conservative restart recovery, and audit CLI support.
 
@@ -55,7 +56,7 @@ user model switching: allowed when available
 mandatory external backend: no
 ```
 
-The existing Python/provider runtime is retained as optional standalone infrastructure and as the engineering reference implementation.
+The Python/provider runtime is retained as optional standalone infrastructure and as the engineering reference implementation.
 
 Primary documents:
 
@@ -79,87 +80,18 @@ Status: COMPLETE
 11.7 GPT Store Packaging / Publication Readiness COMPLETE
 ```
 
-### 5.1 Steps 11.1-11.4A
-
 Delivered:
 
 - validated frozen configuration;
-- immutable task configuration snapshots;
-- restart-safe snapshot reconstruction;
+- immutable task configuration snapshots and restart-safe reconstruction;
 - role-based provider isolation for optional standalone execution;
 - frozen research and critic limits;
 - tool call budgets, timeouts, retries, runtime ceilings, and output-size limits;
-- GPT Store distribution invariants and user-plan model policy.
-
-### 5.2 Step 11.5 - Usage, Cost, and Quality Metrics
-
-Status: COMPLETE
-
-Delivered:
-
-- `TaskQualityMetrics`;
-- `ProviderUsageRecord`;
-- task-level aggregation from ResearchResult, CriticReview, and AgentResult;
-- iteration count and PASS/REVISE history;
-- reliability history and final reliability score;
-- claim/source coverage and claim verification ratios;
-- unresolved claims, critical issues, contradictions, and missing topics;
-- search/fetch, retry, warning, error, and agent-run counts;
+- GPT Store distribution invariants and user-plan model policy;
+- `TaskQualityMetrics` and `ProviderUsageRecord`;
 - restart-safe metric reconstruction from TaskAuditSnapshot;
-- quality fields in the persisted-task audit CLI;
-- optional standalone provider telemetry for usage counts and cost estimation when source data is available.
-
-Validation:
-
-```text
-Implementation: 9018a75b7e932a270fb3e26e81a6d72d03841477
-Compatibility fix: 79d1d8b93b723fa56de32d66b432867e40432613
-GitHub Actions: 31664525682
-144 tests passed
-```
-
-### 5.3 Step 11.6 - Logging / Sensitive-data Redaction
-
-Status: COMPLETE
-
-Delivered:
-
-- `OperationalLogger` JSONL logging for standalone/API runtime;
-- correlation identifiers for task/workflow/agent runs;
-- `SensitiveDataRedactor` for configured and secret-like values;
-- private-reasoning field removal before persistence;
-- mandatory `logging.redact_secrets` invariant;
-- structured CLI lifecycle/error events;
-- Store user-visible audit boundary without a private backend;
-- `LOGGING.md` as the logging contract.
-
-Validation:
-
-```text
-Implementation: bd78027554474793647875341664db067d086d5f
-GitHub Actions: 31665219508
-149 tests passed
-```
-
-### 5.4 Step 11.7 - GPT Store Packaging / Publication Readiness
-
-Status: COMPLETE
-
-Delivered:
-
-- `gpt_store/manifest.yaml` with name, description, conversation starters, model policy, capability mapping, and release invariants;
-- `prompts/GPT_STORE_INSTRUCTIONS.md` as the Builder-ready instruction package;
-- Web search and Code Interpreter & Data Analysis mapped as built-in capabilities;
-- Apps, Actions, external backend, developer API key, and pinned model excluded from the core Store package;
-- explicit logical Supervisor -> Research -> Critic role separation inside one ChatGPT runtime;
-- mandatory CriticProfile APPROVE/EDIT/REJECT gate preserved;
-- `K_SUPERVISOR_CHECKPOINT` schema v1.0 for cross-chat continuation;
-- safe checkpoint boundaries and conservative recovery rules;
-- synthetic checkpoint example and Pydantic validation contract;
-- `scripts/validate_store_package.py` static release validator;
-- Preview test matrix and Free/paid account manual release matrix;
-- current OpenAI GPT creation/publication requirements re-checked on 2026-08-13;
-- `GPT_STORE_PACKAGE.md` as the operator publication specification.
+- structured operational logging and sensitive-data redaction;
+- GPT Store manifest, instructions, checkpoint contract, release validator, and operator documentation.
 
 Release state:
 
@@ -169,36 +101,72 @@ ready_for_manual_publication_test
 
 This state means repository packaging and CI are complete. It does not mean the Custom GPT has already been published. GPT Builder Preview, real Free-account use, paid-account model switching, Builder Profile/category/policy checks, and the final Publish action remain manual release operations in ChatGPT.
 
-Validation:
-
-```text
-Validated head: fb0d84468dddab88f15f425fda217cbabe1b057f
-GitHub Actions: 31666028204
-156 tests passed
-```
-
-Phase 11 is COMPLETE because the package is ready for publication testing and no developer-funded API/backend is required by the public core.
-
 ## 6. Phase 12 - Test and CI Hardening
 
-Status: NEXT
+Status: COMPLETE
 
-Scope:
+### 6.1 Goal
 
-- broaden unit/contract/integration/E2E coverage;
-- linting and type checks;
-- coverage/reporting policy;
-- GitHub Actions maintenance;
-- branch/PR checks;
-- dependency/action maintenance;
-- Store packaging regression checks;
-- release-gate automation where it can be tested without pretending to perform ChatGPT UI/account validation.
+Turn the MVP and Phase 11 controls into a repeatable quality baseline that detects regressions without requiring live paid providers.
+
+### 6.2 Delivered
+
+- broader orchestration, profile, loop, report, failure, Store-package, and configuration regression coverage;
+- deterministic offline reference benchmark in `examples/reference_benchmark.json`;
+- end-to-end benchmark runner in `tests/test_reference_benchmark.py`;
+- four reference domains: literary analysis, software engineering, medicine, and geodesy;
+- explicit benchmark checks for domain resolution, profile approval, autonomous completion, critic PASS/reliability floor, evidence, artifacts, and no-private-reasoning review protocol;
+- full pytest matrix on Python 3.13 and Python 3.14;
+- dependency integrity gate with `python -m pip check`;
+- Ruff correctness gate using E9, F63, F7, and F82 rule families;
+- Mypy typed-boundary gate for `models`, `config`, and `gpt_store`;
+- tracked repository policy validation;
+- GPT Store package regression validation;
+- blocking coverage floor of 70 percent;
+- weekly Dependabot maintenance for pip and GitHub Actions;
+- synchronized README, TEST_PLAN, and CI_QUALITY documentation.
+
+### 6.3 Validated Baseline
+
+The Phase 12 implementation baseline was validated with:
+
+```text
+Python 3.13 full suite: 169 passed
+Python 3.14 full suite: PASS
+Quality gates: PASS
+Total coverage: 85 percent
+Blocking coverage floor: 70 percent
+Reference benchmark cases: 4
+```
+
+The reference benchmark is synthetic, offline, deterministic, and provider-independent. Live ChatGPT account/UI validation is intentionally not represented as an automated CI PASS condition.
+
+### 6.4 Exit Criteria
+
+All Phase 12 exit criteria are satisfied:
+
+- critical edge cases have automated regression coverage;
+- reference end-to-end behavior is reproducibly benchmarked;
+- generated artifacts are validated;
+- CI and local quality gates pass;
+- dependency integrity is checked;
+- architecture remains modular and contract-driven;
+- Store-package regressions are blocked automatically where repository CI can prove them;
+- manual ChatGPT publication/account checks remain explicitly separated from repository automation.
 
 ## 7. Phase 13 - Modular Agent Platform
 
 Status: PLANNED
 
 Goal: extend beyond the first research workflow through capability discovery and capability-based agent selection while keeping Supervisor independent from domain-specific implementations.
+
+Expected direction:
+
+- capability-oriented agent metadata and discovery;
+- executable agent registration rather than definition-only registration;
+- capability-based selection and routing;
+- explicit compatibility contracts between Supervisor and optional agents;
+- preservation of current approval, evidence, audit, configuration, and quality boundaries.
 
 Possible future agents:
 
@@ -210,6 +178,8 @@ FinancialAgent
 LegalAgent
 PlanningAgent
 ```
+
+Phase 13 must not weaken the completed Phase 0-12 invariants merely to add new agent types.
 
 ## 8. Deferred Capabilities
 
@@ -235,6 +205,7 @@ DATA_MODELS.md
 RESEARCH_WORKFLOW.md
 CONFIGURATION.md
 TEST_PLAN.md
+CI_QUALITY.md
 HYBRID_RESOLVER_PLAN.md
 PERSISTENCE.md
 GPT_STORE_DEPLOYMENT.md
@@ -249,6 +220,6 @@ Phase 0-10                               COMPLETE
 Post-MVP Hybrid Domain Resolver         COMPLETE
 GPT Store-first Product Decision        COMPLETE
 Phase 11                                COMPLETE
-Phase 12                                NEXT
+Phase 12                                COMPLETE
 Phase 13                                PLANNED
 ```

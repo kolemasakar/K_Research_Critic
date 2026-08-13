@@ -1,117 +1,76 @@
 # TEST_PLAN
 План перевірки функціональності, надійності, якості та відтворюваності K_Supervisor.
 
-Version: 1.0
+Version: 1.1
 Status: ACTIVE
 
 ## 1. Purpose
 
 This document defines the canonical test strategy for K_Supervisor.
 
-The plan verifies that the system:
-
-- follows ARCHITECTURE.md;
-- follows AGENT_INTERFACE.md;
-- follows DATA_MODELS.md;
-- follows RESEARCH_WORKFLOW.md;
-- follows CONFIGURATION.md;
-- follows PROJECT_FILE_STANDARD.md;
-- preserves the mandatory user approval gate for CriticProfile;
-- runs the ResearchAgent-CriticAgent loop autonomously after approval;
-- produces reproducible and auditable final artifacts.
+The test program verifies that the system follows the architecture and contracts, preserves the mandatory CriticProfile approval boundary, runs the autonomous ResearchAgent-CriticAgent loop only after approval, persists an auditable task history, and produces stable final artifacts without exposing private reasoning.
 
 ## 2. Test Objectives
 
-The test program must prove that K_Supervisor can:
+The suite must prove that K_Supervisor can:
 
 - accept a valid user task;
-- resolve one or more task domains;
+- resolve task domains;
 - generate a valid draft CriticProfile;
-- stop before autonomous work until the user approves the profile;
-- freeze the approved profile for the current task_id;
-- launch ResearchAgent with valid structured context;
-- launch CriticAgent with the approved profile;
-- allow CriticAgent to perform independent verification;
+- block autonomous work before explicit approval;
+- freeze the approved profile and effective task configuration;
+- launch ResearchAgent and CriticAgent with valid structured context;
 - route PASS and REVISE decisions correctly;
-- enforce max_iterations and other configured limits;
-- handle recoverable and unrecoverable failures;
+- enforce configured iterations, resource limits, timeouts, and retries;
+- handle recoverable and unrecoverable failures explicitly;
+- persist and reconstruct task audit information;
 - produce FINAL_REPORT and REVIEW_PROTOCOL artifacts;
-- preserve traceability through task_id, run_id, state transitions, and artifacts.
+- preserve traceability through task_id, workflow/run identifiers, transitions, evidence, reviews, metrics, and artifacts.
 
 ## 3. Test Levels
 
-The project uses the following test levels.
+### 3.1 Unit and Contract Tests
 
-### 3.1 Unit Tests
+Unit and contract tests cover isolated deterministic behavior and canonical data structures.
 
-Unit tests validate isolated logic without real external providers where possible.
-
-Initial targets:
+Primary targets include:
 
 ```text
-DomainResolver
+DomainResolver and HybridResolver
 ProfileManager
 StateMachine
 AgentRegistry
-configuration validation
+configuration loader and schema
+TaskConfigurationSnapshot
 identifier generation
-claim-source linking
-reliability scoring helpers
-artifact naming
-serialization and deserialization
-```
-
-### 3.2 Contract Tests
-
-Contract tests validate structures defined in AGENT_INTERFACE.md and DATA_MODELS.md.
-
-Required contracts include:
-
-```text
-AgentRunRequest
-AgentResult
-CriticProfile
-Task
-Claim
-Source
+Claim and Source contracts
 CriticReview
-WorkflowRun
-StateTransition
-Artifact
+Metrics and usage records
+logging and redaction
+artifact naming and serialization
+GPT Store checkpoint contracts
 ```
 
-Contract tests must reject:
+Invalid contracts must fail explicitly for missing fields, invalid identifiers or states, malformed values, and incompatible schema assumptions.
 
-- missing required fields;
-- invalid status values;
-- invalid identifiers;
-- invalid profile state;
-- malformed agent results;
-- incompatible schema versions.
+### 3.2 Integration and Workflow Tests
 
-### 3.3 Integration Tests
-
-Integration tests validate interaction between components.
-
-Initial integration paths:
+Integration tests cover component boundaries:
 
 ```text
 Supervisor -> DomainResolver
 Supervisor -> ProfileManager
-Supervisor -> AgentRegistry
 Supervisor -> ResearchAgent
 Supervisor -> CriticAgent
 ResearchAgent -> Tools Layer
 CriticAgent -> Tools Layer
 Supervisor -> ReportGenerator
 Supervisor -> Persistence Layer
+Configuration -> runtime controls
+Provider factory -> optional provider adapters
 ```
 
-### 3.4 Workflow Tests
-
-Workflow tests validate state transitions and orchestration behavior.
-
-The primary success path is:
+The primary workflow success path is:
 
 ```text
 NEW
@@ -126,82 +85,29 @@ NEW
 -> FINALIZED
 ```
 
-The primary revision path is:
+Revision and exceptional paths include REVISE, FAILED, MAX_ITERATIONS_REACHED, and COMPLETED_WITH_LIMITATIONS.
 
-```text
-REVIEWING
--> REVISE
--> RESEARCHING
--> DRAFT_READY
--> REVIEWING
-```
+### 3.3 End-to-End Tests
 
-Exceptional terminal paths include:
+End-to-end tests validate the complete user-visible workflow from task preparation through final artifacts. Deterministic offline providers are preferred in repository CI. Live provider/UI checks are kept separate when they cannot be reproduced honestly in CI.
 
-```text
-FAILED
-MAX_ITERATIONS_REACHED
-COMPLETED_WITH_LIMITATIONS
-```
+## 4. Critical Approval and Profile Tests
 
-### 3.5 End-to-End Tests
+Required behavior:
 
-End-to-end tests validate the complete user-visible workflow with real or staging providers.
+- draft profile generation produces reviewable criteria, source requirements, and confidence settings;
+- research is blocked before explicit approval;
+- approval creates an auditable UserApproval record;
+- the active profile is frozen for execution;
+- CriticAgent cannot silently modify approved criteria;
+- a material amendment requires another explicit review/approval boundary;
+- recovery preserves the approved profile state exactly.
 
-A test is successful only when the full task can be traced from input through final artifacts.
+## 5. Domain Resolution Tests
 
-## 4. Mandatory Profile Approval Tests
+Coverage includes single-domain, multi-domain, ambiguous, generic, and unknown-domain tasks.
 
-The CriticProfile approval boundary is a critical control and requires dedicated tests.
-
-### TC-PROFILE-001 - Draft profile generation
-
-Expected result:
-
-- Supervisor generates a CriticProfile in DRAFT or REVIEW_REQUIRED state;
-- the profile contains domain, evaluation criteria, source requirements, and confidence settings appropriate to the task.
-
-### TC-PROFILE-002 - Execution blocked before approval
-
-Expected result:
-
-- ResearchAgent and CriticAgent autonomous workflow does not start while profile status is not APPROVED.
-
-### TC-PROFILE-003 - User approval
-
-Expected result:
-
-- explicit user approval creates a UserApproval record;
-- profile status becomes APPROVED;
-- approved profile version is linked to task_id.
-
-### TC-PROFILE-004 - User edit before approval
-
-Expected result:
-
-- user edits create a new profile revision or update the draft according to implementation policy;
-- only the final approved profile becomes active.
-
-### TC-PROFILE-005 - Profile freeze
-
-Expected result:
-
-- CriticAgent cannot silently modify the approved profile;
-- task execution continues with the approved snapshot.
-
-### TC-PROFILE-006 - Material amendment
-
-Expected result:
-
-- Supervisor detects a material domain or criteria change;
-- autonomous execution pauses at a profile review gate;
-- the amendment requires user approval before activation.
-
-## 5. Domain Resolver Tests
-
-DomainResolver must be tested with single-domain, multi-domain, and ambiguous tasks.
-
-Required test classes:
+Reference domains include:
 
 ```text
 literary_analysis
@@ -214,436 +120,213 @@ law
 software_engineering
 ```
 
-The list is illustrative, not closed.
+Hybrid resolution tests must also cover deterministic fallback, semantic-provider errors, confidence floors, risk floors, and material disagreement audit.
 
-### TC-DOMAIN-001 - Single domain
+## 6. Research, Evidence, and Critic Tests
 
-Input example:
+ResearchAgent tests verify task decomposition, query generation, source collection, duplicate handling, claim extraction, claim-source links, uncertainty capture, structured revision handling, and output contract compliance.
 
-```text
-Analyze a novel and compare two interpretations.
-```
+Evidence tests verify stable IDs, valid source references, contradictory evidence preservation, source reliability metadata, freshness metadata where relevant, and claim verification state changes across iterations.
 
-Expected result:
+CriticAgent tests verify approved-profile use, independent verification behavior, source quality assessment, freshness rules, unsupported-claim detection, contradictions, missing topics, evidence-conclusion consistency, PASS/REVISE output, reliability scores, and no silent profile modification.
 
-```text
-primary_domain = literary_analysis
-```
+ResearchAgent must not self-approve the final reliability of its own result.
 
-### TC-DOMAIN-002 - Multi-domain
+## 7. Revision Loop and State Machine Tests
 
-Input example:
+The suite covers:
 
 ```text
-Evaluate GNSS monitoring methods for structural deformation of a building.
+PASS on first review
+one revision before PASS
+multiple revisions
+max_iterations reached
+completed with limitations
+agent failure
+invalid transitions
+recovery at safe checkpoints
 ```
 
-Expected result includes:
+Every valid transition requires positive coverage and prohibited transitions require negative coverage. No failure may silently disappear from the audit trail.
 
-```text
-geodesy
-structural_engineering
-```
+## 8. Configuration and Runtime-Control Tests
 
-### TC-DOMAIN-003 - Unknown domain
+Configuration tests verify:
 
-Expected result:
-
-- resolver does not fail because a predefined profile is absent;
-- Supervisor may generate a temporary task-specific profile.
-
-### TC-DOMAIN-004 - Ambiguous domain
-
-Expected result:
-
-- ambiguity is recorded;
-- Supervisor chooses a safe resolution path or requests user clarification if internal resolution is not sufficient.
-
-## 6. ResearchAgent Tests
-
-ResearchAgent tests must verify:
-
-- task decomposition;
-- search strategy generation;
-- source collection;
-- duplicate source handling;
-- claim extraction;
-- claim-source linking;
-- uncertainty capture;
-- response to structured revision requests;
-- output contract compliance.
-
-ResearchAgent must not self-approve the final reliability of its result.
-
-## 7. CriticAgent Tests
-
-CriticAgent tests must verify:
-
-- use of the approved CriticProfile;
-- independent search capability;
-- source quality assessment;
-- freshness checks where required;
-- identification of unsupported claims;
-- contradiction detection;
-- missing-topic detection;
-- evidence-conclusion consistency;
-- structured PASS or REVISE output;
-- reliability score validation;
-- no silent profile modification.
-
-## 8. Evidence Tests
-
-Evidence tests validate Claim and Source behavior.
-
-Required checks:
-
-- every key claim has a stable claim_id;
-- source_ids reference existing Source entities;
-- duplicate sources are normalized according to policy;
-- broken source links are recorded explicitly;
-- contradictory evidence can coexist without data loss;
-- source reliability class is stored independently from prose;
-- claim verification status can change across iterations without changing claim_id unless the claim itself changes materially.
-
-## 9. Revision Loop Tests
-
-### TC-LOOP-001 - PASS on first review
-
-Expected result:
-
-```text
-REVIEWING -> APPROVED
-```
-
-### TC-LOOP-002 - One revision
-
-Expected result:
-
-```text
-REVIEWING -> REVISE -> RESEARCHING -> REVIEWING -> APPROVED
-```
-
-### TC-LOOP-003 - Multiple revisions
-
-Expected result:
-
-- each revision has an iteration number;
-- previous review records remain available;
-- new research addresses structured critic feedback.
-
-### TC-LOOP-004 - Max iterations reached
-
-Expected result:
-
-- the system stops further automatic revisions;
-- the result is not reported as fully verified solely because the limit was reached;
-- final status is MAX_ITERATIONS_REACHED or COMPLETED_WITH_LIMITATIONS according to policy.
-
-## 10. State Machine Tests
-
-Every valid state transition must have a positive test.
-
-Every prohibited transition must have a negative test.
-
-Examples of prohibited transitions:
-
-```text
-NEW -> REVIEWING
-PROFILE_REVIEW_REQUIRED -> RESEARCHING without approval
-FAILED -> FINALIZED without explicit recovery workflow
-FINALIZED -> RESEARCHING
-```
-
-Each recorded transition must include:
-
-```text
-task_id
-from_state
-to_state
-timestamp
-reason or trigger
-```
-
-## 11. Configuration Tests
-
-Configuration tests must verify:
-
-- settings file parsing;
-- environment overrides;
+- YAML parsing and validation;
+- environment precedence;
 - secret separation;
-- configuration precedence;
-- invalid values fail early;
-- task configuration snapshot creation;
-- active task configuration does not change silently after global settings change;
-- max_iterations is enforced;
-- timeout and retry values are enforced;
-- model and tool provider settings are isolated from domain logic.
+- immutable effective task snapshots;
+- exact snapshot persistence/recovery;
+- runtime override inclusion in the effective snapshot;
+- max_iterations and tool/resource budgets;
+- timeout and retry behavior;
+- provider/model selection isolation from agent business logic;
+- Store-first distribution invariants;
+- redaction cannot be disabled by normal configuration.
 
-## 12. Failure and Recovery Tests
+## 9. Persistence, Metrics, and Audit Tests
 
-The following failures require explicit test coverage:
+For completed and failed tasks, tests should be able to reconstruct:
 
 ```text
-LLM timeout
-web search timeout
-web fetch failure
-unavailable source
-malformed agent output
-invalid schema
-provider exception
-agent exception
-duplicate request
-persistence failure
-artifact write failure
-iteration limit exceeded
+user task
+approved CriticProfile
+configuration snapshot
+workflow states and transitions
+agent runs
+research iterations
+critic reviews
+claims and sources
+usage and quality metrics
+final artifacts
+errors and warnings
 ```
 
-Expected behavior:
+Persistence tests require exact logical round-trip behavior, idempotent stable-ID writes, safe schema handling, and conservative restart recovery.
 
-- recoverable failures follow configured retry policy;
-- retries preserve request identity and audit information;
-- unrecoverable failures produce FAILED or another explicit terminal state;
-- no failure may silently disappear from the audit trail.
+The audit trail must not require private chain-of-thought.
 
-## 13. Idempotency Tests
+## 10. Failure, Idempotency, and Security Tests
 
-The system must be safe against accidental duplicate execution where the contract marks an operation as idempotent.
+Failure coverage includes provider/tool timeout, fetch/search failure, unavailable source, malformed agent output, schema failure, provider exception, persistence failure, artifact write failure, duplicate requests, and iteration/resource limits.
 
-Test cases must verify:
+Security checks verify that:
 
-- repeated request_id does not create duplicate logical work when prohibited;
-- repeated artifact generation does not create conflicting filenames;
-- duplicate state transition requests do not corrupt workflow state;
-- retry behavior creates a new run_id only when defined by policy while preserving correlation with the original request.
+- API keys are not tracked;
+- `.env` remains ignored;
+- RuntimeSecrets do not leak into snapshots, logs, errors, or artifacts;
+- secret-like and private-reasoning fields are redacted before persistence/logging;
+- test fixtures contain only synthetic values.
 
-## 14. Artifact Tests
+Idempotency tests verify repeated stable operations do not create conflicting logical work or corrupt task state.
 
-The initial required user-facing artifacts are:
+## 11. Artifact Tests
+
+Required artifacts:
 
 ```text
 <TASK_ID>_FINAL_REPORT.md
 <TASK_ID>_REVIEW_PROTOCOL.md
 ```
 
-Tests must verify:
+Tests verify UTF-8 output, canonical filenames, correct task_id, evidence/limitations, iteration/review history, consistent final status, and explicit exclusion of hidden chain-of-thought/private model reasoning from REVIEW_PROTOCOL.
 
-- filenames follow PROJECT_FILE_STANDARD.md;
-- output encoding is UTF-8;
-- FINAL_REPORT contains the consolidated result and limitations;
-- REVIEW_PROTOCOL contains iteration and improvement history;
-- review protocol does not expose private chain-of-thought;
-- artifacts reference the correct task_id;
-- final task status is represented consistently in both artifacts.
+## 12. Determinism and Reproducibility
 
-## 15. Documentation Compliance Tests
+Testing separates structural reproducibility from content reproducibility.
 
-Documentation checks should verify:
+Structural reproducibility requires stable control rules, contracts, state boundaries, evidence rules, and artifact behavior for equivalent inputs.
 
-- documentation filenames use ASCII;
-- documentation body uses ASCII except for the single approved Ukrainian description line after the top-level title;
-- reports and analyses use UTF-8 by default;
-- no ambiguous version suffixes such as final2, new, latest, fixed, or copy are introduced;
-- stable project documents rely on Git history instead of unnecessary filename versions.
+Live LLM/web content may vary and therefore must not be confused with deterministic repository regression fixtures.
 
-A lightweight automated documentation linter is recommended after the MVP.
+## 13. Phase 12 Reference Benchmark
 
-## 16. Security and Secret Tests
-
-Tests must verify:
-
-- API keys are not present in tracked files;
-- .env is ignored by Git;
-- logs do not expose secrets;
-- error messages do not expose credentials;
-- agent payloads contain only required secret-independent configuration;
-- committed test fixtures contain fake credentials only.
-
-## 17. Auditability Tests
-
-For every completed or failed task, the system should be able to reconstruct:
+Phase 12 adds a deterministic offline benchmark:
 
 ```text
-user task
-approved CriticProfile
-configuration snapshot
-workflow states
-agent runs
-research iterations
-critic reviews
-claims and sources
-final artifacts
-errors and warnings
+examples/reference_benchmark.json
+tests/test_reference_benchmark.py
 ```
 
-The audit trail must not require private chain-of-thought.
-
-## 18. Determinism and Reproducibility
-
-LLM and web research cannot be assumed to be fully deterministic.
-
-Testing therefore separates:
-
-- structural reproducibility;
-- content reproducibility.
-
-Structural reproducibility requires that the same valid inputs follow the same control rules, contracts, state boundaries, and artifact rules.
-
-Content reproducibility may vary because external information, provider behavior, and model outputs can change.
-
-Each task should preserve enough metadata to explain relevant runtime conditions.
-
-## 19. Quality Evaluation
-
-End-to-end quality tests should score at least:
+The fixture contains four reference tasks:
 
 ```text
-coverage
-source quality
-claim support
-contradiction handling
-freshness where relevant
-critic usefulness
-revision effectiveness
-final report consistency
+REF_LITERARY_001  -> literary_analysis
+REF_SOFTWARE_001  -> software_engineering
+REF_MEDICINE_001  -> medicine
+REF_GEODESY_001   -> geodesy
 ```
 
-Quality thresholds may vary by CriticProfile and task risk level.
+Each task uses synthetic local evidence and validates:
 
-A high-risk profile may require stronger evidence rules than a low-risk literary interpretation task.
+- expected domain resolution;
+- explicit CriticProfile approval;
+- autonomous completion to FINALIZED;
+- expected iteration count;
+- minimum source and claim presence;
+- task-specific reliability floor;
+- approved-profile confidence threshold;
+- Critic decision PASS;
+- absence of critical issues, unsupported claims, contradictions, and unresolved claims;
+- FINAL_REPORT and REVIEW_PROTOCOL generation;
+- task_id traceability;
+- review-protocol audit note excluding hidden chain-of-thought/private reasoning.
 
-## 20. Initial End-to-End Scenario Set
+The benchmark must remain offline and cost-free in CI. It is a regression baseline, not a substitute for real-world subject-matter validation.
 
-Before the MVP is accepted, at least three substantially different domains must be tested.
-
-Recommended initial scenario set:
+Run only the benchmark with:
 
 ```text
-Scenario A - literary analysis
-Scenario B - technical geodesy or construction research
-Scenario C - high-evidence medical knowledge review
+python -m pytest -q tests/test_reference_benchmark.py
 ```
 
-At least one scenario must trigger REVISE before PASS.
+## 14. CI and Quality Gates
 
-At least one scenario must exercise a multi-domain CriticProfile.
-
-At least one scenario must exercise a failure or limitation path.
-
-## 21. MVP Acceptance Criteria
-
-The MVP is accepted only when all critical requirements below are demonstrated:
-
-- repository bootstrap is complete;
-- core contracts validate;
-- state machine valid and invalid transitions are tested;
-- CriticProfile generation works;
-- user approval is mandatory and enforced;
-- approved profile is frozen for the task;
-- ResearchAgent completes a structured research run;
-- CriticAgent independently reviews the result;
-- PASS path works;
-- REVISE path works;
-- max_iterations path works;
-- final artifacts are generated correctly;
-- errors are recorded explicitly;
-- secrets are excluded from tracked content;
-- three end-to-end domain scenarios pass the defined acceptance conditions.
-
-## 22. Test Automation
-
-The preferred automation sequence is:
+Every push and pull request runs the full deterministic suite on:
 
 ```text
-unit tests
--> contract tests
--> integration tests
--> workflow tests
--> selected end-to-end tests
+Python 3.13
+Python 3.14
 ```
 
-Fast deterministic tests should run on every relevant commit.
+The quality job also runs:
 
-Provider-dependent or cost-bearing end-to-end tests may run separately according to CI policy.
+```text
+python -m pip check
+python -m ruff check . --select E9,F63,F7,F82
+python -m mypy models config gpt_store
+python -m scripts.validate_repository
+python -m scripts.validate_store_package
+python -m pytest --cov --cov-report=term-missing --cov-fail-under=70
+```
 
-## 23. Test Data Rules
+Provider-dependent, paid, or ChatGPT UI/account checks must not be represented as automated PASS conditions unless the CI environment can actually execute and verify them.
+
+## 15. Validated Phase 12 Baseline
+
+Validated implementation baseline:
+
+```text
+Python 3.13 full suite: 169 passed
+Python 3.14 full suite: PASS
+Quality gates: PASS
+Dependency integrity: PASS
+Ruff correctness gate: PASS
+Mypy typed boundary gate: PASS
+Repository policy validator: PASS
+GPT Store package validator: PASS
+Total coverage: 85 percent
+Blocking coverage floor: 70 percent
+Reference benchmark cases: 4
+```
+
+## 16. Regression Policy
+
+Every confirmed defect should gain a regression test when technically practical.
+
+Changes to ARCHITECTURE.md, AGENT_INTERFACE.md, DATA_MODELS.md, RESEARCH_WORKFLOW.md, CONFIGURATION.md, persistence contracts, runtime controls, or Store package invariants require review of affected tests.
+
+The quality gate scope is a ratchet. It may expand or become stricter as coverage and typing improve; it should not be weakened merely to make CI green.
+
+## 17. Test Data Rules
 
 Test data must:
 
-- avoid real secrets;
-- avoid unnecessary personal data;
+- avoid real secrets and unnecessary personal data;
 - identify synthetic fixtures clearly;
-- preserve stable IDs where deterministic fixtures are required;
-- separate expected valid and invalid cases;
-- allow provider-independent testing through mocks or stubs where practical.
+- preserve stable IDs where deterministic fixtures require them;
+- separate valid and invalid cases;
+- support provider-independent execution through deterministic local providers, mocks, or stubs.
 
-## 24. Regression Policy
-
-Every confirmed defect should result in a regression test when technically practical.
-
-A regression test should reproduce the failed behavior before the fix and remain in the suite after the fix.
-
-Changes to ARCHITECTURE.md, AGENT_INTERFACE.md, DATA_MODELS.md, RESEARCH_WORKFLOW.md, or CONFIGURATION.md must trigger a review of affected tests.
-
-## 25. Test Status Classification
-
-Recommended result values:
-
-```text
-PASS
-FAIL
-SKIPPED
-BLOCKED
-EXPECTED_FAILURE
-```
-
-Production readiness must not count SKIPPED or BLOCKED critical tests as PASS.
-
-## 26. Traceability
-
-Critical requirements should be traceable to one or more test cases.
-
-Recommended naming:
-
-```text
-TC-<AREA>-<NUMBER>
-```
-
-Examples:
-
-```text
-TC-PROFILE-001
-TC-DOMAIN-002
-TC-LOOP-004
-TC-CONFIG-003
-TC-ARTIFACT-002
-```
-
-Future implementation may maintain a machine-readable requirements-to-tests matrix.
-
-## 27. Planned Test Structure
-
-Recommended repository layout:
-
-```text
-tests/
-|-- unit/
-|-- contracts/
-|-- integration/
-|-- workflow/
-|-- e2e/
-|-- fixtures/
-`-- conftest.py
-```
-
-The exact Python test framework is an implementation decision, but pytest is the default candidate unless a later project decision changes it.
-
-## 28. Exit Rule
+## 18. Exit Rule
 
 A development phase may be marked complete only when:
 
-- its defined tests exist;
-- critical tests pass;
+- its critical automated tests exist;
+- relevant regression and boundary tests pass;
 - known limitations are documented;
-- no unresolved critical defect is hidden by retries, skips, or manual intervention.
+- no unresolved critical defect is hidden by retries, skips, blanket ignores, or manual intervention;
+- required artifacts and audit behavior remain stable.
 
-MVP completion additionally requires the end-to-end acceptance criteria in this document.
+Phase 12 satisfies this rule with the reference benchmark, cross-version pytest matrix, blocking quality gates, and documented manual boundaries for ChatGPT publication/account validation.

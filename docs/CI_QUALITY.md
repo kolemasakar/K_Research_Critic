@@ -1,18 +1,18 @@
 # CI_QUALITY
 Документ визначає автоматизовані перевірки якості, покриття, типізації та CI для K_Supervisor.
 
-Version: 1.0
+Version: 1.1
 Status: ACTIVE
 
 ## 1. Purpose
 
 This document defines the Phase 12 repository quality gates.
 
-The goal is to convert previously manual quality expectations into reproducible checks that run on pushes and pull requests without adding a paid provider dependency.
+The goal is to make correctness, compatibility, package policy, and regression checks reproducible on pushes and pull requests without adding a paid provider dependency.
 
 ## 2. CI Matrix
 
-The reference workflow validates the supported engineering runtime on:
+The reference workflow validates the engineering runtime on:
 
 ```text
 Python 3.13
@@ -21,63 +21,82 @@ Python 3.14
 
 Both matrix entries run the full deterministic pytest suite.
 
-The quality job uses Python 3.13 as the stable baseline for lint, type, coverage, repository-policy, and GPT Store package validation.
+The quality job uses Python 3.13 as the stable baseline for dependency integrity, lint, type, repository-policy, GPT Store package, and coverage validation.
 
 ## 3. Action Baseline
 
-The workflow uses Node 24 generation GitHub Actions:
+The workflow uses:
 
 ```text
 actions/checkout@v6
 actions/setup-python@v6
 ```
 
-This removes the known Node 20 deprecation warning from the previous v4/v5 workflow baseline.
+Checkout uses `persist-credentials: false` and the workflow has read-only repository permissions.
 
-## 4. Lint Gate
+## 4. Dependency Integrity Gate
+
+After installing development dependencies, CI runs:
+
+```text
+python -m pip check
+```
+
+The quality job fails when installed package requirements are internally inconsistent.
+
+Runtime dependencies remain in `requirements.txt`. Development-only quality dependencies are isolated in `requirements-dev.txt`.
+
+## 5. Ruff Correctness Gate
 
 Ruff is the repository lint engine.
 
-The initial hard gate intentionally focuses on correctness-sensitive rules rather than forcing a broad formatting rewrite in the same phase:
+The current hard gate intentionally focuses on correctness-sensitive rule families rather than forcing a broad style rewrite:
 
 ```text
-E9
-F63
-F7
-F82
+python -m ruff check . --select E9,F63,F7,F82
 ```
 
-These classes catch syntax/runtime-risk and undefined-name failures. Broader style rules may be enabled later in small reviewed increments.
+The selected families catch syntax/runtime-risk constructs and undefined-name failures. Broader formatting/style enforcement may be enabled later through reviewed incremental changes.
 
-## 5. Type Gate
+## 6. Mypy Typed Boundary Gate
 
-Mypy validates the most contract-sensitive typed boundaries first:
+Mypy validates the most contract-sensitive typed boundaries:
 
 ```text
-models/
-config/
-gpt_store/
+python -m mypy models config gpt_store
 ```
 
-This scope covers canonical data contracts, frozen configuration, configuration snapshots, and Store checkpoint contracts. The scope is a ratchet: it should expand over time and should not be reduced merely to make CI green.
+This covers canonical data contracts, frozen configuration and task snapshots, and GPT Store checkpoint contracts.
 
-## 6. Coverage Gate
+The scope is a ratchet: it should expand over time and should not be reduced merely to make CI green.
 
-The quality job collects branch coverage across the source packages.
+## 7. Coverage Gate
 
-Initial minimum:
+The quality job runs:
 
 ```text
-70.0 percent
+python -m pytest --cov --cov-report=term-missing --cov-fail-under=70
 ```
 
-This is a baseline floor, not a target ceiling. A future change should raise the floor when measured coverage and test quality support a stable higher threshold.
+Current blocking floor:
 
-Coverage does not count manual ChatGPT UI checks as automated PASS conditions.
+```text
+70 percent
+```
 
-## 7. Repository Policy Validation
+The validated Phase 12 baseline is 85 percent total coverage. The floor is a minimum, not a target ceiling.
 
-`scripts/validate_repository.py` checks source-controlled repository invariants including:
+Coverage does not count manual ChatGPT UI/account checks as automated PASS conditions.
+
+## 8. Repository Policy Validation
+
+CI runs:
+
+```text
+python -m scripts.validate_repository
+```
+
+The validator checks tracked repository invariants including:
 
 - ASCII tracked filenames;
 - project-document encoding rules;
@@ -89,15 +108,15 @@ Coverage does not count manual ChatGPT UI checks as automated PASS conditions.
 
 The validator intentionally scans tracked files rather than local runtime directories.
 
-## 8. GPT Store Release Regression Gate
+## 9. GPT Store Release Regression Gate
 
-The CI quality job runs:
+CI runs:
 
 ```text
 python -m scripts.validate_store_package
 ```
 
-This keeps the Store-first invariants under regression coverage:
+This protects Store-first invariants including:
 
 ```text
 no developer API key
@@ -111,7 +130,25 @@ checkpoint schema validation
 
 Real Free-account, paid-account, model-picker, Builder Profile, category, and Publish checks remain manual because repository CI cannot honestly prove ChatGPT UI/account behavior.
 
-## 9. Dependency Maintenance
+## 10. Deterministic Reference Benchmark
+
+The full pytest and coverage commands automatically execute:
+
+```text
+tests/test_reference_benchmark.py
+```
+
+Its fixture is:
+
+```text
+examples/reference_benchmark.json
+```
+
+The benchmark covers four end-to-end reference tasks across literary analysis, software engineering, medicine, and geodesy. It validates domain resolution, explicit profile approval, autonomous completion, evidence, reliability floors, PASS decisions, final artifacts, and the no-private-reasoning review-protocol boundary.
+
+The benchmark is synthetic, local, offline, deterministic, and cost-free. It must not be changed into a live-provider dependency for normal repository CI.
+
+## 11. Dependency and Action Maintenance
 
 Dependabot is configured for weekly updates of:
 
@@ -120,39 +157,57 @@ pip dependencies
 GitHub Actions
 ```
 
-Runtime dependencies remain in `requirements.txt`.
+Quality dependency versions are constrained in `requirements-dev.txt`; the project does not claim exact pinning where ranges are intentionally used.
 
-Development-only quality dependencies are isolated in:
+## 12. Pull Request Behavior
 
-```text
-requirements-dev.txt
-```
+The workflow runs on pushes and pull requests.
 
-## 10. Pull Request Behavior
+Concurrency cancellation prevents obsolete runs for the same workflow/ref from consuming CI time after a newer commit arrives.
 
-The workflow runs on both pushes and pull requests and uses read-only repository permissions.
+A merge policy may require named CI jobs through branch protection. Branch-protection configuration is an administrative repository setting and is not silently changed by application code.
 
-Concurrency cancellation prevents obsolete runs for the same ref from consuming CI time after a newer commit arrives.
+## 13. Local Commands
 
-A merge policy may require the named CI jobs as branch-protection checks through GitHub repository settings. Branch-protection configuration itself is an administrative repository setting and is not silently changed by application code.
-
-## 11. Local Commands
-
-Reference commands:
+Install and run the same quality gates locally with:
 
 ```text
 python -m pip install -r requirements-dev.txt
+python -m pip check
 python -m ruff check . --select E9,F63,F7,F82
 python -m mypy models config gpt_store
 python -m scripts.validate_repository
 python -m scripts.validate_store_package
+python -m pytest -q tests/test_reference_benchmark.py
 python -m pytest --cov --cov-report=term-missing --cov-fail-under=70
 ```
 
-## 12. Quality Policy
+## 14. Validated Phase 12 Baseline
 
-A Phase 12 quality gate must fail explicitly when its invariant is violated.
+The implementation baseline immediately before documentation close-out passed all three CI jobs:
 
-Do not hide a critical failure through `continue-on-error`, blanket ignores, or permanent expected failures.
+```text
+Python 3.13 full suite: 169 passed
+Python 3.14 full suite: PASS
+Quality gates: PASS
+Dependency integrity: PASS
+Ruff correctness gate: PASS
+Mypy typed boundary gate: PASS
+Repository policy validator: PASS
+GPT Store package validator: PASS
+Total coverage: 85 percent
+Coverage floor: 70 percent
+Reference benchmark cases: 4
+```
 
-Any temporary exclusion must be narrow, documented, and reviewed for removal.
+The documentation close-out commit must pass the same workflow before Phase 12 is considered finalized.
+
+## 15. Quality Policy
+
+A quality gate must fail explicitly when its invariant is violated.
+
+Do not hide critical failures through `continue-on-error`, blanket ignores, permanent expected failures, or removal of a gate solely to obtain a green workflow.
+
+Temporary exclusions must be narrow, documented, and reviewed for removal.
+
+Phase 12 is complete only when the final synchronized repository state passes the full Python 3.13/3.14 and quality workflow.
