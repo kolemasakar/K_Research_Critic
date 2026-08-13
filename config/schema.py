@@ -86,6 +86,7 @@ class ResearchSettings(FrozenSettingsModel):
 
 class CriticSettings(FrozenSettingsModel):
     max_verification_queries: int = Field(ge=1)
+    max_verification_sources_per_claim: int = Field(default=4, ge=1)
     require_independent_search: bool = True
     require_claim_level_review: bool = True
     default_minimum_cross_checks: int = Field(ge=0)
@@ -164,6 +165,16 @@ class AppSettings(FrozenSettingsModel):
             raise ValueError("freeze_critic_profile is a system invariant and must remain true")
         if self.research.max_sources > self.limits.max_sources:
             raise ValueError("research.max_sources cannot exceed limits.max_sources")
+        if self.research.max_sources_per_query > self.research.max_sources:
+            raise ValueError("research.max_sources_per_query cannot exceed research.max_sources")
+        minimum_agent_capacity = (self.workflow.max_iterations * 2) + 1
+        if minimum_agent_capacity > self.limits.max_agent_runs:
+            raise ValueError(
+                "limits.max_agent_runs is too low for workflow.max_iterations; "
+                f"requires at least {minimum_agent_capacity}"
+            )
+        if self.resolver.mode == "semantic" and not self.resolver.semantic_enabled:
+            raise ValueError("resolver.mode=semantic requires resolver.semantic_enabled=true")
         if self.resolver.semantic_enabled:
             role = self.models.domain_resolver
             if not role.provider or not role.model:

@@ -84,26 +84,26 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     tools = ResearchToolset(WebSearchTool(provider), WebFetchTool(provider))
-    app = KSupervisorApplication(
-        tools,
-        output_directory=Path(output_directory),
-        default_max_iterations=max_iterations,
-        persistence=persistence,
-    )
-    prepared = app.prepare_task(
-        task_text,
-        task_type=args.task_type,
-        max_iterations=max_iterations,
-        special_user_requirements=list(args.special_requirement),
-        metadata={
-            "configuration_schema_version": settings.schema_version,
-            "configuration_environment": settings.environment,
-            "configuration_fingerprint": configuration.fingerprint,
-        },
-    )
+    try:
+        app = KSupervisorApplication(
+            tools,
+            output_directory=Path(output_directory),
+            default_max_iterations=max_iterations,
+            persistence=persistence,
+            configuration=configuration,
+        )
+        prepared = app.prepare_task(
+            task_text,
+            task_type=args.task_type,
+            max_iterations=max_iterations,
+            special_user_requirements=list(args.special_requirement),
+        )
+    except (RuntimeError, ValueError) as exc:
+        print(f"ERROR: cannot prepare configured workflow: {exc}")
+        return 1
 
     print(f"Environment: {settings.environment}")
-    print(f"Configuration fingerprint: {configuration.fingerprint}")
+    print(f"Configuration source fingerprint: {configuration.fingerprint}")
     print(f"Task ID: {prepared.task.task_id}")
     print("Domain assessment:")
     print(prepared.domain_assessment.model_dump_json(indent=2))
@@ -114,12 +114,21 @@ def main(argv: list[str] | None = None) -> int:
     if edits is None and args.profile_edits is not None:
         return 1
 
-    if args.approve_profile:
-        app.approve_profile(prepared.task.task_id, approved_by="CLI_USER", edits=edits)
-    else:
-        approval = _interactive_profile_gate(app, prepared.task.task_id, edits)
-        if not approval:
-            return 4
+    try:
+        if args.approve_profile:
+            app.approve_profile(prepared.task.task_id, approved_by="CLI_USER", edits=edits)
+        else:
+            approval = _interactive_profile_gate(app, prepared.task.task_id, edits)
+            if not approval:
+                return 4
+    except (RuntimeError, ValueError) as exc:
+        print(f"ERROR: profile approval/configuration freeze failed: {exc}")
+        return 1
+
+    snapshot = app.configuration_snapshot(prepared.task.task_id)
+    if snapshot is not None:
+        print(f"Configuration snapshot: {snapshot.snapshot_id}")
+        print(f"Effective configuration fingerprint: {snapshot.settings_fingerprint}")
 
     research_input: dict[str, Any] = {}
     if args.search_query:
@@ -128,11 +137,16 @@ def main(argv: list[str] | None = None) -> int:
         research_input["requirements"] = list(args.required_topic)
     critic_input = {"required_topics": list(args.required_topic)} if args.required_topic else None
 
-    outcome = app.run_to_completion(
-        prepared.task.task_id,
-        research_input=research_input or None,
-        critic_input=critic_input,
-    )
+    try:
+        outcome = app.run_to_completion(
+            prepared.task.task_id,
+            research_input=research_input or None,
+            critic_input=critic_input,
+        )
+    except (RuntimeError, ValueError) as exc:
+        print(f"ERROR: configured workflow execution failed: {exc}")
+        return 1
+
     print(f"MVP status: {outcome.status.value}")
     print(f"Final task state: {outcome.final_state.value}")
     print(f"Audit database: {database}")

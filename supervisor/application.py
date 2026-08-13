@@ -1,20 +1,33 @@
 from __future__ import annotations
 
+from contextlib import nullcontext
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
 from agents import CriticAgent, ReportGenerator, ResearchAgent
+from config import (
+    LoadedConfiguration,
+    TaskConfigurationSnapshot,
+    create_task_configuration_snapshot,
+    latest_task_configuration_snapshot,
+)
 from models import CriticProfile, DomainAssessment, ExecutionStatus, Task, TaskStatus, UserApproval
 from persistence import PersistenceStore, TaskAuditSnapshot
-from tools import ResearchTools
+from tools import (
+    ResearchTools,
+    RuntimeControlledResearchTools,
+    RuntimeToolPolicy,
+)
 
 from .hybrid_resolver import DomainResolverProtocol
 from .profile_workflow import ProfileWorkflow
+from .provider_factory import build_domain_resolver
 from .recovery import RecoveryOutcome, RuntimeRecoveryService
 from .report_workflow import ReportWorkflow, ReportWorkflowOutcome
 from .research_critic_loop import ResearchCriticLoop, ResearchCriticLoopOutcome
+from .runtime_limits import OutputBoundedReportGenerator
 from .workflow_engine import WorkflowEngine
 
 
@@ -62,6 +75,7 @@ class KSupervisorApplication:
         workflow_engine: WorkflowEngine | None = None,
         domain_resolver: DomainResolverProtocol | None = None,
         persistence: PersistenceStore | None = None,
+        configuration: LoadedConfiguration | None = None,
     ) -> None:
         if default_max_iterations <= 0:
             raise ValueError("default_max_iterations must be greater than zero")
@@ -80,13 +94,33 @@ class KSupervisorApplication:
 
         self.workflow_engine = workflow_engine
         self.persistence = persistence or workflow_engine.persistence
+        self.configuration = configuration
+        self._output_directory = Path(output_directory)
+
+        if configuration is not None:
+            self._validate_required_agents(configuration)
+            if domain_resolver is None:
+                domain_resolver = build_domain_resolver(configuration)
+            self.runtime_tools: RuntimeControlledResearchTools | None = (
+                RuntimeControlledResearchTools(tools)
+            )
+            agent_tools: ResearchTools = self.runtime_tools
+        else:
+            self.runtime_tools = None
+            agent_tools = tools
+
         self.profile_workflow = ProfileWorkflow(
             self.workflow_engine,
             domain_resolver=domain_resolver,
         )
-        self.research_agent = ResearchAgent(tools)
-        self.critic_agent = CriticAgent(tools)
-        self.report_generator = ReportGenerator(output_directory)
+        self.research_agent = ResearchAgent(agent_tools)
+        self.critic_agent = CriticAgent(agent_tools)
+        base_report_generator = ReportGenerator(self._output_directory)
+        self.report_generator = (
+            OutputBoundedReportGenerator(base_report_generator)
+            if configuration is not None
+            else base_report_generator
+        )
         self.research_critic_loop = ResearchCriticLoop(
             self.workflow_engine,
             self.profile_workflow.profile_manager,
@@ -114,10 +148,20 @@ class KSupervisorApplication:
         iterations = self.default_max_iterations if max_iterations is None else max_iterations
         if iterations <= 0:
             raise ValueError("max_iterations must be greater than zero")
+
+        task_metadata = dict(metadata or {})
+        if self.configuration is not None:
+            task_metadata.update(
+                {
+                    "configuration_schema_version": self.configuration.settings.schema_version,
+                    "configuration_environment": self.configuration.settings.environment,
+                    "configuration_source_fingerprint": self.configuration.fingerprint,
+                }
+            )
         task = self.workflow_engine.task_manager.create_task(
             user_request=user_request,
             task_type=task_type,
-            metadata=metadata,
+            metadata=task_metadata,
         )
         self.workflow_engine.start_workflow(task.task_id, max_iterations=iterations)
         assessment, profile = self.profile_workflow.generate_profile(
@@ -133,11 +177,14 @@ class KSupervisorApplication:
         approved_by: str = "USER",
         edits: dict[str, Any] | None = None,
     ) -> tuple[CriticProfile, UserApproval]:
-        return self.profile_workflow.approve_current_profile(
+        approved, approval = self.profile_workflow.approve_current_profile(
             task_id,
             approved_by=approved_by,
             edits=edits,
         )
+        if self.configuration is not None:
+            self._freeze_task_configuration(task_id, approved)
+        return approved, approval
 
     def reject_profile(
         self,
@@ -181,6 +228,10 @@ class KSupervisorApplication:
             raise RuntimeError("Task audit requires a configured persistence store")
         return self.persistence.load_task_audit(task_id)
 
+    def configuration_snapshot(self, task_id: str) -> TaskConfigurationSnapshot | None:
+        task = self.workflow_engine.task_manager.get_task(task_id)
+        return latest_task_configuration_snapshot(task.metadata)
+
     def run_to_completion(
         self,
         task_id: str,
@@ -191,20 +242,62 @@ class KSupervisorApplication:
         critic_constraints: dict[str, Any] | None = None,
         report_context: dict[str, Any] | None = None,
     ) -> MVPOutcome:
-        loop_outcome = self.research_critic_loop.run(
-            task_id,
-            research_input=research_input,
-            critic_input=critic_input,
-            research_constraints=research_constraints,
-            critic_constraints=critic_constraints,
-        )
+        snapshot = self.configuration_snapshot(task_id)
+        if self.configuration is not None and snapshot is None:
+            raise RuntimeError(
+                "Autonomous execution requires a frozen TaskConfigurationSnapshot after profile approval"
+            )
+
+        effective_research_constraints = dict(research_constraints or {})
+        effective_critic_constraints = dict(critic_constraints or {})
+        runtime_context = nullcontext()
+        if snapshot is not None:
+            settings = snapshot.effective_settings
+            effective_research_constraints = self._apply_frozen_constraints(
+                effective_research_constraints,
+                {
+                    "max_queries": settings.research.max_queries,
+                    "max_sources": settings.research.max_sources,
+                    "max_sources_per_query": settings.research.max_sources_per_query,
+                },
+            )
+            effective_critic_constraints = self._apply_frozen_constraints(
+                effective_critic_constraints,
+                {
+                    "max_verification_queries": settings.critic.max_verification_queries,
+                    "max_verification_sources_per_claim": (
+                        settings.critic.max_verification_sources_per_claim
+                    ),
+                    "require_independent_search": settings.critic.require_independent_search,
+                },
+            )
+            if self.runtime_tools is not None:
+                runtime_context = self.runtime_tools.scope(self._runtime_policy(snapshot))
+
+        with runtime_context:
+            loop_outcome = self.research_critic_loop.run(
+                task_id,
+                research_input=research_input,
+                critic_input=critic_input,
+                research_constraints=effective_research_constraints,
+                critic_constraints=effective_critic_constraints,
+            )
 
         report_outcome: ReportWorkflowOutcome | None = None
         if loop_outcome.final_state in {TaskStatus.APPROVED, TaskStatus.COMPLETED_WITH_LIMITATIONS}:
+            effective_report_context = dict(report_context or {})
+            if snapshot is not None:
+                effective_report_context.update(
+                    {
+                        "configuration_snapshot_id": snapshot.snapshot_id,
+                        "configuration_fingerprint": snapshot.settings_fingerprint,
+                        "max_output_size_bytes": snapshot.effective_settings.limits.max_output_size_bytes,
+                    }
+                )
             report_outcome = self.report_workflow.finalize(
                 task_id,
                 loop_outcome,
-                extra_context=report_context,
+                extra_context=effective_report_context,
             )
 
         final_state = self.workflow_engine.task_manager.get_task(task_id).status
@@ -216,6 +309,78 @@ class KSupervisorApplication:
             loop_outcome=loop_outcome,
             report_outcome=report_outcome,
         )
+
+    def _freeze_task_configuration(
+        self,
+        task_id: str,
+        profile: CriticProfile,
+    ) -> TaskConfigurationSnapshot:
+        assert self.configuration is not None
+        task = self.workflow_engine.task_manager.get_task(task_id)
+        previous = latest_task_configuration_snapshot(task.metadata)
+        workflow = self.workflow_engine.get_task_workflow(task_id)
+        persistence_path = getattr(self.persistence, "path", None)
+        snapshot = create_task_configuration_snapshot(
+            self.configuration,
+            task_id=task_id,
+            approved_profile_id=profile.profile_id,
+            approved_profile_version=profile.version,
+            max_iterations=workflow.max_iterations,
+            output_directory=str(self._output_directory),
+            persistence_path=(str(persistence_path) if persistence_path is not None else None),
+            supersedes_snapshot_id=(previous.snapshot_id if previous is not None else None),
+        )
+        self.workflow_engine.task_manager.append_configuration_snapshot(task_id, snapshot)
+        return snapshot
+
+    @staticmethod
+    def _apply_frozen_constraints(
+        provided: dict[str, Any],
+        frozen: dict[str, Any],
+    ) -> dict[str, Any]:
+        result = dict(provided)
+        for key, value in frozen.items():
+            if key in result and result[key] != value:
+                raise ValueError(
+                    f"Constraint {key!r} is frozen for the active task and cannot be changed"
+                )
+            result[key] = value
+        return result
+
+    @staticmethod
+    def _runtime_policy(snapshot: TaskConfigurationSnapshot) -> RuntimeToolPolicy:
+        settings = snapshot.effective_settings
+        return RuntimeToolPolicy(
+            max_search_calls=settings.limits.max_search_calls,
+            max_fetch_calls=settings.limits.max_fetch_calls,
+            max_runtime_seconds=float(settings.limits.max_runtime_seconds),
+            search_timeout_seconds=float(settings.tools.web_search.timeout_seconds),
+            fetch_timeout_seconds=float(settings.tools.web_fetch.timeout_seconds),
+            retry_max_attempts=settings.retry.max_attempts,
+            retry_initial_delay_seconds=settings.retry.initial_delay_seconds,
+            retry_max_delay_seconds=settings.retry.max_delay_seconds,
+            retry_backoff_multiplier=settings.retry.backoff_multiplier,
+            search_enabled=settings.tools.web_search.enabled,
+            fetch_enabled=settings.tools.web_fetch.enabled,
+        )
+
+    @staticmethod
+    def _validate_required_agents(configuration: LoadedConfiguration) -> None:
+        agents = configuration.settings.agents
+        disabled = [
+            name
+            for name, enabled in (
+                ("research_agent", agents.research_agent.enabled),
+                ("critic_agent", agents.critic_agent.enabled),
+                ("report_generator", agents.report_generator.enabled),
+            )
+            if not enabled
+        ]
+        if disabled:
+            raise ValueError(
+                "The RESEARCH_CRITIC workflow requires these enabled agents: "
+                + ", ".join(disabled)
+            )
 
     def _register_agents(self) -> None:
         existing = {

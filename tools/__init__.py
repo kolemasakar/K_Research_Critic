@@ -18,6 +18,11 @@ from .interfaces import (
     WebFetchProvider,
     WebSearchProvider,
 )
+from .runtime_control import (
+    RuntimeControlledResearchTools,
+    RuntimeToolPolicy,
+    RuntimeToolUsage,
+)
 from .web import ResearchToolset, WebFetchTool, WebSearchTool
 
 __all__ = [
@@ -28,6 +33,9 @@ __all__ = [
     "JsonCorpusProvider",
     "ResearchTools",
     "ResearchToolset",
+    "RuntimeControlledResearchTools",
+    "RuntimeToolPolicy",
+    "RuntimeToolUsage",
     "SearchHit",
     "SourceDeduplicator",
     "SourceMetadataExtractor",

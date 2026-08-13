@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from config import TaskConfigurationSnapshot, snapshots_from_task_metadata
 from models import DomainAssessment, Task, utc_now
 from persistence import PersistenceStore
 
@@ -71,6 +72,40 @@ class TaskManager:
         task.secondary_domains = list(assessment.secondary_domains)
         task.task_type = assessment.task_type
         task.risk_level = assessment.risk_level
+        task.updated_at = utc_now()
+        self.persist_task(task_id)
+        return task
+
+    def append_configuration_snapshot(
+        self,
+        task_id: str,
+        snapshot: TaskConfigurationSnapshot,
+    ) -> Task:
+        """Append an immutable configuration snapshot without mutating historical snapshots."""
+        task = self.get_task(task_id)
+        if snapshot.task_id != task_id:
+            raise ValueError("TaskConfigurationSnapshot task_id must match Task task_id")
+
+        existing = list(snapshots_from_task_metadata(task.metadata))
+        for item in existing:
+            if item.snapshot_id == snapshot.snapshot_id:
+                if item != snapshot:
+                    raise ValueError("Configuration snapshot ID already exists with different content")
+                return task
+
+        latest = existing[-1] if existing else None
+        if latest is None and snapshot.supersedes_snapshot_id is not None:
+            raise ValueError("Initial configuration snapshot cannot supersede another snapshot")
+        if latest is not None and snapshot.supersedes_snapshot_id != latest.snapshot_id:
+            raise ValueError("New configuration snapshot must supersede the current snapshot")
+
+        serialized = [item.model_dump(mode="json") for item in existing]
+        serialized.append(snapshot.model_dump(mode="json"))
+        task.metadata = {
+            **task.metadata,
+            "configuration_snapshots": serialized,
+            "active_configuration_snapshot_id": snapshot.snapshot_id,
+        }
         task.updated_at = utc_now()
         self.persist_task(task_id)
         return task

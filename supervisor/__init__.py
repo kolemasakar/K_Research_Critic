@@ -24,6 +24,11 @@ from .hybrid_resolver import (
 )
 from .profile_manager import ProfileManager
 from .profile_workflow import ProfileWorkflow
+from .provider_factory import (
+    ProviderConfigurationError,
+    SemanticOnlyDomainResolver,
+    build_domain_resolver,
+)
 from .recovery import RecoveryOutcome, RuntimeRecoveryService
 from .report_workflow import ReportWorkflow, ReportWorkflowOutcome
 from .research_critic_loop import (
@@ -56,6 +61,7 @@ __all__ = [
     "ProfileNotFoundError",
     "ProfileStateError",
     "ProfileWorkflow",
+    "ProviderConfigurationError",
     "RecoveryOutcome",
     "ReportWorkflow",
     "ReportWorkflowOutcome",
@@ -66,6 +72,7 @@ __all__ = [
     "RuntimeRecoveryService",
     "SemanticDomainProvider",
     "SemanticDomainResult",
+    "SemanticOnlyDomainResolver",
     "SemanticResolutionError",
     "StateMachine",
     "SupervisorError",
@@ -74,4 +81,5 @@ __all__ = [
     "WorkflowAlreadyActiveError",
     "WorkflowEngine",
     "WorkflowNotFoundError",
+    "build_domain_resolver",
 ]

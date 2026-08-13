@@ -69,6 +69,7 @@ research:
 
 critic:
   max_verification_queries: 12
+  max_verification_sources_per_claim: 4
   require_independent_search: true
   require_claim_level_review: true
   default_minimum_cross_checks: 2
