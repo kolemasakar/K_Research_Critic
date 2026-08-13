@@ -35,6 +35,7 @@ _TEXT_SUFFIXES = {
     ".txt",
     ".example",
 }
+_CANONICAL_STANDARD_WITH_UNICODE_EXAMPLE = "PROJECT_FILE_STANDARD.md"
 
 
 def _require(condition: bool, message: str) -> None:
@@ -61,7 +62,7 @@ def _is_ascii(value: str) -> bool:
     return True
 
 
-def validate_document(path: Path) -> None:
+def validate_document(path: Path, *, allow_additional_unicode: bool = False) -> None:
     text = path.read_text(encoding="utf-8")
     lines = text.splitlines()
     relative = path.as_posix()
@@ -69,6 +70,9 @@ def validate_document(path: Path) -> None:
     _require(len(lines) >= 2, f"documentation file is too short: {relative}")
     _require(lines[0].startswith("# "), f"documentation title is missing: {relative}")
     _require(not _is_ascii(lines[1]), f"Ukrainian description line is missing after title: {relative}")
+
+    if allow_additional_unicode:
+        return
 
     for line_number, line in enumerate(lines[2:], start=3):
         _require(
@@ -140,7 +144,10 @@ def validate_repository(root: Path) -> RepositoryValidationSummary:
             )
 
     for document in documents:
-        validate_document(document)
+        validate_document(
+            document,
+            allow_additional_unicode=document.name == _CANONICAL_STANDARD_WITH_UNICODE_EXAMPLE,
+        )
 
     gitkeep_count = _validate_gitkeep_files(root, tracked)
     secret_count = _validate_secret_patterns(root, tracked)
