@@ -1,4 +1,5 @@
 from .agent_registry import AgentRegistry
+from .application import KSupervisorApplication, MVPOutcome, MVPStatus, PreparedTask
 from .domain_resolver import DomainResolver
 from .exceptions import (
     AgentNotFoundError,
@@ -31,6 +32,10 @@ __all__ = [
     "DomainResolver",
     "DuplicateTaskError",
     "InvalidStateTransitionError",
+    "KSupervisorApplication",
+    "MVPOutcome",
+    "MVPStatus",
+    "PreparedTask",
     "ProfileManager",
     "ProfileNotFoundError",
     "ProfileStateError",

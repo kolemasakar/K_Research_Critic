@@ -1,4 +1,5 @@
 from .citations import CitationManager
+from .corpus_provider import JsonCorpusProvider
 from .errors import ToolExecutionError
 from .evidence import (
     EvidenceLinker,
@@ -24,6 +25,7 @@ __all__ = [
     "EvidenceLinker",
     "EvidenceToolkit",
     "FetchedDocument",
+    "JsonCorpusProvider",
     "ResearchTools",
     "ResearchToolset",
     "SearchHit",

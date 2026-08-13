@@ -1,0 +1,28 @@
+{
+  "documents": [
+    {
+      "url": "https://source-a.example/k-supervisor",
+      "title": "Synthetic K_Supervisor Evidence A",
+      "publisher": "Synthetic Source A",
+      "snippet": "Synthetic fixture for Phase 9 workflow validation.",
+      "publication_date": "2026-08-01",
+      "source_type": "OFFICIAL",
+      "reliability_class": "A",
+      "primary_source": true,
+      "independence_group": "synthetic-a",
+      "content": "Supervisor-controlled research workflows require explicit profile approval before autonomous critique. This synthetic document exists only to validate the local MVP workflow."
+    },
+    {
+      "url": "https://source-b.example/k-supervisor",
+      "title": "Synthetic K_Supervisor Evidence B",
+      "publisher": "Synthetic Source B",
+      "snippet": "Independent synthetic fixture for Phase 9 workflow validation.",
+      "publication_date": "2026-08-01",
+      "source_type": "OFFICIAL",
+      "reliability_class": "A",
+      "primary_source": true,
+      "independence_group": "synthetic-b",
+      "content": "Supervisor-controlled research workflows require explicit profile approval before autonomous critique. This second synthetic document provides an independent fixture source for deterministic testing."
+    }
+  ]
+}
