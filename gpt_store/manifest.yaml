@@ -1,0 +1,50 @@
+schema_version: "1.0"
+
+product:
+  name: K_Supervisor
+  description: >-
+    Research supervisor that plans evidence-based work, asks you to approve its
+    critic criteria, independently verifies claims, revises weak drafts, and
+    produces a final report with sources, uncertainty, and review status.
+  primary_channel: chatgpt_store
+  publication_state: ready_for_manual_publication_test
+
+model:
+  policy: user_plan
+  recommended_model: null
+  allow_user_model_switch: true
+
+capabilities:
+  web_search: true
+  code_interpreter_data_analysis: true
+  image_generation: false
+  apps: false
+  actions: false
+
+knowledge:
+  required: false
+  files: []
+
+instructions:
+  file: prompts/GPT_STORE_INSTRUCTIONS.md
+
+checkpoint:
+  schema_version: "1.0"
+  marker: K_SUPERVISOR_CHECKPOINT
+  contract: gpt_store/checkpoint.py
+  example: gpt_store/checkpoint_example.json
+
+conversation_starters:
+  - "Research this topic and build the CriticProfile for my approval before you start."
+  - "Compare two technologies using independent sources and show unresolved risks."
+  - "Verify this claim, including evidence that supports or contradicts it."
+  - "Resume a K_Supervisor task from a checkpoint I will paste."
+
+release:
+  free_user_compatible: true
+  developer_api_key_required: false
+  external_backend_required: false
+  privacy_policy_url_required_by_package: false
+  live_free_plan_test_required: true
+  live_paid_plan_model_switch_test_required: true
+  public_publish_is_manual: true
