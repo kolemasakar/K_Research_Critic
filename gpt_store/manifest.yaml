@@ -1,7 +1,7 @@
 schema_version: "1.0"
 
 product:
-  name: K_Supervisor
+  name: K-Research & Critic
   description: >-
     Research supervisor that plans evidence-based work, asks you to approve its
     critic criteria, independently verifies claims, revises weak drafts, and
@@ -38,7 +38,7 @@ conversation_starters:
   - "Research this topic and build the CriticProfile for my approval before you start."
   - "Compare two technologies using independent sources and show unresolved risks."
   - "Verify this claim, including evidence that supports or contradicts it."
-  - "Resume a K_Supervisor task from a checkpoint I will paste."
+  - "Resume a K-Research & Critic task from a checkpoint I will paste."
 
 release:
   free_user_compatible: true
