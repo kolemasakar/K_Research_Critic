@@ -32,18 +32,19 @@ Phase 6 - CriticAgent MVP: COMPLETE.
 Phase 7 - Autonomous Research-Critic Loop: COMPLETE.
 Phase 8 - ReportGenerator and Final Artifacts: COMPLETE.
 Phase 9 - End-to-End MVP: COMPLETE.
+Post-MVP Hybrid Domain Resolver: COMPLETE.
 
 MVP boundary reached.
 
-Next scheduled implementation:
+Next implementation phase:
 
 ```text
-Post-MVP Enhancement - Hybrid Domain Resolver
+Phase 10 - Persistence and Audit
 ```
 
-The repository now includes deterministic domain resolution, multi-domain detection, dynamic CriticProfile approval workflows, a generic ResearchAgent, structured ResearchResult output, provider-neutral web tool adapters, normalized tool errors, source metadata extraction, URL/source deduplication, source validation, reliability classification with explicit override support, bidirectional claim-to-source linking, citation management, a generic profile-driven CriticAgent, a Supervisor-owned autonomous Research-Critic revision loop, ReportGenerator finalization, and a runnable Phase 9 application layer.
+The repository now includes deterministic domain resolution, HybridResolver semantic merge support, multi-domain detection, dynamic CriticProfile approval workflows, a generic ResearchAgent, structured ResearchResult output, provider-neutral web tool adapters, normalized tool errors, source metadata extraction, URL/source deduplication, source validation, reliability classification with explicit override support, bidirectional claim-to-source linking, citation management, a generic profile-driven CriticAgent, a Supervisor-owned autonomous Research-Critic revision loop, ReportGenerator finalization, and a runnable Phase 9 application layer.
 
-`KSupervisorApplication` composes task intake, domain assessment, CriticProfile review, explicit user approval, autonomous Research-Critic iterations, deterministic termination, and final artifact generation into one programmatic workflow.
+`KSupervisorApplication` composes task intake, domain assessment, CriticProfile review, explicit user approval, autonomous Research-Critic iterations, deterministic termination, and final artifact generation into one programmatic workflow. A custom domain resolver can now be injected at application construction without changing the rest of the workflow.
 
 The Phase 9 application exposes explicit overall statuses:
 
@@ -55,11 +56,17 @@ FAILURE
 
 The built-in Phase 9 CLI uses `JsonCorpusProvider`, a deterministic local provider intended for a runnable MVP, reproducible integration tests, and offline evidence-corpus execution. It is not a live Internet search provider. Live external search/fetch providers remain pluggable through the existing `ResearchTools`, `WebSearchTool`, and `WebFetchTool` boundaries and are intentionally not hard-coded into agent logic.
 
+Hybrid domain resolution is now implemented through `DomainResolverProtocol`, `RuleBasedResolver`, `LLMSemanticResolver`, and `HybridResolver`. The semantic resolver is provider-neutral and requires structured `SemanticDomainResult` output. HybridResolver preserves deterministic fallback, prevents matched deterministic risk from being silently lowered, merges compatible multi-domain results, records material disagreements in uncertainty, and exposes `HybridResolutionAudit` without changing the stable `DomainAssessment` schema.
+
+`ProfileWorkflow` now uses `HybridResolver` by default. When no semantic provider is configured, the deterministic Phase 3 `DomainResolver` result is returned unchanged. A semantic provider can be injected through `LLMSemanticResolver`; no vendor LLM SDK is embedded in Supervisor. The bundled CLI therefore remains deterministic until a semantic provider is explicitly wired.
+
+Tracked resolver defaults are declared in `config/settings.yaml`, including hybrid mode, semantic enablement, minimum semantic confidence, high-risk agreement behavior, and deterministic fallback. Central provider/model factory wiring remains scheduled for the later configuration-control phase.
+
 The Phase 6 CriticAgent still uses conservative deterministic evidence-relation heuristics for the MVP. Semantic LLM-based verification remains a later enhancement and does not change the approved CriticProfile boundary.
 
-Iteration, agent-run, profile, and artifact audit data is currently in-memory. Durable restart-safe persistence remains scheduled for Phase 10.
+Iteration, agent-run, profile, resolver-audit, and artifact data is currently in-memory. Durable restart-safe persistence is the scope of Phase 10.
 
-Hybrid semantic domain resolution is the next scheduled post-MVP enhancement. See `docs/HYBRID_RESOLVER_PLAN.md`.
+See `docs/HYBRID_RESOLVER_PLAN.md` for the completed HybridResolver design and validation record.
 
 ## Repository Structure
 
