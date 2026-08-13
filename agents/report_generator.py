@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+import tempfile
 from hashlib import sha256
 from pathlib import Path
 from time import perf_counter
@@ -21,7 +23,6 @@ from models import (
     ExecutionStatus,
     Metrics,
     ResearchResult,
-    Source,
     TaskStatus,
     utc_now,
 )
@@ -94,8 +95,16 @@ class ReportGenerator(Agent):
                 review_history,
                 final_status,
             )
-            final_path.write_text(final_content, encoding="utf-8")
-            protocol_path.write_text(protocol_content, encoding="utf-8")
+            artifacts = [
+                self._artifact(request, final_path, final_content, ArtifactType.FINAL_REPORT, final_status),
+                self._artifact(request, protocol_path, protocol_content, ArtifactType.REVIEW_PROTOCOL, final_status),
+            ]
+            self._write_artifact_pair(
+                (
+                    (final_path, final_content),
+                    (protocol_path, protocol_content),
+                )
+            )
         except OSError as exc:
             return self._failed_result(
                 request,
@@ -111,10 +120,6 @@ class ReportGenerator(Agent):
                 ),
             )
 
-        artifacts = [
-            self._artifact(request, final_path, final_content, ArtifactType.FINAL_REPORT, final_status),
-            self._artifact(request, protocol_path, protocol_content, ArtifactType.REVIEW_PROTOCOL, final_status),
-        ]
         return AgentResult(
             run_id=request.run_id,
             request_id=request.request_id,
@@ -131,6 +136,77 @@ class ReportGenerator(Agent):
             started_at=started_at,
             completed_at=utc_now(),
         )
+
+    def _write_artifact_pair(self, outputs: tuple[tuple[Path, str], tuple[Path, str]]) -> None:
+        """Stage both files before commit and restore the previous pair if commit fails."""
+        staged: dict[Path, Path] = {}
+        backups: dict[Path, Path] = {}
+        existed: dict[Path, bool] = {}
+
+        try:
+            for target, content in outputs:
+                staged[target] = self._stage_text(target, content)
+
+            for target, _ in outputs:
+                existed[target] = target.exists()
+                if existed[target]:
+                    backup = self._reserve_temp_path(target, "backup")
+                    os.replace(target, backup)
+                    backups[target] = backup
+
+            for target, _ in outputs:
+                os.replace(staged[target], target)
+        except OSError:
+            self._rollback_artifact_pair(outputs, backups, existed)
+            raise
+        finally:
+            for path in [*staged.values(), *backups.values()]:
+                try:
+                    path.unlink(missing_ok=True)
+                except OSError:
+                    pass
+
+    def _stage_text(self, target: Path, content: str) -> Path:
+        file_descriptor, name = tempfile.mkstemp(
+            dir=self.output_directory,
+            prefix=f".{target.name}.",
+            suffix=".tmp",
+        )
+        os.close(file_descriptor)
+        staged = Path(name)
+        try:
+            staged.write_text(content, encoding="utf-8")
+        except OSError:
+            staged.unlink(missing_ok=True)
+            raise
+        return staged
+
+    def _reserve_temp_path(self, target: Path, purpose: str) -> Path:
+        file_descriptor, name = tempfile.mkstemp(
+            dir=self.output_directory,
+            prefix=f".{target.name}.{purpose}.",
+            suffix=".tmp",
+        )
+        os.close(file_descriptor)
+        path = Path(name)
+        path.unlink(missing_ok=True)
+        return path
+
+    @staticmethod
+    def _rollback_artifact_pair(
+        outputs: tuple[tuple[Path, str], tuple[Path, str]],
+        backups: dict[Path, Path],
+        existed: dict[Path, bool],
+    ) -> None:
+        for target, _ in reversed(outputs):
+            backup = backups.get(target)
+            try:
+                if backup is not None and backup.exists():
+                    os.replace(backup, target)
+                elif not existed.get(target, False):
+                    target.unlink(missing_ok=True)
+            except OSError:
+                pass
 
     def _validate_request(self, request: AgentRunRequest) -> ErrorRecord | None:
         if request.agent_type != AgentType.REPORT_GENERATOR:

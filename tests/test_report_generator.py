@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib
 from datetime import date
 
 from agents import ReportGenerator
@@ -90,7 +91,14 @@ def make_review(task_id: str, profile_id: str, *, iteration: int = 1) -> CriticR
     )
 
 
-def make_request(generator: ReportGenerator, task_id: str, workflow_run_id: str, research: ResearchResult, review: CriticReview, final_status: TaskStatus) -> AgentRunRequest:
+def make_request(
+    generator: ReportGenerator,
+    task_id: str,
+    workflow_run_id: str,
+    research: ResearchResult,
+    review: CriticReview,
+    final_status: TaskStatus,
+) -> AgentRunRequest:
     return AgentRunRequest(
         task_id=task_id,
         workflow_run_id=workflow_run_id,
@@ -104,6 +112,56 @@ def make_request(generator: ReportGenerator, task_id: str, workflow_run_id: str,
             "final_status": final_status.value,
         },
     )
+
+
+def make_approved_loop(engine: WorkflowEngine) -> tuple[object, object, ResearchCriticLoopOutcome]:
+    task = engine.task_manager.create_task(user_request="Research a final report", task_type="research")
+    workflow = engine.start_workflow(task.task_id)
+    profile_workflow = ProfileWorkflow(engine)
+    profile_workflow.generate_profile(task.task_id)
+    profile, _ = profile_workflow.approve_current_profile(task.task_id, approved_by="TEST_USER")
+    engine.start_research_iteration(task.task_id)
+    engine.transition(task.task_id, TaskStatus.DRAFT_READY, trigger="test_draft")
+    engine.transition(task.task_id, TaskStatus.REVIEWING, trigger="test_review")
+    engine.transition(task.task_id, TaskStatus.APPROVED, trigger="test_pass")
+
+    research = make_research(task.task_id)
+    review = make_review(task.task_id, profile.profile_id)
+    research_result_envelope = AgentResult(
+        run_id=research.run_id,
+        request_id=generate_id(IdPrefix.REQUEST),
+        task_id=task.task_id,
+        agent_id=generate_id(IdPrefix.AGENT),
+        agent_type=AgentType.RESEARCH,
+        status=ExecutionStatus.SUCCEEDED,
+        result_type="research_result",
+        payload=research.model_dump(mode="json"),
+        metrics=Metrics(),
+        started_at=utc_now(),
+        completed_at=utc_now(),
+    )
+    critic_result_envelope = AgentResult(
+        run_id=review.run_id,
+        request_id=generate_id(IdPrefix.REQUEST),
+        task_id=task.task_id,
+        agent_id=generate_id(IdPrefix.AGENT),
+        agent_type=AgentType.CRITIC,
+        status=ExecutionStatus.SUCCEEDED,
+        result_type="critic_review",
+        payload=review.model_dump(mode="json"),
+        metrics=Metrics(),
+        started_at=utc_now(),
+        completed_at=utc_now(),
+    )
+    iteration = ResearchCriticIteration(1, research_result_envelope, research, critic_result_envelope, review)
+    loop_outcome = ResearchCriticLoopOutcome(
+        task_id=task.task_id,
+        workflow_run_id=workflow.workflow_run_id,
+        final_state=TaskStatus.APPROVED,
+        iterations=(iteration,),
+        agent_results=(research_result_envelope, critic_result_envelope),
+    )
+    return task, workflow, loop_outcome
 
 
 def test_report_generator_writes_both_utf8_artifacts_with_required_content(tmp_path) -> None:
@@ -175,54 +233,68 @@ def test_report_generator_rejects_non_final_status(tmp_path) -> None:
     assert result.errors[0].error_code == "INVALID_REPORT_INPUT"
 
 
+def test_report_generator_second_stage_failure_leaves_no_partial_visible_pair(tmp_path, monkeypatch) -> None:
+    generator = ReportGenerator(tmp_path)
+    task_id = generate_id(IdPrefix.TASK)
+    workflow_id = generate_id(IdPrefix.WORKFLOW)
+    research = make_research(task_id)
+    review = make_review(task_id, generate_id(IdPrefix.PROFILE))
+    original_stage = generator._stage_text
+    calls = 0
+
+    def fail_second_stage(target, content):
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise OSError("simulated second staging failure")
+        return original_stage(target, content)
+
+    monkeypatch.setattr(generator, "_stage_text", fail_second_stage)
+
+    result = generator.run(make_request(generator, task_id, workflow_id, research, review, TaskStatus.FINALIZED))
+
+    assert result.status == ExecutionStatus.FAILED
+    assert result.errors[0].error_code == "ARTIFACT_WRITE_FAILED"
+    assert not (tmp_path / f"{task_id}_FINAL_REPORT.md").exists()
+    assert not (tmp_path / f"{task_id}_REVIEW_PROTOCOL.md").exists()
+    assert not list(tmp_path.glob("*.tmp"))
+
+
+def test_report_generator_commit_failure_restores_existing_artifact_pair(tmp_path, monkeypatch) -> None:
+    generator = ReportGenerator(tmp_path)
+    task_id = generate_id(IdPrefix.TASK)
+    workflow_id = generate_id(IdPrefix.WORKFLOW)
+    research = make_research(task_id)
+    review = make_review(task_id, generate_id(IdPrefix.PROFILE))
+    final_path = tmp_path / f"{task_id}_FINAL_REPORT.md"
+    protocol_path = tmp_path / f"{task_id}_REVIEW_PROTOCOL.md"
+    final_path.write_text("previous final", encoding="utf-8")
+    protocol_path.write_text("previous protocol", encoding="utf-8")
+
+    module = importlib.import_module("agents.report_generator")
+    original_replace = module.os.replace
+    calls = 0
+
+    def fail_second_commit(source, destination):
+        nonlocal calls
+        calls += 1
+        if calls == 4:
+            raise OSError("simulated second commit failure")
+        return original_replace(source, destination)
+
+    monkeypatch.setattr(module.os, "replace", fail_second_commit)
+
+    result = generator.run(make_request(generator, task_id, workflow_id, research, review, TaskStatus.FINALIZED))
+
+    assert result.status == ExecutionStatus.FAILED
+    assert final_path.read_text(encoding="utf-8") == "previous final"
+    assert protocol_path.read_text(encoding="utf-8") == "previous protocol"
+    assert not list(tmp_path.glob("*.tmp"))
+
+
 def test_report_workflow_transitions_approved_task_to_finalized_and_tracks_run(tmp_path) -> None:
     engine = WorkflowEngine()
-    task = engine.task_manager.create_task(user_request="Research a final report", task_type="research")
-    workflow = engine.start_workflow(task.task_id)
-    profile_workflow = ProfileWorkflow(engine)
-    profile_workflow.generate_profile(task.task_id)
-    profile, _ = profile_workflow.approve_current_profile(task.task_id, approved_by="TEST_USER")
-    engine.start_research_iteration(task.task_id)
-    engine.transition(task.task_id, TaskStatus.DRAFT_READY, trigger="test_draft")
-    engine.transition(task.task_id, TaskStatus.REVIEWING, trigger="test_review")
-    engine.transition(task.task_id, TaskStatus.APPROVED, trigger="test_pass")
-
-    research = make_research(task.task_id)
-    review = make_review(task.task_id, profile.profile_id)
-    research_result_envelope = AgentResult(
-        run_id=research.run_id,
-        request_id=generate_id(IdPrefix.REQUEST),
-        task_id=task.task_id,
-        agent_id=generate_id(IdPrefix.AGENT),
-        agent_type=AgentType.RESEARCH,
-        status=ExecutionStatus.SUCCEEDED,
-        result_type="research_result",
-        payload=research.model_dump(mode="json"),
-        metrics=Metrics(),
-        started_at=utc_now(),
-        completed_at=utc_now(),
-    )
-    critic_result_envelope = AgentResult(
-        run_id=review.run_id,
-        request_id=generate_id(IdPrefix.REQUEST),
-        task_id=task.task_id,
-        agent_id=generate_id(IdPrefix.AGENT),
-        agent_type=AgentType.CRITIC,
-        status=ExecutionStatus.SUCCEEDED,
-        result_type="critic_review",
-        payload=review.model_dump(mode="json"),
-        metrics=Metrics(),
-        started_at=utc_now(),
-        completed_at=utc_now(),
-    )
-    iteration = ResearchCriticIteration(1, research_result_envelope, research, critic_result_envelope, review)
-    loop_outcome = ResearchCriticLoopOutcome(
-        task_id=task.task_id,
-        workflow_run_id=workflow.workflow_run_id,
-        final_state=TaskStatus.APPROVED,
-        iterations=(iteration,),
-        agent_results=(research_result_envelope, critic_result_envelope),
-    )
+    task, workflow, loop_outcome = make_approved_loop(engine)
 
     outcome = ReportWorkflow(engine, ReportGenerator(tmp_path)).finalize(task.task_id, loop_outcome)
 
@@ -231,3 +303,53 @@ def test_report_workflow_transitions_approved_task_to_finalized_and_tracks_run(t
     assert outcome.report_agent_result.run_id in engine.get_task_workflow(task.task_id).agent_run_ids
     states = [item.to_state for item in engine.get_transitions(workflow.workflow_run_id)]
     assert states[-2:] == [TaskStatus.FINALIZING, TaskStatus.FINALIZED]
+
+
+def test_report_workflow_rejects_duplicate_artifact_types_and_fails_finalization(tmp_path) -> None:
+    class DuplicateArtifactGenerator(ReportGenerator):
+        def run(self, request: AgentRunRequest) -> AgentResult:
+            artifacts = [
+                Artifact(
+                    task_id=request.task_id,
+                    workflow_run_id=request.workflow_run_id,
+                    artifact_type=ArtifactType.FINAL_REPORT,
+                    path=str(tmp_path / "one.md"),
+                    status=ArtifactStatus.APPROVED,
+                    encoding="UTF-8",
+                    checksum="a" * 64,
+                    created_by_run_id=request.run_id,
+                ),
+                Artifact(
+                    task_id=request.task_id,
+                    workflow_run_id=request.workflow_run_id,
+                    artifact_type=ArtifactType.FINAL_REPORT,
+                    path=str(tmp_path / "two.md"),
+                    status=ArtifactStatus.APPROVED,
+                    encoding="UTF-8",
+                    checksum="b" * 64,
+                    created_by_run_id=request.run_id,
+                ),
+            ]
+            return AgentResult(
+                run_id=request.run_id,
+                request_id=request.request_id,
+                task_id=request.task_id,
+                agent_id=request.agent_id,
+                agent_type=AgentType.REPORT_GENERATOR,
+                status=ExecutionStatus.SUCCEEDED,
+                result_type="artifacts",
+                payload={"artifacts": [item.model_dump(mode="json") for item in artifacts]},
+                metrics=Metrics(),
+                started_at=utc_now(),
+                completed_at=utc_now(),
+            )
+
+    engine = WorkflowEngine()
+    task, workflow, loop_outcome = make_approved_loop(engine)
+
+    outcome = ReportWorkflow(engine, DuplicateArtifactGenerator(tmp_path)).finalize(task.task_id, loop_outcome)
+
+    assert outcome.final_state == TaskStatus.FAILED
+    assert {item.artifact_type for item in outcome.artifacts} == {ArtifactType.FINAL_REPORT}
+    states = [item.to_state for item in engine.get_transitions(workflow.workflow_run_id)]
+    assert states[-2:] == [TaskStatus.FINALIZING, TaskStatus.FAILED]

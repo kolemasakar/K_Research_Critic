@@ -3,8 +3,19 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from pydantic import ValidationError
+
 from agents import Agent
-from models import AgentResult, AgentRunRequest, AgentType, Artifact, ExecutionStatus, TaskStatus
+from models import (
+    AgentResult,
+    AgentRunRequest,
+    AgentType,
+    Artifact,
+    ArtifactStatus,
+    ArtifactType,
+    ExecutionStatus,
+    TaskStatus,
+)
 from persistence import PersistenceStore
 
 from .exceptions import ProfileStateError
@@ -105,23 +116,36 @@ class ReportWorkflow:
                 artifacts=(),
             )
 
-        artifacts = tuple(Artifact.model_validate(item) for item in result.payload.get("artifacts", []))
+        try:
+            artifacts = tuple(Artifact.model_validate(item) for item in result.payload.get("artifacts", []))
+        except (TypeError, ValueError, ValidationError) as exc:
+            return self._invalid_artifact_outcome(
+                task_id,
+                task.status,
+                result,
+                (),
+                f"ReportGenerator returned invalid artifact metadata: {exc}",
+            )
+
+        validation_error = self._validate_artifact_set(
+            artifacts,
+            task_id=task_id,
+            workflow_run_id=workflow.workflow_run_id,
+            report_run_id=result.run_id,
+            target_status=target_status,
+        )
+        if validation_error is not None:
+            return self._invalid_artifact_outcome(
+                task_id,
+                task.status,
+                result,
+                artifacts,
+                validation_error,
+            )
+
         if self.persistence is not None:
             for artifact in artifacts:
                 self.persistence.save_artifact(artifact)
-
-        if len(artifacts) != 2:
-            if task.status == TaskStatus.FINALIZING:
-                self.workflow_engine.fail_task(
-                    task_id,
-                    reason="ReportGenerator did not return both required artifacts",
-                )
-            return ReportWorkflowOutcome(
-                task_id=task_id,
-                final_state=self.workflow_engine.task_manager.get_task(task_id).status,
-                report_agent_result=result,
-                artifacts=artifacts,
-            )
 
         if task.status == TaskStatus.FINALIZING:
             self.workflow_engine.transition(
@@ -131,6 +155,52 @@ class ReportWorkflow:
                 reason="FINAL_REPORT and REVIEW_PROTOCOL generated successfully",
             )
 
+        return ReportWorkflowOutcome(
+            task_id=task_id,
+            final_state=self.workflow_engine.task_manager.get_task(task_id).status,
+            report_agent_result=result,
+            artifacts=artifacts,
+        )
+
+    @staticmethod
+    def _validate_artifact_set(
+        artifacts: tuple[Artifact, ...],
+        *,
+        task_id: str,
+        workflow_run_id: str,
+        report_run_id: str,
+        target_status: TaskStatus,
+    ) -> str | None:
+        required_types = {ArtifactType.FINAL_REPORT, ArtifactType.REVIEW_PROTOCOL}
+        if len(artifacts) != 2 or {artifact.artifact_type for artifact in artifacts} != required_types:
+            return "ReportGenerator must return exactly one FINAL_REPORT and one REVIEW_PROTOCOL"
+        if any(artifact.task_id != task_id for artifact in artifacts):
+            return "ReportGenerator artifact task_id does not match the finalized task"
+        if any(artifact.workflow_run_id != workflow_run_id for artifact in artifacts):
+            return "ReportGenerator artifact workflow_run_id does not match the active workflow"
+        if any(artifact.created_by_run_id != report_run_id for artifact in artifacts):
+            return "ReportGenerator artifact created_by_run_id does not match the report run"
+        expected_status = (
+            ArtifactStatus.APPROVED
+            if target_status == TaskStatus.FINALIZED
+            else ArtifactStatus.GENERATED
+        )
+        if any(artifact.status != expected_status for artifact in artifacts):
+            return "ReportGenerator artifact status does not match the final task status"
+        if len({artifact.path for artifact in artifacts}) != 2:
+            return "ReportGenerator artifacts must use distinct paths"
+        return None
+
+    def _invalid_artifact_outcome(
+        self,
+        task_id: str,
+        task_status: TaskStatus,
+        result: AgentResult,
+        artifacts: tuple[Artifact, ...],
+        reason: str,
+    ) -> ReportWorkflowOutcome:
+        if task_status == TaskStatus.FINALIZING:
+            self.workflow_engine.fail_task(task_id, reason=reason)
         return ReportWorkflowOutcome(
             task_id=task_id,
             final_state=self.workflow_engine.task_manager.get_task(task_id).status,
