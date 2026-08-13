@@ -31,30 +31,35 @@ Phase 5 - Tools and Evidence Layer: COMPLETE.
 Phase 6 - CriticAgent MVP: COMPLETE.
 Phase 7 - Autonomous Research-Critic Loop: COMPLETE.
 Phase 8 - ReportGenerator and Final Artifacts: COMPLETE.
+Phase 9 - End-to-End MVP: COMPLETE.
 
-Next implementation phase:
+MVP boundary reached.
+
+Next scheduled implementation:
 
 ```text
-Phase 9 - End-to-End MVP
+Post-MVP Enhancement - Hybrid Domain Resolver
 ```
 
-The repository now includes deterministic domain resolution, multi-domain detection, dynamic CriticProfile approval workflows, a generic ResearchAgent, structured ResearchResult output, provider-neutral web tool adapters, normalized tool errors, source metadata extraction, URL/source deduplication, source validation, reliability classification with explicit override support, bidirectional claim-to-source linking, citation management, a generic profile-driven CriticAgent, a Supervisor-owned autonomous Research-Critic revision loop, and ReportGenerator finalization.
+The repository now includes deterministic domain resolution, multi-domain detection, dynamic CriticProfile approval workflows, a generic ResearchAgent, structured ResearchResult output, provider-neutral web tool adapters, normalized tool errors, source metadata extraction, URL/source deduplication, source validation, reliability classification with explicit override support, bidirectional claim-to-source linking, citation management, a generic profile-driven CriticAgent, a Supervisor-owned autonomous Research-Critic revision loop, ReportGenerator finalization, and a runnable Phase 9 application layer.
 
-The Phase 7 loop versions research results by iteration, feeds structured CriticReview recommendations back to ResearchAgent, enforces the approved confidence threshold and max_iterations, rejects incomplete PARTIAL critic execution as an accepted PASS, records agent runs and completed iteration records, stops on accepted PASS, and terminates explicitly with FAILED or COMPLETED_WITH_LIMITATIONS where appropriate.
+`KSupervisorApplication` composes task intake, domain assessment, CriticProfile review, explicit user approval, autonomous Research-Critic iterations, deterministic termination, and final artifact generation into one programmatic workflow.
 
-Phase 8 generates UTF-8 `<TASK_ID>_FINAL_REPORT.md` and `<TASK_ID>_REVIEW_PROTOCOL.md` artifacts. The final report contains structured findings, source citations, uncertainty, limitations, and bibliography. The review protocol records iteration decisions, reliability scores, critical issues, requested changes, applied changes, unresolved items, and final status without exposing hidden chain-of-thought or private model reasoning.
+The Phase 9 application exposes explicit overall statuses:
 
-Artifact metadata includes type, path, UTF-8 encoding, checksum, creation run, and final task status. Approved research finalization is routed through FINALIZING to FINALIZED. Useful results that reached COMPLETED_WITH_LIMITATIONS can still produce explicit limitation artifacts without changing that terminal status.
+```text
+SUCCESS
+LIMITATION
+FAILURE
+```
 
-Iteration, agent-run, and artifact audit data is in-memory in the current MVP implementation. Durable restart-safe persistence remains scheduled for Phase 10.
+The built-in Phase 9 CLI uses `JsonCorpusProvider`, a deterministic local provider intended for a runnable MVP, reproducible integration tests, and offline evidence-corpus execution. It is not a live Internet search provider. Live external search/fetch providers remain pluggable through the existing `ResearchTools`, `WebSearchTool`, and `WebFetchTool` boundaries and are intentionally not hard-coded into agent logic.
 
-Concrete external search/fetch providers remain pluggable behind the provider-neutral adapters rather than being embedded in agent logic.
+The Phase 6 CriticAgent still uses conservative deterministic evidence-relation heuristics for the MVP. Semantic LLM-based verification remains a later enhancement and does not change the approved CriticProfile boundary.
 
-The Phase 6 CriticAgent uses conservative deterministic evidence-relation heuristics for the MVP. Semantic LLM-based verification remains a later enhancement and does not change the approved CriticProfile boundary.
+Iteration, agent-run, profile, and artifact audit data is currently in-memory. Durable restart-safe persistence remains scheduled for Phase 10.
 
-Hybrid semantic domain resolution is scheduled as a post-MVP enhancement after Phase 9. See `docs/HYBRID_RESOLVER_PLAN.md`.
-
-A runnable end-to-end application entry point is not implemented yet; this is the scope of Phase 9.
+Hybrid semantic domain resolution is the next scheduled post-MVP enhancement. See `docs/HYBRID_RESOLVER_PLAN.md`.
 
 ## Repository Structure
 
@@ -66,7 +71,8 @@ tools/        external capability adapters and evidence utilities
 prompts/      prompt assets
 config/       tracked non-secret configuration
 tests/        automated tests
-scripts/      development and maintenance scripts
+scripts/      runnable local commands and maintenance scripts
+examples/     deterministic sample inputs
 output/       generated user-facing artifacts
 logs/         runtime logs
 docs/         project specifications and standards
@@ -93,7 +99,7 @@ Windows activation:
 .venv\Scripts\activate
 ```
 
-Install the initial dependencies:
+Install dependencies:
 
 ```text
 python -m pip install --upgrade pip
@@ -111,6 +117,68 @@ Run tests:
 ```text
 python -m pytest
 ```
+
+## End-to-End MVP CLI
+
+The default CLI requires an explicit CriticProfile approval action before autonomous execution:
+
+```text
+python -m scripts.run_research --task "Explain software architecture behavior" --corpus examples/sample_corpus.json
+```
+
+The CLI prints the DomainAssessment and CriticProfile proposal and then requests one of:
+
+```text
+approve
+edit
+reject
+```
+
+For a non-interactive run, explicit approval can be supplied as part of the command invocation:
+
+```text
+python -m scripts.run_research --task "Explain software architecture behavior" --corpus examples/sample_corpus.json --approve-profile
+```
+
+Profile edits can be supplied together with explicit approval:
+
+```text
+python -m scripts.run_research --task "Explain software architecture behavior" --corpus examples/sample_corpus.json --approve-profile --profile-edits '{"critic_role":"Independent software reviewer"}'
+```
+
+The sample corpus is synthetic and exists only to validate the workflow. It must not be treated as factual research evidence.
+
+CLI exit codes:
+
+```text
+0  SUCCESS
+1  FAILURE or invalid input
+2  LIMITATION
+4  profile rejected or explicit approval not supplied
+```
+
+## Local Corpus Format
+
+`JsonCorpusProvider` accepts either a JSON list of documents or an object with a `documents` list. Each document follows the provider-neutral `FetchedDocument` contract. Example:
+
+```json
+{
+  "documents": [
+    {
+      "url": "https://example.org/source",
+      "title": "Source title",
+      "publisher": "Publisher",
+      "publication_date": "2026-08-01",
+      "source_type": "OFFICIAL",
+      "primary_source": true,
+      "independence_group": "source-a",
+      "content": "Evidence text."
+    }
+  ]
+}
+```
+
+For high-risk profiles, provide enough independent authoritative sources to satisfy the approved cross-check requirements.
 
 ## Configuration
 
@@ -146,7 +214,7 @@ docs/HYBRID_RESOLVER_PLAN.md
 
 ## Output Artifacts
 
-The first complete workflow generates:
+The complete MVP workflow generates:
 
 ```text
 <TASK_ID>_FINAL_REPORT.md
