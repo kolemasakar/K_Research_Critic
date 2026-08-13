@@ -1,0 +1,44 @@
+{
+  "marker": "K_SUPERVISOR_CHECKPOINT",
+  "schema_version": "1.0",
+  "task_id": "TASK_EXAMPLE_001",
+  "task_summary": "Compare two software architectures using current independent evidence.",
+  "workflow_state": "PROFILE_APPROVED",
+  "resume_policy": "CONFIRM_RESUME",
+  "iteration": 0,
+  "critic_profile": {
+    "profile_id": "PROFILE_EXAMPLE_001",
+    "version": 1,
+    "status": "APPROVED",
+    "domain": "software_engineering",
+    "subdomains": ["software_architecture"],
+    "task_type": "comparative_research",
+    "risk_level": "MEDIUM",
+    "critic_role": "Independent software architecture reviewer",
+    "evaluation_criteria": [
+      "claim support",
+      "source authority",
+      "current technical relevance",
+      "trade-off completeness"
+    ],
+    "preferred_source_types": ["OFFICIAL", "PRIMARY_DOCUMENT", "PROFESSIONAL_PUBLICATION"],
+    "required_cross_checks": 2,
+    "standards": [],
+    "minimum_evidence_level": "authoritative independent evidence",
+    "freshness_requirement": "prefer current sources for changing technical claims",
+    "confidence_threshold": 0.85,
+    "special_user_requirements": [],
+    "approved_by": "USER",
+    "approved_at": "2026-08-13T04:00:00Z"
+  },
+  "latest_research": null,
+  "latest_review": null,
+  "limitations": [],
+  "distribution": {
+    "channel": "chatgpt_store",
+    "model_policy": "user_plan",
+    "developer_api_key_required": false,
+    "external_backend_required": false
+  },
+  "created_at": "2026-08-13T04:00:00Z"
+}
