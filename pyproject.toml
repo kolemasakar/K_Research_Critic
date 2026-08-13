@@ -1,0 +1,39 @@
+[tool.ruff]
+target-version = "py313"
+line-length = 120
+exclude = ["output", "runtime", "logs"]
+
+[tool.mypy]
+python_version = "3.13"
+ignore_missing_imports = true
+check_untyped_defs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+no_implicit_optional = true
+show_error_codes = true
+pretty = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = [
+  "agents",
+  "config",
+  "gpt_store",
+  "models",
+  "observability",
+  "persistence",
+  "providers",
+  "scripts",
+  "supervisor",
+  "tools",
+]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+fail_under = 70
+show_missing = true
+skip_covered = true
+precision = 1

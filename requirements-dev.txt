@@ -1,0 +1,5 @@
+-r requirements.txt
+mypy>=1.17,<2
+pytest-cov>=6,<8
+ruff>=0.12,<1
+types-PyYAML>=6.0.12,<7
