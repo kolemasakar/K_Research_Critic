@@ -30,18 +30,23 @@ Phase 4 - ResearchAgent MVP: COMPLETE.
 Phase 5 - Tools and Evidence Layer: COMPLETE.
 Phase 6 - CriticAgent MVP: COMPLETE.
 Phase 7 - Autonomous Research-Critic Loop: COMPLETE.
+Phase 8 - ReportGenerator and Final Artifacts: COMPLETE.
 
 Next implementation phase:
 
 ```text
-Phase 8 - ReportGenerator and Final Artifacts
+Phase 9 - End-to-End MVP
 ```
 
-The repository now includes deterministic domain resolution, multi-domain detection, dynamic CriticProfile approval workflows, a generic ResearchAgent, structured ResearchResult output, provider-neutral web tool adapters, normalized tool errors, source metadata extraction, URL/source deduplication, source validation, reliability classification with explicit override support, bidirectional claim-to-source linking, citation management, a generic profile-driven CriticAgent, and a Supervisor-owned autonomous Research-Critic revision loop.
+The repository now includes deterministic domain resolution, multi-domain detection, dynamic CriticProfile approval workflows, a generic ResearchAgent, structured ResearchResult output, provider-neutral web tool adapters, normalized tool errors, source metadata extraction, URL/source deduplication, source validation, reliability classification with explicit override support, bidirectional claim-to-source linking, citation management, a generic profile-driven CriticAgent, a Supervisor-owned autonomous Research-Critic revision loop, and ReportGenerator finalization.
 
 The Phase 7 loop versions research results by iteration, feeds structured CriticReview recommendations back to ResearchAgent, enforces the approved confidence threshold and max_iterations, rejects incomplete PARTIAL critic execution as an accepted PASS, records agent runs and completed iteration records, stops on accepted PASS, and terminates explicitly with FAILED or COMPLETED_WITH_LIMITATIONS where appropriate.
 
-Iteration and agent-run audit data is in-memory in the current MVP implementation. Durable restart-safe persistence remains scheduled for Phase 10.
+Phase 8 generates UTF-8 `<TASK_ID>_FINAL_REPORT.md` and `<TASK_ID>_REVIEW_PROTOCOL.md` artifacts. The final report contains structured findings, source citations, uncertainty, limitations, and bibliography. The review protocol records iteration decisions, reliability scores, critical issues, requested changes, applied changes, unresolved items, and final status without exposing hidden chain-of-thought or private model reasoning.
+
+Artifact metadata includes type, path, UTF-8 encoding, checksum, creation run, and final task status. Approved research finalization is routed through FINALIZING to FINALIZED. Useful results that reached COMPLETED_WITH_LIMITATIONS can still produce explicit limitation artifacts without changing that terminal status.
+
+Iteration, agent-run, and artifact audit data is in-memory in the current MVP implementation. Durable restart-safe persistence remains scheduled for Phase 10.
 
 Concrete external search/fetch providers remain pluggable behind the provider-neutral adapters rather than being embedded in agent logic.
 
@@ -49,7 +54,7 @@ The Phase 6 CriticAgent uses conservative deterministic evidence-relation heuris
 
 Hybrid semantic domain resolution is scheduled as a post-MVP enhancement after Phase 9. See `docs/HYBRID_RESOLVER_PLAN.md`.
 
-A runnable end-to-end application entry point is not implemented yet.
+A runnable end-to-end application entry point is not implemented yet; this is the scope of Phase 9.
 
 ## Repository Structure
 
@@ -141,7 +146,7 @@ docs/HYBRID_RESOLVER_PLAN.md
 
 ## Output Artifacts
 
-The first complete workflow is expected to generate:
+The first complete workflow generates:
 
 ```text
 <TASK_ID>_FINAL_REPORT.md
