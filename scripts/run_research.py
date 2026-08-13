@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from config import ConfigurationError, load_configuration
 from persistence import SQLitePersistenceStore
 from supervisor import KSupervisorApplication, MVPStatus
 from tools import JsonCorpusProvider, ResearchToolset, WebFetchTool, WebSearchTool
@@ -19,9 +20,11 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         help="UTF-8 JSON evidence corpus used by the local MVP provider.",
     )
-    parser.add_argument("--output-directory", default="output")
-    parser.add_argument("--database", default="runtime/k_supervisor.db")
-    parser.add_argument("--max-iterations", type=int, default=3)
+    parser.add_argument("--settings", default="config/settings.yaml")
+    parser.add_argument("--env-file", default=".env")
+    parser.add_argument("--output-directory")
+    parser.add_argument("--database")
+    parser.add_argument("--max-iterations", type=int)
     parser.add_argument(
         "--approve-profile",
         action="store_true",
@@ -39,6 +42,24 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+
+    try:
+        configuration = load_configuration(args.settings, env_path=args.env_file)
+    except ConfigurationError as exc:
+        print(f"ERROR: cannot load configuration: {exc}")
+        return 1
+
+    settings = configuration.settings
+    max_iterations = (
+        settings.workflow.max_iterations if args.max_iterations is None else args.max_iterations
+    )
+    output_directory = args.output_directory or settings.reports.output_directory
+    database = args.database or settings.persistence.path
+
+    if max_iterations <= 0:
+        print("ERROR: --max-iterations must be greater than zero.")
+        return 1
+
     task_text = (args.task or "").strip()
     if not task_text:
         try:
@@ -57,7 +78,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     try:
-        persistence = SQLitePersistenceStore(args.database)
+        persistence = SQLitePersistenceStore(database)
     except (OSError, ValueError) as exc:
         print(f"ERROR: cannot initialize persistence: {exc}")
         return 1
@@ -65,17 +86,24 @@ def main(argv: list[str] | None = None) -> int:
     tools = ResearchToolset(WebSearchTool(provider), WebFetchTool(provider))
     app = KSupervisorApplication(
         tools,
-        output_directory=Path(args.output_directory),
-        default_max_iterations=args.max_iterations,
+        output_directory=Path(output_directory),
+        default_max_iterations=max_iterations,
         persistence=persistence,
     )
     prepared = app.prepare_task(
         task_text,
         task_type=args.task_type,
-        max_iterations=args.max_iterations,
+        max_iterations=max_iterations,
         special_user_requirements=list(args.special_requirement),
+        metadata={
+            "configuration_schema_version": settings.schema_version,
+            "configuration_environment": settings.environment,
+            "configuration_fingerprint": configuration.fingerprint,
+        },
     )
 
+    print(f"Environment: {settings.environment}")
+    print(f"Configuration fingerprint: {configuration.fingerprint}")
     print(f"Task ID: {prepared.task.task_id}")
     print("Domain assessment:")
     print(prepared.domain_assessment.model_dump_json(indent=2))
@@ -107,7 +135,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     print(f"MVP status: {outcome.status.value}")
     print(f"Final task state: {outcome.final_state.value}")
-    print(f"Audit database: {args.database}")
+    print(f"Audit database: {database}")
     for path in outcome.artifact_paths:
         print(f"Artifact: {path}")
 
