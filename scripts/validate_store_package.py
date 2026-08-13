@@ -33,7 +33,7 @@ def validate_store_package(root: Path = ROOT) -> dict:
     instructions = _mapping(manifest, "instructions")
     checkpoint = _mapping(manifest, "checkpoint")
 
-    _require(product.get("name") == "K_Supervisor", "product.name must be K_Supervisor")
+    _require(product.get("name") == "K-Research & Critic", "product.name must be K-Research & Critic")
     _require(
         product.get("primary_channel") == "chatgpt_store",
         "primary channel must remain chatgpt_store",
