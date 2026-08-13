@@ -1,12 +1,12 @@
 # GPT_STORE_DEPLOYMENT
-Документ визначає основну GPT Store-модель розгортання K_Supervisor без обов'язкового developer API key.
+Документ визначає основну GPT Store-модель розгортання K-Research & Critic без обов'язкового developer API key.
 
-Version: 1.1
+Version: 1.2
 Status: ACTIVE
 
 ## 1. Decision
 
-K_Supervisor is GPT Store-first.
+K-Research & Critic is GPT Store-first.
 
 The primary public edition is a Custom GPT distributed through ChatGPT and intended to remain usable by signed-in users whose plan allows access to public GPTs, including the Free plan where the platform makes GPT access available.
 
@@ -25,7 +25,7 @@ recommended_model: null
 allow_user_model_switch: true
 ```
 
-`recommended_model: null` is intentional. K_Supervisor does not pin a model identifier that may later be retired or unavailable to a user. ChatGPT selects an available model according to the user's account and current platform behavior. Users with additional model choices may switch to another available model.
+`recommended_model: null` is intentional. K-Research & Critic does not pin a model identifier that may later be retired or unavailable to a user. ChatGPT selects an available model according to the user's account and current platform behavior. Users with additional model choices may switch to another available model.
 
 The Store package maps research to built-in Web search and Code Interpreter & Data Analysis when those capabilities are available to the current user. Capability absence must produce an explicit limitation rather than fabricated tool use.
 
@@ -52,17 +52,17 @@ This state means the repository package and static validation are complete. It d
 
 ## 4. Free and Paid User Behavior
 
-K_Supervisor does not implement plan detection or billing logic.
+K-Research & Critic does not implement plan detection or billing logic.
 
 Expected platform behavior is:
 
 ```text
 Free user
   -> model/capabilities available to that user in ChatGPT
-  -> K_Supervisor workflow
+  -> K-Research & Critic workflow
 
 Paid user
-  -> the same K_Supervisor workflow
+  -> the same K-Research & Critic workflow
   -> optional switch to additional models exposed by the user's plan
 ```
 
@@ -108,12 +108,15 @@ The existing SQLite persistence layer remains part of the optional standalone/AP
 
 ## 7. Optional Standalone/API Edition
 
+The repository and standalone engineering core retain the stable technical identifier `K_Supervisor`.
+
 The existing Python runtime is retained as an optional deployment profile:
 
 ```text
 K_Supervisor Core
   |
   +-- GPT Store Edition       PRIMARY
+  |     - public name: K-Research & Critic
   |     - ChatGPT-managed model
   |     - no developer API key
   |     - no mandatory backend
