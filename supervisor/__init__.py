@@ -14,6 +14,7 @@ from .exceptions import (
 )
 from .profile_manager import ProfileManager
 from .profile_workflow import ProfileWorkflow
+from .report_workflow import ReportWorkflow, ReportWorkflowOutcome
 from .research_critic_loop import (
     ResearchCriticIteration,
     ResearchCriticLoop,
@@ -34,6 +35,8 @@ __all__ = [
     "ProfileNotFoundError",
     "ProfileStateError",
     "ProfileWorkflow",
+    "ReportWorkflow",
+    "ReportWorkflowOutcome",
     "ResearchCriticIteration",
     "ResearchCriticLoop",
     "ResearchCriticLoopOutcome",
