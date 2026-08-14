@@ -42,6 +42,8 @@ def test_instruction_package_contains_required_workflow_boundaries() -> None:
     assert "actually exposed in the current runtime" in text
     assert "Supervisor proposes." in text
     assert "USER APPROVAL" in text
+    assert "1=APPROVE, 2=EDIT, 3=REJECT" in text
+    assert "Наступна допустима дія: 1 - **APPROVE**, 2 - **EDIT** або 3 - **REJECT**." in text
     assert "K_SUPERVISOR_CHECKPOINT" in text
     assert "task_id matching ^TASK_[A-Za-z0-9_-]+$" in text
     assert "required_cross_checks:int >=0" in text
