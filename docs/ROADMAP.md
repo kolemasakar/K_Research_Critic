@@ -1,7 +1,7 @@
 # ROADMAP
 План завершеного розвитку K-Research & Critic та межі подальшого maintenance.
 
-Version: 1.6
+Version: 1.7
 Status: MAINTENANCE
 
 ## 1. Purpose
@@ -10,7 +10,7 @@ This roadmap records the completed implementation path for K-Research & Critic.
 
 K-Research & Critic is a finished GPT Store product. Its active product-development roadmap ends with Phase 12. Future work in this repository is limited to maintenance, compatibility, security, regression fixes, and narrowly scoped product improvements.
 
-The previously planned Modular Agent Platform is no longer Phase 13 of this product. That direction is transferred to a separate new project and repository named `K_Supervisor`, which will start from a new Phase 0 roadmap.
+The previously planned Modular Agent Platform is no longer Phase 13 of this product. That direction is transferred to a separate new project and repository named `K_Supervisor`, which starts from a new Phase 0 roadmap.
 
 ## 2. Stable Product Invariants
 
@@ -122,10 +122,11 @@ Production smoke test: PASS
 
 ## 7. Production Release Boundary
 
-The completed product is released as:
+Canonical first production release:
 
 ```text
 K-Research & Critic v1.0.0
+Git tag: v1.0.0
 ```
 
 Release characteristics:
@@ -141,7 +142,7 @@ Production Research -> Critic workflow: PASS
 Production REVISE -> PASS cycle: PASS
 ```
 
-The exact Git tag and GitHub Release are created from the final maintenance-synchronization commit after CI passes.
+The `v1.0.0` tag must point to the finalized maintenance-synchronization commit whose CI is fully green.
 
 ## 8. Maintenance Scope
 
@@ -223,7 +224,7 @@ Phase 11                                COMPLETE
 Phase 12                                COMPLETE
 GPT Store publication                   COMPLETE
 Production smoke test                   COMPLETE
-K-Research & Critic v1.0.0              RELEASE CANDIDATE BASELINE
+K-Research & Critic v1.0.0              RELEASE BASELINE
 Future Modular Agent Platform           MOVED TO NEW K_Supervisor PROJECT
 Current repository mode                 MAINTENANCE
 ```
