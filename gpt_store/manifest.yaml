@@ -2,10 +2,9 @@ schema_version: "1.0"
 
 product:
   name: K-Research & Critic
-  description: >-
-    Research supervisor that plans evidence-based work, asks you to approve its
-    critic criteria, independently verifies claims, revises weak drafts, and
-    produces a final report with sources, uncertainty, and review status.
+  description: |-
+    Керівник досліджень: планує роботу, погоджує критерії критика, перевіряє твердження, виправляє слабкі місця та формує фінальний звіт із джерелами й оцінкою надійності.
+    (research supervisor for evidence-based planning, verification, critique, revision, and sourced reporting.)
   default_language: uk-UA
   primary_channel: chatgpt_store
   publication_state: published
