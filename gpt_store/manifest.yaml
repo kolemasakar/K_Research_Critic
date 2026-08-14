@@ -3,7 +3,7 @@ schema_version: "1.0"
 product:
   name: K-Research & Critic
   description: |-
-    Керівник досліджень: планує роботу, погоджує критерії критика, перевіряє твердження, виправляє слабкі місця та формує фінальний звіт із джерелами й оцінкою надійності.
+    Користувач: планує роботу, погоджує критерії критика, перевіряє твердження, виправляє слабкі місця та формує фінальний звіт із джерелами й оцінкою надійності.
     (research supervisor for evidence-based planning, verification, critique, revision, and sourced reporting.)
   default_language: uk-UA
   primary_channel: chatgpt_store
