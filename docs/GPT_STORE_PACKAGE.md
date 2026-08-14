@@ -1,7 +1,7 @@
 # GPT_STORE_PACKAGE
 Документ визначає production-пакет K-Research & Critic, перевірки релізу та maintenance-gates для GPT Store.
 
-Version: 1.7
+Version: 1.8
 Status: MAINTENANCE
 
 ## 1. Purpose
@@ -248,20 +248,21 @@ production_smoke_tested_at: 2026-08-14
 
 ## 12. Release State
 
-Current product state:
+Canonical first production release:
 
 ```text
 product: K-Research & Critic
 repository: K_Research_Critic
+GitHub release: K-Research & Critic v1.0.0
+Git tag: v1.0.0
 publication_state: published
 published_at: 2026-08-14
 store_category: Research & Analysis
 production_smoke_test: PASS
-release: K-Research & Critic v1.0.0
 repository_mode: MAINTENANCE
 ```
 
-The exact GitHub `v1.0.0` tag/release is created from the final maintenance-synchronization commit after CI passes.
+The `v1.0.0` tag must point to the finalized maintenance-synchronization commit with fully green CI.
 
 ## 13. Maintenance Rules
 
