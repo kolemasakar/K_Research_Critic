@@ -40,6 +40,10 @@ conversation_starters:
   - "Порівняй дві технології за незалежними джерелами та покажи невирішені ризики."
   - "Перевір це твердження, включно з доказами на його підтримку або спростування."
   - "Віднови завдання K-Research & Critic з checkpoint, який я надам."
+  - "Research this topic and build the CriticProfile for my approval before you start."
+  - "Compare two technologies using independent sources and show unresolved risks."
+  - "Verify this claim, including evidence that supports or contradicts it."
+  - "Resume a K-Research & Critic task from a checkpoint I will paste."
 
 release:
   free_user_compatible: true
