@@ -18,6 +18,7 @@ def test_manifest_preserves_store_first_invariants() -> None:
     manifest = validate_store_package(ROOT)
 
     assert manifest["product"]["name"] == "K-Research & Critic"
+    assert manifest["product"]["default_language"] == "uk-UA"
     assert manifest["product"]["primary_channel"] == "chatgpt_store"
     assert manifest["product"]["publication_state"] == "ready_for_manual_publication_test"
     assert manifest["model"]["policy"] == "user_plan"
@@ -34,6 +35,7 @@ def test_manifest_preserves_store_first_invariants() -> None:
 def test_instruction_package_contains_required_workflow_boundaries() -> None:
     text = (ROOT / "prompts" / "GPT_STORE_INSTRUCTIONS.md").read_text(encoding="utf-8")
 
+    assert "Use Ukrainian for conversation" in text
     assert "Supervisor proposes." in text
     assert "USER APPROVAL" in text
     assert "Do not begin the autonomous Research-Critic loop before explicit approval." in text
