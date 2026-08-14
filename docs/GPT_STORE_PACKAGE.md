@@ -1,7 +1,7 @@
 # GPT_STORE_PACKAGE
 Документ визначає пакет, налаштування та ручні release-gates для публікації K-Research & Critic у GPT Store.
 
-Version: 1.3
+Version: 1.4
 Status: ACTIVE
 
 ## 1. Purpose
@@ -109,13 +109,21 @@ The Custom GPT is one ChatGPT runtime executing separated logical roles.
 Supervisor stage
   -> Domain/risk assessment
   -> CriticProfile proposal
-  -> USER APPROVAL / EDIT / REJECT
+  -> USER CHOICE: 1=APPROVE / 2=EDIT / 3=REJECT
   -> Research stage
   -> Critic stage
   -> autonomous REVISE/PASS loop
   -> Final report
   -> Review protocol
 ```
+
+Approval UI contract:
+
+- semantic mapping is fixed: `1=APPROVE`, `2=EDIT`, `3=REJECT`;
+- a standalone digit is sufficient and must be treated as the mapped action;
+- choice `2` without edit details keeps `REVIEW_REQUIRED` and asks only what must be changed;
+- after edits, the revised CriticProfile is presented through the same numbered approval gate;
+- choice `3` stops the current workflow before research.
 
 The Store Edition therefore provides logical multi-agent separation rather than process-isolated model instances. The Critic stage must perform a fresh verification pass and, when web search is available, should use independent verification searches rather than only reusing Research-stage source selection.
 
@@ -153,7 +161,7 @@ Recovery rules:
 
 - validate marker/version/required fields;
 - never reconstruct missing critical state from guesswork;
-- PROFILE_REVIEW_REQUIRED returns to the normal approval gate;
+- PROFILE_REVIEW_REQUIRED returns to the same numbered approval gate (`1=APPROVE`, `2=EDIT`, `3=REJECT`);
 - PROFILE_APPROVED, REVISE_REQUIRED, and APPROVED require user confirmation to resume but do not require re-approval of an unchanged approved CriticProfile;
 - terminal states are summarized rather than automatically restarted.
 
@@ -204,7 +212,7 @@ Static validation checks:
 - no mandatory backend;
 - Apps/Actions disabled;
 - required built-in capabilities declared;
-- instruction file present and containing the mandatory language, approval, review, and checkpoint rules;
+- instruction file present and containing mandatory language, numbered approval, review, and checkpoint rules;
 - checkpoint example conforms to the checkpoint contract.
 
 ## 9. Preview Test Matrix
@@ -214,9 +222,9 @@ Run in GPT Builder Preview before public sharing:
 ```text
 P1 New low-risk research task
 P2 High-risk domain task and conservative risk floor
-P3 Explicit APPROVE gate
-P4 EDIT then approve
-P5 REJECT stops autonomous execution
+P3 Explicit APPROVE gate including numeric alias 1
+P4 EDIT/2 then approve
+P5 REJECT/3 stops autonomous execution
 P6 Research -> Critic -> PASS
 P7 Forced REVISE then corrected second iteration
 P8 Web-search-unavailable/freshness limitation behavior
