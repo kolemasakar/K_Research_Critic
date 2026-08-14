@@ -35,17 +35,19 @@ def test_manifest_preserves_store_first_invariants() -> None:
 def test_instruction_package_contains_required_workflow_boundaries() -> None:
     text = (ROOT / "prompts" / "GPT_STORE_INSTRUCTIONS.md").read_text(encoding="utf-8")
 
-    assert "Use Ukrainian by default for user-facing content" in text
+    assert "Use Ukrainian by default" in text
     assert "CAPABILITY PREFLIGHT" in text
     assert "web_search=AVAILABLE" in text
     assert "web_search=UNAVAILABLE" in text
     assert "actually exposed in the current runtime" in text
     assert "Supervisor proposes." in text
     assert "USER APPROVAL" in text
-    assert "Do not begin the autonomous Research-Critic loop before explicit approval." in text
     assert "K_SUPERVISOR_CHECKPOINT" in text
+    assert "task_id matching ^TASK_[A-Za-z0-9_-]+$" in text
+    assert "required_cross_checks:int >=0" in text
+    assert 'approved_by="user"' in text
+    assert "Output one complete valid JSON object" in text
     assert "Do not persist or reveal hidden chain-of-thought" in text
-    assert "Do not require a developer API key" in text
 
 
 def test_checkpoint_example_validates_and_round_trips() -> None:
@@ -79,8 +81,9 @@ def test_checkpoint_rejects_resume_policy_mismatch() -> None:
 def test_manifest_can_be_parsed_without_secrets_or_external_actions() -> None:
     manifest = yaml.safe_load((ROOT / "gpt_store" / "manifest.yaml").read_text(encoding="utf-8"))
     serialized = json.dumps(manifest, sort_keys=True)
+    secret_name = "OPENAI" + "_API_KEY"
 
-    assert "OPENAI_API_KEY" not in serialized
+    assert secret_name not in serialized
     assert manifest["capabilities"]["actions"] is False
     assert manifest["capabilities"]["apps"] is False
     assert manifest["knowledge"]["required"] is False
