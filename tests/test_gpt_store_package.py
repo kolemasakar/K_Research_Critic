@@ -39,17 +39,23 @@ def test_instruction_package_contains_required_workflow_boundaries() -> None:
     assert "CAPABILITY PREFLIGHT" in text
     assert "web_search=AVAILABLE" in text
     assert "web_search=UNAVAILABLE" in text
-    assert "actually exposed in the current runtime" in text
     assert "Supervisor proposes." in text
     assert "USER APPROVAL" in text
     assert "1=APPROVE, 2=EDIT, 3=REJECT" in text
     assert "Наступна допустима дія: 1 - **APPROVE**, 2 - **EDIT** або 3 - **REJECT**." in text
+    assert "Present the profile itself, NOT a checkpoint" in text
+    assert "Never expose internal placeholders such as :contentReference, oaicite" in text
+    assert "On PASS produce normal user-facing output, NOT a checkpoint" in text
+    assert "Create checkpoint ONLY when user explicitly requests" in text
+    assert "Never auto-create it at a normal profile gate/final report" in text
+    assert "latest_research object uses EXACTLY" in text
+    assert "latest_review object uses EXACTLY" in text
     assert "K_SUPERVISOR_CHECKPOINT" in text
     assert "task_id matching ^TASK_[A-Za-z0-9_-]+$" in text
-    assert "required_cross_checks:int >=0" in text
+    assert "required_cross_checks:int>=0" in text
     assert 'approved_by="user"' in text
     assert "Output one complete valid JSON object" in text
-    assert "Do not persist or reveal hidden chain-of-thought" in text
+    assert "Do not persist/reveal hidden chain-of-thought" in text
 
 
 def test_checkpoint_example_validates_and_round_trips() -> None:
@@ -77,6 +83,40 @@ def test_checkpoint_rejects_resume_policy_mismatch() -> None:
     payload["resume_policy"] = "TERMINAL"
 
     with pytest.raises(ValidationError, match="CONFIRM_RESUME"):
+        StoreCheckpoint.model_validate(payload)
+
+
+def test_checkpoint_rejects_extra_research_keys() -> None:
+    payload = json.loads((ROOT / "gpt_store" / "checkpoint_example.json").read_text(encoding="utf-8"))
+    payload["latest_research"] = {
+        "summary": "Research summary",
+        "findings": [],
+        "claims": [],
+        "sources": [],
+        "uncertainties": [],
+        "limitations": [],
+        "capability_preflight": "web_search=AVAILABLE",
+    }
+
+    with pytest.raises(ValidationError):
+        StoreCheckpoint.model_validate(payload)
+
+
+def test_checkpoint_rejects_extra_review_keys() -> None:
+    payload = json.loads((ROOT / "gpt_store" / "checkpoint_example.json").read_text(encoding="utf-8"))
+    payload["latest_review"] = {
+        "decision": "PASS",
+        "reliability_score": 0.9,
+        "critical_issues": [],
+        "unsupported_claims": [],
+        "weak_sources": [],
+        "contradictions": [],
+        "missing_topics": [],
+        "recommended_changes": [],
+        "verification_sources": [],
+    }
+
+    with pytest.raises(ValidationError):
         StoreCheckpoint.model_validate(payload)
 
 
