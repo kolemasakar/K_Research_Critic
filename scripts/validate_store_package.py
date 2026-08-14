@@ -34,6 +34,7 @@ def validate_store_package(root: Path = ROOT) -> dict:
     checkpoint = _mapping(manifest, "checkpoint")
 
     _require(product.get("name") == "K-Research & Critic", "product.name must be K-Research & Critic")
+    _require(product.get("default_language") == "uk-UA", "product.default_language must be uk-UA")
     _require(
         product.get("primary_channel") == "chatgpt_store",
         "primary channel must remain chatgpt_store",
@@ -65,6 +66,7 @@ def validate_store_package(root: Path = ROOT) -> dict:
         raise StorePackageValidationError(f"Cannot load instruction package: {exc}") from exc
 
     required_instruction_tokens = [
+        "Use Ukrainian for conversation",
         "Supervisor proposes.",
         "USER APPROVAL",
         "APPROVE",
