@@ -54,3 +54,5 @@ release:
   live_free_plan_test_required: true
   live_paid_plan_model_switch_test_required: true
   public_publish_is_manual: true
+  production_smoke_test_passed: true
+  production_smoke_tested_at: "2026-08-14"
