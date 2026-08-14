@@ -55,13 +55,14 @@ The former planned Phase 13 Modular Agent Platform has been removed from this pr
 
 ## Release
 
-The first production release is:
+Canonical first production release:
 
 ```text
 K-Research & Critic v1.0.0
+Git tag: v1.0.0
 ```
 
-The GitHub tag/release is created from the final maintenance-synchronization commit after CI passes.
+The `v1.0.0` tag must point to the finalized maintenance-synchronization commit with fully green CI.
 
 ## Primary Product Target
 
