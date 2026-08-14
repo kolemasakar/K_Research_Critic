@@ -1,7 +1,7 @@
 # K-Research & Critic
 Базовий опис завершеного production-продукту K-Research & Critic для дослідження та незалежної перевірки.
 
-Version: 1.0
+Version: 1.1
 Status: PRODUCTION / MAINTENANCE
 
 ## Overview
@@ -34,6 +34,14 @@ Supervisor proposes.
 User approves or edits.
 Critic executes.
 ```
+
+## User Guide
+
+Ukrainian quick-start guide for first-time users:
+
+[Open the Ukrainian user guide](docs/K_RESEARCH_CRITIC_USER_GUIDE_UK.pdf)
+
+The guide explains task formulation, CriticProfile approval, the Research-Critic revision workflow, FINAL REPORT interpretation, and REVIEW PROTOCOL evaluation.
 
 ## Product Status
 
