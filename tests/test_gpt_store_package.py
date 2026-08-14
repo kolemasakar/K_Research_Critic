@@ -35,6 +35,8 @@ def test_manifest_preserves_store_first_invariants() -> None:
     assert manifest["capabilities"]["actions"] is False
     assert manifest["release"]["developer_api_key_required"] is False
     assert manifest["release"]["external_backend_required"] is False
+    assert manifest["release"]["production_smoke_test_passed"] is True
+    assert manifest["release"]["production_smoke_tested_at"] == "2026-08-14"
 
 
 def test_instruction_package_contains_required_workflow_boundaries() -> None:
