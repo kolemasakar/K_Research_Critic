@@ -34,6 +34,13 @@ def validate_store_package(root: Path = ROOT) -> dict:
     checkpoint = _mapping(manifest, "checkpoint")
 
     _require(product.get("name") == "K-Research & Critic", "product.name must be K-Research & Critic")
+    description = product.get("description")
+    _require(isinstance(description, str), "product.description must be a string")
+    _require(description.startswith("Керівник досліджень:"), "Store description must be Ukrainian-first")
+    _require(
+        "\n(research supervisor for evidence-based planning" in description,
+        "Store description must include the English parenthetical second line",
+    )
     _require(product.get("default_language") == "uk-UA", "product.default_language must be uk-UA")
     _require(product.get("primary_channel") == "chatgpt_store", "primary channel must remain chatgpt_store")
     _require(product.get("publication_state") == "published", "publication state must be published")
