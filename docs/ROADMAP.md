@@ -1,23 +1,28 @@
 # ROADMAP
-План поетапної реалізації K_Supervisor від базового каркаса до GPT Store-first мультиагентного продукту.
+План завершеного розвитку K-Research & Critic та межі подальшого maintenance.
 
-Version: 1.5
-Status: ACTIVE
+Version: 1.6
+Status: MAINTENANCE
 
 ## 1. Purpose
 
-This roadmap records the approved implementation order for K_Supervisor. The primary public target is the GPT Store Edition, while the Python runtime remains an engineering and optional standalone reference implementation.
+This roadmap records the completed implementation path for K-Research & Critic.
 
-## 2. Stable Delivery Principles
+K-Research & Critic is a finished GPT Store product. Its active product-development roadmap ends with Phase 12. Future work in this repository is limited to maintenance, compatibility, security, regression fixes, and narrowly scoped product improvements.
 
-- Supervisor coordinates but does not replace domain research or critique.
+The previously planned Modular Agent Platform is no longer Phase 13 of this product. That direction is transferred to a separate new project and repository named `K_Supervisor`, which will start from a new Phase 0 roadmap.
+
+## 2. Stable Product Invariants
+
+- Supervisor coordinates but does not replace research or critique.
 - CriticProfile approval is mandatory before autonomous execution.
 - Approved profiles remain immutable unless a material amendment is approved.
 - Research-Critic revision cycles are autonomous after approval.
 - Contracts, task states, evidence, limitations, and failures remain explicit.
-- The public Store workflow must not depend on a fixed model identifier or a mandatory external service.
+- The public Store workflow does not depend on a fixed model identifier or mandatory external service.
 - Private chain-of-thought is never required for auditability.
-- Project documentation follows PROJECT_FILE_STANDARD.md.
+- Cross-chat continuation uses the explicit checkpoint contract when requested.
+- Maintenance changes must preserve the validated production workflow unless a separately approved product revision changes it.
 
 ## 3. Completed Core
 
@@ -39,31 +44,23 @@ MVP boundary: Phase 9.
 
 The post-MVP Hybrid Domain Resolver enhancement is COMPLETE.
 
-Phase 10 includes storage-neutral persistence, SQLite reference storage, TaskAuditSnapshot, conservative restart recovery, and audit CLI support.
-
 ## 4. GPT Store-first Product Decision
 
 Status: COMPLETE
 
-Primary public behavior:
-
 ```text
 channel: chatgpt_store
+public product: K-Research & Critic
 free-user compatible: yes
 model policy: user_plan
 fixed model dependency: none
 user model switching: allowed when available
 mandatory external backend: no
+publication state: published
+production smoke test: passed
 ```
 
-The Python/provider runtime is retained as optional standalone infrastructure and as the engineering reference implementation.
-
-Primary documents:
-
-```text
-GPT_STORE_DEPLOYMENT.md
-GPT_STORE_PACKAGE.md
-```
+The Python/provider runtime remains an engineering and optional standalone reference implementation. It is not required by the public GPT Store execution path.
 
 ## 5. Phase 11 - Configuration, Cost, and Quality Controls
 
@@ -85,116 +82,119 @@ Delivered:
 - validated frozen configuration;
 - immutable task configuration snapshots and restart-safe reconstruction;
 - role-based provider isolation for optional standalone execution;
-- frozen research and critic limits;
+- research and critic limits;
 - tool call budgets, timeouts, retries, runtime ceilings, and output-size limits;
 - GPT Store distribution invariants and user-plan model policy;
-- `TaskQualityMetrics` and `ProviderUsageRecord`;
-- restart-safe metric reconstruction from TaskAuditSnapshot;
+- usage and quality metrics;
+- restart-safe metric reconstruction;
 - structured operational logging and sensitive-data redaction;
-- GPT Store manifest, instructions, checkpoint contract, release validator, and operator documentation.
-
-Release state:
-
-```text
-ready_for_manual_publication_test
-```
-
-This state means repository packaging and CI are complete. It does not mean the Custom GPT has already been published. GPT Builder Preview, real Free-account use, paid-account model switching, Builder Profile/category/policy checks, and the final Publish action remain manual release operations in ChatGPT.
+- Store manifest, instructions, checkpoint contract, release validator, and operator documentation.
 
 ## 6. Phase 12 - Test and CI Hardening
 
 Status: COMPLETE
 
-### 6.1 Goal
+Delivered:
 
-Turn the MVP and Phase 11 controls into a repeatable quality baseline that detects regressions without requiring live paid providers.
-
-### 6.2 Delivered
-
-- broader orchestration, profile, loop, report, failure, Store-package, and configuration regression coverage;
-- deterministic offline reference benchmark in `examples/reference_benchmark.json`;
-- end-to-end benchmark runner in `tests/test_reference_benchmark.py`;
+- orchestration, profile, loop, report, failure, Store-package, and configuration regression coverage;
+- deterministic offline reference benchmark;
 - four reference domains: literary analysis, software engineering, medicine, and geodesy;
-- explicit benchmark checks for domain resolution, profile approval, autonomous completion, critic PASS/reliability floor, evidence, artifacts, and no-private-reasoning review protocol;
-- full pytest matrix on Python 3.13 and Python 3.14;
-- dependency integrity gate with `python -m pip check`;
-- Ruff correctness gate using E9, F63, F7, and F82 rule families;
-- Mypy typed-boundary gate for `models`, `config`, and `gpt_store`;
-- tracked repository policy validation;
+- Python 3.13 and Python 3.14 CI test matrix;
+- dependency integrity gate;
+- Ruff correctness gate;
+- Mypy typed-boundary gate;
+- repository policy validation;
 - GPT Store package regression validation;
-- blocking coverage floor of 70 percent;
-- weekly Dependabot maintenance for pip and GitHub Actions;
-- synchronized README, TEST_PLAN, and CI_QUALITY documentation.
+- blocking coverage floor;
+- dependency maintenance automation;
+- synchronized quality documentation.
 
-### 6.3 Validated Baseline
-
-The Phase 12 implementation baseline was validated with:
+Validated release baseline:
 
 ```text
-Python 3.13 full suite: 169 passed
+Python 3.13 full suite: PASS
 Python 3.14 full suite: PASS
 Quality gates: PASS
-Total coverage: 85 percent
-Blocking coverage floor: 70 percent
-Reference benchmark cases: 4
+Repository validation: PASS
+GPT Store package validation: PASS
+Production smoke test: PASS
 ```
 
-The reference benchmark is synthetic, offline, deterministic, and provider-independent. Live ChatGPT account/UI validation is intentionally not represented as an automated CI PASS condition.
+## 7. Production Release Boundary
 
-### 6.4 Exit Criteria
-
-All Phase 12 exit criteria are satisfied:
-
-- critical edge cases have automated regression coverage;
-- reference end-to-end behavior is reproducibly benchmarked;
-- generated artifacts are validated;
-- CI and local quality gates pass;
-- dependency integrity is checked;
-- architecture remains modular and contract-driven;
-- Store-package regressions are blocked automatically where repository CI can prove them;
-- manual ChatGPT publication/account checks remain explicitly separated from repository automation.
-
-## 7. Phase 13 - Modular Agent Platform
-
-Status: PLANNED
-
-Goal: extend beyond the first research workflow through capability discovery and capability-based agent selection while keeping Supervisor independent from domain-specific implementations.
-
-Expected direction:
-
-- capability-oriented agent metadata and discovery;
-- executable agent registration rather than definition-only registration;
-- capability-based selection and routing;
-- explicit compatibility contracts between Supervisor and optional agents;
-- preservation of current approval, evidence, audit, configuration, and quality boundaries.
-
-Possible future agents:
+The completed product is released as:
 
 ```text
-FactCheckAgent
-DataAnalysisAgent
-TechnicalAgent
-FinancialAgent
-LegalAgent
-PlanningAgent
+K-Research & Critic v1.0.0
 ```
 
-Phase 13 must not weaken the completed Phase 0-12 invariants merely to add new agent types.
-
-## 8. Deferred Capabilities
+Release characteristics:
 
 ```text
-custom Web UI
-distributed execution
-complex parallel orchestration
-vector database
-complex long-term memory
-automatic agent generation
-large-scale workflow scheduling
-mandatory external backend for GPT Store Edition
+status: PRODUCTION / MAINTENANCE
+GPT Store: published
+Free-account validation: PASS
+Paid-account validation: PASS
+Model/runtime-switch validation: PASS
+Store discoverability: PASS
+Production Research -> Critic workflow: PASS
+Production REVISE -> PASS cycle: PASS
 ```
 
-## 9. Canonical Project Documents
+The exact Git tag and GitHub Release are created from the final maintenance-synchronization commit after CI passes.
+
+## 8. Maintenance Scope
+
+Allowed future work in this repository:
+
+```text
+bug fixes
+security fixes
+GPT Store compatibility updates
+OpenAI platform compatibility updates
+regression fixes
+documentation corrections
+narrow UX improvements
+maintenance releases such as v1.0.1 and v1.0.2
+```
+
+Changes that turn the product into a general modular agent platform are out of scope here.
+
+## 9. Modular Agent Platform Transfer
+
+The former planned item:
+
+```text
+Phase 13 - Modular Agent Platform
+```
+
+is intentionally removed from the K-Research & Critic product roadmap.
+
+Its goals are transferred to the separate `K_Supervisor` project:
+
+```text
+capability-oriented agent metadata
+automatic agent discovery
+executable agent registration
+capability-based selection and routing
+standard compatibility contracts
+modular FactCheck/DataAnalysis/Technical/Financial/Legal/Planning agents
+```
+
+The new K_Supervisor project starts with its own Phase 0 and is not a continuation of this roadmap numbering.
+
+## 10. Legacy Engineering Identifiers
+
+Some stable internal identifiers retain the historical `K_Supervisor` name for compatibility, including the checkpoint marker and existing runtime/database conventions. These identifiers are not repository/product names and must not be renamed solely for cosmetic consistency if doing so would break compatibility.
+
+Examples:
+
+```text
+K_SUPERVISOR_CHECKPOINT
+runtime/k_supervisor.db
+```
+
+## 11. Canonical Project Documents
 
 ```text
 PROJECT_FILE_STANDARD.md
@@ -213,7 +213,7 @@ GPT_STORE_PACKAGE.md
 LOGGING.md
 ```
 
-## 10. Current Implementation Order
+## 12. Final Implementation State
 
 ```text
 Phase 0-10                               COMPLETE
@@ -221,5 +221,9 @@ Post-MVP Hybrid Domain Resolver         COMPLETE
 GPT Store-first Product Decision        COMPLETE
 Phase 11                                COMPLETE
 Phase 12                                COMPLETE
-Phase 13                                PLANNED
+GPT Store publication                   COMPLETE
+Production smoke test                   COMPLETE
+K-Research & Critic v1.0.0              RELEASE CANDIDATE BASELINE
+Future Modular Agent Platform           MOVED TO NEW K_Supervisor PROJECT
+Current repository mode                 MAINTENANCE
 ```
