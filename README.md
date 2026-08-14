@@ -1,19 +1,30 @@
 # K-Research & Critic
-Базовий опис K-Research & Critic як GPT Store-first мультиагентної системи для дослідження та незалежної перевірки.
+Базовий опис завершеного production-продукту K-Research & Critic для дослідження та незалежної перевірки.
 
-Version: 0.5
-Status: DEVELOPMENT
+Version: 1.0
+Status: PRODUCTION / MAINTENANCE
 
 ## Overview
 
-K-Research & Critic is the public GPT Store product built on the reusable K_Supervisor multi-agent orchestration system.
+K-Research & Critic is a published GPT Store product for structured research, independent critique, autonomous revision, and sourced final reporting.
 
-Stable technical identifiers remain:
+Repository:
 
 ```text
-Repository / engineering core: K_Supervisor
+kolemasakar/K_Research_Critic
+```
+
+Public product:
+
+```text
+K-Research & Critic
+```
+
+Stable legacy engineering identifiers intentionally retained for compatibility include:
+
+```text
 Checkpoint marker: K_SUPERVISOR_CHECKPOINT
-Public GPT Store name: K-Research & Critic
+Standalone database: runtime/k_supervisor.db
 ```
 
 Core rule:
@@ -24,54 +35,50 @@ User approves or edits.
 Critic executes.
 ```
 
-The first product workflow combines ResearchAgent, independent CriticAgent review, autonomous revision cycles, and final report generation.
-
-## Primary Product Target
-
-K-Research & Critic is GPT Store-first.
-
-Primary public edition:
-
-```text
-GPT Store Edition
-  - intended for public ChatGPT use
-  - free-user compatible
-  - no developer-owned API key required
-  - no mandatory external backend
-  - model policy follows the user's ChatGPT plan
-  - no pinned model identifier
-  - user may switch models when their plan exposes alternatives
-```
-
-The Python/SQLite/provider implementation remains available as an optional Standalone/API Edition and engineering reference runtime. It is not a dependency of the free GPT Store core path.
-
-See `docs/GPT_STORE_DEPLOYMENT.md` and `docs/GPT_STORE_PACKAGE.md`.
-
-## Current Status
+## Product Status
 
 ```text
 Phase 0-10                                           COMPLETE
 Post-MVP Hybrid Domain Resolver                     COMPLETE
 Phase 11 - Configuration, Cost, Quality Controls    COMPLETE
-  11.1 Configuration Core                           COMPLETE
-  11.2 Task Configuration Snapshot                  COMPLETE
-  11.3 Provider / Model Factory                     COMPLETE
-  11.4 Runtime Controls                             COMPLETE
-  11.4A GPT Store-first Distribution Policy         COMPLETE
-  11.5 Usage, Cost, and Quality Metrics             COMPLETE
-  11.6 Logging / Secret Redaction                   COMPLETE
-  11.7 GPT Store Packaging / Publication Readiness  COMPLETE
 Phase 12 - Test and CI Hardening                    COMPLETE
-Phase 13 - Modular Agent Platform                   PLANNED
+GPT Store publication                               COMPLETE
+Free-account live validation                        PASS
+Paid-account runtime/model-switch validation        PASS
+Store discoverability                               PASS
+Production smoke test                               PASS
+Release line                                        v1.0.x
+Repository mode                                     MAINTENANCE
 ```
 
-Store package release state:
+The former planned Phase 13 Modular Agent Platform has been removed from this product roadmap. General modular multi-agent platform development continues in a separate new repository named `K_Supervisor`, with a new roadmap starting from Phase 0.
+
+## Release
+
+The first production release is:
 
 ```text
-ready_for_manual_publication_test
+K-Research & Critic v1.0.0
 ```
 
-This means the repository package is ready for GPT Builder Preview and real Free/paid account release checks. It does not mean the GPT is already published in the GPT Store.
+The GitHub tag/release is created from the final maintenance-synchronization commit after CI passes.
+
+## Primary Product Target
+
+K-Research & Critic is GPT Store-first.
+
+```text
+GPT Store Edition
+  - public ChatGPT product
+  - free-user compatible
+  - no developer-owned API key required
+  - no mandatory external backend
+  - model policy follows the user's ChatGPT plan
+  - no pinned model identifier
+  - user may switch available models/runtimes when exposed by the plan
+```
+
+The Python/SQLite/provider implementation remains available as an optional standalone engineering reference runtime. It is not a dependency of the public Store path.
 
 ## Logical Workflow
 
@@ -97,15 +104,15 @@ CriticAgent
    |
    +---- PASS ------> ReportGenerator
                          |
-                         +-- <TASK_ID>_FINAL_REPORT.md
-                         +-- <TASK_ID>_REVIEW_PROTOCOL.md
+                         +-- FINAL REPORT
+                         +-- REVIEW PROTOCOL
 ```
 
-The same logical workflow is preserved across Store and standalone editions. In the Store Edition, Research and Critic are separated logical passes inside one ChatGPT runtime rather than process-isolated model instances.
+In the GPT Store Edition, Research and Critic are separated logical passes inside one ChatGPT runtime rather than process-isolated model instances.
 
 ## GPT Store Package
 
-The publication package is tracked in the repository:
+Canonical package files:
 
 ```text
 gpt_store/manifest.yaml
@@ -113,66 +120,20 @@ prompts/GPT_STORE_INSTRUCTIONS.md
 gpt_store/checkpoint.py
 gpt_store/checkpoint_example.json
 scripts/validate_store_package.py
+docs/GPT_STORE_DEPLOYMENT.md
 docs/GPT_STORE_PACKAGE.md
 ```
 
-Static validation:
+Production package state includes:
 
 ```text
-python -m scripts.validate_store_package
-python -m pytest
+publication_state: published
+production_smoke_test_passed: true
 ```
 
-Builder configuration keeps Web search and Code Interpreter & Data Analysis enabled while Apps, Actions, mandatory external backend, developer API keys, and pinned model identifiers are excluded from the core Store path.
+## Quality Baseline
 
-The actual GPT Store publication action and real Free/paid account tests are manual release operations in ChatGPT.
-
-## Configuration and Runtime Controls
-
-Phase 11 provides:
-
-```text
-validated frozen configuration
-tracked distribution policy
-secret-free TaskConfigurationSnapshot
-research and critic limits
-search/fetch call budgets
-timeouts
-retry/backoff
-runtime ceilings
-artifact size limits
-optional standalone provider/model factory
-structured usage and quality metrics
-operational logging with sensitive-data redaction
-```
-
-The free Store path requires no `.env` secret.
-
-## Persistence and Recovery
-
-Standalone/API Edition provides storage-neutral persistence plus SQLite:
-
-```text
-runtime/k_supervisor.db
-```
-
-Persisted records include tasks, workflows, transitions, agent runs, domain assessments, CriticProfiles, approvals, effective configuration snapshots, ResearchResults, Claims, Sources, CriticReviews, usage/quality records, and artifact metadata.
-
-Safe automatic standalone recovery checkpoints:
-
-```text
-PROFILE_REVIEW_REQUIRED
-PROFILE_APPROVED
-REVISE_REQUIRED
-```
-
-GPT Store Edition does not depend on private server-side SQLite. Cross-chat continuity uses the explicit user-controlled `K_SUPERVISOR_CHECKPOINT` contract.
-
-## Phase 12 Quality Baseline
-
-Phase 12 hardens orchestration behavior and makes repository quality gates reproducible.
-
-Automated CI now includes:
+CI includes:
 
 ```text
 Python 3.13 full pytest suite
@@ -182,43 +143,16 @@ python -m ruff check . --select E9,F63,F7,F82
 python -m mypy models config gpt_store
 python -m scripts.validate_repository
 python -m scripts.validate_store_package
-python -m pytest --cov --cov-report=term-missing --cov-fail-under=70
+coverage gate
 ```
 
-The validated Phase 12 implementation baseline is:
-
-```text
-169 tests passed on Python 3.13
-Python 3.14 test job passed
-quality job passed
-85 percent total coverage
-70 percent blocking coverage floor
-```
-
-The deterministic offline reference benchmark is tracked in:
-
-```text
-examples/reference_benchmark.json
-tests/test_reference_benchmark.py
-```
-
-It executes four end-to-end reference tasks across literary analysis, software engineering, medicine, and geodesy. Each case validates domain resolution, explicit profile approval, autonomous completion, Critic PASS/reliability floors, evidence presence, final artifacts, and the no-private-reasoning review-protocol boundary.
-
-Run it locally with:
-
-```text
-python -m pytest -q tests/test_reference_benchmark.py
-```
-
-The benchmark uses synthetic local fixtures. It does not call live providers and therefore remains deterministic and cost-free in CI.
-
-See `docs/TEST_PLAN.md` and `docs/CI_QUALITY.md`.
+The release baseline has passed Python 3.13, Python 3.14, repository validation, GPT Store package validation, lint/type gates, and coverage checks.
 
 ## Optional Local / Standalone Setup
 
 ```text
-git clone https://github.com/kolemasakar/K_Supervisor.git
-cd K_Supervisor
+git clone https://github.com/kolemasakar/K_Research_Critic.git
+cd K_Research_Critic
 python -m venv .venv
 .venv\Scripts\activate
 python -m pip install --upgrade pip
@@ -226,34 +160,42 @@ pip install -r requirements.txt
 python -m pytest
 ```
 
-For all development quality dependencies:
+For development quality dependencies:
 
 ```text
 python -m pip install -r requirements-dev.txt
 ```
 
-`.env` is optional and is needed only when a selected standalone integration requires a secret.
+`.env` is optional and is needed only when an optional standalone integration requires a secret.
 
 ## End-to-End Local CLI
 
-The bundled CLI uses `JsonCorpusProvider`, a deterministic local corpus provider for reproducible tests/offline execution.
+The bundled CLI can use the deterministic local corpus provider for offline/reference execution:
 
 ```text
 python -m scripts.run_research --task "Explain software architecture behavior" --corpus examples/sample_corpus.json
 ```
 
-Explicit non-interactive approval:
+Explicit non-interactive profile approval:
 
 ```text
 python -m scripts.run_research --task "Explain software architecture behavior" --corpus examples/sample_corpus.json --approve-profile
 ```
 
-The local CLI is an engineering/reference runtime, not the GPT Store execution surface.
+## Persistence and Recovery
 
-## Audit CLI
+Standalone/reference runtime persistence uses:
 
 ```text
-python -m scripts.audit_task --task-id TASK_EXAMPLE --database runtime/k_supervisor.db
+runtime/k_supervisor.db
+```
+
+The database name is a stable legacy engineering identifier and is intentionally retained in the v1.0 line.
+
+GPT Store cross-chat continuity uses the explicit user-controlled:
+
+```text
+K_SUPERVISOR_CHECKPOINT
 ```
 
 ## Repository Structure
@@ -261,22 +203,51 @@ python -m scripts.audit_task --task-id TASK_EXAMPLE --database runtime/k_supervi
 ```text
 agents/         agent implementations
 supervisor/     orchestration core
-persistence/    storage-neutral persistence and SQLite store
-providers/      optional concrete external provider adapters
-observability/  structured operational logging and redaction
+persistence/    persistence and SQLite reference store
+providers/      optional provider adapters
+observability/  logging and redaction
 gpt_store/      GPT Store manifest and checkpoint contract
 models/         domain and transport contracts
-tools/          external capability adapters and evidence utilities
+tools/          capability adapters and evidence utilities
 config/         tracked non-secret configuration
-prompts/        GPT Store and future prompt assets
+prompts/        Store prompt assets
 tests/          automated tests
-scripts/        local commands and package validators
+scripts/        local commands and validators
 examples/       deterministic sample and benchmark inputs
 output/         generated standalone artifacts
 runtime/        local SQLite runtime data; ignored by Git
 logs/           standalone operational logs
 docs/           canonical project documentation
 ```
+
+## Maintenance Policy
+
+This repository is no longer the development home of the general modular K_Supervisor platform.
+
+Allowed work here:
+
+```text
+bug fixes
+security fixes
+GPT Store compatibility updates
+OpenAI platform compatibility updates
+regression fixes
+documentation corrections
+narrow UX improvements
+maintenance releases v1.0.1, v1.0.2, ...
+```
+
+Out of scope here:
+
+```text
+general capability-based agent platform
+automatic agent discovery
+large modular agent catalog
+capability router development
+new platform roadmap phases
+```
+
+Those belong to the separate `K_Supervisor` project.
 
 ## Canonical Documentation
 
@@ -297,24 +268,12 @@ docs/GPT_STORE_PACKAGE.md
 docs/LOGGING.md
 ```
 
-## Current Known Boundaries
+## Successor Project
 
-- The repository package is ready for manual GPT Builder Preview/publication testing but has not been published automatically.
-- Live Free-account execution and paid-account model-switch behavior must be verified in real ChatGPT accounts before public release.
-- Store Edition has no mandatory private backend, SQLite, or private operational-log dependency.
-- Each separate Custom GPT conversation starts fresh; cross-chat continuation depends on the explicit checkpoint artifact.
-- The Python reference CLI uses deterministic local corpus research rather than ChatGPT-native live tools.
-- CriticAgent's Python reference implementation uses conservative deterministic evidence-relation heuristics rather than full semantic LLM fact checking.
-- Provider token/cost telemetry is meaningful only for optional standalone/API providers that expose it.
-- `MeteredOpenAISemanticDomainProvider` remains opt-in and is not automatically selected by the provider factory.
-
-## Output Artifacts
-
-Logical workflow outputs remain:
+The reusable modular multi-agent platform is developed separately as:
 
 ```text
-<TASK_ID>_FINAL_REPORT.md
-<TASK_ID>_REVIEW_PROTOCOL.md
+K_Supervisor
 ```
 
-The GPT Store instructions define the equivalent ChatGPT-native final report/review protocol and the `K_SUPERVISOR_CHECKPOINT` continuity artifact without requiring an external service.
+That project starts with a clean repository, a new architecture decision set, and a new roadmap beginning at Phase 0. K-Research & Critic remains the completed production reference product and is not rewritten merely to follow future platform experiments.
