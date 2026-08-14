@@ -66,7 +66,7 @@ def validate_store_package(root: Path = ROOT) -> dict:
         raise StorePackageValidationError(f"Cannot load instruction package: {exc}") from exc
 
     required_instruction_tokens = [
-        "Use Ukrainian for conversation",
+        "Use Ukrainian by default for conversation",
         "Supervisor proposes.",
         "USER APPROVAL",
         "APPROVE",
