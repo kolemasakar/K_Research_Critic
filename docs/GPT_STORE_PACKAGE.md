@@ -1,7 +1,7 @@
 # GPT_STORE_PACKAGE
 Документ визначає пакет, налаштування та ручні release-gates для публікації K-Research & Critic у GPT Store.
 
-Version: 1.5
+Version: 1.6
 Status: ACTIVE
 
 ## 1. Purpose
@@ -48,7 +48,8 @@ K-Research & Critic
 ### Description
 
 ```text
-Research supervisor that plans evidence-based work, asks you to approve its critic criteria, independently verifies claims, revises weak drafts, and produces a final report with sources, uncertainty, and review status.
+Користувач: планує роботу, погоджує критерії критика, перевіряє твердження, виправляє слабкі місця та формує фінальний звіт із джерелами й оцінкою надійності.
+(research supervisor for evidence-based planning, verification, critique, revision, and sourced reporting.)
 ```
 
 ### Default language
