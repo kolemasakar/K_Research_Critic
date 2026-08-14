@@ -20,7 +20,9 @@ def test_manifest_preserves_store_first_invariants() -> None:
     assert manifest["product"]["name"] == "K-Research & Critic"
     assert manifest["product"]["default_language"] == "uk-UA"
     assert manifest["product"]["primary_channel"] == "chatgpt_store"
-    assert manifest["product"]["publication_state"] == "ready_for_manual_publication_test"
+    assert manifest["product"]["publication_state"] == "published"
+    assert manifest["product"]["published_at"] == "2026-08-14"
+    assert manifest["product"]["store_category"] == "Research & Analysis"
     assert manifest["model"]["policy"] == "user_plan"
     assert manifest["model"]["recommended_model"] is None
     assert manifest["model"]["allow_user_model_switch"] is True
