@@ -18,6 +18,9 @@ def test_manifest_preserves_store_first_invariants() -> None:
     manifest = validate_store_package(ROOT)
 
     assert manifest["product"]["name"] == "K-Research & Critic"
+    description = manifest["product"]["description"]
+    assert description.startswith("Керівник досліджень:")
+    assert "\n(research supervisor for evidence-based planning" in description
     assert manifest["product"]["default_language"] == "uk-UA"
     assert manifest["product"]["primary_channel"] == "chatgpt_store"
     assert manifest["product"]["publication_state"] == "published"
