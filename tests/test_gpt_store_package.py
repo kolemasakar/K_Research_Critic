@@ -35,16 +35,17 @@ def test_manifest_preserves_store_first_invariants() -> None:
 def test_instruction_package_contains_required_workflow_boundaries() -> None:
     text = (ROOT / "prompts" / "GPT_STORE_INSTRUCTIONS.md").read_text(encoding="utf-8")
 
-    assert "Use Ukrainian by default for conversation" in text
-    assert "Before promising tool use, check capabilities actually available now." in text
-    assert "record it in the CriticProfile" in text
+    assert "Use Ukrainian by default for user-facing content" in text
+    assert "CAPABILITY PREFLIGHT" in text
+    assert "web_search=AVAILABLE" in text
+    assert "web_search=UNAVAILABLE" in text
+    assert "actually exposed in the current runtime" in text
     assert "Supervisor proposes." in text
     assert "USER APPROVAL" in text
     assert "Do not begin the autonomous Research-Critic loop before explicit approval." in text
     assert "K_SUPERVISOR_CHECKPOINT" in text
     assert "Do not persist or reveal hidden chain-of-thought" in text
-    assert "Do not require a developer API key." in text
-    assert "Do not require an external backend, Action, or App" in text
+    assert "Do not require a developer API key" in text
 
 
 def test_checkpoint_example_validates_and_round_trips() -> None:
