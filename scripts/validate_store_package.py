@@ -59,6 +59,11 @@ def validate_store_package(root: Path = ROOT) -> dict:
     _require(release.get("developer_api_key_required") is False, "Store package must not require a developer API key")
     _require(release.get("external_backend_required") is False, "Store package must not require an external backend")
     _require(release.get("free_user_compatible") is True, "Store package must remain Free-user compatible")
+    _require(release.get("production_smoke_test_passed") is True, "production smoke test must be recorded as passed")
+    _require(
+        release.get("production_smoke_tested_at") == "2026-08-14",
+        "production smoke test date must record the launch verification date",
+    )
 
     instruction_path = root / str(instructions.get("file", ""))
     try:
