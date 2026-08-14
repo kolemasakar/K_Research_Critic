@@ -35,10 +35,7 @@ def validate_store_package(root: Path = ROOT) -> dict:
 
     _require(product.get("name") == "K-Research & Critic", "product.name must be K-Research & Critic")
     _require(product.get("default_language") == "uk-UA", "product.default_language must be uk-UA")
-    _require(
-        product.get("primary_channel") == "chatgpt_store",
-        "primary channel must remain chatgpt_store",
-    )
+    _require(product.get("primary_channel") == "chatgpt_store", "primary channel must remain chatgpt_store")
     _require(model.get("policy") == "user_plan", "model policy must remain user_plan")
     _require(model.get("recommended_model") is None, "recommended model must remain unset")
     _require(model.get("allow_user_model_switch") is True, "user model switching must remain enabled")
@@ -49,14 +46,8 @@ def validate_store_package(root: Path = ROOT) -> dict:
     )
     _require(capabilities.get("apps") is False, "Apps must remain disabled for the core package")
     _require(capabilities.get("actions") is False, "Actions must remain disabled for the core package")
-    _require(
-        release.get("developer_api_key_required") is False,
-        "Store package must not require a developer API key",
-    )
-    _require(
-        release.get("external_backend_required") is False,
-        "Store package must not require an external backend",
-    )
+    _require(release.get("developer_api_key_required") is False, "Store package must not require a developer API key")
+    _require(release.get("external_backend_required") is False, "Store package must not require an external backend")
     _require(release.get("free_user_compatible") is True, "Store package must remain Free-user compatible")
 
     instruction_path = root / str(instructions.get("file", ""))
@@ -66,7 +57,7 @@ def validate_store_package(root: Path = ROOT) -> dict:
         raise StorePackageValidationError(f"Cannot load instruction package: {exc}") from exc
 
     required_instruction_tokens = [
-        "Use Ukrainian by default for user-facing content",
+        "Use Ukrainian by default",
         "CAPABILITY PREFLIGHT",
         "web_search=AVAILABLE",
         "web_search=UNAVAILABLE",
@@ -80,7 +71,10 @@ def validate_store_package(root: Path = ROOT) -> dict:
         "PASS",
         "REVISE",
         "K_SUPERVISOR_CHECKPOINT",
-        "Do not require a developer API key",
+        "task_id matching ^TASK_[A-Za-z0-9_-]+$",
+        "required_cross_checks:int >=0",
+        "approved_by=\"user\"",
+        "Output one complete valid JSON object",
         "Do not persist or reveal hidden chain-of-thought",
     ]
     for token in required_instruction_tokens:
