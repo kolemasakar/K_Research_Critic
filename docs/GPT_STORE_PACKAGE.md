@@ -1,7 +1,7 @@
 # GPT_STORE_PACKAGE
 Документ визначає пакет, налаштування та ручні release-gates для публікації K-Research & Critic у GPT Store.
 
-Version: 1.4
+Version: 1.5
 Status: ACTIVE
 
 ## 1. Purpose
@@ -196,7 +196,7 @@ Because this package uses no Actions and no Apps, it does not require an Action 
 
 ## 8. Static Validation
 
-Run before opening the GPT Builder:
+Run after Store package changes:
 
 ```text
 python -m scripts.validate_store_package
@@ -206,6 +206,7 @@ python -m pytest
 Static validation checks:
 
 - Store channel and user-plan model policy;
+- publication state and Store category metadata;
 - public default language is `uk-UA`;
 - no pinned recommended model;
 - no developer secret requirement;
@@ -217,70 +218,71 @@ Static validation checks:
 
 ## 9. Preview Test Matrix
 
-Run in GPT Builder Preview before public sharing:
+The pre-publication Preview matrix was completed successfully on 2026-08-14:
 
 ```text
-P1 New low-risk research task
-P2 High-risk domain task and conservative risk floor
-P3 Explicit APPROVE gate including numeric alias 1
-P4 EDIT/2 then approve
-P5 REJECT/3 stops autonomous execution
-P6 Research -> Critic -> PASS
-P7 Forced REVISE then corrected second iteration
-P8 Web-search-unavailable/freshness limitation behavior
-P9 Generate checkpoint at PROFILE_APPROVED
-P10 Paste checkpoint into a fresh GPT conversation and resume
-P11 Malformed checkpoint rejection
-P12 Final report plus review protocol without hidden reasoning
+P1 New low-risk research task - PASS
+P2 High-risk domain task and conservative risk floor - PASS
+P3 Explicit APPROVE gate including numeric alias 1 - PASS
+P4 EDIT/2 then approve - PASS
+P5 REJECT/3 stops autonomous execution - PASS
+P6 Research -> Critic -> PASS - PASS
+P7 Forced REVISE then corrected second iteration - PASS
+P8 Web-search-unavailable/freshness limitation behavior - PASS
+P9 Generate checkpoint at PROFILE_APPROVED - PASS
+P10 Paste checkpoint into a fresh GPT conversation and resume - PASS
+P11 Malformed checkpoint rejection - PASS
+P12 Final report plus review protocol without hidden reasoning - PASS
 ```
 
-P1-P12 user-facing responses are expected in Ukrainian unless the test explicitly starts or requests another language.
+A separate forced-REVISE control scenario also passed.
 
 ## 10. Account/Plan Release Matrix
 
-These checks require real ChatGPT accounts and cannot be proven by repository CI alone.
-
-Before public release, manually verify:
+Live account validation completed on 2026-08-14.
 
 ```text
 Free account:
-  - can open/use the public GPT;
-  - workflow reaches the profile gate;
-  - capability limits degrade explicitly rather than fabricating tool use.
+  - public-link access: PASS
+  - numbered CriticProfile gate: PASS
+  - web-search capability path: PASS
+  - Research -> Critic -> final output: PASS
+  - no developer API key/backend requirement: PASS
 
-Paid account:
-  - can use the same workflow;
-  - can switch to another available model when the account exposes alternatives;
-  - workflow semantics and checkpoint format remain unchanged after switching.
+Paid/Plus account:
+  - same workflow: PASS
+  - runtime/reasoning-level switch after profile gate: PASS
+  - approval/state continuity after switch: PASS
+  - final report/review semantics preserved: PASS
 ```
-
-Record the result in the release notes or release checklist. A live account test is a publication gate, not a reason to add developer-funded API calls to the free core.
 
 ## 11. Publication Checklist
 
-Immediately before Store publication:
+Completed on 2026-08-14:
 
-1. Re-run static validation and full CI.
-2. Re-check the official OpenAI GPT publishing documentation because plan/model/Store rules can change.
-3. Open GPT Builder on the web using an eligible creator account.
-4. Configure name, description, bilingual starters, instructions, and capabilities exactly from the manifest/package.
-5. Leave Recommended model unset.
-6. Keep Apps and Actions disabled.
-7. Complete Builder Profile requirements if prompted.
-8. Run the Preview test matrix.
-9. Run the Free and paid account release matrix.
-10. Select an appropriate Store category when prompted.
-11. Confirm policy/product requirements and publish to GPT Store.
+1. Static validation and CI completed successfully before publication.
+2. Current OpenAI GPT publishing requirements were reviewed.
+3. GPT Builder configuration matched the Store package.
+4. Recommended model remained unset.
+5. Apps and Actions remained disabled.
+6. Preview test matrix passed.
+7. Free and paid account release tests passed.
+8. Store category selected: `Research & Analysis`.
+9. Builder Profile was accepted by the publication UI.
+10. GPT Store sharing was enabled manually.
 
-Actual publication is a manual ChatGPT UI action. Repository automation does not claim to publish the GPT.
+Actual publication was completed through the ChatGPT UI, not repository automation.
 
 ## 12. Release State
 
-The repository package may be marked `ready_for_manual_publication_test` when:
+Current state:
 
-- package files validate;
-- CI is green;
-- official OpenAI requirements have been re-checked;
-- no developer secret/backend is required by the Store core.
+```text
+publication_state: published
+published_at: 2026-08-14
+store_category: Research & Analysis
+```
 
-`ready_for_manual_publication_test` does not mean `published`.
+The ChatGPT Builder UI confirmed the public state with `Published / Everyone` and a successful sharing-settings update on 2026-08-14.
+
+Post-publication production smoke testing remains the final operational verification step. Any later Builder changes must be treated as a new draft/update and revalidated before applying them to the published GPT.
