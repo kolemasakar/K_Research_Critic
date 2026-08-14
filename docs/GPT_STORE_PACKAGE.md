@@ -1,7 +1,7 @@
 # GPT_STORE_PACKAGE
 Документ визначає пакет, налаштування та ручні release-gates для публікації K-Research & Critic у GPT Store.
 
-Version: 1.2
+Version: 1.3
 Status: ACTIVE
 
 ## 1. Purpose
@@ -20,7 +20,7 @@ user-plan model policy
 built-in ChatGPT capabilities only for the core path
 ```
 
-Default user-facing language for the public edition is Ukrainian (`uk-UA`). A user may explicitly request another language.
+Default user-facing language for the public edition is Ukrainian (`uk-UA`). A user may start in another language or explicitly request another language.
 
 ## 2. Package Files
 
@@ -57,7 +57,7 @@ Research supervisor that plans evidence-based work, asks you to approve its crit
 uk-UA
 ```
 
-Use Ukrainian for conversation, CriticProfile, research plans, findings, reports, review protocols, checkpoint summaries, and user-facing explanations unless the user explicitly requests another language.
+Use Ukrainian by default for conversation, CriticProfile, research plans, findings, reports, review protocols, checkpoint summaries, and user-facing explanations. If the user starts in another language or explicitly requests another language, use that language until the user switches again.
 
 ### Recommended model
 
@@ -92,14 +92,14 @@ Behavioral rules belong in Instructions. This keeps the public core self-contain
 
 ## 4. Conversation Starters
 
-Use the four starters from the manifest:
+Use the eight bilingual starters from `gpt_store/manifest.yaml`:
 
 ```text
-Досліди цю тему та спочатку сформуй CriticProfile для мого погодження.
-Порівняй дві технології за незалежними джерелами та покажи невирішені ризики.
-Перевір це твердження, включно з доказами на його підтримку або спростування.
-Віднови завдання K-Research & Critic з checkpoint, який я надам.
+4 Ukrainian starters
+4 English starters
 ```
+
+The exact UTF-8 starter strings are canonical in the manifest and are intentionally not duplicated in this ASCII documentation file.
 
 ## 5. Store Workflow Mapping
 
@@ -204,7 +204,7 @@ Static validation checks:
 - no mandatory backend;
 - Apps/Actions disabled;
 - required built-in capabilities declared;
-- instruction file present and containing the mandatory Ukrainian-language, approval, review, and checkpoint rules;
+- instruction file present and containing the mandatory language, approval, review, and checkpoint rules;
 - checkpoint example conforms to the checkpoint contract.
 
 ## 9. Preview Test Matrix
@@ -226,7 +226,7 @@ P11 Malformed checkpoint rejection
 P12 Final report plus review protocol without hidden reasoning
 ```
 
-P1-P12 user-facing responses are expected in Ukrainian unless the test explicitly requests another language.
+P1-P12 user-facing responses are expected in Ukrainian unless the test explicitly starts or requests another language.
 
 ## 10. Account/Plan Release Matrix
 
@@ -255,7 +255,7 @@ Immediately before Store publication:
 1. Re-run static validation and full CI.
 2. Re-check the official OpenAI GPT publishing documentation because plan/model/Store rules can change.
 3. Open GPT Builder on the web using an eligible creator account.
-4. Configure name, description, Ukrainian starters, instructions, and capabilities exactly from the manifest/package.
+4. Configure name, description, bilingual starters, instructions, and capabilities exactly from the manifest/package.
 5. Leave Recommended model unset.
 6. Keep Apps and Actions disabled.
 7. Complete Builder Profile requirements if prompted.
