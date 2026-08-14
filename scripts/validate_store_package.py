@@ -67,6 +67,8 @@ def validate_store_package(root: Path = ROOT) -> dict:
 
     required_instruction_tokens = [
         "Use Ukrainian by default for conversation",
+        "Before promising tool use, check capabilities actually available now.",
+        "record it in the CriticProfile",
         "Supervisor proposes.",
         "USER APPROVAL",
         "APPROVE",
