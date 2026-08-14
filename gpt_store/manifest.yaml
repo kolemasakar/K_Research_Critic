@@ -8,7 +8,9 @@ product:
     produces a final report with sources, uncertainty, and review status.
   default_language: uk-UA
   primary_channel: chatgpt_store
-  publication_state: ready_for_manual_publication_test
+  publication_state: published
+  published_at: "2026-08-14"
+  store_category: Research & Analysis
 
 model:
   policy: user_plan
