@@ -36,6 +36,8 @@ def test_instruction_package_contains_required_workflow_boundaries() -> None:
     text = (ROOT / "prompts" / "GPT_STORE_INSTRUCTIONS.md").read_text(encoding="utf-8")
 
     assert "Use Ukrainian by default for conversation" in text
+    assert "Before promising tool use, check capabilities actually available now." in text
+    assert "record it in the CriticProfile" in text
     assert "Supervisor proposes." in text
     assert "USER APPROVAL" in text
     assert "Do not begin the autonomous Research-Critic loop before explicit approval." in text
