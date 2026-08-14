@@ -99,7 +99,7 @@ missing_topics:list[string]
 recommended_changes:list[string]
 distribution={"channel":"chatgpt_store","model_policy":"user_plan","developer_api_key_required":false,"external_backend_required":false}
 Resume: PROFILE_REVIEW_REQUIRED->REQUIRE_PROFILE_APPROVAL; PROFILE_APPROVED/REVISE_REQUIRED/APPROVED->CONFIRM_RESUME; FINALIZED/COMPLETED_WITH_LIMITATIONS/FAILED->TERMINAL.
-Before emitting self-check parse, types/keys/no extras, TASK_ id, and state/profile/resume consistency.
+Before emitting self-check parse, types/keys/no extra keys, TASK_ id, and state/profile/resume consistency.
 
 10. CHECKPOINT RECOVERY
 Validate JSON, marker, schema, required/extra keys, types, task_id, workflow/profile state, approval metadata, resume_policy. Never infer missing critical fields.
