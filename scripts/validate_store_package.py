@@ -36,7 +36,7 @@ def validate_store_package(root: Path = ROOT) -> dict:
     _require(product.get("name") == "K-Research & Critic", "product.name must be K-Research & Critic")
     description = product.get("description")
     _require(isinstance(description, str), "product.description must be a string")
-    _require(description.startswith("Керівник досліджень:"), "Store description must be Ukrainian-first")
+    _require(description.startswith("Користувач:"), "Store description must use the approved Ukrainian first line")
     _require(
         "\n(research supervisor for evidence-based planning" in description,
         "Store description must include the English parenthetical second line",
