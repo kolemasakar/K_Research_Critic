@@ -1,22 +1,21 @@
 # ARCHITECTURE
-Короткий опис архітектури K_Supervisor, основних компонентів, workflow та моделей розгортання.
+Короткий опис зафіксованої production-архітектури K-Research & Critic та її maintenance-меж.
 
-Version: 1.1
-Status: ACTIVE
+Version: 1.2
+Status: MAINTENANCE
 
 ## 1. Purpose
 
-K_Supervisor is a reusable multi-agent orchestration system.
+K-Research & Critic is a completed GPT Store-first research and independent-critique product.
 
-Its core responsibility is to accept a user task, configure the required agent roles, coordinate autonomous agent interaction, control quality gates, and produce final artifacts.
+Its production architecture accepts a user task, resolves the task domain and risk, proposes a CriticProfile for explicit user approval, performs research, executes an independent critique/revision loop, and produces a sourced final report plus review protocol.
 
-The initial product workflow is research plus independent critique. The architecture remains extensible for additional agents and workflows.
+The repository `K_Research_Critic` is now maintained as a stable product. General modular-agent-platform evolution is transferred to the separate new `K_Supervisor` project.
 
 ## 2. Core Principles
 
-- Supervisor coordinates work but does not perform domain research or critique itself.
-- Agents communicate through explicit validated contracts.
-- Every task has a stable task_id and every agent execution has a stable run_id.
+- Supervisor coordinates work but does not replace research or critique.
+- Agents/components communicate through explicit validated contracts.
 - Workflow transitions are explicit and auditable.
 - CriticAgent is generic and receives a task-specific CriticProfile.
 - User approval of CriticProfile is mandatory before autonomous execution.
@@ -25,14 +24,30 @@ The initial product workflow is research plus independent critique. The architec
 - Evidence, uncertainty, limitations, and final status remain explicit.
 - Execution status, critic decision, task state, and workflow state remain separate concepts.
 - Hidden chain-of-thought/private reasoning is never persisted as an artifact.
+- Maintenance changes must preserve production behavior unless an explicitly approved product revision changes it.
 
-## 3. Product Distribution Decision
+## 3. Product Identity
 
-K_Supervisor is GPT Store-first.
+```text
+Public product: K-Research & Critic
+Repository: kolemasakar/K_Research_Critic
+Distribution: GPT Store
+Release line: v1.0.x
+Repository mode: PRODUCTION / MAINTENANCE
+```
 
-The primary public edition is a Custom GPT distributed through ChatGPT. It is designed to work without a developer-owned OpenAI API key, without a mandatory external backend, and without a pinned model identifier.
+Stable legacy engineering identifiers intentionally remain where compatibility matters:
 
-Primary policy:
+```text
+K_SUPERVISOR_CHECKPOINT
+runtime/k_supervisor.db
+```
+
+These are compatibility identifiers, not the current repository/product name.
+
+## 4. Product Distribution Decision
+
+The primary public edition is a Custom GPT distributed through ChatGPT.
 
 ```text
 channel: chatgpt_store
@@ -42,34 +57,13 @@ model_policy: user_plan
 recommended_model: null
 allow_user_model_switch: true
 external_backend_required: false
+publication_state: published
+production_smoke_test_passed: true
 ```
 
-The platform supplies the model available to the user. Users with additional model choices may switch to another model exposed by their ChatGPT plan. K_Supervisor workflow semantics must not depend on a specific named ChatGPT model.
+The public product is designed to work without a developer-owned API key, without a mandatory external backend, and without a pinned model identifier.
 
-The canonical deployment policy is specified in `GPT_STORE_DEPLOYMENT.md`.
-
-## 4. Deployment Profiles
-
-K_Supervisor has two deployment profiles built around the same logical workflow contracts.
-
-```text
-K_Supervisor Core
-  |
-  +-- GPT Store Edition       PRIMARY
-  |     - runs inside ChatGPT
-  |     - ChatGPT-managed model
-  |     - no developer API key
-  |     - no mandatory backend
-  |     - built-in ChatGPT capabilities where available
-  |
-  +-- Standalone/API Edition  OPTIONAL
-        - Python runtime
-        - SQLite persistence
-        - provider/model factory
-        - provider secrets only when a selected provider requires them
-```
-
-The optional standalone/API edition exists for local engineering, automated tests, server integrations, and future products. It must not become a dependency of the free GPT Store core experience.
+The optional Python/SQLite/provider runtime remains an engineering reference and standalone execution path. It is not a dependency of the GPT Store product.
 
 ## 5. High-Level Logical Architecture
 
@@ -79,19 +73,16 @@ USER
   v
 SUPERVISOR
   |
-  +-- Task Manager
   +-- Domain Resolver
   +-- Profile Manager
-  +-- Agent Registry
-  +-- Workflow Engine
-  +-- State Machine
+  +-- Workflow / State Control
   |
   +-----------------------------+
   |                             |
   v                             v
 ResearchAgent               CriticAgent
   |                             |
-  +---------- Tools Layer ------+
+  +---------- Tools / Evidence -+
   |
   v
 Evidence / Sources
@@ -99,63 +90,48 @@ Evidence / Sources
   v
 ReportGenerator
   |
-  +-- FINAL_REPORT
-  +-- REVIEW_PROTOCOL
+  +-- FINAL REPORT
+  +-- REVIEW PROTOCOL
 ```
 
-Deployment infrastructure may differ, but these logical roles and boundaries remain stable.
+In the GPT Store Edition these are separated logical roles/passes inside one ChatGPT runtime rather than independent agent processes.
 
 ## 6. Supervisor Responsibilities
 
 Supervisor is responsible for:
 
 - receiving the user task;
-- creating task_id;
-- analyzing task domain/type;
+- resolving task domain/type/risk;
 - generating a draft CriticProfile;
 - presenting the profile for explicit user approval/edit/reject;
 - freezing the approved profile;
-- selecting and launching agents;
-- passing structured context/results between agents;
 - controlling workflow state and iteration limits;
-- enforcing configured limits and termination rules;
+- passing structured context/results between logical roles;
 - handling recoverable and unrecoverable failures;
-- triggering final artifact generation.
+- triggering final output generation.
 
-Supervisor must not perform domain research, fact checking, or domain critique directly.
+Supervisor must not silently bypass the approval gate or replace independent critique with self-approval.
 
-## 7. Dynamic Agent Configuration
-
-Core rule:
-
-```text
-Agent = generic capability + dynamically assigned task/domain profile
-```
-
-The system avoids hard-coded domain critic classes such as `MedicalCriticAgent` or `GeodesyCriticAgent`. One generic CriticAgent receives the approved task-specific CriticProfile.
-
-## 8. Domain Resolution
+## 7. Domain Resolution
 
 Domain resolution identifies:
 
-- primary domain;
-- secondary domains;
-- task type;
-- risk level;
-- relevant source classes/standards;
-- multi-domain requirements.
+```text
+primary domain
+secondary domains
+task type
+risk level
+relevant source classes / standards
+multi-domain requirements
+```
 
-Current implementation supports deterministic RuleBasedResolver plus provider-neutral LLMSemanticResolver and HybridResolver.
+The engineering reference implementation includes deterministic RuleBasedResolver plus semantic and HybridResolver paths with conservative fallback and risk floors.
 
-HybridResolver preserves deterministic fallback and risk floors, validates semantic results, and surfaces material disagreement for user review.
+The GPT Store Edition uses ChatGPT-native reasoning/capabilities where available and must not require a developer API secret.
 
-In the GPT Store edition, semantic reasoning is supplied by the ChatGPT runtime and must not require a developer API secret. The existing OpenAI API adapter remains optional for standalone/API execution.
+## 8. CriticProfile and User Approval
 
-## 9. CriticProfile and User Approval
-
-Before autonomous execution, Supervisor generates a CriticProfile draft and presents it to the user.
-
-The user may approve, edit, or reject it.
+Before autonomous execution, Supervisor generates a CriticProfile draft.
 
 The profile includes at least:
 
@@ -177,7 +153,7 @@ special_user_requirements
 status
 ```
 
-Required interaction rule:
+Interaction rule:
 
 ```text
 Supervisor proposes.
@@ -185,76 +161,88 @@ User approves or edits.
 Critic executes.
 ```
 
-Only an APPROVED profile may be used by CriticAgent.
+Only an APPROVED profile may be used for normal autonomous research/review execution.
 
-## 10. Profile Freeze Rule
+## 9. Profile Freeze Rule
 
-After approval, CriticProfile is frozen for the current task.
-
-CriticAgent must not independently change assigned domain, evaluation criteria, evidence thresholds, source hierarchy, standards, or confidence threshold.
+After approval, CriticProfile is frozen for the task.
 
 If research reveals a materially new requirement, Supervisor may propose an amended profile. The amendment becomes active only after explicit user approval.
 
-## 11. Multi-Domain Support
+Ordinary Research-Critic revisions do not reopen the approval gate.
 
-A task may require multiple domains, for example geodetic monitoring of structural deformation.
+## 10. ResearchAgent
 
-One CriticProfile may contain multiple domains and grouped criteria. Future workflows may assign multiple critic instances through the same Agent Interface without redesigning Supervisor.
-
-## 12. Agent Registry and Interface
-
-Initial registry:
-
-```text
-ResearchAgent
-CriticAgent
-ReportGenerator
-```
-
-Future examples:
-
-```text
-FactCheckAgent
-DataAnalysisAgent
-TechnicalAgent
-FinancialAgent
-LegalAgent
-PlanningAgent
-```
-
-Logical execution contract:
-
-```text
-run(request) -> AgentResult
-```
-
-Detailed contracts are defined in `AGENT_INTERFACE.md` and `DATA_MODELS.md`.
-
-## 13. ResearchAgent
-
-ResearchAgent:
+ResearchAgent/logical Research stage:
 
 - decomposes the task;
-- builds a search strategy;
+- builds a search/research strategy;
 - collects sources and evidence;
-- extracts claims;
-- records uncertainty/limitations;
+- extracts and evaluates claims;
+- records uncertainty and limitations;
 - creates a draft report;
-- revises output from structured CriticAgent feedback.
+- revises output from structured critic feedback.
 
-ResearchAgent is not the final verifier of its own conclusions.
+Research is not the final verifier of its own conclusions.
 
-## 14. CriticAgent
+## 11. CriticAgent
 
-CriticAgent performs independent verification under the approved CriticProfile.
+CriticAgent/logical Critic stage performs an independent verification pass under the approved CriticProfile.
 
-It evaluates source authority/freshness, unsupported claims, contradictions, missing topics, conclusion/evidence consistency, and returns a machine-readable PASS or REVISE decision with structured recommendations.
+It evaluates:
 
-CriticAgent is not limited to wording edits.
+```text
+source authority
+source freshness
+unsupported claims
+contradictions
+missing topics
+conclusion/evidence consistency
+approved thresholds
+```
 
-## 15. Evidence Layer
+The result is PASS or REVISE with reliability score and structured recommendations.
 
-Claims and sources are represented separately from prose.
+## 12. Research-Critic Workflow
+
+```text
+NEW
+ |
+ v
+PROFILE_REVIEW_REQUIRED
+ |
+ +-- EDIT ------> PROFILE_REVIEW_REQUIRED
+ |
+ +-- REJECT ----> STOP
+ |
+ +-- APPROVE ---> PROFILE_APPROVED
+                    |
+                    v
+                RESEARCHING
+                    |
+                    v
+                 REVIEWING
+                    |
+             +------+------+
+             |             |
+          REVISE          PASS
+             |             |
+             v             v
+        RESEARCHING     FINALIZED
+```
+
+Additional outcomes:
+
+```text
+FAILED
+COMPLETED_WITH_LIMITATIONS
+```
+
+The Store instructions define the exact public state semantics and checkpoint-safe states.
+
+## 13. Evidence Model
+
+Claims and sources are represented separately from prose in the engineering reference model.
 
 Claim baseline:
 
@@ -279,186 +267,158 @@ source_type
 reliability_class
 ```
 
-Default reliability classes:
+The public report must distinguish evidence-backed claims, uncertainty, inference, and limitations.
 
-```text
-A - primary or official
-B - authoritative independent
-C - secondary
-D - weak or unverified
-```
+## 14. Termination Rules
 
-CriticProfile may strengthen or refine evidence requirements.
+The review loop stops when:
 
-## 16. Research-Critic Workflow
-
-```text
-NEW
- |
- v
-PROFILE_GENERATING
- |
- v
-PROFILE_REVIEW_REQUIRED
- |
- +-- user edit/reject --> PROFILE_GENERATING
- |
- +-- user approval ----> PROFILE_APPROVED
-                           |
-                           v
-                      RESEARCHING
-                           |
-                           v
-                      DRAFT_READY
-                           |
-                           v
-                       REVIEWING
-                           |
-                +----------+----------+
-                |                     |
-             REVISE                  PASS
-                |                     |
-                v                     v
-          REVISE_REQUIRED          APPROVED
-                |                     |
-                v                     v
-           RESEARCHING            FINALIZING
-                                      |
-                                      v
-                                  FINALIZED
-```
-
-Additional terminal/exception states:
-
-```text
-FAILED
-MAX_ITERATIONS_REACHED
-COMPLETED_WITH_LIMITATIONS
-```
-
-## 17. Autonomous Interaction Boundary
-
-User interaction is required before PROFILE_APPROVED and again only for material profile amendments or unrecoverable ambiguity that cannot be resolved internally.
-
-Normal Research-Critic revision cycles require no user intervention.
-
-## 18. Critic Result Contract
-
-Baseline review result:
-
-```json
-{
-  "decision": "PASS | REVISE",
-  "reliability_score": 0.0,
-  "critical_issues": [],
-  "unsupported_claim_ids": [],
-  "weak_source_ids": [],
-  "contradictions": [],
-  "missing_topics": [],
-  "recommended_changes": []
-}
-```
-
-AgentResult.status remains separate from CriticReview.decision.
-
-## 19. Termination Rules
-
-The loop stops when:
-
-- accepted PASS meets the approved reliability threshold;
-- max_iterations is reached;
+- PASS meets the approved reliability threshold;
+- maximum permitted iterations are reached;
 - an unrecoverable failure occurs.
 
-Reaching max_iterations is not successful verification. If useful output exists but full acceptance is not reached, Supervisor may finish as `COMPLETED_WITH_LIMITATIONS`.
+Failure to reach PASS is not silently presented as verified success. Useful output may finish as `COMPLETED_WITH_LIMITATIONS` when appropriate.
 
-## 20. ReportGenerator
+## 15. Final Output
 
-ReportGenerator creates:
+The final user-facing result contains:
 
 ```text
-<TASK_ID>_FINAL_REPORT.md
-<TASK_ID>_REVIEW_PROTOCOL.md
+FINAL REPORT
+REVIEW PROTOCOL
 ```
 
-Reports include evidence references, uncertainty, significant review issues, applied changes, unresolved limitations, and final status. They must not contain hidden chain-of-thought/private reasoning.
+It includes evidence references, uncertainty, significant review issues, applied changes, unresolved limitations, reliability information, and final status.
 
-## 21. Tools Layer
+It must not contain hidden chain-of-thought/private reasoning or internal citation/tool placeholders.
 
-External capabilities are isolated behind provider-neutral boundaries, including:
+## 16. Tools and Capabilities
+
+Public Store execution primarily uses built-in ChatGPT capabilities where available, including web research and data analysis when exposed to the current runtime.
+
+Optional standalone adapters remain isolated behind provider-neutral boundaries.
+
+Capability absence must be surfaced explicitly when it materially limits freshness or verification.
+
+## 17. Persistence and Recovery
+
+Standalone/reference persistence remains isolated behind a dedicated boundary and may use:
 
 ```text
-web_search
-web_fetch
-source_validator
-citation_manager
+runtime/k_supervisor.db
 ```
 
-GPT Store Edition should prefer built-in ChatGPT capabilities where available. Standalone/API Edition may use injected provider adapters.
+GPT Store Edition does not depend on private server-side SQLite.
 
-## 22. Configuration
-
-Tracked defaults live in:
+Cross-chat continuation uses the explicit user-controlled checkpoint contract:
 
 ```text
-config/settings.yaml
+K_SUPERVISOR_CHECKPOINT
 ```
 
-Configuration includes workflow, distribution policy, models, tools, research, critic, reports, persistence, logging, retry, and limits.
+Checkpoint generation is explicit-request only in the public Store workflow.
 
-The GPT Store distribution policy is a system invariant in tracked defaults: no required developer API key, no required external backend, user-plan model selection, and no pinned model identifier.
+## 18. Configuration, Limits, and Audit
 
-Provider secrets remain optional standalone/API configuration and are never part of persisted task configuration snapshots.
-
-## 23. Persistence
-
-Persistence is isolated behind a dedicated boundary.
-
-Standalone/API Edition currently provides SQLite persistence for tasks, workflows, profiles, claims, sources, reviews, agent results, and artifacts.
-
-GPT Store Edition cannot depend on that server-side SQLite runtime. Its baseline continuity model is conversation-local state plus explicit checkpoint/recovery artifacts for cross-chat continuation.
-
-## 24. Failure Handling
-
-Supervisor handles at least model/tool timeout, malformed output, unavailable source, repeated results, resource limit, tool exception, agent exception, and unrecoverable ambiguity.
-
-Recoverable failures follow retry policy. Unrecoverable failures produce explicit task status.
-
-## 25. Extensibility
-
-New agents implement the Agent Interface, register through AgentRegistry, and become available to workflow definitions without requiring unrelated agents to change.
-
-## 26. MVP and Product Boundary
-
-The completed Python MVP includes Supervisor, Task Manager, Domain Resolver, Profile Manager, State Machine, Agent Registry, Workflow Engine, ResearchAgent, CriticAgent, Tools Layer, Evidence Model, ReportGenerator, CLI, and SQLite persistence.
-
-The primary public product target is now the GPT Store Edition. Packaging/publication work must preserve the completed core workflow while adapting execution state, tools, and model selection to ChatGPT-native capabilities.
-
-## 27. Deferred Capabilities
-
-Deferred until separate architectural decisions:
+The completed architecture includes:
 
 ```text
-custom Web UI
-distributed execution
-complex parallel orchestration
-vector database
-complex long-term memory
+validated configuration
+frozen task configuration snapshots
+runtime limits
+timeouts and retries
+usage/quality metrics
+structured logging
+sensitive-data redaction
+audit/recovery support
+GPT Store package validation
+```
+
+The free Store path has no mandatory developer secret or backend dependency.
+
+## 19. Quality Boundary
+
+The production baseline is protected by:
+
+```text
+Python 3.13 tests
+Python 3.14 tests
+dependency integrity
+Ruff correctness checks
+Mypy typed-boundary checks
+repository policy validation
+GPT Store package validation
+coverage gate
+deterministic reference benchmark
+manual Free/paid Store validation
+production smoke test
+```
+
+Repository CI validates what can be proven offline. Live ChatGPT UI/account behavior remains a manual release/maintenance verification boundary.
+
+## 20. Maintenance Architecture Boundary
+
+This repository may evolve only within the K-Research & Critic product boundary unless a new major product decision explicitly reopens architecture scope.
+
+Normal maintenance includes:
+
+```text
+bug fixes
+security fixes
+Store/platform compatibility changes
+regression fixes
+small UX improvements
+documentation corrections
+v1.0.x maintenance releases
+```
+
+The following are intentionally NOT developed here as the next architecture generation:
+
+```text
+capability-based general agent platform
+automatic agent discovery
+executable plugin registry for arbitrary new agents
+general capability router
+large catalog of domain agents
+complex parallel/distributed orchestration
 automatic agent generation
-large-scale workflow scheduling
-mandatory external backend for Store Edition
 ```
 
-## 28. Architecture Decision Summary
+## 21. Successor Platform Decision
 
-- K_Supervisor remains a generic multi-agent orchestration platform.
-- Supervisor coordinates but does not replace domain agents.
-- CriticAgent remains generic and profile-driven.
+The previously planned Phase 13 Modular Agent Platform is transferred to a separate new project:
+
+```text
+K_Supervisor
+```
+
+The new project starts from Phase 0 with clean platform-level requirements and may selectively extract reusable concepts from K-Research & Critic.
+
+Migration principle:
+
+```text
+extract -> generalize -> import
+```
+
+not:
+
+```text
+clone -> modify
+```
+
+K-Research & Critic therefore remains a stable production reference product rather than becoming the experimental development branch of the future platform.
+
+## 22. Architecture Decision Summary
+
+- K-Research & Critic is the completed production research/critique product.
+- Repository name is `K_Research_Critic`.
+- GPT Store Edition is the primary public distribution target.
+- Supervisor/Profile/Research/Critic/Report boundaries remain stable.
 - CriticProfile approval is mandatory and approved profiles are frozen.
-- Multi-domain profiles are supported.
 - Research-Critic interaction is autonomous after approval.
 - Final output contains a consolidated report and review protocol.
-- GPT Store Edition is the primary public distribution target.
 - GPT Store Edition requires no developer API key and no mandatory backend.
-- GPT Store Edition uses the model available to the user's ChatGPT plan; paid users may select additional available models.
-- No concrete ChatGPT model identifier is a core architectural dependency.
-- The existing Python/SQLite/provider stack is retained as an optional standalone/API edition and engineering reference runtime.
+- Model selection follows the user's available ChatGPT runtime/plan rather than a pinned model identifier.
+- The Python/SQLite/provider stack remains an optional engineering/reference runtime.
+- Legacy compatibility identifiers such as `K_SUPERVISOR_CHECKPOINT` remain unchanged in v1.0.x.
+- The general modular agent platform is developed separately as the new `K_Supervisor` project with a new roadmap beginning at Phase 0.
