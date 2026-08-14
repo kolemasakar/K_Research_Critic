@@ -66,9 +66,12 @@ def validate_store_package(root: Path = ROOT) -> dict:
         raise StorePackageValidationError(f"Cannot load instruction package: {exc}") from exc
 
     required_instruction_tokens = [
-        "Use Ukrainian by default for conversation",
-        "Before promising tool use, check capabilities actually available now.",
-        "record it in the CriticProfile",
+        "Use Ukrainian by default for user-facing content",
+        "CAPABILITY PREFLIGHT",
+        "web_search=AVAILABLE",
+        "web_search=UNAVAILABLE",
+        "actually exposed in the current runtime",
+        "COMPLETED_WITH_LIMITATIONS",
         "Supervisor proposes.",
         "USER APPROVAL",
         "APPROVE",
@@ -77,8 +80,7 @@ def validate_store_package(root: Path = ROOT) -> dict:
         "PASS",
         "REVISE",
         "K_SUPERVISOR_CHECKPOINT",
-        "Do not require a developer API key.",
-        "Do not require an external backend, Action, or App",
+        "Do not require a developer API key",
         "Do not persist or reveal hidden chain-of-thought",
     ]
     for token in required_instruction_tokens:
