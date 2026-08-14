@@ -47,10 +47,7 @@ K-Research & Critic
 
 ### Description
 
-```text
-Користувач: планує роботу, погоджує критерії критика, перевіряє твердження, виправляє слабкі місця та формує фінальний звіт із джерелами й оцінкою надійності.
-(research supervisor for evidence-based planning, verification, critique, revision, and sourced reporting.)
-```
+The canonical public description is stored in `gpt_store/manifest.yaml` because the first line is Ukrainian UTF-8. Copy `product.description` into the Builder exactly, including the English parenthetical second line.
 
 ### Default language
 
