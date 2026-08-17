@@ -1,7 +1,7 @@
 # MEDIA BETA Current State
 Канонічний знімок фактичного стану реалізації для відновлення роботи без припущень.
 
-Version: 1.3
+Version: 1.4
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-17
 
@@ -11,9 +11,9 @@ Current phase: `A4 - Live transcript validation`
 
 Current state:
 
-`CODE_READY / CI_GREEN / RENDER_API_BRIDGE_READY / BETA_SERVICE_LIVE / MEDIA_CONFIGURED / A3_COMPLETE`
+`A3_COMPLETE / BETA_LIVE / MEDIA_CONFIGURED / A4_YOUTUBE_INGRESS_REMEDIATION_DEPLOYED`
 
-Dedicated Render MEDIA BETA is live on the Free plan. All three service-level beta secrets are configured. Health returns HTTP 200 and `media_transcript.configured=true`. Production VoiceBridge health was rechecked separately and remains `status=ok`.
+Dedicated Render MEDIA BETA remains live on the Free plan. Health returns HTTP 200 and `media_transcript.configured=true`. Production VoiceBridge remains isolated and was not targeted by A4 remediation.
 
 ## Repositories
 
@@ -29,71 +29,92 @@ VoiceBridge:
 - draft PR #28;
 - production service unchanged.
 
-## Render beta evidence
+## Render beta
 
-Service:
-`voicebridge-krc-media-beta-kolemasakar`
+Service: `voicebridge-krc-media-beta-kolemasakar`.
 
-Service ID:
-`srv-da1kic5bedkc73d6fk60`
+Service ID: `srv-da1kic5bedkc73d6fk60`.
 
-Endpoint:
-`https://voicebridge-krc-media-beta-kolemasakar.onrender.com`
+Endpoint: `https://voicebridge-krc-media-beta-kolemasakar.onrender.com`.
 
-Verified configuration:
-- branch `agent/krc-media-transcript`;
+Verified base configuration:
 - plan `free`;
 - media mode `closed_beta`;
-- providers `youtube_captions`, `assemblyai_stt`;
 - `configured=true`;
-- language hints `auto`, `uk`, `ru`, `en`;
-- `subtitle_first=true`;
+- subtitle-first true;
 - max duration 3600 sec;
 - max concurrent jobs 1;
-- daily STT budget 7200 sec.
+- daily STT budget 7200 sec;
+- language hints auto/uk/ru/en.
 
-Latest successful post-secret deploy observed by inspect:
-- deploy ID `dep-da1l56n40ujc73bso600`;
-- status `live`;
-- commit `7aa415247835d337373888db932f89549feb14c5`.
+## A4.1 live test evidence
 
-Final A3 verification workflow:
-- run `32055491376`;
-- beta health HTTP 200;
-- beta media mode `closed_beta`;
-- beta media configured `true`;
-- production `voicebridge-cloud-us` health HTTP 200;
-- production status `ok`.
+Test URL:
+`https://www.youtube.com/watch?v=DZLzmQ2kwaA`
 
-## Configuration incident resolved
+Authentication checks:
+- bearer auth: PASS;
+- invalid beta code rejected with `MEDIA_BETA_ACCESS_DENIED`: PASS;
+- owner beta code accepted: PASS;
+- job creation/lifecycle start: PASS.
 
-First redeploy after adding secrets failed at runtime because at least one `KRC_MEDIA_BETA_CODES` entry was shorter than the required 12 characters.
+Attempt 1:
+- job reached `FETCHING_MEDIA`;
+- final status `FAILED`;
+- error `MEDIA_FETCH_FAILED`;
+- YouTube response: `Sign in to confirm you're not a bot`;
+- `stt_seconds_charged=0`.
 
-Observed startup error:
-`KRC_MEDIA_BETA_CODES entries must contain 12 to 128 characters.`
+Attempt 2 after `web_embedded,android_vr` client fallback:
+- job again reached `FETCHING_MEDIA`;
+- final status `FAILED` with the same YouTube anti-bot challenge;
+- `stt_seconds_charged=0`.
 
-The tester-code value was corrected and redeployed successfully. No secret values are recorded here.
+Conclusion: failure occurs before captions/STT acquisition at YouTube ingress from Render cloud IP. AssemblyAI was not consumed.
+
+## A4 YouTube ingress remediation
+
+First remediation:
+- explicit yt-dlp clients `web_embedded,android_vr`;
+- deployed successfully;
+- did not resolve the anti-bot challenge for the acceptance URL.
+
+Second remediation implemented according to current yt-dlp guidance:
+- yt-dlp client changed to `mweb`;
+- `bgutil-ytdlp-pot-provider` 1.3.1 added;
+- local PO Token Provider runs inside the same beta container on port 4416;
+- no additional Render service created;
+- no YouTube account cookies introduced;
+- yt-dlp installed as `yt-dlp[default]==2026.07.04`;
+- Node.js 24 explicitly enabled as EJS runtime;
+- ffmpeg retained;
+- provider remains internal to the beta container.
+
+VoiceBridge CI after the provider changes: PASS.
+
+Isolated Render remediation workflow run `32059276099`: PASS.
+
+Render build/deploy of commit `d7864ad1625f815613deaea8043b4f1786768c61`: COMPLETE / LIVE.
+
+Post-deploy beta health/configuration: PASS.
 
 ## Completed gates
 
 - A1 architecture/isolation: COMPLETE;
 - A2 resource protection in code: COMPLETE;
-- GitHub -> Render API bridge: COMPLETE;
-- dedicated Free Render beta service: COMPLETE;
-- branch isolation: COMPLETE;
-- beta service secrets configured: COMPLETE;
-- beta health HTTP 200: COMPLETE;
-- `media_transcript.configured=true`: COMPLETE;
-- production health final check: COMPLETE;
-- A3 Render beta deployment: COMPLETE.
+- A3 dedicated Render beta deployment: COMPLETE;
+- beta authentication live checks: PARTIAL COMPLETE;
+- YouTube anti-bot root cause: IDENTIFIED;
+- first no-cookie client fallback: TESTED / INSUFFICIENT;
+- PO Token Provider remediation: IMPLEMENTED / CI PASS / DEPLOYED.
 
 ## Not complete
 
-- real YouTube captions-path acceptance;
-- real AssemblyAI fallback acceptance;
-- UK/RU/EN live media tests;
-- auto-language test;
-- invalid tester-code behavior live check;
+- successful real YouTube transcript acceptance after PO remediation;
+- captions-path acceptance;
+- AssemblyAI fallback acceptance;
+- UK/RU/EN live matrix;
+- auto-language acceptance;
 - >60 min rejection live check;
 - concurrency rejection live check;
 - quota exhaustion simulation;
@@ -105,8 +126,13 @@ The tester-code value was corrected and redeployed successfully. No secret value
 
 ## Exact next action
 
-Begin A4 live transcript validation from `05_TEST_PLAN.md`.
+Repeat A4.1 against the same YouTube URL using a new job after the PO Token Provider deployment.
 
-First acceptance should use a short public YouTube video with usable captions to validate the subtitle-first path without consuming AssemblyAI STT quota. Then test an STT-fallback video separately.
+Expected successful subtitle-first result:
+- `status=COMPLETED`;
+- preferably `transcript_source=youtube_captions`;
+- `stt_seconds_charged=0`.
 
-Do not merge PR #8 or PR #28 merely to perform A4 beta testing.
+If YouTube still returns the anti-bot challenge with the PO provider stack, stop retrying the same cloud-IP strategy and evaluate the next approved ingress architecture rather than introducing personal YouTube cookies by default.
+
+Do not merge PR #8 or PR #28 merely to continue A4 beta testing.
