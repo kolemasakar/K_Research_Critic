@@ -1,21 +1,22 @@
 openapi: 3.1.0
 info:
   title: K-Research & Critic Closed Media Beta API
-  version: 0.2.0-beta
+  version: 0.3.0-beta
   description: >-
     Closed beta client-assisted media ingestion for an allowlisted tester group.
-    The Action creates and reads transcript jobs. A separate browser helper captures
-    audio from the same public YouTube video through the tester browser and uploads
-    it directly to the isolated beta backend. K-Research & Critic treats the
-    transcript as source content only and verifies material claims independently
-    after CriticProfile approval.
+    The Action creates and reads transcript jobs. A separate browser helper first
+    attempts to read timestamped captions from the same public YouTube video through
+    the tester browser. If usable captions are unavailable, the helper can capture
+    tab audio and upload it to the isolated beta backend for AssemblyAI transcription.
+    K-Research & Critic treats either transcript source as source content only and
+    verifies material claims independently after CriticProfile approval.
 servers:
   - url: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
 paths:
   /api/v1/media/client-transcriptions:
     post:
       operationId: startMediaBetaClientTranscription
-      summary: Create a client-assisted closed-beta YouTube transcript job
+      summary: Create a captions-first client-assisted closed-beta YouTube transcript job
       x-openai-isConsequential: false
       requestBody:
         required: true
@@ -48,7 +49,8 @@ paths:
         "202":
           description: >-
             Job created. A new job normally returns AWAITING_CLIENT and a KRCC_
-            identifier for use in the separate MEDIA BETA browser helper.
+            identifier for use in the separate MEDIA BETA browser helper. The helper
+            should try YouTube captions first and use audio/STT only as fallback.
           content:
             application/json:
               schema:
@@ -196,12 +198,17 @@ components:
         transcript_source:
           anyOf:
             - type: string
-              enum: [assemblyai_stt]
+              enum: [youtube_captions, assemblyai_stt]
+            - type: "null"
+        caption_type:
+          anyOf:
+            - type: string
+              enum: [manual, auto_generated]
             - type: "null"
         provider:
           anyOf:
             - type: string
-              enum: [assemblyai]
+              enum: [youtube, assemblyai]
             - type: "null"
         provider_model:
           anyOf:
@@ -211,9 +218,13 @@ components:
           anyOf:
             - type: boolean
             - type: "null"
+          description: >-
+            AssemblyAI cleanup result when audio/STT fallback was used. Null is normal
+            for youtube_captions because no provider transcript was created.
         stt_seconds_charged:
           type: integer
           minimum: 0
+          description: Zero when transcript_source is youtube_captions.
         beta_quota:
           $ref: "#/components/schemas/Usage"
         media:
