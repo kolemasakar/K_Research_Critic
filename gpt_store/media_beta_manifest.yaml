@@ -26,7 +26,7 @@ knowledge:
   files: []
 
 instructions:
-  file: prompts/GPT_STORE_INSTRUCTIONS.md
+  file: prompts/GPT_STORE_MEDIA_BETA_INSTRUCTIONS.md
 
 actions:
   media_transcript:
