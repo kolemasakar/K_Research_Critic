@@ -10,6 +10,7 @@ from gpt_store import StoreCheckpoint
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_PATH = ROOT / "gpt_store" / "manifest.yaml"
+MEDIA_BETA_MANIFEST_PATH = ROOT / "gpt_store" / "media_beta_manifest.yaml"
 
 
 class StorePackageValidationError(RuntimeError):
@@ -61,7 +62,6 @@ def validate_store_package(root: Path = ROOT) -> dict:
     _require(capabilities.get("apps") is False, "Apps must remain disabled")
     _require(capabilities.get("actions") is True, "Actions must be enabled for optional media input")
 
-    # Core text mode remains backend-free. Media URL ingestion is explicitly scoped below.
     _require(release.get("developer_api_key_required") is False, "Core Store path must not require a developer API key")
     _require(release.get("external_backend_required") is False, "Core Store path must not require an external backend")
     _require(release.get("free_user_compatible") is True, "Store package must remain Free-user compatible")
@@ -180,6 +180,98 @@ def validate_store_package(root: Path = ROOT) -> dict:
     except (OSError, json.JSONDecodeError) as exc:
         raise StorePackageValidationError(f"Cannot load checkpoint example: {exc}") from exc
     StoreCheckpoint.model_validate(checkpoint_payload)
+
+    validate_media_beta_package(root)
+    return manifest
+
+
+def validate_media_beta_package(root: Path = ROOT) -> dict:
+    manifest_path = root / "gpt_store" / "media_beta_manifest.yaml"
+    try:
+        manifest = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError) as exc:
+        raise StorePackageValidationError(f"Cannot load media beta manifest: {exc}") from exc
+    if not isinstance(manifest, dict):
+        raise StorePackageValidationError("media beta manifest root must be a mapping")
+
+    _require(manifest.get("schema_version") == "0.1-beta", "media beta schema_version must be 0.1-beta")
+    product = _mapping(manifest, "product")
+    capabilities = _mapping(manifest, "capabilities")
+    instructions = _mapping(manifest, "instructions")
+    actions = _mapping(manifest, "actions")
+    media_action = _mapping(actions, "media_transcript")
+    beta = _mapping(manifest, "beta")
+    release = _mapping(manifest, "release")
+
+    _require(product.get("name") == "K-Research & Critic - MEDIA BETA", "closed beta product name must be isolated")
+    _require(product.get("publication_state") == "closed_beta", "closed beta publication state must remain closed_beta")
+    _require(product.get("primary_channel") == "chatgpt_store_unlisted_beta", "closed beta channel must remain unlisted")
+    _require(capabilities.get("actions") is True, "closed media beta requires Actions")
+    _require(capabilities.get("apps") is False, "closed media beta must not require Apps")
+
+    _require(beta.get("access_model") == "per_tester_access_code", "closed beta must use per-tester access codes")
+    _require(beta.get("intended_testers") == 4, "closed beta target must remain four testers")
+    _require(beta.get("max_video_seconds") == 3600, "closed beta max video must remain 60 minutes")
+    _require(beta.get("max_concurrent_jobs") == 1, "closed beta concurrency must remain one")
+    _require(beta.get("daily_stt_seconds") == 7200, "closed beta STT budget must remain two hours/day")
+    _require(beta.get("subtitle_first") is True, "closed beta must remain subtitle-first")
+    _require(beta.get("stt_fallback") == "assemblyai", "closed beta fallback must remain AssemblyAI")
+    stt_audio = _mapping(beta, "stt_audio")
+    _require(stt_audio.get("channels") == 1, "closed beta STT audio must be mono")
+    _require(stt_audio.get("sample_rate_hz") == 16000, "closed beta STT audio must be 16 kHz")
+    _require(stt_audio.get("bitrate_kbps") == 32, "closed beta STT audio must be 32 kbps")
+
+    _require(release.get("rollout_state") == "CLOSED_BETA", "closed beta rollout state must remain CLOSED_BETA")
+    _require(release.get("production_core_unchanged") is True, "closed beta must preserve production core")
+    _require(release.get("public_store_gpt_unchanged") is True, "closed beta must not modify public GPT")
+    _require(release.get("user_api_key_required") is False, "closed beta must not request user API keys")
+    _require(release.get("merge_to_public_product_allowed") is False, "closed beta must not auto-promote to public product")
+
+    _require(media_action.get("authentication") == "bearer_api_key", "closed beta action must use bearer authentication")
+    _require(
+        media_action.get("server") == "https://voicebridge-cloud-us.onrender.com",
+        "closed beta action server must match VoiceBridge",
+    )
+
+    beta_instructions_path = root / str(instructions.get("file", ""))
+    try:
+        beta_instructions_text = beta_instructions_path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise StorePackageValidationError(f"Cannot load media beta instructions: {exc}") from exc
+    for token in [
+        "MEDIA BETA ACCESS REQUIRED",
+        "startMediaBetaTranscription",
+        "getMediaBetaTranscriptionStatus",
+        "getMediaBetaTranscriptSegments",
+        "maximum video duration: 60 minutes",
+        "global AssemblyAI fallback budget: 2 hours",
+        "YouTube captions are attempted first",
+        "Never include beta access codes",
+        "Do not store the full transcript or beta access code in a checkpoint",
+    ]:
+        _require(token in beta_instructions_text, f"media beta instructions are missing required token: {token}")
+
+    beta_action_path = root / str(media_action.get("schema", ""))
+    try:
+        beta_action_text = beta_action_path.read_text(encoding="utf-8")
+        beta_action = yaml.safe_load(beta_action_text)
+    except (OSError, yaml.YAMLError) as exc:
+        raise StorePackageValidationError(f"Cannot load media beta Action schema: {exc}") from exc
+    _require(isinstance(beta_action, dict), "media beta Action root must be a mapping")
+    _require(beta_action.get("openapi") == "3.1.0", "media beta Action must use OpenAPI 3.1.0")
+    for token in [
+        "operationId: startMediaBetaTranscription",
+        "operationId: getMediaBetaTranscriptionStatus",
+        "operationId: getMediaBetaTranscriptSegments",
+        "beta_access_code",
+        "writeOnly: true",
+        "^KRCB_[A-Za-z0-9-]+$",
+        "youtube_captions",
+        "assemblyai_stt",
+        "stt_seconds_charged",
+        "beta_quota",
+    ]:
+        _require(token in beta_action_text, f"media beta Action schema is missing required token: {token}")
 
     return manifest
 
