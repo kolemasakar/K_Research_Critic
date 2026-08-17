@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 Дорожня карта реалізації закритого beta-медіарежиму та наступного сталого безкоштовного режиму.
 
-Version: 1.1
+Version: 1.2
 Status: ACTIVE
 Updated: 2026-08-17
 
@@ -12,7 +12,6 @@ Updated: 2026-08-17
 Status: COMPLETE
 
 Deliverables:
-
 - separate K-Research & Critic beta identity;
 - separate GPT Action contract;
 - separate VoiceBridge media backend path;
@@ -26,7 +25,6 @@ Deliverables:
 Status: COMPLETE_IN_CODE
 
 Deliverables:
-
 - subtitle-first acquisition;
 - max video = 60 min;
 - concurrency = 1;
@@ -38,48 +36,39 @@ Deliverables:
 - access codes excluded from reports/checkpoints.
 
 Validation:
-
 - VoiceBridge automated CI green;
 - KRC Store/package tests green.
 
 ### A3. Dedicated Render beta deployment
 
-Status: IN_PROGRESS_SECRETS_PENDING
+Status: COMPLETE
 
 Completed:
-
 - GitHub -> Render API control bridge validated;
-- dedicated Render service created: `voicebridge-krc-media-beta-kolemasakar`;
-- Render service ID: `srv-da1kic5bedkc73d6fk60`;
-- branch verified: `agent/krc-media-transcript`;
-- plan verified: `free`;
-- initial deploy reached `live`;
-- beta `/api/v1/health` returned HTTP 200;
-- health reports `mode=closed_beta`, `subtitle_first=true`, max duration 3600 sec, concurrency 1, daily STT budget 7200 sec;
-- production `voicebridge-cloud-us` was not modified.
+- dedicated service `voicebridge-krc-media-beta-kolemasakar` created;
+- service ID `srv-da1kic5bedkc73d6fk60`;
+- branch `agent/krc-media-transcript` verified;
+- plan `free` verified;
+- service-level beta secrets configured;
+- post-secret deploy reached `live`;
+- beta `/api/v1/health` HTTP 200;
+- `media_transcript.configured=true` verified;
+- media mode `closed_beta` verified;
+- production `voicebridge-cloud-us` health HTTP 200 / `status=ok` verified;
+- production was not modified by beta deployment.
 
-Pending:
+Resolved incident:
+- first secret-enabled redeploy failed because a beta access-code entry was shorter than 12 characters;
+- tester codes corrected;
+- redeploy succeeded.
 
-- configure `KRC_MEDIA_ACTION_TOKEN`;
-- configure `KRC_MEDIA_BETA_CODES`;
-- configure `ASSEMBLYAI_API_KEY`;
-- verify health changes from `media_transcript.configured=false` to `true`;
-- verify production VoiceBridge health remains normal after beta configuration.
-
-Exit criteria:
-
-- dedicated beta endpoint reachable: COMPLETE;
-- Free plan/branch isolation: COMPLETE;
-- health endpoint reachable: COMPLETE;
-- media beta `configured=true`: PENDING;
-- production VoiceBridge health unchanged: PENDING FINAL CHECK.
+Exit criteria: COMPLETE.
 
 ### A4. Live transcript validation
 
-Status: BLOCKED_BY_A3_SECRETS
+Status: NEXT
 
 Test set:
-
 - Ukrainian YouTube video with captions;
 - Russian YouTube video with captions;
 - English YouTube video with captions;
@@ -91,20 +80,25 @@ Test set:
 - daily STT quota exhaustion simulation;
 - provider cleanup verification.
 
-Exit criteria:
+Execution order:
+1. short public YouTube video with usable captions — validate subtitle-first path without STT quota use;
+2. separate short video with no usable captions — validate AssemblyAI fallback;
+3. language matrix UK/RU/EN and auto;
+4. access/resource guard cases;
+5. provider cleanup evidence.
 
+Exit criteria:
 - captions path works without STT charge;
 - fallback path works with expected quota charge;
 - timestamps and language metadata are usable;
 - `provider_data_deleted=true` observed on successful AssemblyAI cleanup where applicable;
-- no beta secret appears in output/loggable response payloads.
+- no beta secret appears in response/loggable payloads.
 
 ### A5. Separate GPT Builder beta
 
 Status: BLOCKED_BY_A4
 
 Tasks:
-
 - create `K-Research & Critic - MEDIA BETA` separately from public GPT;
 - import beta instructions;
 - import beta OpenAPI schema;
@@ -114,19 +108,11 @@ Tasks:
 - configure privacy policy URL if required by Builder;
 - do not alter public GPT.
 
-Exit criteria:
-
-- Action callable from GPT Preview;
-- missing tester code handled correctly;
-- invalid tester code handled correctly;
-- transcript acquired and CriticProfile shown before research.
-
 ### A6. End-to-end beta acceptance
 
 Status: BLOCKED_BY_A5
 
 Scenario:
-
 ```text
 YouTube URL
  -> beta access
@@ -142,12 +128,11 @@ YouTube URL
 ```
 
 Acceptance targets:
-
 - 3 languages;
-- both captions and STT fallback paths;
+- captions and STT fallback paths;
 - no research before CriticProfile approval;
 - no self-corroboration of video claims;
-- useful timestamp-to-claim traceability;
+- timestamp-to-claim traceability;
 - ordinary text workflow regression passes;
 - checkpoint workflow regression passes.
 
@@ -156,24 +141,20 @@ Acceptance targets:
 Status: BLOCKED_BY_A6
 
 Tasks:
-
 - owner tests first;
 - issue independent tester codes to up to three testers;
 - collect failures by category;
 - monitor Render bandwidth and AssemblyAI credits;
-- adjust limits only through an explicit decision update.
+- adjust limits only through explicit decision update.
 
 ## Phase B - Sustainable Free Media
 
 Status: PLANNED_AFTER_BETA
 
 ### B1. Cloudflare Whisper proof of concept
-
 Compare against AssemblyAI for Ukrainian, Russian, English, timestamps, names/numbers/acronyms, latency, and effective free daily capacity.
 
 ### B2. Provider-neutral transcript router
-
-Routing target:
 
 ```text
 captions
@@ -182,12 +163,10 @@ captions
 ```
 
 ### B3. Local Media Node proof of concept
-
 Evaluate faster-whisper, whisper.cpp, CPU-only operation, optional GPU acceleration, public HTTPS exposure, availability, and security.
 
 ### B4. Remove permanent AssemblyAI dependency from public free path
-
-AssemblyAI may remain as development comparator, emergency fallback, or optional paid reliability path. It must not be required for the intended sustainable free public mode.
+AssemblyAI may remain as development comparator, emergency fallback, or optional paid reliability path. It must not be required for intended sustainable free public mode.
 
 ## Phase C - Public media release
 
@@ -197,4 +176,4 @@ Public release requires sustainable resource validation, privacy validation, Fre
 
 ## Roadmap rule
 
-A roadmap item marked COMPLETE means implementation evidence exists. A roadmap item marked NEXT/BLOCKED/PLANNED must never be described as already deployed or validated.
+A roadmap item marked COMPLETE means implementation evidence exists. NEXT/BLOCKED/PLANNED must never be described as already validated.
