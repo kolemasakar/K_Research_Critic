@@ -1,7 +1,7 @@
 # MEDIA BETA Current State
 Канонічний знімок фактичного стану реалізації для відновлення роботи без припущень.
 
-Version: 1.0
+Version: 1.1
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-17
 
@@ -13,9 +13,11 @@ Current phase:
 
 Current state:
 
-`CODE_READY / CI_GREEN / LIVE_BETA_NOT_DEPLOYED`
+`CODE_READY / CI_GREEN / RENDER_API_BRIDGE_READY / LIVE_BETA_NOT_DEPLOYED`
 
-The next action is to create the dedicated Render beta service from the VoiceBridge feature branch using its beta Blueprint. Do not proceed to GPT Builder before live backend validation.
+GitHub-to-Render control has been established and validated with a read-only Render API request. The dedicated beta service itself does not yet exist.
+
+The next action is to create the dedicated Render beta service from the VoiceBridge feature branch using the approved isolated configuration. Do not proceed to GPT Builder before live backend validation.
 
 ## 2. K-Research & Critic repository
 
@@ -58,7 +60,7 @@ Implemented on feature branch:
 - closed-beta runbook;
 - this documentation subproject.
 
-Latest verified KRC CI before this documentation checkpoint:
+Latest verified KRC CI:
 
 - Python 3.13 tests: PASS;
 - Python 3.14 tests: PASS;
@@ -68,8 +70,6 @@ Latest verified KRC CI before this documentation checkpoint:
 - repository policy: PASS;
 - GPT Store package validation: PASS;
 - coverage gate: PASS.
-
-Documentation-only commits created after that CI may trigger a new run; check current GitHub CI before any merge.
 
 ## 3. VoiceBridge repository
 
@@ -115,9 +115,10 @@ Implemented on feature branch:
 - temporary media cleanup;
 - AssemblyAI transcript delete attempt;
 - beta quota diagnostics;
-- dedicated Render Blueprint `render.media-beta.yaml`.
+- dedicated Render Blueprint `render.media-beta.yaml`;
+- GitHub Actions Render control workflow `.github/workflows/render-media-beta-control.yml`.
 
-Latest verified VoiceBridge CI:
+Latest verified VoiceBridge implementation CI:
 
 - TypeScript build: PASS;
 - cloud tests: PASS;
@@ -125,7 +126,47 @@ Latest verified VoiceBridge CI:
 - browser-extension regressions: PASS;
 - repository documentation checks: PASS.
 
-## 4. Production endpoints and beta target
+Latest Render control verification:
+
+- GitHub Actions workflow: `Render Media Beta Control`;
+- run ID: `32050872616`;
+- operation: `inspect`;
+- `RENDER_API_KEY` available from GitHub Actions Secrets: YES;
+- Render API authentication/discovery request: PASS / HTTP 200;
+- dedicated beta service discovery: NOT FOUND;
+- deployment operation: NOT EXECUTED;
+- production Render service: NOT TOUCHED.
+
+## 4. GitHub -> Render control boundary
+
+The Render API credential is stored only as the GitHub Actions repository secret:
+
+`RENDER_API_KEY`
+
+Repository containing the secret/control workflow:
+
+`kolemasakar/VoiceBridge`
+
+The secret value is not stored in GitHub files, KRC documentation, checkpoints, reports, or chat output.
+
+Control workflow:
+
+`.github/workflows/render-media-beta-control.yml`
+
+Current supported operations:
+
+- `inspect` - read-only discovery/status;
+- `deploy` - manual deployment of the isolated beta service only, after the service exists.
+
+Safety rules implemented in the workflow:
+
+- required deploy branch is `agent/krc-media-transcript`;
+- target service name is fixed to `voicebridge-krc-media-beta-kolemasakar`;
+- deployment is refused if that isolated service does not exist;
+- production service `voicebridge-cloud-us` is never selected by the workflow;
+- automatic push-triggered execution is read-only `inspect`.
+
+## 5. Production endpoints and beta target
 
 Existing VoiceBridge production:
 
@@ -143,27 +184,31 @@ Checkpoint status:
 
 `NOT YET CREATED / NOT YET LIVE-VALIDATED`
 
-## 5. Secrets
+## 6. Secrets
 
-Required for the dedicated beta service:
+Render control credential:
+
+- `RENDER_API_KEY` - configured in VoiceBridge GitHub Actions Secrets and validated against the Render API.
+
+Required service-level secrets for the dedicated beta service:
 
 - `KRC_MEDIA_ACTION_TOKEN`;
 - `KRC_MEDIA_BETA_CODES`;
 - `ASSEMBLYAI_API_KEY`.
 
-Checkpoint status:
+Service-level secret checkpoint status:
 
 - not committed to GitHub;
-- not configured in a dedicated beta Render service yet.
+- not configured in a dedicated beta Render service yet because that service does not yet exist.
 
 `KRC_MEDIA_BETA_CODES` should contain four independent random tester codes separated according to the backend configuration contract. Never place real values in repository documentation.
 
-## 6. What is NOT complete
+## 7. What is NOT complete
 
 The following are explicitly not complete:
 
 - dedicated Render beta service creation;
-- beta Render secrets configuration;
+- beta Render service-level secrets configuration;
 - beta `/api/v1/health` live check;
 - real YouTube captions test;
 - real AssemblyAI fallback test;
@@ -181,22 +226,24 @@ The following are explicitly not complete:
 - tester rollout;
 - public media production rollout.
 
-## 7. Current next action
+## 8. Current next action
 
-Create the dedicated Render beta service using the VoiceBridge repository and `render.media-beta.yaml`.
+Create the dedicated Render beta service using the VoiceBridge repository and the isolated beta configuration from `render.media-beta.yaml`.
+
+The GitHub-to-Render API bridge is now available for read-only inspection and later manual beta deployment, but it deliberately does not create or modify production resources automatically.
 
 Required rule:
 
-Do not merge PR #28 or PR #8 merely to perform the first beta test unless the deployment mechanism explicitly requires it. Prefer the feature branch/Blueprint path that preserves production isolation.
+Do not merge PR #28 or PR #8 merely to perform the first beta test unless the deployment mechanism explicitly requires it. Prefer the feature branch/isolated beta path that preserves production isolation.
 
 After Render service creation:
 
-1. configure the three server-side secrets;
-2. deploy;
+1. configure the three service-level secrets;
+2. deploy the beta branch;
 3. check `/api/v1/health`;
 4. verify production VoiceBridge remains healthy;
 5. begin live transcript tests from `05_TEST_PLAN.md`.
 
-## 8. Update rule
+## 9. Update rule
 
 Whenever a release gate changes state, update this file before ending the chat or before generating a cross-chat handoff.
