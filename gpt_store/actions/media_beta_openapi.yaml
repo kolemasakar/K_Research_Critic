@@ -8,7 +8,7 @@ info:
     available. It acquires source text only; K-Research & Critic verifies claims
     independently after CriticProfile approval.
 servers:
-  - url: https://voicebridge-cloud-us.onrender.com
+  - url: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
 paths:
   /api/v1/media/transcriptions:
     post:
