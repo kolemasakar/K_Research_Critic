@@ -191,7 +191,7 @@ def validate_store_package(root: Path = ROOT) -> dict:
 
 def validate_media_beta_package(root: Path = ROOT) -> dict:
     manifest = _load_yaml(root / "gpt_store" / "media_beta_manifest.yaml", "media beta manifest")
-    _require(manifest.get("schema_version") == "0.2-beta", "media beta schema_version must be 0.2-beta")
+    _require(manifest.get("schema_version") == "0.3-beta", "media beta schema_version must be 0.3-beta")
 
     product = _mapping(manifest, "product")
     capabilities = _mapping(manifest, "capabilities")
@@ -212,12 +212,16 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(beta.get("browser_helper_required") is True, "closed beta client path must require the browser helper")
     _require(beta.get("browser_helper_job_prefix") == "KRCC_", "closed beta client jobs must use KRCC_ prefix")
     _require(beta.get("direct_transcript_first") is True, "reliable direct transcript/caption intake must remain preferred")
-    _require(beta.get("client_caption_first") is False, "client caption extraction must not be claimed before implementation")
+    _require(beta.get("client_caption_first") is True, "client caption extraction must remain the primary browser path")
+    _require(
+        beta.get("client_caption_first_status") == "IMPLEMENTED_PENDING_LIVE_BROWSER_ACCEPTANCE",
+        "client caption-first must remain gated by live browser acceptance",
+    )
     _require(beta.get("max_video_seconds") == 3600, "closed beta max video must remain 60 minutes")
     _require(beta.get("max_concurrent_jobs") == 1, "closed beta concurrency must remain one")
     _require(beta.get("daily_stt_seconds") == 7200, "closed beta STT budget must remain two hours/day")
     _require(beta.get("max_client_audio_bytes") == 33554432, "closed beta client upload limit must remain 32 MiB")
-    _require(beta.get("stt_provider") == "assemblyai", "closed beta client STT provider must remain AssemblyAI")
+    _require(beta.get("stt_provider") == "assemblyai", "closed beta fallback STT provider must remain AssemblyAI")
     stt_audio = _mapping(beta, "stt_audio")
     _require(stt_audio.get("channels") == 1, "closed beta STT audio must be mono")
     _require(stt_audio.get("sample_rate_hz") == 16000, "closed beta STT audio must be 16 kHz")
@@ -237,16 +241,21 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require_tokens(
         beta_instructions_text,
         [
+            "Version: 0.3-beta",
             "MEDIA BETA ACCESS REQUIRED",
             "startMediaBetaClientTranscription",
             "getMediaBetaClientTranscriptionStatus",
             "getMediaBetaClientTranscriptSegments",
             "status=AWAITING_CLIENT",
             "KRCC_...",
-            "maximum captured video/audio duration: 60 minutes",
-            "global AssemblyAI budget: 2 hours",
-            "client-assisted browser audio",
-            "client-side caption extraction is a planned optimization",
+            "maximum source/captured duration: 60 minutes",
+            "global AssemblyAI fallback budget: 2 hours",
+            "Helper 0.2.0",
+            "Use subtitles",
+            "Audio fallback",
+            "transcript_source=youtube_captions",
+            "caption_type=manual|auto_generated",
+            "stt_seconds_charged=0",
             "Never include beta access codes",
             "Do not store the full transcript or beta access code in a checkpoint",
         ],
@@ -263,6 +272,7 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require_tokens(
         beta_action_text,
         [
+            "version: 0.3.0-beta",
             "operationId: startMediaBetaClientTranscription",
             "operationId: getMediaBetaClientTranscriptionStatus",
             "operationId: getMediaBetaClientTranscriptSegments",
@@ -272,7 +282,10 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
             "AWAITING_CLIENT",
             "client_assisted",
             "client_upload_required",
+            "youtube_captions",
             "assemblyai_stt",
+            "caption_type",
+            "manual, auto_generated",
             "stt_seconds_charged",
             "beta_quota",
         ],
