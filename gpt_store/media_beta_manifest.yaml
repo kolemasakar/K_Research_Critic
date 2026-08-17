@@ -1,4 +1,4 @@
-schema_version: "0.1-beta"
+schema_version: "0.2-beta"
 
 product:
   name: K-Research & Critic - MEDIA BETA
@@ -45,11 +45,17 @@ checkpoint:
 beta:
   access_model: per_tester_access_code
   intended_testers: 4
+  ingress_mode: client_assisted
+  browser_helper_required: true
+  browser_helper_job_prefix: KRCC_
+  direct_transcript_first: true
+  client_caption_first: false
+  client_caption_first_status: PLANNED_OPTIMIZATION
   max_video_seconds: 3600
   max_concurrent_jobs: 1
   daily_stt_seconds: 7200
-  subtitle_first: true
-  stt_fallback: assemblyai
+  max_client_audio_bytes: 33554432
+  stt_provider: assemblyai
   stt_audio:
     channels: 1
     sample_rate_hz: 16000
@@ -60,10 +66,13 @@ beta:
     never_echo: true
     never_checkpoint: true
     never_log: true
+    backend_plaintext_persisted: false
+    backend_job_ownership_digest: sha256
   quota_notes:
-    - YouTube caption jobs do not consume the STT budget.
-    - The STT budget is reserved before AssemblyAI fallback starts.
-    - Daily quota state is in process memory and resets on service restart.
+    - Direct reliable transcript/caption intake does not consume the beta STT budget.
+    - Current client-assisted browser-audio jobs use AssemblyAI and consume the STT budget.
+    - The backend determines captured-audio duration before reserving STT seconds.
+    - Daily quota state is currently process-memory beta state and may reset on service restart.
 
 release:
   rollout_state: CLOSED_BETA
@@ -73,4 +82,5 @@ release:
   developer_provider_key_required: true
   external_backend_required: true
   live_beta_test_required: true
+  browser_helper_live_test_required: true
   merge_to_public_product_allowed: false
