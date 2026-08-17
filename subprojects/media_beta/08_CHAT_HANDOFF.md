@@ -1,21 +1,17 @@
 # MEDIA BETA Chat Handoff
 Канонічний документ відновлення та переходу між чатами для продовження MEDIA BETA без втрати стану або повторного проєктування.
 
-Version: 1.0
+Version: 1.1
 Status: ACTIVE_HANDOFF
 Checkpoint date: 2026-08-17
 
-## 1. Recovery command
-
-When a new chat starts for this subproject, the intended user command may be as short as:
+## Recovery command
 
 `recover MEDIA BETA`
 
-The assistant must then recover from repository state rather than inventing missing history.
+Recover from repository state; do not invent missing history.
 
-## 2. Mandatory recovery sources
-
-Read in this order:
+## Mandatory recovery order
 
 1. `subprojects/media_beta/00_INDEX.md`
 2. `subprojects/media_beta/03_CURRENT_STATE.md`
@@ -26,54 +22,23 @@ Read in this order:
 7. `subprojects/media_beta/05_TEST_PLAN.md`
 8. `subprojects/media_beta/07_FREE_MODE_TARGET.md`
 
-Then verify live GitHub state for both feature branches and draft PRs before making writes.
+Then verify live GitHub state for both draft PRs before writes.
 
-## 3. Repository context
+## Repository context
 
-Primary repository:
+KRC:
+- `kolemasakar/K_Research_Critic`;
+- branch `agent/video-url-research`;
+- draft PR #8.
 
-`kolemasakar/K_Research_Critic`
+VoiceBridge:
+- `kolemasakar/VoiceBridge`;
+- branch `agent/krc-media-transcript`;
+- draft PR #28.
 
-Active media branch:
+Production branches are `main`. Do not assume either draft PR is merged unless live GitHub state proves it.
 
-`agent/video-url-research`
-
-Draft PR:
-
-`#8`
-
-Backend dependency:
-
-`kolemasakar/VoiceBridge`
-
-Active backend branch:
-
-`agent/krc-media-transcript`
-
-Draft PR:
-
-`#28`
-
-Production branches in both repositories:
-
-`main`
-
-Do not assume either draft PR is merged unless live GitHub state proves it.
-
-## 4. Product context
-
-The current work is NOT a replacement of K-Research & Critic.
-
-It is an additive media-input extension with two tracks:
-
-- first: CLOSED MEDIA BETA for owner + up to three testers;
-- later: sustainable free public media architecture.
-
-Existing K-Research & Critic text mode remains production baseline.
-
-Existing VoiceBridge production streaming service remains production baseline.
-
-## 5. Approved closed-beta architecture
+## Approved beta architecture
 
 ```text
 YouTube URL
@@ -92,119 +57,97 @@ YouTube URL
 ```
 
 Limits:
-
-- 4 intended testers total;
-- max video 60 minutes;
+- 4 intended testers;
+- max video 60 min;
 - concurrency 1;
-- global AssemblyAI fallback budget 7200 sec/UTC day;
+- AssemblyAI fallback budget 7200 sec/UTC day;
 - captions consume no STT budget;
-- fallback audio mono 16 kHz approximately 32 kbps;
+- fallback audio mono 16 kHz ~32 kbps;
 - languages auto/uk/ru/en.
 
-## 6. Non-negotiable semantic boundary
+Transcript is source content only. Independent claim verification begins only after CriticProfile approval.
 
-Transcript is source content only.
+## Current checkpoint
 
-It may be acquired before CriticProfile approval to determine subject/risk and identify material claims.
+Marker:
 
-Independent verification of the claims starts only after user approval of CriticProfile.
+`BETA_SERVICE_LIVE / SERVICE_SECRETS_PENDING`
 
-The video/transcript must never corroborate its own factual claim.
-
-## 7. Current implementation checkpoint
-
-At this checkpoint:
-
-- KRC media/beta code exists on feature branch;
-- VoiceBridge media/beta backend code exists on feature branch;
-- automated CI was green for both implementation branches before/following beta code validation;
-- both PRs are draft and unmerged;
-- separate beta Render Blueprint exists in VoiceBridge;
-- documentation subproject exists in KRC.
-
-Not yet completed:
-
-- dedicated beta Render service is not live-validated;
-- beta secrets are not configured on a dedicated service;
-- no real YouTube caption/STT beta acceptance has been completed;
-- separate MEDIA BETA GPT has not been live-validated in Builder;
-- no external tester rollout has occurred.
-
-Always re-read `03_CURRENT_STATE.md` because it may supersede this checkpoint.
-
-## 8. Exact next task at this checkpoint
-
-Phase:
-
-`A3 - Dedicated Render beta deployment`
-
-Next action:
-
-Create a separate Render Blueprint service from `kolemasakar/VoiceBridge`, branch `agent/krc-media-transcript`, Blueprint file `render.media-beta.yaml`.
-
-Target service:
+Dedicated Render service:
 
 `voicebridge-krc-media-beta-kolemasakar`
 
-Production service that must remain untouched:
+Service ID:
 
-`voicebridge-cloud-us`
+`srv-da1kic5bedkc73d6fk60`
 
-Then configure only in Render Dashboard:
+Endpoint:
 
+`https://voicebridge-krc-media-beta-kolemasakar.onrender.com`
+
+Verified evidence:
+- Render bootstrap run `32051889378`: PASS;
+- plan: `free`;
+- branch: `agent/krc-media-transcript`;
+- initial deploy reached `live`;
+- post-bootstrap inspect run `32052056782`: PASS;
+- beta `/api/v1/health`: HTTP 200;
+- media mode: `closed_beta`;
+- subtitle-first: true;
+- max duration: 3600 sec;
+- concurrency: 1;
+- daily STT: 7200 sec;
+- `media_transcript.configured=false`.
+
+Production `voicebridge-cloud-us` was not modified.
+
+## Exact next task
+
+Phase:
+
+`A3 - service secret configuration`
+
+Configure on the dedicated beta Render service only:
 - `KRC_MEDIA_ACTION_TOKEN`;
 - `KRC_MEDIA_BETA_CODES`;
 - `ASSEMBLYAI_API_KEY`.
 
-After deployment, validate beta and production `/api/v1/health` before any GPT Builder work.
+Do not put secret values into chat or GitHub files.
 
-## 9. Do-not-do list on recovery
+After configuration:
+1. read-only health check;
+2. require `media_transcript.configured=true`;
+3. confirm production VoiceBridge health;
+4. begin A4 live transcript tests from `05_TEST_PLAN.md`.
+
+## Do-not-do list
 
 Do not:
-
-- restart architecture design from zero;
-- switch directly to Cloudflare/local Whisper before closed beta validation unless user changes priority;
 - merge PR #8 or #28 automatically;
-- deploy beta over production VoiceBridge;
-- edit the published K-Research & Critic GPT for beta testing;
-- invent Render or AssemblyAI secret values;
-- place secrets or tester codes in GitHub;
-- claim live tests passed without actual live evidence;
-- skip the CriticProfile approval boundary.
+- deploy beta over `voicebridge-cloud-us`;
+- alter the published KRC GPT for beta;
+- invent or expose secrets/tester codes;
+- claim transcript tests passed before live evidence;
+- bypass CriticProfile approval;
+- switch priority to Cloudflare/local Whisper before closed beta validation unless the user changes the plan.
 
-## 10. Cross-chat update protocol
+## Cross-chat update protocol
 
-Before ending a chat after meaningful work:
+After meaningful work update:
+- `03_CURRENT_STATE.md`;
+- `02_ROADMAP.md` if phase/gate changes;
+- `06_DECISION_LOG.md` if architecture/limits/providers change;
+- this file if exact next action changes;
+- `09_WORK_LOG.md` with material events.
 
-1. update `03_CURRENT_STATE.md` with the actual completed state;
-2. update `02_ROADMAP.md` statuses if a phase/gate changed;
-3. append a decision to `06_DECISION_LOG.md` if architecture, limits, providers, or rollout rules changed;
-4. update this `08_CHAT_HANDOFF.md` if the exact next action changed materially;
-5. verify draft PR state and CI;
-6. never write secret values into the handoff.
+## Recovery output
 
-## 11. Recovery output expected from a new assistant
+A recovered assistant should report current phase, completed gates, blockers, exact next action, and confirmation that production boundaries remain intact.
 
-After reading repository state, the assistant should return a concise recovery summary containing:
+Terminal markers:
 
-- current phase;
-- completed gates;
-- open blockers;
-- exact next action;
-- confirmation that production boundaries remain intact.
+`MEDIA_BETA_HANDOFF_V1_1`
 
-It should not ask the user to repeat information already contained in these canonical documents.
-
-## 12. Terminal handoff marker
-
-Current marker:
-
-`MEDIA_BETA_HANDOFF_V1`
-
-Current next phase marker:
-
-`A3_RENDER_BETA_DEPLOYMENT`
-
-Current safety marker:
+`A3_RENDER_SERVICE_SECRETS_PENDING`
 
 `PRODUCTION_UNCHANGED_DRAFT_PRS_UNMERGED`
