@@ -1,173 +1,125 @@
 # MEDIA BETA Work Log
 Хронологічний журнал суттєвих робіт і перевірок підпроєкту для аудиту та відновлення контексту.
 
-Version: 1.1
+Version: 1.2
 Status: ACTIVE
 
 ## 2026-08-17 - Media URL upgrade initiated
 
-Goal approved:
+Approved goal: public YouTube URL -> transcript -> material claims -> CriticProfile gate -> independent research -> Critic -> final claim verification/report. Existing text mode remains intact.
 
-- accept public YouTube URLs;
-- acquire source speech/transcript in Ukrainian, Russian, or English;
-- identify material claims;
-- preserve the existing CriticProfile approval gate;
-- independently verify claims after approval;
-- return K-Research & Critic final report and review protocol.
-
-Architecture decision:
-
-Media input is additive. Existing text workflow remains intact.
-
-## 2026-08-17 - Initial media feature branches
+## 2026-08-17 - Feature branches and draft PRs
 
 KRC:
-
 - branch `agent/video-url-research`;
 - draft PR #8.
 
 VoiceBridge:
-
 - branch `agent/krc-media-transcript`;
 - draft PR #28.
 
-Initial implementation included asynchronous YouTube audio transcription via AssemblyAI and GPT Action integration.
+Automated implementation CI reached green state.
 
-Automated CI reached green state after TypeScript/test compatibility fixes.
+## 2026-08-17 - Free-tier review and optimization decision
 
-## 2026-08-17 - Free-tier exhaustion review
+Identified risks: Render outbound, finite AssemblyAI credits, Free Render resources, yt-dlp/YouTube changes, ChatGPT runtime limits.
 
-Identified primary sustainability risks:
-
-- Render outbound bandwidth;
-- finite AssemblyAI free credits;
-- Render free memory/CPU;
-- YouTube/yt-dlp operational changes;
-- ChatGPT Free/runtime limits.
-
-Approved optimization direction:
-
+Approved direction:
 - subtitle-first;
-- lower bitrate STT audio;
+- lower bitrate fallback audio;
 - closed beta first;
 - sustainable free architecture later.
 
-## 2026-08-17 - Closed MEDIA BETA approved as first priority
+## 2026-08-17 - Closed MEDIA BETA controls implemented
 
-Approved beta target:
-
-- owner + up to three testers;
-- per-tester server-side access code;
+Approved and implemented:
+- owner + up to 3 testers;
+- per-tester code;
 - max video 60 min;
 - concurrency 1;
-- global AssemblyAI fallback budget 2 hours source audio / UTC day;
+- AssemblyAI fallback budget 7200 sec/UTC day;
 - captions do not consume STT quota;
-- fallback audio mono 16 kHz approximately 32 kbps.
-
-## 2026-08-17 - Closed beta backend implemented
-
-VoiceBridge feature branch extended with:
-
-- tester-code gate;
-- daily STT budget;
-- subtitle-first retrieval;
-- low-bitrate audio fallback;
-- beta diagnostics;
-- dedicated beta deployment Blueprint.
-
-VoiceBridge validation run after beta changes: PASS.
-
-## 2026-08-17 - Separate beta GPT package implemented
-
-KRC feature branch extended with:
-
-- `K-Research & Critic - MEDIA BETA` manifest;
-- beta-specific instructions;
-- beta OpenAPI Action schema;
-- validation rules;
-- privacy/runbook updates.
-
-KRC validation after beta package fixes:
-
-- Python 3.13 PASS;
-- Python 3.14 PASS;
-- Quality gates PASS.
-
-## 2026-08-17 - Production isolation strengthened
-
-Decision:
-
-Do not deploy media beta over existing `voicebridge-cloud-us`.
-
-Dedicated target defined:
-
-`voicebridge-krc-media-beta-kolemasakar.onrender.com`
-
-Existing production VoiceBridge remains untouched.
+- fallback audio mono 16 kHz ~32 kbps;
+- separate beta GPT package;
+- production isolation.
 
 ## 2026-08-17 - Documentation subproject created
 
-Created canonical documentation root:
+Canonical root:
 
 `subprojects/media_beta/`
 
-Documents:
-
-- `00_INDEX.md`;
-- `README.md`;
-- `01_ARCHITECTURE.md`;
-- `02_ROADMAP.md`;
-- `03_CURRENT_STATE.md`;
-- `04_OPERATIONS_RUNBOOK.md`;
-- `05_TEST_PLAN.md`;
-- `06_DECISION_LOG.md`;
-- `07_FREE_MODE_TARGET.md`;
-- `08_CHAT_HANDOFF.md`;
-- `09_WORK_LOG.md`.
+Contains architecture, roadmap, current state, runbook, test plan, decision log, sustainable-free target, handoff, and work log.
 
 ## 2026-08-17 - GitHub to Render API bridge established
 
-User created a Render API key and stored it as the VoiceBridge GitHub Actions repository secret:
+User created Render API credential and stored it only as VoiceBridge GitHub Actions secret `RENDER_API_KEY`.
 
-`RENDER_API_KEY`
+Created `.github/workflows/render-media-beta-control.yml`.
 
-Created VoiceBridge control workflow:
+First read-only inspect run `32050872616`:
+- PASS;
+- Render API HTTP 200;
+- beta service not yet present;
+- no deployment;
+- production untouched.
 
-`.github/workflows/render-media-beta-control.yml`
+## 2026-08-17 - Dedicated Free Render beta service created
 
-Safety behavior:
+Created VoiceBridge bootstrap workflow:
 
-- automatic push execution performs read-only `inspect` only;
-- deployment is manual-only;
-- deployment is restricted to branch `agent/krc-media-transcript`;
-- target service name is fixed to `voicebridge-krc-media-beta-kolemasakar`;
-- deployment is refused if the isolated beta service is absent;
-- production `voicebridge-cloud-us` is not a selectable target.
+`.github/workflows/render-media-beta-bootstrap.yml`
 
-First control verification:
+Bootstrap run:
 
-- workflow run ID `32050872616`;
-- workflow conclusion: PASS;
-- Render API credential detected without printing value;
-- Render API authentication/discovery: HTTP 200 / PASS;
-- dedicated MEDIA BETA service: NOT FOUND;
-- deployment: NOT EXECUTED;
-- production service: NOT TOUCHED.
+`32051889378`
 
-Current next operational step remains:
+Result:
 
-`A3 - create the dedicated Render beta service, then configure service-level beta secrets and deploy.`
+`PASS`
+
+Created dedicated service:
+
+`voicebridge-krc-media-beta-kolemasakar`
+
+Service ID:
+
+`srv-da1kic5bedkc73d6fk60`
+
+Verified:
+- branch `agent/krc-media-transcript`;
+- plan `free`;
+- production `voicebridge-cloud-us` not modified.
+
+## 2026-08-17 - Initial beta deploy and health verified
+
+Created read-only post-bootstrap inspection workflow:
+
+`.github/workflows/render-media-beta-post-bootstrap-inspect.yml`
+
+Run:
+
+`32052056782`
+
+Result:
+
+`PASS`
+
+Observed:
+- latest deploy `dep-da1kictbedkc73d6fm7g`;
+- deploy status `live`;
+- deployed commit `4047fabde211b5459f80691713ebc1db7e505b51`;
+- beta health HTTP 200;
+- media mode `closed_beta`;
+- providers `youtube_captions` and `assemblyai_stt`;
+- `subtitle_first=true`;
+- limits 3600 sec / concurrency 1 / STT 7200 sec/day;
+- `media_transcript.configured=false` because beta service-level secrets are still absent.
+
+Current next operational step:
+
+Configure `KRC_MEDIA_ACTION_TOKEN`, `KRC_MEDIA_BETA_CODES`, and `ASSEMBLYAI_API_KEY` on the dedicated beta Render service, then require `media_transcript.configured=true` before live transcript acceptance.
 
 ## Logging rule
 
-Append only material events:
-
-- implementation milestones;
-- live deployments;
-- acceptance results;
-- major failures;
-- provider/architecture decisions;
-- resource-limit changes;
-- promotion/rollback events.
-
-Do not log secrets, tester codes, hidden reasoning, or full transcripts.
+Append only material implementation, deployment, acceptance, failure, architecture/provider, resource-limit, promotion, or rollback events. Never log secret values, tester codes, hidden reasoning, or full transcripts.
