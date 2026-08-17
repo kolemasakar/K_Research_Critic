@@ -1,7 +1,7 @@
 # MEDIA BETA Work Log
 Хронологічний журнал суттєвих робіт і перевірок підпроєкту для аудиту та відновлення контексту.
 
-Version: 1.8
+Version: 1.9
 Status: ACTIVE
 
 ## 2026-08-17 - Media URL upgrade initiated
@@ -222,6 +222,30 @@ Explicit isolated Render deployment:
 Production VoiceBridge was not targeted.
 
 KRC beta Action contract advanced to `0.3.0-beta` to represent `youtube_captions` and `assemblyai_stt`. Media beta manifest advanced to `0.3-beta` with client captions-first marked implemented pending live browser acceptance.
+
+## 2026-08-17 - Captions-first KRC package consistency validation
+
+The beta GPT instructions were advanced to `0.3-beta` and now explicitly direct testers to `Use subtitles` first, with `Audio fallback` only when captions are unavailable/unusable.
+
+The Store package validator was advanced from the old `0.2-beta` invariant to the captions-first `0.3-beta` contract and now requires:
+- `client_caption_first=true`;
+- `IMPLEMENTED_PENDING_LIVE_BROWSER_ACCEPTANCE`;
+- Helper 0.2.0 instructions;
+- `youtube_captions` and `assemblyai_stt` Action result semantics;
+- caption type metadata;
+- zero-STT caption behavior.
+
+KRC CI run `32070081505` on commit `1e7ad361d7e12c860c4129d920388c783a72b618`: SUCCESS.
+
+Validation evidence:
+- Tests / Python 3.13 PASS;
+- Tests / Python 3.14 PASS;
+- GPT Store package validation PASS;
+- dependency integrity PASS;
+- Ruff PASS;
+- Mypy PASS;
+- repository policy PASS;
+- coverage gate PASS.
 
 ## 2026-08-17 - Current next gate
 
