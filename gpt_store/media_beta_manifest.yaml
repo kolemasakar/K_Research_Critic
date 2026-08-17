@@ -1,0 +1,76 @@
+schema_version: "0.1-beta"
+
+product:
+  name: K-Research & Critic - MEDIA BETA
+  description: |-
+    Закрите тестування перевірки тверджень із YouTube-відео для обмеженої групи тестерів.
+    (closed media-input beta for K-Research & Critic.)
+  default_language: uk-UA
+  primary_channel: chatgpt_store_unlisted_beta
+  publication_state: closed_beta
+
+model:
+  policy: user_plan
+  recommended_model: null
+  allow_user_model_switch: true
+
+capabilities:
+  web_search: true
+  code_interpreter_data_analysis: true
+  image_generation: false
+  apps: false
+  actions: true
+
+knowledge:
+  required: false
+  files: []
+
+instructions:
+  file: prompts/GPT_STORE_INSTRUCTIONS.md
+
+actions:
+  media_transcript:
+    enabled: true
+    schema: gpt_store/actions/media_beta_openapi.yaml
+    authentication: bearer_api_key
+    server: https://voicebridge-cloud-us.onrender.com
+    privacy_policy_document: docs/PRIVACY_POLICY.md
+
+checkpoint:
+  schema_version: "1.0"
+  marker: K_SUPERVISOR_CHECKPOINT
+  contract: gpt_store/checkpoint.py
+  example: gpt_store/checkpoint_example.json
+
+beta:
+  access_model: per_tester_access_code
+  intended_testers: 4
+  max_video_seconds: 3600
+  max_concurrent_jobs: 1
+  daily_stt_seconds: 7200
+  subtitle_first: true
+  stt_fallback: assemblyai
+  stt_audio:
+    channels: 1
+    sample_rate_hz: 16000
+    bitrate_kbps: 32
+  access_code_handling:
+    min_length: 12
+    user_visible: true
+    never_echo: true
+    never_checkpoint: true
+    never_log: true
+  quota_notes:
+    - YouTube caption jobs do not consume the STT budget.
+    - The STT budget is reserved before AssemblyAI fallback starts.
+    - Daily quota state is in process memory and resets on service restart.
+
+release:
+  rollout_state: CLOSED_BETA
+  production_core_unchanged: true
+  public_store_gpt_unchanged: true
+  user_api_key_required: false
+  developer_provider_key_required: true
+  external_backend_required: true
+  live_beta_test_required: true
+  merge_to_public_product_allowed: false
