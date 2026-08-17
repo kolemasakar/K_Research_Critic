@@ -1,19 +1,21 @@
 openapi: 3.1.0
 info:
   title: K-Research & Critic Closed Media Beta API
-  version: 0.1.0-beta
+  version: 0.2.0-beta
   description: >-
-    Closed beta media-ingestion helper for a small allowlisted tester group.
-    It uses YouTube captions first and AssemblyAI STT only when captions are not
-    available. It acquires source text only; K-Research & Critic verifies claims
-    independently after CriticProfile approval.
+    Closed beta client-assisted media ingestion for an allowlisted tester group.
+    The Action creates and reads transcript jobs. A separate browser helper captures
+    audio from the same public YouTube video through the tester browser and uploads
+    it directly to the isolated beta backend. K-Research & Critic treats the
+    transcript as source content only and verifies material claims independently
+    after CriticProfile approval.
 servers:
   - url: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
 paths:
-  /api/v1/media/transcriptions:
+  /api/v1/media/client-transcriptions:
     post:
-      operationId: startMediaBetaTranscription
-      summary: Start a closed-beta YouTube transcript job
+      operationId: startMediaBetaClientTranscription
+      summary: Create a client-assisted closed-beta YouTube transcript job
       x-openai-isConsequential: false
       requestBody:
         required: true
@@ -41,10 +43,12 @@ paths:
                   writeOnly: true
                   description: >-
                     Closed-beta tester code. Never echo, quote, log, place in a
-                    checkpoint, or include in the final report.
+                    checkpoint, or include in a final report.
       responses:
         "202":
-          description: Job accepted.
+          description: >-
+            Job created. A new job normally returns AWAITING_CLIENT and a KRCC_
+            identifier for use in the separate MEDIA BETA browser helper.
           content:
             application/json:
               schema:
@@ -56,13 +60,13 @@ paths:
         "403":
           description: Closed-beta tester code rejected.
         "429":
-          description: Concurrency, request-rate, or daily STT budget limit reached.
+          description: Concurrency or request-rate limit reached.
         "503":
-          description: Media beta unavailable or not configured.
-  /api/v1/media/transcriptions/{job_id}:
+          description: Client-assisted media beta unavailable or not configured.
+  /api/v1/media/client-transcriptions/{job_id}:
     get:
-      operationId: getMediaBetaTranscriptionStatus
-      summary: Read closed-beta media job status
+      operationId: getMediaBetaClientTranscriptionStatus
+      summary: Read client-assisted media job status
       x-openai-isConsequential: false
       parameters:
         - name: job_id
@@ -70,7 +74,7 @@ paths:
           required: true
           schema:
             type: string
-            pattern: ^KRCB_[A-Za-z0-9-]+$
+            pattern: ^KRCC_[A-Za-z0-9-]+$
       responses:
         "200":
           description: Current job state.
@@ -80,9 +84,9 @@ paths:
                 $ref: "#/components/schemas/Job"
         "404":
           description: Job not found or expired.
-  /api/v1/media/transcriptions/{job_id}/segments:
+  /api/v1/media/client-transcriptions/{job_id}/segments:
     get:
-      operationId: getMediaBetaTranscriptSegments
+      operationId: getMediaBetaClientTranscriptSegments
       summary: Read a page of timestamped transcript segments
       x-openai-isConsequential: false
       parameters:
@@ -91,7 +95,7 @@ paths:
           required: true
           schema:
             type: string
-            pattern: ^KRCB_[A-Za-z0-9-]+$
+            pattern: ^KRCC_[A-Za-z0-9-]+$
         - name: cursor
           in: query
           required: false
@@ -120,8 +124,10 @@ paths:
                     type: string
                   job_id:
                     type: string
+                    pattern: ^KRCC_[A-Za-z0-9-]+$
                   status:
                     type: string
+                    enum: [AWAITING_CLIENT, UPLOADING, TRANSCRIBING, COMPLETED, FAILED]
                   cursor:
                     type: integer
                   next_cursor:
@@ -161,10 +167,10 @@ components:
           type: boolean
         job_id:
           type: string
-          pattern: ^KRCB_[A-Za-z0-9-]+$
+          pattern: ^KRCC_[A-Za-z0-9-]+$
         status:
           type: string
-          enum: [QUEUED, FETCHING_MEDIA, UPLOADING, TRANSCRIBING, COMPLETED, FAILED]
+          enum: [AWAITING_CLIENT, UPLOADING, TRANSCRIBING, COMPLETED, FAILED]
         created_at:
           type: string
         updated_at:
@@ -173,6 +179,7 @@ components:
           type: string
         language_hint:
           type: string
+          enum: [auto, uk, ru, en]
         detected_language:
           anyOf:
             - type: string
@@ -181,15 +188,20 @@ components:
           anyOf:
             - type: number
             - type: "null"
+        ingress_mode:
+          type: string
+          enum: [client_assisted]
+        client_upload_required:
+          type: boolean
         transcript_source:
           anyOf:
             - type: string
-              enum: [youtube_captions, assemblyai_stt]
+              enum: [assemblyai_stt]
             - type: "null"
         provider:
           anyOf:
             - type: string
-              enum: [youtube, assemblyai]
+              enum: [assemblyai]
             - type: "null"
         provider_model:
           anyOf:
@@ -209,6 +221,7 @@ components:
           properties:
             platform:
               type: string
+              enum: [youtube]
             title:
               anyOf:
                 - type: string
