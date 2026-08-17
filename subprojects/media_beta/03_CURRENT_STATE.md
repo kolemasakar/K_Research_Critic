@@ -1,7 +1,7 @@
 # MEDIA BETA Current State
 Канонічний знімок фактичного стану реалізації для відновлення роботи без припущень.
 
-Version: 1.4
+Version: 1.5
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-17
 
@@ -11,9 +11,9 @@ Current phase: `A4 - Live transcript validation`
 
 Current state:
 
-`A3_COMPLETE / BETA_LIVE / MEDIA_CONFIGURED / A4_YOUTUBE_INGRESS_REMEDIATION_DEPLOYED`
+`A3_COMPLETE / BETA_LIVE / MEDIA_CONFIGURED / A4_SERVER_SIDE_YOUTUBE_INGRESS_BLOCKED / ARCHITECTURE_DECISION_REQUIRED`
 
-Dedicated Render MEDIA BETA remains live on the Free plan. Health returns HTTP 200 and `media_transcript.configured=true`. Production VoiceBridge remains isolated and was not targeted by A4 remediation.
+Dedicated Render MEDIA BETA remains live on the Free plan. Health returns HTTP 200 and `media_transcript.configured=true`. Production VoiceBridge remains isolated. The blocker is now proven to be YouTube anti-bot enforcement against cloud/datacenter ingress, not a missing PO-token plugin or AssemblyAI failure.
 
 ## Repositories
 
@@ -59,44 +59,57 @@ Authentication checks:
 - job creation/lifecycle start: PASS.
 
 Attempt 1:
-- job reached `FETCHING_MEDIA`;
-- final status `FAILED`;
-- error `MEDIA_FETCH_FAILED`;
-- YouTube response: `Sign in to confirm you're not a bot`;
+- job `KRCB_1c137194-3b23-4ed9-ab1e-fa5a49255cc9`;
+- `FETCHING_MEDIA` -> `FAILED`;
+- `MEDIA_FETCH_FAILED`;
+- YouTube: `Sign in to confirm you're not a bot`;
 - `stt_seconds_charged=0`.
 
-Attempt 2 after `web_embedded,android_vr` client fallback:
-- job again reached `FETCHING_MEDIA`;
-- final status `FAILED` with the same YouTube anti-bot challenge;
+Attempt 2 after `web_embedded,android_vr` fallback:
+- job `KRCB_03d37ccd-4059-4b0c-9675-6f2568d4c207`;
+- same YouTube anti-bot failure;
 - `stt_seconds_charged=0`.
 
-Conclusion: failure occurs before captions/STT acquisition at YouTube ingress from Render cloud IP. AssemblyAI was not consumed.
+Attempt 3 after `mweb` + PO Token Provider:
+- job `KRCB_981465dc-e400-470f-a236-c5414c26bd63`;
+- same YouTube anti-bot failure;
+- `stt_seconds_charged=0`.
 
-## A4 YouTube ingress remediation
+AssemblyAI has not been consumed by any of these failures.
 
-First remediation:
+## A4 remediation evidence
+
+R1:
 - explicit yt-dlp clients `web_embedded,android_vr`;
-- deployed successfully;
-- did not resolve the anti-bot challenge for the acceptance URL.
+- CI/deploy PASS;
+- live retest did not resolve the challenge.
 
-Second remediation implemented according to current yt-dlp guidance:
-- yt-dlp client changed to `mweb`;
-- `bgutil-ytdlp-pot-provider` 1.3.1 added;
-- local PO Token Provider runs inside the same beta container on port 4416;
-- no additional Render service created;
-- no YouTube account cookies introduced;
-- yt-dlp installed as `yt-dlp[default]==2026.07.04`;
-- Node.js 24 explicitly enabled as EJS runtime;
+R2:
+- yt-dlp client `mweb`;
+- `bgutil-ytdlp-pot-provider` 1.3.1;
+- local PO Token Provider at `127.0.0.1:4416` in the same beta container;
+- `yt-dlp[default]==2026.07.04`;
+- Node.js 24 EJS runtime;
 - ffmpeg retained;
-- provider remains internal to the beta container.
+- no personal YouTube cookies;
+- no additional Render service or paid resource;
+- VoiceBridge CI PASS;
+- isolated Render workflow `32059276099` PASS;
+- deploy LIVE and health/configuration PASS.
 
-VoiceBridge CI after the provider changes: PASS.
+## Decisive PO-provider diagnostic
 
-Isolated Render remediation workflow run `32059276099`: PASS.
+One-shot Docker diagnostic run `32060462596`, job `95480351954`, built the same beta image and verified:
+- local bgutil provider starts and responds to `/ping`;
+- yt-dlp version is `2026.07.04`;
+- Node.js EJS runtime is available;
+- yt-dlp reports `PO Token Providers: bgutil:http-1.3.1 (external)`;
+- extraction of the acceptance URL still ends with `Sign in to confirm you're not a bot`;
+- yt-dlp return code is 1.
 
-Render build/deploy of commit `d7864ad1625f815613deaea8043b4f1786768c61`: COMPLETE / LIVE.
+Conclusion: the provider/plugin/runtime wiring is functional. The current failure is a cloud/datacenter-IP YouTube bot challenge that the PO-token provider does not remove. Repeating server-side Render/GitHub-runner fetch attempts is not an evidence-based next step.
 
-Post-deploy beta health/configuration: PASS.
+The one-shot diagnostic workflow was removed after use.
 
 ## Completed gates
 
@@ -104,13 +117,13 @@ Post-deploy beta health/configuration: PASS.
 - A2 resource protection in code: COMPLETE;
 - A3 dedicated Render beta deployment: COMPLETE;
 - beta authentication live checks: PARTIAL COMPLETE;
-- YouTube anti-bot root cause: IDENTIFIED;
-- first no-cookie client fallback: TESTED / INSUFFICIENT;
-- PO Token Provider remediation: IMPLEMENTED / CI PASS / DEPLOYED.
+- R1 no-cookie client fallback: TESTED / INSUFFICIENT;
+- R2 PO Token Provider: IMPLEMENTED / CI PASS / DEPLOYED / INTEGRATION VERIFIED;
+- server-side cloud YouTube ingress blocker: CONFIRMED.
 
 ## Not complete
 
-- successful real YouTube transcript acceptance after PO remediation;
+- successful real YouTube transcript acceptance;
 - captions-path acceptance;
 - AssemblyAI fallback acceptance;
 - UK/RU/EN live matrix;
@@ -124,15 +137,31 @@ Post-deploy beta health/configuration: PASS.
 - external tester rollout;
 - public media release.
 
-## Exact next action
+## Architecture decision required
 
-Repeat A4.1 against the same YouTube URL using a new job after the PO Token Provider deployment.
+Recommended next beta ingress architecture:
 
-Expected successful subtitle-first result:
-- `status=COMPLETED`;
-- preferably `transcript_source=youtube_captions`;
-- `stt_seconds_charged=0`.
+`client-assisted / browser-assisted acquisition`
 
-If YouTube still returns the anti-bot challenge with the PO provider stack, stop retrying the same cloud-IP strategy and evaluate the next approved ingress architecture rather than introducing personal YouTube cookies by default.
+Target flow:
+```text
+YouTube URL
+ -> beta job/session
+ -> browser helper or existing VoiceBridge extension acquires captions/tab audio through tester residential IP
+ -> upload captions/audio to isolated beta backend
+ -> AssemblyAI only when captions are unavailable
+ -> timestamped transcript
+ -> existing KRC claim/CriticProfile workflow
+```
+
+Why recommended:
+- avoids YouTube datacenter-IP anti-bot path;
+- no YouTube cookies stored in Render;
+- no residential proxy subscription;
+- preserves Render Free plan;
+- reuses existing VoiceBridge browser capability;
+- suitable for owner + 2-3 tester closed beta.
+
+Alternative architectures requiring explicit approval include paid residential proxy ingress or cloud use of personal YouTube cookies. Personal cookies are not the default recommendation.
 
 Do not merge PR #8 or PR #28 merely to continue A4 beta testing.
