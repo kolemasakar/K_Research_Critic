@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 Дорожня карта реалізації закритого beta-медіарежиму та наступного сталого безкоштовного режиму.
 
-Version: 1.3
+Version: 1.4
 Status: ACTIVE
 Updated: 2026-08-17
 
@@ -56,83 +56,113 @@ Completed:
 - production `voicebridge-cloud-us` health HTTP 200 / `status=ok` verified;
 - production was not modified by beta deployment.
 
-Resolved startup incident:
-- first secret-enabled redeploy failed because a beta access-code entry was shorter than 12 characters;
-- tester codes corrected;
-- redeploy succeeded.
-
 Exit criteria: COMPLETE.
 
 ### A4. Live transcript validation
 
-Status: IN_PROGRESS_YOUTUBE_INGRESS_REMEDIATION
+Status: BLOCKED_SERVER_SIDE_YOUTUBE_INGRESS / ARCHITECTURE_DECISION_REQUIRED
 
-Test set:
-- Ukrainian YouTube video with captions;
-- Russian YouTube video with captions;
-- English YouTube video with captions;
-- Ukrainian/Russian/English video requiring STT fallback;
-- auto language detection case;
-- invalid tester code;
-- video >60 min;
-- concurrency rejection;
-- daily STT quota exhaustion simulation;
-- provider cleanup verification.
+#### A4.1 server-side acceptance history
 
-#### A4.1 First public YouTube acceptance URL
-
-URL:
+Acceptance URL:
 `https://www.youtube.com/watch?v=DZLzmQ2kwaA`
 
-Observed:
+Verified:
 - bearer auth PASS;
 - invalid tester code rejection PASS;
 - owner tester code PASS;
-- job creation PASS;
-- two media fetch attempts failed before transcript acquisition with YouTube `Sign in to confirm you're not a bot`;
-- both failures charged `0` STT seconds.
+- job creation PASS.
 
-Interpretation:
-- Render cloud IP / YouTube ingress is the blocker;
-- AssemblyAI and quota controls were not involved in the failures.
+Three live fetch attempts failed before transcript acquisition with YouTube `Sign in to confirm you're not a bot` and each charged 0 AssemblyAI STT seconds.
 
-#### A4.1 remediation progression
-
-Remediation R1:
+R1:
 - `web_embedded,android_vr` clients;
 - CI/deploy PASS;
 - live retest FAIL with same anti-bot challenge.
 
-Remediation R2:
-- current yt-dlp recommended `mweb` route;
+R2:
+- `mweb`;
 - `bgutil-ytdlp-pot-provider` 1.3.1;
-- provider embedded inside the same beta container on localhost;
+- local provider in the same beta container;
 - `yt-dlp[default]==2026.07.04`;
 - Node.js 24 EJS runtime;
-- no personal YouTube cookies;
-- no additional Render service or paid resource;
-- VoiceBridge CI PASS;
-- Render remediation workflow `32059276099` PASS;
-- beta deploy LIVE and health PASS.
+- no YouTube cookies;
+- no additional paid/free Render service;
+- CI PASS;
+- Render deploy LIVE;
+- live retest FAIL with same anti-bot challenge.
 
-Next A4 action:
-- repeat the same A4.1 URL after R2 deployment;
-- require a new job;
-- if successful, inspect transcript source and quota;
-- if anti-bot persists, stop repeated retries from the same cloud-IP design and evaluate a different ingress architecture before considering cookies.
+One-shot diagnostic run `32060462596` / job `95480351954` confirmed:
+- provider `/ping` works;
+- yt-dlp detects `PO Token Providers: bgutil:http-1.3.1 (external)`;
+- Node EJS runtime works;
+- YouTube still returns the same bot challenge.
 
-Execution order after A4.1 succeeds:
-1. verify subtitle-first result and zero STT charge;
-2. separate short video with no usable captions — validate AssemblyAI fallback;
-3. language matrix UK/RU/EN and auto;
-4. access/resource guard cases;
-5. provider cleanup evidence.
+Decision: stop repeated server-side cloud-IP retries. The blocker is not missing PO-provider integration.
+
+#### A4.2 recommended client-assisted ingress
+
+Status: PENDING_USER_APPROVAL
+
+Recommended closed-beta architecture:
+```text
+YouTube URL
+ -> beta job/session
+ -> browser helper / VoiceBridge extension
+ -> captions or tab audio acquired through tester residential IP
+ -> upload derived captions/audio to beta backend
+ -> AssemblyAI only if captions unavailable
+ -> timestamped transcript
+ -> KRC claim inventory / CriticProfile workflow
+```
+
+Implementation targets after approval:
+- reuse existing VoiceBridge browser-extension transport where practical;
+- one-time media job/session binding;
+- beta access-code enforcement remains server-side;
+- captions preferred over tab-audio STT;
+- do not upload full video unless technically unavoidable;
+- no personal YouTube cookies stored in cloud;
+- no permanent local file storage;
+- preserve 60 min, concurrency 1 and daily STT limits;
+- test with same A4.1 URL first.
+
+Exit target:
+- same acceptance URL reaches `COMPLETED` through client-assisted ingress;
+- captions path, if available, consumes 0 STT seconds;
+- otherwise audio fallback consumes expected quota;
+- timestamps usable.
+
+#### Other ingress alternatives
+
+Paid residential proxy:
+- preserves URL-only server UX;
+- introduces recurring cost and new privacy/provider dependency;
+- conflicts with primary free-tier objective.
+
+Personal YouTube cookies in Render:
+- not recommended as default;
+- account/session/privacy risk;
+- fragile against IP/session enforcement;
+- requires explicit user decision if ever tested.
+
+#### Remaining A4 matrix after ingress succeeds
+
+- Ukrainian captions case;
+- Russian captions case;
+- English captions case;
+- STT fallback case;
+- automatic language detection;
+- >60 min rejection;
+- concurrency rejection;
+- daily STT quota exhaustion simulation;
+- provider cleanup verification.
 
 Exit criteria:
 - captions path works without STT charge;
 - fallback path works with expected quota charge;
 - timestamps and language metadata are usable;
-- `provider_data_deleted=true` observed on successful AssemblyAI cleanup where applicable;
+- `provider_data_deleted=true` observed where applicable;
 - no beta secret appears in response/loggable payloads.
 
 ### A5. Separate GPT Builder beta
@@ -203,8 +233,8 @@ captions
  -> optional local Whisper fallback
 ```
 
-### B3. Local Media Node proof of concept
-Evaluate faster-whisper, whisper.cpp, CPU-only operation, optional GPU acceleration, public HTTPS exposure, availability, and security. A local/residential ingress path may also be evaluated if cloud YouTube anti-bot controls remain a blocker.
+### B3. Local Media Node / residential ingress proof of concept
+Evaluate browser-assisted and local-node acquisition, faster-whisper/whisper.cpp, CPU-only operation, optional GPU acceleration, secure transport, availability and operational burden.
 
 ### B4. Remove permanent AssemblyAI dependency from public free path
 AssemblyAI may remain as development comparator, emergency fallback, or optional paid reliability path. It must not be required for intended sustainable free public mode.
@@ -217,4 +247,4 @@ Public release requires sustainable resource validation, privacy validation, Fre
 
 ## Roadmap rule
 
-A roadmap item marked COMPLETE means implementation evidence exists. IN_PROGRESS/NEXT/BLOCKED/PLANNED must never be described as already validated.
+A roadmap item marked COMPLETE means implementation evidence exists. BLOCKED/PENDING/PLANNED must never be described as already validated.
