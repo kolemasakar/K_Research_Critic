@@ -1,7 +1,7 @@
 # MEDIA BETA Current State
 Канонічний знімок фактичного стану реалізації для відновлення роботи без припущень.
 
-Version: 1.8
+Version: 1.9
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-17
 
@@ -11,9 +11,9 @@ Current phase: `A4 - Live transcript validation`
 
 Current state:
 
-`A3_COMPLETE / A4_1_SERVER_INGRESS_BLOCKED / A4_2_CLIENT_ASSISTED_IMPLEMENTED / FIRST_BROWSER_CAPTURE_REACHED_BACKEND / WEBM_DURATION_FIX_LIVE / OWNER_RETEST_NEXT`
+`A3_COMPLETE / A4_1_SERVER_INGRESS_BLOCKED / A4_2_CAPTIONS_FIRST_IMPLEMENTED / VOICEBRIDGE_CI_GREEN / RENDER_CAPTIONS_FIRST_LIVE / HELPER_0_2_OWNER_ACCEPTANCE_NEXT`
 
-The direct Render/datacenter YouTube acquisition path is confirmed blocked by YouTube anti-bot enforcement. A4.2 therefore uses client/browser-assisted ingestion. The first real owner browser capture reached the beta backend but exposed a MediaRecorder WebM duration-metadata issue before STT. The backend duration handling has been corrected, validated in CI, and explicitly redeployed to the isolated Render MEDIA BETA service. Production VoiceBridge and the published K-Research & Critic GPT remain unchanged.
+Direct Render/datacenter YouTube acquisition remains unsuitable because YouTube anti-bot enforcement blocks the cloud path. The approved A4.2 architecture is now captions-first browser-assisted ingestion: the helper reads the caption track through the tester browser and uses browser audio plus AssemblyAI only as fallback. The captions-first backend and Helper 0.2.0 are implemented, automated validation is green, and the exact implementation commit is live on the isolated Render MEDIA BETA service. Production VoiceBridge and the published K-Research & Critic GPT remain unchanged.
 
 ## Repositories
 
@@ -44,8 +44,9 @@ Verified beta baseline:
 - plan `free`;
 - max duration 3600 sec;
 - max concurrent jobs 1;
-- daily STT budget 7200 sec;
-- language hints auto/uk/ru/en.
+- daily AssemblyAI fallback budget 7200 sec;
+- language hints auto/uk/ru/en;
+- browser helper required for the current beta ingestion path.
 
 ## A4.1 server-side conclusion
 
@@ -57,46 +58,50 @@ Three server-side attempts failed before transcript acquisition:
 - `KRCB_03d37ccd-4059-4b0c-9675-6f2568d4c207`;
 - `KRCB_981465dc-e400-470f-a236-c5414c26bd63`.
 
-All returned YouTube `Sign in to confirm you're not a bot` and charged `0` STT seconds.
+All returned YouTube `Sign in to confirm you're not a bot` and charged `0` STT seconds. Diagnostic run `32060462596`, job `95480351954`, confirmed the PO-provider/runtime wiring worked. Repeated server-side cloud-ingress retries are not an approved beta path.
 
-Diagnostic run `32060462596`, job `95480351954`, confirmed the PO-provider/runtime wiring worked. Server-side cloud/datacenter YouTube ingress is therefore not the approved beta acceptance path.
-
-## Approved A4.2 client-assisted flow
+## Approved A4.2 captions-first flow
 
 ```text
 YouTube URL
  -> KRC MEDIA BETA Action creates KRCC_ job
  -> status AWAITING_CLIENT
- -> separate KRC MEDIA BETA browser helper
- -> same active YouTube tab captured through tester browser/network path
- -> compressed audio uploaded to isolated beta backend
- -> normalize browser audio with bounded ffmpeg processing
- -> duration/source/quota validation
- -> AssemblyAI async multilingual STT
- -> timestamped transcript segments
- -> provider delete request
+ -> KRC MEDIA BETA Helper 0.2.0 in tester Chrome/Edge
+ -> try active/source YouTube caption track through tester browser
+    -> timestamped captions found
+       -> browser-only /captions upload
+       -> source/timestamp/access validation
+       -> COMPLETED
+       -> transcript_source=youtube_captions
+       -> stt_seconds_charged=0
+    -> captions unavailable/unusable
+       -> Audio fallback
+       -> tabCapture through tester browser/network path
+       -> compressed audio upload
+       -> bounded ffmpeg normalization
+       -> duration/source/quota validation
+       -> AssemblyAI async multilingual STT
+       -> timestamped transcript
+       -> provider delete request
  -> KRC claim inventory
  -> CriticProfile gate
  -> user approval
  -> independent Research / Critic
 ```
 
-Direct reliable transcript/caption intake remains preferred when available through current built-in/web capabilities. Helper-side caption extraction is not implemented in 0.1.0 and remains a planned optimization.
+Caption text remains source content only. It proves what is represented as being said in the video; it is not independent evidence that the claims are true.
 
-## VoiceBridge A4.2 implementation
+## VoiceBridge captions-first implementation
 
-Initial A4.2 implementation commit:
-`923389b3fdd89eef4a57b308b8fe2a98d41ce8e5`
-
-Current deployed duration-fix commit:
-`772901a167611f0197d1bc05cea8091da211dc47`
+Current VoiceBridge feature/deployed commit:
+`92f809440098fd42eb562a36c6feddeaa9c17155`
 
 Core backend components:
 - `src/cloud/src/media_client_ingest.ts`;
 - `src/cloud/src/media_client_http.ts`;
 - additive integration in `src/cloud/src/server.ts`.
 
-Action-facing routes:
+Action-facing routes remain:
 ```text
 POST /api/v1/media/client-transcriptions
 GET  /api/v1/media/client-transcriptions/{KRCC_job_id}
@@ -105,160 +110,132 @@ GET  /api/v1/media/client-transcriptions/{KRCC_job_id}/segments
 
 Browser-only routes:
 ```text
+POST /api/v1/media/client-transcriptions/{KRCC_job_id}/captions
 POST /api/v1/media/client-transcriptions/{KRCC_job_id}/audio
 GET  /api/v1/media/client-transcriptions/{KRCC_job_id}/client-status
 ```
 
-Controls:
-- `KRCC_` client job IDs;
-- `AWAITING_CLIENT`;
-- same-YouTube-video matching;
-- temporary SHA-256 access-code ownership digest;
-- max client upload 32 MiB;
-- browser WebM/Opus is normalized before duration probing;
-- ffmpeg normalization has a hard approximately 60-minute processing cap;
-- duration is probed on normalized MP3 where metadata is reliable;
-- STT quota is reserved only after duration validation succeeds;
-- 60-minute limit;
-- 16 kHz mono approximately 32 kbps STT normalization;
-- UK/RU/EN/auto AssemblyAI transcription;
+The browser-only routes are intentionally absent from the GPT Action schema.
+
+Caption path controls:
+- same-YouTube-video validation;
+- per-tester job ownership digest;
+- caption language/type validation;
+- 1..20000 caption segments;
+- monotonic timestamps;
+- 60-minute timestamp boundary;
+- bounded text sizes;
+- `caption_type=manual|auto_generated`;
+- `transcript_source=youtube_captions`;
+- `provider=youtube`;
+- `stt_seconds_charged=0`;
+- no AssemblyAI provider transcript is created.
+
+Audio fallback controls retained:
+- max client audio upload 32 MiB;
+- browser WebM/Opus normalized before duration probing;
+- bounded ffmpeg processing;
+- duration probed on normalized MP3;
+- STT quota reserved only after duration validation;
+- mono 16 kHz approximately 32 kbps normalization;
+- AssemblyAI auto/uk/ru/en;
 - timestamped segments;
 - provider transcript delete request;
-- temporary media cleanup;
-- in-memory job TTL.
+- temporary media cleanup.
 
-## Separate browser helper
+## Browser helper
 
 Directory:
 `src/media_beta_helper/`
 
-Helper 0.1.0:
+Current helper: `0.2.0`.
+
+Implemented:
 - Chrome/Edge Manifest V3;
-- active-tab YouTube validation;
-- tabCapture + offscreen recording;
-- Opus approximately 32 kbps;
-- normal tab-audio playback while capturing;
-- Start/Stop UI;
-- upload with tester code and active source URL;
-- backend status polling;
-- detected-language/segment/STT/provider-cleanup display.
+- `activeTab` plus `scripting` for user-initiated YouTube caption extraction;
+- best-effort access to the current YouTube player caption-track metadata;
+- browser fetch of selected caption timed-text as `json3`;
+- preference for active caption language and manual/source captions when suitable;
+- timestamped caption upload to `/captions`;
+- UI: `Use subtitles`, `Audio fallback`, `Stop`;
+- fallback tabCapture/offscreen Opus recording remains available;
+- status displays transcript source, caption type, language, segments, STT seconds and provider cleanup.
 
-It does not receive the Action bearer token or AssemblyAI API key.
+The helper never receives the Action bearer token or AssemblyAI API key. The tester beta code remains the only user-side beta credential.
 
-The duration fix is backend-only; helper 0.1.0 does not require reinstall for the next retest.
+YouTube player internals used for caption discovery are not a stable public YouTube API. Therefore caption extraction is best-effort and failure must fall back to audio rather than being treated as a terminal architecture failure.
 
-## Automated validation
+## Validation evidence
 
-Initial VoiceBridge A4.2 CI:
-- run `32062552003`;
-- commit `923389b3fdd89eef4a57b308b8fe2a98d41ce8e5`;
-- result SUCCESS.
-
-Duration-fix VoiceBridge CI:
-- run `32067365619`;
-- commit `772901a167611f0197d1bc05cea8091da211dc47`;
-- browser-extension SUCCESS;
+VoiceBridge captions-first CI:
+- run `32069122559`;
+- commit `92f809440098fd42eb562a36c6feddeaa9c17155`;
 - cloud build/tests SUCCESS;
-- repository-docs SUCCESS;
-- overall SUCCESS.
+- browser/helper JS + manifest validation SUCCESS;
+- Helper 0.2.0 package SUCCESS;
+- repository-docs SUCCESS.
 
-KRC package CI after A4.2 contract/privacy updates:
-- run `32063557028`;
-- result SUCCESS.
+Backend unit coverage includes caption completion with:
+- `status=COMPLETED`;
+- `transcript_source=youtube_captions`;
+- `caption_type=auto_generated`;
+- `provider=youtube`;
+- `stt_seconds_charged=0`;
+- timestamped segments;
+- no STT quota consumption.
 
-## Live Render A4.2 deployment history
+KRC media beta contract advanced to `0.3.0-beta` with `youtube_captions` and `assemblyai_stt` result semantics. KRC branch CI must remain green after the associated documentation/contract updates.
 
-Initial A4.2 deploy:
-- workflow run `32063396120`: SUCCESS;
-- deploy ID `dep-da1mgebutv3s73fd2grg`;
-- exact commit `923389b3fdd89eef4a57b308b8fe2a98d41ce8e5` reached `live`;
-- health HTTP 200;
-- `media_client_ingest.mode=client_assisted`;
-- `media_client_ingest.configured=true`;
-- `requires_browser_helper=true`;
-- `upload_max_bytes=33554432`.
+## Live Render captions-first deployment
 
-Duration-fix redeploy:
-- workflow run `32067505039`: SUCCESS;
-- deploy ID `dep-da1n5rou01pc73b5v73g`;
-- exact commit `772901a167611f0197d1bc05cea8091da211dc47` reached `live`;
+Workflow run:
+`32069270467` - SUCCESS.
+
+Deploy:
+- deploy ID `dep-da1nf76gekts738dst5g`;
+- exact commit `92f809440098fd42eb562a36c6feddeaa9c17155` reached `live`;
 - health HTTP 200;
 - service status `ok`;
 - `media_client_ingest.mode=client_assisted`;
 - `configured=true`;
 - `requires_browser_helper=true`.
 
-Temporary deployment workflow files were removed after verification. Production VoiceBridge was not targeted.
+Production VoiceBridge was not targeted.
 
-## First real owner browser acceptance evidence
+## Previous owner browser evidence
 
-Created job:
-`KRCC_aa3b2cbc-4d4e-4f89-b6e6-4549766f34f5`
+Previous helper 0.1.0 proved:
+- extension installation works;
+- same YouTube URL can be used;
+- tab capture reaches `CAPTURING`;
+- browser audio reaches backend.
 
-Initial state:
-- `AWAITING_CLIENT`;
-- `client_upload_required=true`;
+The first audio job `KRCC_aa3b2cbc-4d4e-4f89-b6e6-4549766f34f5` ended with `MEDIA_DURATION_UNKNOWN`; the backend duration bug was fixed in commit `772901a167611f0197d1bc05cea8091da211dc47` and remains included in the current captions-first commit.
+
+## Exact next acceptance action
+
+Install/reload Helper 0.2.0 and create a NEW fresh `KRCC_...` job for the acceptance URL.
+
+First press `Use subtitles` rather than starting audio capture.
+
+Required captions-first PASS evidence:
+- helper/backend `COMPLETED`;
+- `transcript_source=youtube_captions`;
+- `caption_type=manual` or `auto_generated`;
+- non-empty timestamped segments;
+- sensible detected/source language;
 - `stt_seconds_charged=0`;
-- daily quota remaining 7200 sec.
+- beta STT quota unchanged.
 
-Owner Edge helper 0.1.0:
-- installed successfully;
-- same YouTube URL open;
-- helper reached `CAPTURING`;
-- active tab audio was captured and upload reached backend processing.
-
-First Stop result:
-`MEDIA_DURATION_UNKNOWN: The browser-captured audio duration could not be determined.`
-
-Root cause:
-MediaRecorder streaming WebM/Opus may omit container-level duration metadata. The backend had probed the raw capture before ffmpeg normalization.
-
-Resolution:
-- normalize browser capture to bounded MP3 first;
-- probe normalized MP3 duration;
-- enforce duration limit after reliable probe;
-- reserve STT quota only after successful duration validation.
-
-The failed job is terminal and must not be reused for the retest. No AssemblyAI charge was recorded for this failed duration check.
-
-## KRC beta contract
-
-Closed-beta GPT Action uses:
-- `startMediaBetaClientTranscription`;
-- `getMediaBetaClientTranscriptionStatus`;
-- `getMediaBetaClientTranscriptSegments`.
-
-Expected initial Action state:
-```text
-HTTP 202
-job_id=KRCC_...
-status=AWAITING_CLIENT
-client_upload_required=true
-stt_seconds_charged=0
-```
-
-Browser audio/status endpoints are intentionally absent from the GPT Action schema and are used only by the helper.
+Only if Helper 0.2.0 reports captions unavailable/unusable should the owner run `Audio fallback` and validate AssemblyAI STT.
 
 ## Known beta limitations
 
-- first browser capture exposed and resolved the raw WebM duration issue; successful end-to-end STT acceptance is still pending retest;
-- helper requires normal-speed playback for timestamp alignment;
-- helper buffers compressed audio until Stop;
-- client-side captions are not implemented yet;
-- the client-ingest STT quota gate is separate from the legacy server-side media route; beta GPT must use the client route only until quota accounting is unified or legacy route disabled;
+- real owner Helper 0.2.0 caption extraction has not yet been accepted on the target video;
+- YouTube player caption metadata is an internal browser-page interface and may change;
+- audio fallback still requires normal-speed playback for timestamp alignment;
 - process-memory jobs/quota can reset on service restart;
-- AssemblyAI model-training opt-out remains a public-release gate.
-
-## Exact next action
-
-Create a NEW fresh `KRCC_...` job for the same acceptance URL because the previous browser job is terminal FAILED.
-
-Reuse the already installed helper 0.1.0; no reinstall is required. Capture approximately 60-90 seconds at normal speed and require:
-- upload accepted;
-- `TRANSCRIBING` then `COMPLETED`;
-- non-empty timestamped segments;
-- detected language;
-- sensible `stt_seconds_charged`;
-- provider cleanup result.
+- client-ingest quota remains separate from the legacy server-side route;
+- AssemblyAI model-training opt-out remains a public-release gate for fallback use.
 
 Do not merge PR #8 or PR #28, modify the public GPT, introduce personal YouTube cookies, or add paid residential proxy ingress merely to continue A4 beta testing.
