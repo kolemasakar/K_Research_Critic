@@ -1,7 +1,7 @@
 # MEDIA BETA Work Log
 Хронологічний журнал суттєвих робіт і перевірок підпроєкту для аудиту та відновлення контексту.
 
-Version: 1.0
+Version: 1.1
 Status: ACTIVE
 
 ## 2026-08-17 - Media URL upgrade initiated
@@ -125,9 +125,38 @@ Documents:
 - `08_CHAT_HANDOFF.md`;
 - `09_WORK_LOG.md`.
 
+## 2026-08-17 - GitHub to Render API bridge established
+
+User created a Render API key and stored it as the VoiceBridge GitHub Actions repository secret:
+
+`RENDER_API_KEY`
+
+Created VoiceBridge control workflow:
+
+`.github/workflows/render-media-beta-control.yml`
+
+Safety behavior:
+
+- automatic push execution performs read-only `inspect` only;
+- deployment is manual-only;
+- deployment is restricted to branch `agent/krc-media-transcript`;
+- target service name is fixed to `voicebridge-krc-media-beta-kolemasakar`;
+- deployment is refused if the isolated beta service is absent;
+- production `voicebridge-cloud-us` is not a selectable target.
+
+First control verification:
+
+- workflow run ID `32050872616`;
+- workflow conclusion: PASS;
+- Render API credential detected without printing value;
+- Render API authentication/discovery: HTTP 200 / PASS;
+- dedicated MEDIA BETA service: NOT FOUND;
+- deployment: NOT EXECUTED;
+- production service: NOT TOUCHED.
+
 Current next operational step remains:
 
-`A3 - Dedicated Render beta deployment`.
+`A3 - create the dedicated Render beta service, then configure service-level beta secrets and deploy.`
 
 ## Logging rule
 
