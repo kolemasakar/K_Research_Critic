@@ -1,7 +1,7 @@
 # MEDIA BETA Current State
 Канонічний знімок фактичного стану реалізації для відновлення роботи без припущень.
 
-Version: 1.5
+Version: 1.6
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-17
 
@@ -11,9 +11,9 @@ Current phase: `A4 - Live transcript validation`
 
 Current state:
 
-`A3_COMPLETE / BETA_LIVE / MEDIA_CONFIGURED / A4_SERVER_SIDE_YOUTUBE_INGRESS_BLOCKED / ARCHITECTURE_DECISION_REQUIRED`
+`A3_COMPLETE / SERVER_SIDE_YOUTUBE_INGRESS_BLOCKED / A4_2_CLIENT_ASSISTED_IMPLEMENTED / VOICEBRIDGE_CI_PASS / KRC_CONTRACT_UPDATED / LIVE_CLIENT_TEST_NEXT`
 
-Dedicated Render MEDIA BETA remains live on the Free plan. Health returns HTTP 200 and `media_transcript.configured=true`. Production VoiceBridge remains isolated. The blocker is now proven to be YouTube anti-bot enforcement against cloud/datacenter ingress, not a missing PO-token plugin or AssemblyAI failure.
+The direct Render/datacenter YouTube acquisition path is confirmed blocked by YouTube anti-bot enforcement. The approved A4.2 response is a separate client/browser-assisted ingestion path. Production VoiceBridge and the published K-Research & Critic GPT remain isolated and unchanged.
 
 ## Repositories
 
@@ -27,7 +27,7 @@ VoiceBridge:
 - repo `kolemasakar/VoiceBridge`;
 - branch `agent/krc-media-transcript`;
 - draft PR #28;
-- production service unchanged.
+- production service and `main` unchanged.
 
 ## Render beta
 
@@ -37,131 +37,151 @@ Service ID: `srv-da1kic5bedkc73d6fk60`.
 
 Endpoint: `https://voicebridge-krc-media-beta-kolemasakar.onrender.com`.
 
-Verified base configuration:
+Verified base configuration before A4.2 deployment verification:
 - plan `free`;
 - media mode `closed_beta`;
-- `configured=true`;
-- subtitle-first true;
+- action/provider configuration present;
 - max duration 3600 sec;
 - max concurrent jobs 1;
 - daily STT budget 7200 sec;
 - language hints auto/uk/ru/en.
 
-## A4.1 live test evidence
+## A4.1 server-side evidence
 
-Test URL:
+Acceptance URL:
 `https://www.youtube.com/watch?v=DZLzmQ2kwaA`
 
-Authentication checks:
-- bearer auth: PASS;
-- invalid beta code rejected with `MEDIA_BETA_ACCESS_DENIED`: PASS;
-- owner beta code accepted: PASS;
-- job creation/lifecycle start: PASS.
+Three server-side attempts failed before transcript acquisition:
+- original yt-dlp path: `KRCB_1c137194-3b23-4ed9-ab1e-fa5a49255cc9`;
+- `web_embedded,android_vr`: `KRCB_03d37ccd-4059-4b0c-9675-6f2568d4c207`;
+- `mweb` + PO Token Provider: `KRCB_981465dc-e400-470f-a236-c5414c26bd63`.
 
-Attempt 1:
-- job `KRCB_1c137194-3b23-4ed9-ab1e-fa5a49255cc9`;
-- `FETCHING_MEDIA` -> `FAILED`;
-- `MEDIA_FETCH_FAILED`;
-- YouTube: `Sign in to confirm you're not a bot`;
-- `stt_seconds_charged=0`.
+All three returned YouTube `Sign in to confirm you're not a bot` and charged `0` STT seconds.
 
-Attempt 2 after `web_embedded,android_vr` fallback:
-- job `KRCB_03d37ccd-4059-4b0c-9675-6f2568d4c207`;
-- same YouTube anti-bot failure;
-- `stt_seconds_charged=0`.
+One-shot diagnostic run `32060462596`, job `95480351954`, proved the PO-token integration itself was functioning:
+- bgutil provider `/ping`: PASS;
+- yt-dlp `2026.07.04`: PASS;
+- Node EJS runtime: PASS;
+- `PO Token Providers: bgutil:http-1.3.1 (external)`: present;
+- YouTube anti-bot response still occurred.
 
-Attempt 3 after `mweb` + PO Token Provider:
-- job `KRCB_981465dc-e400-470f-a236-c5414c26bd63`;
-- same YouTube anti-bot failure;
-- `stt_seconds_charged=0`.
+Conclusion: server-side cloud/datacenter YouTube ingress is not the beta acceptance path. Do not continue blind retries from the same cloud-IP architecture.
 
-AssemblyAI has not been consumed by any of these failures.
+## Approved A4.2 architecture
 
-## A4 remediation evidence
+User approved client/browser-assisted ingestion.
 
-R1:
-- explicit yt-dlp clients `web_embedded,android_vr`;
-- CI/deploy PASS;
-- live retest did not resolve the challenge.
-
-R2:
-- yt-dlp client `mweb`;
-- `bgutil-ytdlp-pot-provider` 1.3.1;
-- local PO Token Provider at `127.0.0.1:4416` in the same beta container;
-- `yt-dlp[default]==2026.07.04`;
-- Node.js 24 EJS runtime;
-- ffmpeg retained;
-- no personal YouTube cookies;
-- no additional Render service or paid resource;
-- VoiceBridge CI PASS;
-- isolated Render workflow `32059276099` PASS;
-- deploy LIVE and health/configuration PASS.
-
-## Decisive PO-provider diagnostic
-
-One-shot Docker diagnostic run `32060462596`, job `95480351954`, built the same beta image and verified:
-- local bgutil provider starts and responds to `/ping`;
-- yt-dlp version is `2026.07.04`;
-- Node.js EJS runtime is available;
-- yt-dlp reports `PO Token Providers: bgutil:http-1.3.1 (external)`;
-- extraction of the acceptance URL still ends with `Sign in to confirm you're not a bot`;
-- yt-dlp return code is 1.
-
-Conclusion: the provider/plugin/runtime wiring is functional. The current failure is a cloud/datacenter-IP YouTube bot challenge that the PO-token provider does not remove. Repeating server-side Render/GitHub-runner fetch attempts is not an evidence-based next step.
-
-The one-shot diagnostic workflow was removed after use.
-
-## Completed gates
-
-- A1 architecture/isolation: COMPLETE;
-- A2 resource protection in code: COMPLETE;
-- A3 dedicated Render beta deployment: COMPLETE;
-- beta authentication live checks: PARTIAL COMPLETE;
-- R1 no-cookie client fallback: TESTED / INSUFFICIENT;
-- R2 PO Token Provider: IMPLEMENTED / CI PASS / DEPLOYED / INTEGRATION VERIFIED;
-- server-side cloud YouTube ingress blocker: CONFIRMED.
-
-## Not complete
-
-- successful real YouTube transcript acceptance;
-- captions-path acceptance;
-- AssemblyAI fallback acceptance;
-- UK/RU/EN live matrix;
-- auto-language acceptance;
-- >60 min rejection live check;
-- concurrency rejection live check;
-- quota exhaustion simulation;
-- provider cleanup verification;
-- separate GPT Builder beta;
-- GPT Preview/Free-plan tests;
-- external tester rollout;
-- public media release.
-
-## Architecture decision required
-
-Recommended next beta ingress architecture:
-
-`client-assisted / browser-assisted acquisition`
-
-Target flow:
+Current target flow:
 ```text
 YouTube URL
- -> beta job/session
- -> browser helper or existing VoiceBridge extension acquires captions/tab audio through tester residential IP
- -> upload captions/audio to isolated beta backend
- -> AssemblyAI only when captions are unavailable
- -> timestamped transcript
- -> existing KRC claim/CriticProfile workflow
+ -> KRC MEDIA BETA Action creates KRCC_ job
+ -> status AWAITING_CLIENT
+ -> separate KRC MEDIA BETA browser helper
+ -> active same YouTube tab captured through tester browser/network path
+ -> compressed audio uploaded to isolated beta backend
+ -> backend validates source, duration and quota
+ -> AssemblyAI async multilingual STT
+ -> timestamped transcript segments
+ -> provider delete request
+ -> KRC claim inventory
+ -> CriticProfile gate
+ -> user approval
+ -> independent Research -> Critic -> final report
 ```
 
-Why recommended:
-- avoids YouTube datacenter-IP anti-bot path;
-- no YouTube cookies stored in Render;
-- no residential proxy subscription;
-- preserves Render Free plan;
-- reuses existing VoiceBridge browser capability;
-- suitable for owner + 2-3 tester closed beta.
+Direct reliable transcript/caption acquisition remains preferred when already available through current built-in/web capabilities. The A4.2 helper itself currently captures audio; client-side caption extraction is a planned optimization and must not be described as implemented.
 
-Alternative architectures requiring explicit approval include paid residential proxy ingress or cloud use of personal YouTube cookies. Personal cookies are not the default recommendation.
+## VoiceBridge A4.2 implementation
 
-Do not merge PR #8 or PR #28 merely to continue A4 beta testing.
+New isolated backend components:
+- `src/cloud/src/media_client_ingest.ts`;
+- `src/cloud/src/media_client_http.ts`;
+- additive integration in `src/cloud/src/server.ts`.
+
+Action-facing routes:
+```text
+POST /api/v1/media/client-transcriptions
+GET  /api/v1/media/client-transcriptions/{KRCC_job_id}
+GET  /api/v1/media/client-transcriptions/{KRCC_job_id}/segments
+```
+
+Browser-only routes, intentionally absent from the GPT Action contract:
+```text
+POST /api/v1/media/client-transcriptions/{KRCC_job_id}/audio
+GET  /api/v1/media/client-transcriptions/{KRCC_job_id}/client-status
+```
+
+Implemented controls:
+- `KRCC_` client job IDs;
+- `AWAITING_CLIENT` state;
+- same-YouTube-video matching;
+- per-tester ownership using temporary access-code digest, not plaintext job persistence;
+- max client upload 32 MiB;
+- real captured duration checked with ffprobe;
+- 60-minute limit;
+- 16 kHz mono approximately 32 kbps STT normalization;
+- UK/RU/EN/auto AssemblyAI async transcription;
+- timestamped segments;
+- provider transcript delete request;
+- temporary media cleanup;
+- in-memory job TTL.
+
+## Separate browser helper
+
+New directory:
+`src/media_beta_helper/`
+
+This is intentionally separate from the validated VoiceBridge translation extension.
+
+Helper 0.1.0 implements:
+- Chrome/Edge Manifest V3;
+- active-tab YouTube validation;
+- tabCapture + offscreen recording;
+- Opus approximately 32 kbps;
+- normal tab audio playback while capturing;
+- Start/Stop UI;
+- upload with tester code and active source URL;
+- backend status polling;
+- detected-language/segment/quota/provider-cleanup status display.
+
+The helper does not receive the server-side Action bearer token or AssemblyAI key.
+
+## Automated validation
+
+VoiceBridge validation run `32062552003` for commit `923389b3fdd89eef4a57b308b8fe2a98d41ce8e5`: SUCCESS.
+
+Validated:
+- TypeScript cloud build/tests;
+- new client-ingest unit tests;
+- existing VoiceBridge browser-extension regression;
+- new MEDIA BETA helper JavaScript/manifest checks;
+- separate helper package artifact;
+- repository documentation checks.
+
+KRC beta contract has been switched to:
+- `startMediaBetaClientTranscription`;
+- `getMediaBetaClientTranscriptionStatus`;
+- `getMediaBetaClientTranscriptSegments`;
+- `KRCC_` job IDs;
+- `AWAITING_CLIENT` semantics.
+
+KRC CI for the final A4.2 contract/documentation branch state must pass before live Builder use.
+
+## Known beta limitations
+
+- helper runtime behavior in real Chrome/Edge is not yet live-validated;
+- current helper requires video playback at normal speed for timestamp alignment;
+- current helper buffers the recorded compressed audio until Stop;
+- client-side captions are not implemented yet;
+- current client-ingest STT quota gate is isolated from the legacy server-side media route; the beta GPT must use the client-assisted route only to avoid split quota semantics;
+- process-memory jobs/quota are beta-only and may reset on service restart.
+
+## Exact next actions
+
+1. Require KRC CI green for the updated client-assisted Action package.
+2. Verify the dedicated Render beta has deployed the new VoiceBridge head and health exposes `media_client_ingest` with `configured=true`.
+3. Create a new client job for the acceptance URL and require `status=AWAITING_CLIENT`, `job_id=KRCC_...`, `stt_seconds_charged=0` before browser upload.
+4. Install/load the separate helper in Chrome/Edge and run a short owner acceptance capture.
+5. Require `COMPLETED`, non-empty timestamped segments, sensible STT charge, detected language, and provider cleanup evidence.
+
+Do not merge PR #8 or PR #28, alter the public GPT, introduce personal YouTube cookies, or add paid residential proxy ingress merely to continue A4 beta testing.
