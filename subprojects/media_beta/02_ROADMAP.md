@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 Дорожня карта реалізації закритого beta-медіарежиму та наступного сталого безкоштовного режиму.
 
-Version: 1.4
+Version: 1.5
 Status: ACTIVE
 Updated: 2026-08-17
 
@@ -11,7 +11,7 @@ Updated: 2026-08-17
 
 Status: COMPLETE
 
-Deliverables:
+Delivered:
 - separate K-Research & Critic beta identity;
 - separate GPT Action contract;
 - separate VoiceBridge media backend path;
@@ -24,170 +24,141 @@ Deliverables:
 
 Status: COMPLETE_IN_CODE
 
-Deliverables:
-- subtitle-first acquisition;
-- max video = 60 min;
+Current beta limits:
+- max captured duration = 60 min;
 - concurrency = 1;
-- global STT budget = 7200 sec / UTC day;
-- 16 kHz mono ~32 kbps STT fallback audio;
+- global AssemblyAI budget = 7200 sec / UTC day;
+- helper upload guard = 32 MiB;
+- STT normalization = mono 16 kHz approximately 32 kbps;
 - temporary media cleanup;
 - provider delete request;
 - transcript/job TTL;
 - access codes excluded from reports/checkpoints.
 
-Validation:
-- VoiceBridge automated CI green;
-- KRC Store/package tests green.
-
 ### A3. Dedicated Render beta deployment
 
 Status: COMPLETE
 
-Completed:
-- GitHub -> Render API control bridge validated;
-- dedicated service `voicebridge-krc-media-beta-kolemasakar` created;
-- service ID `srv-da1kic5bedkc73d6fk60`;
-- branch `agent/krc-media-transcript` verified;
-- plan `free` verified;
-- service-level beta secrets configured;
-- beta `/api/v1/health` HTTP 200;
-- `media_transcript.configured=true` verified;
-- media mode `closed_beta` verified;
-- production `voicebridge-cloud-us` health HTTP 200 / `status=ok` verified;
-- production was not modified by beta deployment.
-
-Exit criteria: COMPLETE.
+Dedicated service:
+- `voicebridge-krc-media-beta-kolemasakar`;
+- ID `srv-da1kic5bedkc73d6fk60`;
+- plan `free`;
+- production VoiceBridge isolated.
 
 ### A4. Live transcript validation
 
-Status: BLOCKED_SERVER_SIDE_YOUTUBE_INGRESS / ARCHITECTURE_DECISION_REQUIRED
+Status: IN_PROGRESS_CLIENT_ASSISTED_LIVE_ACCEPTANCE
 
-#### A4.1 server-side acceptance history
+#### A4.1 Server-side YouTube ingress
+
+Status: CLOSED_AS_UNSUITABLE_FOR_CURRENT_BETA
 
 Acceptance URL:
 `https://www.youtube.com/watch?v=DZLzmQ2kwaA`
 
-Verified:
-- bearer auth PASS;
-- invalid tester code rejection PASS;
-- owner tester code PASS;
-- job creation PASS.
+Three server-side attempts failed before transcript acquisition with YouTube `Sign in to confirm you're not a bot` and charged 0 AssemblyAI seconds:
+- original yt-dlp;
+- `web_embedded,android_vr`;
+- `mweb` + `bgutil-ytdlp-pot-provider` 1.3.1.
 
-Three live fetch attempts failed before transcript acquisition with YouTube `Sign in to confirm you're not a bot` and each charged 0 AssemblyAI STT seconds.
+Diagnostic run `32060462596` / job `95480351954` proved the PO-provider/runtime wiring was functional. Therefore repeated cloud/datacenter-IP retries are not an approved next step.
 
-R1:
-- `web_embedded,android_vr` clients;
-- CI/deploy PASS;
-- live retest FAIL with same anti-bot challenge.
+#### A4.2 Client/browser-assisted ingress
 
-R2:
-- `mweb`;
-- `bgutil-ytdlp-pot-provider` 1.3.1;
-- local provider in the same beta container;
-- `yt-dlp[default]==2026.07.04`;
-- Node.js 24 EJS runtime;
-- no YouTube cookies;
-- no additional paid/free Render service;
-- CI PASS;
-- Render deploy LIVE;
-- live retest FAIL with same anti-bot challenge.
+Status: IMPLEMENTED / CI_PASS / DEPLOYED / HEALTH_PASS / BROWSER_LIVE_TEST_NEXT
 
-One-shot diagnostic run `32060462596` / job `95480351954` confirmed:
-- provider `/ping` works;
-- yt-dlp detects `PO Token Providers: bgutil:http-1.3.1 (external)`;
-- Node EJS runtime works;
-- YouTube still returns the same bot challenge.
-
-Decision: stop repeated server-side cloud-IP retries. The blocker is not missing PO-provider integration.
-
-#### A4.2 recommended client-assisted ingress
-
-Status: PENDING_USER_APPROVAL
-
-Recommended closed-beta architecture:
+Approved flow:
 ```text
 YouTube URL
- -> beta job/session
- -> browser helper / VoiceBridge extension
- -> captions or tab audio acquired through tester residential IP
- -> upload derived captions/audio to beta backend
- -> AssemblyAI only if captions unavailable
+ -> beta Action creates KRCC_ job
+ -> AWAITING_CLIENT
+ -> separate KRC MEDIA BETA browser helper
+ -> same active YouTube tab captured through tester browser/network path
+ -> compressed audio uploaded to isolated beta backend
+ -> duration/quota/source validation
+ -> AssemblyAI async STT
  -> timestamped transcript
  -> KRC claim inventory / CriticProfile workflow
 ```
 
-Implementation targets after approval:
-- reuse existing VoiceBridge browser-extension transport where practical;
-- one-time media job/session binding;
-- beta access-code enforcement remains server-side;
-- captions preferred over tab-audio STT;
-- do not upload full video unless technically unavoidable;
-- no personal YouTube cookies stored in cloud;
-- no permanent local file storage;
-- preserve 60 min, concurrency 1 and daily STT limits;
-- test with same A4.1 URL first.
+Direct reliable transcript/caption intake remains preferred when already available through current built-in/web capabilities. Client-side caption extraction by the helper is not yet implemented and remains a planned optimization.
 
-Exit target:
-- same acceptance URL reaches `COMPLETED` through client-assisted ingress;
-- captions path, if available, consumes 0 STT seconds;
-- otherwise audio fallback consumes expected quota;
-- timestamps usable.
+Implemented:
+- `KRCC_` client jobs;
+- `AWAITING_CLIENT` state;
+- same-video validation;
+- per-tester temporary job ownership digest;
+- 32 MiB upload guard;
+- 60-minute captured-duration check;
+- auto/uk/ru/en AssemblyAI async path;
+- timestamped segments;
+- provider delete request;
+- separate Chrome/Edge MV3 helper;
+- existing VoiceBridge translation extension unchanged.
 
-#### Other ingress alternatives
+Validation evidence:
+- VoiceBridge CI run `32062552003`: SUCCESS;
+- VoiceBridge implementation commit `923389b3fdd89eef4a57b308b8fe2a98d41ce8e5`;
+- explicit isolated Render deploy run `32063396120`: SUCCESS;
+- deploy ID `dep-da1mgebutv3s73fd2grg`;
+- deployed commit confirmed `923389b3fdd89eef4a57b308b8fe2a98d41ce8e5`;
+- beta health HTTP 200;
+- `media_client_ingest.mode=client_assisted`;
+- `media_client_ingest.configured=true`;
+- `requires_browser_helper=true`;
+- `upload_max_bytes=33554432`;
+- KRC package CI run `32063557028`: SUCCESS.
 
-Paid residential proxy:
-- preserves URL-only server UX;
-- introduces recurring cost and new privacy/provider dependency;
-- conflicts with primary free-tier objective.
+Next acceptance sequence:
+1. create a fresh `KRCC_...` job for the A4.1 URL;
+2. require `AWAITING_CLIENT`, `client_upload_required=true`, `stt_seconds_charged=0` before upload;
+3. load helper 0.1.0 in owner Chrome/Edge;
+4. record a short normal-speed segment of the same YouTube video;
+5. require `COMPLETED`, non-empty timestamped segments, sensible detected language/STT charge, and provider cleanup evidence;
+6. then expand to UK/RU/EN/auto and guard-condition matrix.
 
-Personal YouTube cookies in Render:
-- not recommended as default;
-- account/session/privacy risk;
-- fragile against IP/session enforcement;
-- requires explicit user decision if ever tested.
-
-#### Remaining A4 matrix after ingress succeeds
-
-- Ukrainian captions case;
-- Russian captions case;
-- English captions case;
-- STT fallback case;
+Remaining A4 matrix:
+- owner real browser capture acceptance;
+- Ukrainian case;
+- Russian case;
+- English case;
 - automatic language detection;
 - >60 min rejection;
+- source mismatch rejection;
 - concurrency rejection;
 - daily STT quota exhaustion simulation;
-- provider cleanup verification.
+- provider cleanup verification;
+- client-side caption optimization evaluation.
 
 Exit criteria:
-- captions path works without STT charge;
-- fallback path works with expected quota charge;
-- timestamps and language metadata are usable;
-- `provider_data_deleted=true` observed where applicable;
-- no beta secret appears in response/loggable payloads.
+- real browser-assisted transcription reaches `COMPLETED`;
+- timestamps are usable;
+- language metadata is usable;
+- quota charge is consistent with captured duration;
+- `provider_data_deleted=true` is observed on successful AssemblyAI cleanup;
+- no beta/developer secret appears in reports/checkpoints/loggable payloads.
 
 ### A5. Separate GPT Builder beta
 
-Status: BLOCKED_BY_A4
+Status: BLOCKED_BY_A4_LIVE_BROWSER_ACCEPTANCE
 
-Tasks:
+After A4 owner browser acceptance:
 - create `K-Research & Critic - MEDIA BETA` separately from public GPT;
-- import beta instructions;
-- import beta OpenAPI schema;
+- import beta instructions and client-assisted OpenAPI schema;
 - configure Action bearer secret;
-- point schema/server to dedicated beta Render endpoint;
-- set unlisted/link distribution;
-- configure privacy policy URL if required by Builder;
-- do not alter public GPT.
+- point to dedicated beta Render endpoint;
+- configure privacy policy URL;
+- keep public GPT unchanged.
 
 ### A6. End-to-end beta acceptance
 
 Status: BLOCKED_BY_A5
 
-Scenario:
+Target:
 ```text
 YouTube URL
  -> beta access
- -> transcript
+ -> KRCC browser-assisted transcript
  -> claim inventory
  -> CriticProfile
  -> user approval
@@ -198,25 +169,11 @@ YouTube URL
  -> REVIEW PROTOCOL
 ```
 
-Acceptance targets:
-- 3 languages;
-- captions and STT fallback paths;
-- no research before CriticProfile approval;
-- no self-corroboration of video claims;
-- timestamp-to-claim traceability;
-- ordinary text workflow regression passes;
-- checkpoint workflow regression passes.
-
 ### A7. Controlled tester rollout
 
 Status: BLOCKED_BY_A6
 
-Tasks:
-- owner tests first;
-- issue independent tester codes to up to three testers;
-- collect failures by category;
-- monitor Render bandwidth and AssemblyAI credits;
-- adjust limits only through explicit decision update.
+Owner tests first; then up to three additional tester codes. Monitor reliability, Render bandwidth, and AssemblyAI credits. Limit changes require explicit decision update.
 
 ## Phase B - Sustainable Free Media
 
@@ -228,23 +185,23 @@ Compare against AssemblyAI for Ukrainian, Russian, English, timestamps, names/nu
 ### B2. Provider-neutral transcript router
 
 ```text
-captions
+captions/direct transcript
  -> free cloud Whisper quota
  -> optional local Whisper fallback
 ```
 
 ### B3. Local Media Node / residential ingress proof of concept
-Evaluate browser-assisted and local-node acquisition, faster-whisper/whisper.cpp, CPU-only operation, optional GPU acceleration, secure transport, availability and operational burden.
+Evaluate browser-assisted/local-node acquisition, faster-whisper/whisper.cpp, CPU/GPU options, secure transport, availability, and operational burden.
 
 ### B4. Remove permanent AssemblyAI dependency from public free path
-AssemblyAI may remain as development comparator, emergency fallback, or optional paid reliability path. It must not be required for intended sustainable free public mode.
+AssemblyAI may remain as comparator/emergency fallback but must not be mandatory for intended sustainable public free mode.
 
 ## Phase C - Public media release
 
 Status: FUTURE
 
-Public release requires sustainable resource validation, privacy validation, Free-plan ChatGPT test, Actions runtime compatibility, production smoke tests, and explicit user approval.
+Requires sustainable resources, privacy validation, provider no-training gate, Free-plan ChatGPT test, Actions compatibility, production smoke tests, and explicit user approval.
 
 ## Roadmap rule
 
-A roadmap item marked COMPLETE means implementation evidence exists. BLOCKED/PENDING/PLANNED must never be described as already validated.
+A roadmap item marked COMPLETE means implementation evidence exists. IN_PROGRESS/BLOCKED/PLANNED must never be described as already validated.
