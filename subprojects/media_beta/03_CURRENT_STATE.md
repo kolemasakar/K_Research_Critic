@@ -1,7 +1,7 @@
 # MEDIA BETA Current State
 Канонічний знімок фактичного стану реалізації для відновлення роботи без припущень.
 
-Version: 1.7
+Version: 1.8
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-17
 
@@ -11,9 +11,9 @@ Current phase: `A4 - Live transcript validation`
 
 Current state:
 
-`A3_COMPLETE / A4_1_SERVER_INGRESS_BLOCKED / A4_2_CLIENT_ASSISTED_IMPLEMENTED / CI_GREEN / RENDER_LIVE / OWNER_BROWSER_ACCEPTANCE_NEXT`
+`A3_COMPLETE / A4_1_SERVER_INGRESS_BLOCKED / A4_2_CLIENT_ASSISTED_IMPLEMENTED / FIRST_BROWSER_CAPTURE_REACHED_BACKEND / WEBM_DURATION_FIX_LIVE / OWNER_RETEST_NEXT`
 
-The direct Render/datacenter YouTube acquisition path is confirmed blocked by YouTube anti-bot enforcement. The approved A4.2 response is a separate client/browser-assisted ingestion path. A4.2 code is implemented, automated validation is green, and the exact VoiceBridge implementation commit is live on the isolated Render MEDIA BETA service. Production VoiceBridge and the published K-Research & Critic GPT remain unchanged.
+The direct Render/datacenter YouTube acquisition path is confirmed blocked by YouTube anti-bot enforcement. A4.2 therefore uses client/browser-assisted ingestion. The first real owner browser capture reached the beta backend but exposed a MediaRecorder WebM duration-metadata issue before STT. The backend duration handling has been corrected, validated in CI, and explicitly redeployed to the isolated Render MEDIA BETA service. Production VoiceBridge and the published K-Research & Critic GPT remain unchanged.
 
 ## Repositories
 
@@ -70,7 +70,8 @@ YouTube URL
  -> separate KRC MEDIA BETA browser helper
  -> same active YouTube tab captured through tester browser/network path
  -> compressed audio uploaded to isolated beta backend
- -> source/duration/quota validation
+ -> normalize browser audio with bounded ffmpeg processing
+ -> duration/source/quota validation
  -> AssemblyAI async multilingual STT
  -> timestamped transcript segments
  -> provider delete request
@@ -84,10 +85,13 @@ Direct reliable transcript/caption intake remains preferred when available throu
 
 ## VoiceBridge A4.2 implementation
 
-Implementation commit:
+Initial A4.2 implementation commit:
 `923389b3fdd89eef4a57b308b8fe2a98d41ce8e5`
 
-New backend components:
+Current deployed duration-fix commit:
+`772901a167611f0197d1bc05cea8091da211dc47`
+
+Core backend components:
 - `src/cloud/src/media_client_ingest.ts`;
 - `src/cloud/src/media_client_http.ts`;
 - additive integration in `src/cloud/src/server.ts`.
@@ -111,7 +115,10 @@ Controls:
 - same-YouTube-video matching;
 - temporary SHA-256 access-code ownership digest;
 - max client upload 32 MiB;
-- ffprobe duration check;
+- browser WebM/Opus is normalized before duration probing;
+- ffmpeg normalization has a hard approximately 60-minute processing cap;
+- duration is probed on normalized MP3 where metadata is reliable;
+- STT quota is reserved only after duration validation succeeds;
 - 60-minute limit;
 - 16 kHz mono approximately 32 kbps STT normalization;
 - UK/RU/EN/auto AssemblyAI transcription;
@@ -138,46 +145,90 @@ Helper 0.1.0:
 
 It does not receive the Action bearer token or AssemblyAI API key.
 
-Actual Chrome/Edge runtime acceptance is the next live gate.
+The duration fix is backend-only; helper 0.1.0 does not require reinstall for the next retest.
 
 ## Automated validation
 
-VoiceBridge CI:
+Initial VoiceBridge A4.2 CI:
 - run `32062552003`;
 - commit `923389b3fdd89eef4a57b308b8fe2a98d41ce8e5`;
 - result SUCCESS.
+
+Duration-fix VoiceBridge CI:
+- run `32067365619`;
+- commit `772901a167611f0197d1bc05cea8091da211dc47`;
+- browser-extension SUCCESS;
+- cloud build/tests SUCCESS;
+- repository-docs SUCCESS;
+- overall SUCCESS.
 
 KRC package CI after A4.2 contract/privacy updates:
 - run `32063557028`;
 - result SUCCESS.
 
-## Live Render A4.2 deployment
+## Live Render A4.2 deployment history
 
-An initial read-only check confirmed auto-deploy had not occurred and old R2 commit `d7864ad1625f815613deaea8043b4f1786768c61` was still live. This was expected because the beta service was originally created with auto-deploy disabled.
-
-An explicit isolated deployment then targeted only MEDIA BETA service `srv-da1kic5bedkc73d6fk60`.
-
-Deployment evidence:
+Initial A4.2 deploy:
 - workflow run `32063396120`: SUCCESS;
 - deploy ID `dep-da1mgebutv3s73fd2grg`;
 - exact commit `923389b3fdd89eef4a57b308b8fe2a98d41ce8e5` reached `live`;
 - health HTTP 200;
-- service status `ok`;
 - `media_client_ingest.mode=client_assisted`;
 - `media_client_ingest.configured=true`;
 - `requires_browser_helper=true`;
 - `upload_max_bytes=33554432`.
 
-The temporary deployment workflow file was removed after verification. Production VoiceBridge was not targeted.
+Duration-fix redeploy:
+- workflow run `32067505039`: SUCCESS;
+- deploy ID `dep-da1n5rou01pc73b5v73g`;
+- exact commit `772901a167611f0197d1bc05cea8091da211dc47` reached `live`;
+- health HTTP 200;
+- service status `ok`;
+- `media_client_ingest.mode=client_assisted`;
+- `configured=true`;
+- `requires_browser_helper=true`.
+
+Temporary deployment workflow files were removed after verification. Production VoiceBridge was not targeted.
+
+## First real owner browser acceptance evidence
+
+Created job:
+`KRCC_aa3b2cbc-4d4e-4f89-b6e6-4549766f34f5`
+
+Initial state:
+- `AWAITING_CLIENT`;
+- `client_upload_required=true`;
+- `stt_seconds_charged=0`;
+- daily quota remaining 7200 sec.
+
+Owner Edge helper 0.1.0:
+- installed successfully;
+- same YouTube URL open;
+- helper reached `CAPTURING`;
+- active tab audio was captured and upload reached backend processing.
+
+First Stop result:
+`MEDIA_DURATION_UNKNOWN: The browser-captured audio duration could not be determined.`
+
+Root cause:
+MediaRecorder streaming WebM/Opus may omit container-level duration metadata. The backend had probed the raw capture before ffmpeg normalization.
+
+Resolution:
+- normalize browser capture to bounded MP3 first;
+- probe normalized MP3 duration;
+- enforce duration limit after reliable probe;
+- reserve STT quota only after successful duration validation.
+
+The failed job is terminal and must not be reused for the retest. No AssemblyAI charge was recorded for this failed duration check.
 
 ## KRC beta contract
 
-Closed-beta GPT Action now uses:
+Closed-beta GPT Action uses:
 - `startMediaBetaClientTranscription`;
 - `getMediaBetaClientTranscriptionStatus`;
 - `getMediaBetaClientTranscriptSegments`.
 
-Expected first Action state:
+Expected initial Action state:
 ```text
 HTTP 202
 job_id=KRCC_...
@@ -190,7 +241,7 @@ Browser audio/status endpoints are intentionally absent from the GPT Action sche
 
 ## Known beta limitations
 
-- real owner Chrome/Edge helper execution is not yet accepted;
+- first browser capture exposed and resolved the raw WebM duration issue; successful end-to-end STT acceptance is still pending retest;
 - helper requires normal-speed playback for timestamp alignment;
 - helper buffers compressed audio until Stop;
 - client-side captions are not implemented yet;
@@ -200,10 +251,11 @@ Browser audio/status endpoints are intentionally absent from the GPT Action sche
 
 ## Exact next action
 
-Create one fresh `KRCC_...` job for the acceptance URL without exposing credentials in chat.
+Create a NEW fresh `KRCC_...` job for the same acceptance URL because the previous browser job is terminal FAILED.
 
-Then run a short owner browser test with helper 0.1.0 and require:
-- `COMPLETED`;
+Reuse the already installed helper 0.1.0; no reinstall is required. Capture approximately 60-90 seconds at normal speed and require:
+- upload accepted;
+- `TRANSCRIBING` then `COMPLETED`;
 - non-empty timestamped segments;
 - detected language;
 - sensible `stt_seconds_charged`;
