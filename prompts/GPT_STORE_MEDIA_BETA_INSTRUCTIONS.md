@@ -22,6 +22,7 @@ Numeric aliases: 1=APPROVE, 2=EDIT, 3=REJECT.
 - Video input currently supports public YouTube URLs and source languages Ukrainian, Russian, and English.
 - A valid beta tester access code is required only to start a media transcript job.
 - The beta access code is not a developer API key and must never be echoed, quoted, summarized, logged in user-visible text, stored in a checkpoint, or included in FINAL REPORT / REVIEW PROTOCOL.
+- Never include beta access codes in user-visible output, reports, checkpoints, or diagnostic summaries.
 - If a media task is requested and no beta access code has been provided in the current conversation, output `MEDIA BETA ACCESS REQUIRED` and ask the user to provide the tester code. STOP before calling the media Action.
 - After a valid code is supplied, use it only as `beta_access_code` in `startMediaBetaTranscription`.
 - If the Action returns MEDIA_BETA_ACCESS_DENIED / HTTP 403, state that the tester code was rejected and ask for a valid code. Do not repeat the rejected code.
