@@ -1,4 +1,4 @@
-schema_version: "0.2-beta"
+schema_version: "0.3-beta"
 
 product:
   name: K-Research & Critic - MEDIA BETA
@@ -49,8 +49,8 @@ beta:
   browser_helper_required: true
   browser_helper_job_prefix: KRCC_
   direct_transcript_first: true
-  client_caption_first: false
-  client_caption_first_status: PLANNED_OPTIMIZATION
+  client_caption_first: true
+  client_caption_first_status: IMPLEMENTED_PENDING_LIVE_BROWSER_ACCEPTANCE
   max_video_seconds: 3600
   max_concurrent_jobs: 1
   daily_stt_seconds: 7200
@@ -70,7 +70,8 @@ beta:
     backend_job_ownership_digest: sha256
   quota_notes:
     - Direct reliable transcript/caption intake does not consume the beta STT budget.
-    - Current client-assisted browser-audio jobs use AssemblyAI and consume the STT budget.
+    - Browser-side YouTube caption ingestion completes with transcript_source=youtube_captions and stt_seconds_charged=0.
+    - Browser audio is the fallback when usable captions are unavailable and consumes the AssemblyAI STT budget.
     - The backend determines captured-audio duration before reserving STT seconds.
     - Daily quota state is currently process-memory beta state and may reset on service restart.
 
