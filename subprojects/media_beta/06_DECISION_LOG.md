@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 Реєстр затверджених рішень щодо архітектури, beta-обмежень і майбутнього безкоштовного медіарежиму.
 
-Version: 1.0
+Version: 1.1
 Status: ACTIVE
 Updated: 2026-08-17
 
@@ -79,19 +79,17 @@ Personal Custom GPT sharing cannot be relied upon as a strict per-person access-
 
 ## D008 - Subtitle-first
 
-Decision: APPROVED
+Decision: SUPERSEDED_FOR_CLIENT_HELPER_BY_D016
 
-Try usable YouTube captions before any STT fallback.
+Original decision: try usable YouTube captions before STT fallback.
 
-Reason:
-
-Captions dramatically reduce external STT usage, bandwidth, latency, and free-credit exhaustion.
+The principle remains valid when a reliable transcript/caption is directly available, but server-side YouTube acquisition from Render is blocked and the current A4.2 browser helper does not yet implement client-side caption extraction.
 
 ## D009 - AssemblyAI is beta fallback, not final public dependency
 
 Decision: APPROVED
 
-Use AssemblyAI Universal-2 during closed beta when captions are unavailable.
+Use AssemblyAI Universal-2 during closed beta when transcript/caption intake is unavailable.
 
 Reason:
 
@@ -103,8 +101,8 @@ Decision: APPROVED
 
 - max video: 60 min;
 - max concurrent media jobs: 1;
-- global AssemblyAI fallback budget: 7200 sec per UTC day;
-- fallback audio: mono 16 kHz approximately 32 kbps;
+- global AssemblyAI budget: 7200 sec per UTC day;
+- STT audio: mono 16 kHz approximately 32 kbps;
 - transcript/job TTL: approximately one hour.
 
 Reason:
@@ -168,3 +166,17 @@ Do not silently raise tester count, duration, concurrency, or daily STT budget.
 Reason:
 
 These parameters directly affect cost/resource risk and reliability.
+
+## D016 - Client/browser-assisted ingress replaces cloud YouTube acquisition for A4 beta
+
+Decision: APPROVED
+
+For the current closed beta, use a separate browser helper to capture the same active YouTube tab through the tester browser/network path and upload captured audio to the isolated beta backend.
+
+The beta GPT creates `KRCC_...` jobs with `AWAITING_CLIENT`. The helper uses the tester beta code, but never receives the server-side Action bearer token or provider API key.
+
+Direct reliable transcript/caption intake remains preferred when available. Client-side caption extraction is a planned optimization, not an implemented A4.2 capability.
+
+Reason:
+
+Three Render/cloud acquisition attempts, including a correctly wired current PO Token Provider, were blocked by YouTube datacenter-IP anti-bot enforcement. Client-assisted ingress avoids personal YouTube cookies, paid residential proxy infrastructure, and changes to the validated production VoiceBridge extension while preserving the Free Render beta target.
