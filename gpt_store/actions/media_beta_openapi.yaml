@@ -1,0 +1,264 @@
+openapi: 3.1.0
+info:
+  title: K-Research & Critic Closed Media Beta API
+  version: 0.1.0-beta
+  description: >-
+    Closed beta media-ingestion helper for a small allowlisted tester group.
+    It uses YouTube captions first and AssemblyAI STT only when captions are not
+    available. It acquires source text only; K-Research & Critic verifies claims
+    independently after CriticProfile approval.
+servers:
+  - url: https://voicebridge-cloud-us.onrender.com
+paths:
+  /api/v1/media/transcriptions:
+    post:
+      operationId: startMediaBetaTranscription
+      summary: Start a closed-beta YouTube transcript job
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+                - url
+                - beta_access_code
+              properties:
+                url:
+                  type: string
+                  format: uri
+                  description: Public HTTPS YouTube or youtu.be URL.
+                language_hint:
+                  type: string
+                  enum: [auto, uk, ru, en]
+                  default: auto
+                beta_access_code:
+                  type: string
+                  minLength: 12
+                  maxLength: 128
+                  writeOnly: true
+                  description: >-
+                    Closed-beta tester code. Never echo, quote, log, place in a
+                    checkpoint, or include in the final report.
+      responses:
+        "202":
+          description: Job accepted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "400":
+          description: Invalid request or unsupported URL.
+        "401":
+          description: GPT Action authentication failed.
+        "403":
+          description: Closed-beta tester code rejected.
+        "429":
+          description: Concurrency, request-rate, or daily STT budget limit reached.
+        "503":
+          description: Media beta unavailable or not configured.
+  /api/v1/media/transcriptions/{job_id}:
+    get:
+      operationId: getMediaBetaTranscriptionStatus
+      summary: Read closed-beta media job status
+      x-openai-isConsequential: false
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCB_[A-Za-z0-9-]+$
+      responses:
+        "200":
+          description: Current job state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "404":
+          description: Job not found or expired.
+  /api/v1/media/transcriptions/{job_id}/segments:
+    get:
+      operationId: getMediaBetaTranscriptSegments
+      summary: Read a page of timestamped transcript segments
+      x-openai-isConsequential: false
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCB_[A-Za-z0-9-]+$
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+      responses:
+        "200":
+          description: Transcript segment page. Follow next_cursor until null.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [job_id, status, cursor, next_cursor, segments]
+                properties:
+                  request_id:
+                    type: string
+                  job_id:
+                    type: string
+                  status:
+                    type: string
+                  cursor:
+                    type: integer
+                  next_cursor:
+                    anyOf:
+                      - type: integer
+                      - type: "null"
+                  segments:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Segment"
+        "404":
+          description: Job not found or expired.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    Usage:
+      type: object
+      required: [day_utc, daily_limit_seconds, used_seconds, remaining_seconds]
+      properties:
+        day_utc:
+          type: string
+        daily_limit_seconds:
+          type: integer
+        used_seconds:
+          type: integer
+        remaining_seconds:
+          type: integer
+    Job:
+      type: object
+      properties:
+        request_id:
+          type: string
+        reused:
+          type: boolean
+        job_id:
+          type: string
+          pattern: ^KRCB_[A-Za-z0-9-]+$
+        status:
+          type: string
+          enum: [QUEUED, FETCHING_MEDIA, UPLOADING, TRANSCRIBING, COMPLETED, FAILED]
+        created_at:
+          type: string
+        updated_at:
+          type: string
+        source_url:
+          type: string
+        language_hint:
+          type: string
+        detected_language:
+          anyOf:
+            - type: string
+            - type: "null"
+        language_confidence:
+          anyOf:
+            - type: number
+            - type: "null"
+        transcript_source:
+          anyOf:
+            - type: string
+              enum: [youtube_captions, assemblyai_stt]
+            - type: "null"
+        provider:
+          anyOf:
+            - type: string
+              enum: [youtube, assemblyai]
+            - type: "null"
+        provider_model:
+          anyOf:
+            - type: string
+            - type: "null"
+        provider_data_deleted:
+          anyOf:
+            - type: boolean
+            - type: "null"
+        stt_seconds_charged:
+          type: integer
+          minimum: 0
+        beta_quota:
+          $ref: "#/components/schemas/Usage"
+        media:
+          type: object
+          properties:
+            platform:
+              type: string
+            title:
+              anyOf:
+                - type: string
+                - type: "null"
+            channel:
+              anyOf:
+                - type: string
+                - type: "null"
+            duration_seconds:
+              anyOf:
+                - type: number
+                - type: "null"
+            canonical_url:
+              anyOf:
+                - type: string
+                - type: "null"
+        transcript_characters:
+          type: integer
+        segment_count:
+          type: integer
+        error:
+          anyOf:
+            - type: object
+              properties:
+                code:
+                  type: string
+                message:
+                  type: string
+                retryable:
+                  type: boolean
+            - type: "null"
+    Segment:
+      type: object
+      required: [index, start_ms, end_ms, text, confidence]
+      properties:
+        index:
+          type: integer
+        start_ms:
+          anyOf:
+            - type: integer
+            - type: "null"
+        end_ms:
+          anyOf:
+            - type: integer
+            - type: "null"
+        text:
+          type: string
+        confidence:
+          anyOf:
+            - type: number
+            - type: "null"
+security:
+  - bearerAuth: []
