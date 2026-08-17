@@ -1,9 +1,9 @@
-schema_version: "1.0"
+schema_version: "1.1"
 
 product:
   name: K-Research & Critic
   description: |-
-    Користувач: планує роботу, погоджує критерії критика, перевіряє твердження, виправляє слабкі місця та формує фінальний звіт із джерелами й оцінкою надійності.
+    Користувач: планує роботу, погоджує критерії критика, перевіряє твердження з тексту або відео, виправляє слабкі місця та формує фінальний звіт із джерелами й оцінкою надійності.
     (research supervisor for evidence-based planning, verification, critique, revision, and sourced reporting.)
   default_language: uk-UA
   primary_channel: chatgpt_store
@@ -21,7 +21,7 @@ capabilities:
   code_interpreter_data_analysis: true
   image_generation: false
   apps: false
-  actions: false
+  actions: true
 
 knowledge:
   required: false
@@ -29,6 +29,14 @@ knowledge:
 
 instructions:
   file: prompts/GPT_STORE_INSTRUCTIONS.md
+
+actions:
+  media_transcript:
+    enabled: true
+    schema: gpt_store/actions/media_transcript_openapi.yaml
+    authentication: bearer_api_key
+    server: https://voicebridge-cloud-us.onrender.com
+    privacy_policy_document: docs/PRIVACY_POLICY.md
 
 checkpoint:
   schema_version: "1.0"
@@ -38,10 +46,12 @@ checkpoint:
 
 conversation_starters:
   - "Досліди цю тему та спочатку сформуй CriticProfile для мого погодження."
+  - "Перевір твердження з цього YouTube-відео та спочатку сформуй CriticProfile."
   - "Порівняй дві технології за незалежними джерелами та покажи невирішені ризики."
   - "Перевір це твердження, включно з доказами на його підтримку або спростування."
   - "Віднови завдання K-Research & Critic з checkpoint, який я надам."
   - "Research this topic and build the CriticProfile for my approval before you start."
+  - "Verify claims from this YouTube video and build the CriticProfile before research."
   - "Compare two technologies using independent sources and show unresolved risks."
   - "Verify this claim, including evidence that supports or contradicts it."
   - "Resume a K-Research & Critic task from a checkpoint I will paste."
@@ -50,9 +60,26 @@ release:
   free_user_compatible: true
   developer_api_key_required: false
   external_backend_required: false
-  privacy_policy_url_required_by_package: false
+  privacy_policy_url_required_by_package: true
   live_free_plan_test_required: true
   live_paid_plan_model_switch_test_required: true
   public_publish_is_manual: true
   production_smoke_test_passed: true
   production_smoke_tested_at: "2026-08-14"
+  media_input:
+    enabled: true
+    rollout_state: PREVIEW_REQUIRED
+    supported_platforms:
+      - youtube
+    supported_languages:
+      - uk
+      - ru
+      - en
+    automatic_language_detection: true
+    external_backend_required: true
+    developer_provider_key_required: true
+    user_api_key_required: false
+    action_auth_secret_managed_by_builder: true
+    live_preview_test_required: true
+    live_free_plan_test_required: true
+    production_smoke_test_passed: false
