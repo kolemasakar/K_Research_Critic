@@ -33,7 +33,7 @@ actions:
     enabled: true
     schema: gpt_store/actions/media_beta_openapi.yaml
     authentication: bearer_api_key
-    server: https://voicebridge-cloud-us.onrender.com
+    server: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
     privacy_policy_document: docs/PRIVACY_POLICY.md
 
 checkpoint:
