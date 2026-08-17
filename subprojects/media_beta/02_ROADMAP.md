@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 Дорожня карта реалізації закритого beta-медіарежиму та наступного сталого безкоштовного режиму.
 
-Version: 1.5
+Version: 1.6
 Status: ACTIVE
 Updated: 2026-08-17
 
@@ -47,7 +47,7 @@ Dedicated service:
 
 ### A4. Live transcript validation
 
-Status: IN_PROGRESS_CLIENT_ASSISTED_LIVE_ACCEPTANCE
+Status: IN_PROGRESS_CLIENT_ASSISTED_OWNER_RETEST
 
 #### A4.1 Server-side YouTube ingress
 
@@ -65,7 +65,7 @@ Diagnostic run `32060462596` / job `95480351954` proved the PO-provider/runtime 
 
 #### A4.2 Client/browser-assisted ingress
 
-Status: IMPLEMENTED / CI_PASS / DEPLOYED / HEALTH_PASS / BROWSER_LIVE_TEST_NEXT
+Status: IMPLEMENTED / CI_PASS / DEPLOYED / FIRST_BROWSER_CAPTURE_REACHED_BACKEND / DURATION_FIX_LIVE / RETEST_NEXT
 
 Approved flow:
 ```text
@@ -75,7 +75,8 @@ YouTube URL
  -> separate KRC MEDIA BETA browser helper
  -> same active YouTube tab captured through tester browser/network path
  -> compressed audio uploaded to isolated beta backend
- -> duration/quota/source validation
+ -> bounded ffmpeg normalization
+ -> reliable normalized-audio duration/source/quota validation
  -> AssemblyAI async STT
  -> timestamped transcript
  -> KRC claim inventory / CriticProfile workflow
@@ -89,36 +90,60 @@ Implemented:
 - same-video validation;
 - per-tester temporary job ownership digest;
 - 32 MiB upload guard;
+- bounded browser-audio normalization before duration probing;
 - 60-minute captured-duration check;
+- STT quota reservation only after valid duration is known;
 - auto/uk/ru/en AssemblyAI async path;
 - timestamped segments;
 - provider delete request;
 - separate Chrome/Edge MV3 helper;
 - existing VoiceBridge translation extension unchanged.
 
-Validation evidence:
+Initial validation evidence:
 - VoiceBridge CI run `32062552003`: SUCCESS;
-- VoiceBridge implementation commit `923389b3fdd89eef4a57b308b8fe2a98d41ce8e5`;
+- initial implementation commit `923389b3fdd89eef4a57b308b8fe2a98d41ce8e5`;
 - explicit isolated Render deploy run `32063396120`: SUCCESS;
 - deploy ID `dep-da1mgebutv3s73fd2grg`;
-- deployed commit confirmed `923389b3fdd89eef4a57b308b8fe2a98d41ce8e5`;
-- beta health HTTP 200;
-- `media_client_ingest.mode=client_assisted`;
-- `media_client_ingest.configured=true`;
-- `requires_browser_helper=true`;
-- `upload_max_bytes=33554432`;
 - KRC package CI run `32063557028`: SUCCESS.
 
+First live browser acceptance evidence:
+- job `KRCC_aa3b2cbc-4d4e-4f89-b6e6-4549766f34f5` created successfully;
+- pre-upload state `AWAITING_CLIENT`, `client_upload_required=true`, `stt_seconds_charged=0`;
+- helper 0.1.0 installed in Edge;
+- helper reached `CAPTURING` on the correct YouTube tab;
+- browser audio upload reached backend processing;
+- first Stop ended with `MEDIA_DURATION_UNKNOWN` before AssemblyAI.
+
+Root cause and fix:
+- MediaRecorder streaming WebM/Opus may omit container-level duration metadata;
+- raw WebM was originally probed before normalization;
+- backend now normalizes first to MP3 with a hard processing cap, then probes duration on normalized audio;
+- quota is reserved only after duration validation succeeds;
+- helper 0.1.0 does not require reinstall.
+
+Duration-fix validation/deployment:
+- VoiceBridge CI run `32067365619`: SUCCESS;
+- current commit `772901a167611f0197d1bc05cea8091da211dc47`;
+- explicit isolated Render deploy run `32067505039`: SUCCESS;
+- deploy ID `dep-da1n5rou01pc73b5v73g`;
+- exact duration-fix commit reached `live`;
+- beta health HTTP 200;
+- service `status=ok`;
+- `media_client_ingest.mode=client_assisted`;
+- `media_client_ingest.configured=true`;
+- `requires_browser_helper=true`.
+
 Next acceptance sequence:
-1. create a fresh `KRCC_...` job for the A4.1 URL;
+1. create a NEW `KRCC_...` job for the A4.1 URL because the previous job is terminal FAILED;
 2. require `AWAITING_CLIENT`, `client_upload_required=true`, `stt_seconds_charged=0` before upload;
-3. load helper 0.1.0 in owner Chrome/Edge;
-4. record a short normal-speed segment of the same YouTube video;
-5. require `COMPLETED`, non-empty timestamped segments, sensible detected language/STT charge, and provider cleanup evidence;
-6. then expand to UK/RU/EN/auto and guard-condition matrix.
+3. reuse already installed helper 0.1.0 in owner Edge/Chrome;
+4. record approximately 60-90 seconds at normal speed;
+5. require upload acceptance, `TRANSCRIBING`, then `COMPLETED`;
+6. require non-empty timestamped segments, sensible detected language/STT charge, and provider cleanup evidence;
+7. then expand to UK/RU/EN/auto and guard-condition matrix.
 
 Remaining A4 matrix:
-- owner real browser capture acceptance;
+- successful owner real browser STT acceptance;
 - Ukrainian case;
 - Russian case;
 - English case;
