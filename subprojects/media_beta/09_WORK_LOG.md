@@ -1,7 +1,7 @@
 # MEDIA BETA Work Log
 Хронологічний журнал суттєвих робіт і перевірок підпроєкту для аудиту та відновлення контексту.
 
-Version: 1.6
+Version: 1.7
 Status: ACTIVE
 
 ## 2026-08-17 - Media URL upgrade initiated
@@ -80,7 +80,7 @@ Implemented controls:
 - same-video matching;
 - per-tester temporary ownership digest;
 - 32 MiB upload limit;
-- ffprobe duration check and 60-minute limit;
+- duration validation and 60-minute limit;
 - ffmpeg mono 16 kHz approximately 32 kbps STT normalization;
 - AssemblyAI auto/uk/ru/en;
 - timestamped segments;
@@ -131,15 +131,71 @@ Evidence:
 
 Temporary deployment workflow file was removed after verification. Production VoiceBridge was not targeted.
 
-## 2026-08-17 - Current next gate
+## 2026-08-17 - First real KRCC owner browser test
 
-Create a fresh `KRCC_...` job for the acceptance URL and verify before browser upload:
-- HTTP 202;
+Created client job:
+`KRCC_aa3b2cbc-4d4e-4f89-b6e6-4549766f34f5`.
+
+Initial response PASS:
 - `AWAITING_CLIENT`;
 - `client_upload_required=true`;
-- `stt_seconds_charged=0`.
+- `stt_seconds_charged=0`;
+- daily quota remaining 7200 sec.
 
-Then load helper 0.1.0 in owner Edge/Chrome, capture a short normal-speed segment of the same video, Stop, and require a successful timestamped transcript plus provider cleanup evidence.
+Owner loaded helper 0.1.0 in Edge and the helper successfully reached `CAPTURING` on the same YouTube video. Audio capture and upload reached backend processing.
+
+Stop result:
+`MEDIA_DURATION_UNKNOWN: The browser-captured audio duration could not be determined.`
+
+No AssemblyAI STT charge was recorded for this failure.
+
+## 2026-08-17 - MediaRecorder WebM duration incident resolved in backend
+
+Root cause: browser MediaRecorder streaming WebM/Opus blobs can omit container-level duration metadata. The initial A4.2 backend probed raw WebM with ffprobe before normalization, so a valid browser capture could return unknown duration.
+
+Backend correction:
+- write browser capture to temporary source file;
+- normalize first with ffmpeg to mono 16 kHz approximately 32 kbps MP3;
+- apply a hard processing cap of max duration plus approximately one second;
+- verify normalized file size;
+- probe duration on normalized MP3;
+- enforce the 60-minute limit after the reliable probe;
+- reserve STT quota only after duration validation succeeds.
+
+Helper 0.1.0 was not changed and does not require reinstall.
+
+VoiceBridge duration-fix CI:
+- run `32067365619`;
+- commit `772901a167611f0197d1bc05cea8091da211dc47`;
+- browser-extension PASS;
+- cloud build/tests PASS;
+- repository-docs PASS;
+- overall SUCCESS.
+
+Explicit isolated Render redeploy:
+- workflow run `32067505039`: SUCCESS;
+- deploy ID `dep-da1n5rou01pc73b5v73g`;
+- exact commit `772901a167611f0197d1bc05cea8091da211dc47` reached `live`;
+- health HTTP 200;
+- service status `ok`;
+- `media_client_ingest.mode=client_assisted`;
+- `configured=true`;
+- `requires_browser_helper=true`.
+
+The one-shot patch/deploy workflow files were removed after use. Production VoiceBridge was not targeted.
+
+## 2026-08-17 - Current next gate
+
+The failed KRCC job is terminal and must not be reused.
+
+Create a NEW `KRCC_...` job for the same acceptance URL, reuse the already installed helper 0.1.0, capture approximately 60-90 seconds at normal speed, then require:
+- upload accepted;
+- `TRANSCRIBING`;
+- `COMPLETED`;
+- non-empty timestamped segments;
+- detected language;
+- sensible STT charge;
+- provider cleanup evidence.
 
 ## Logging rule
 
