@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 Дорожня карта реалізації закритого beta-медіарежиму та наступного сталого безкоштовного режиму.
 
-Version: 1.0
+Version: 1.1
 Status: ACTIVE
 Updated: 2026-08-17
 
@@ -21,12 +21,6 @@ Deliverables:
 - production VoiceBridge unchanged;
 - published K-Research & Critic unchanged.
 
-Exit criteria:
-
-- architecture documented;
-- production boundaries explicit;
-- feature branches and draft PRs created.
-
 ### A2. Resource protection
 
 Status: COMPLETE_IN_CODE
@@ -43,39 +37,46 @@ Deliverables:
 - transcript/job TTL;
 - access codes excluded from reports/checkpoints.
 
-Exit criteria:
+Validation:
 
-- automated CI green in VoiceBridge;
+- VoiceBridge automated CI green;
 - KRC Store/package tests green.
 
 ### A3. Dedicated Render beta deployment
 
-Status: NEXT
+Status: IN_PROGRESS_SECRETS_PENDING
 
-Tasks:
+Completed:
 
-- create a new Render Blueprint/service from VoiceBridge feature branch;
-- use `render.media-beta.yaml`;
-- confirm service name `voicebridge-krc-media-beta-kolemasakar`;
-- configure secrets only in Render Dashboard;
-- do not modify `voicebridge-cloud-us`;
-- validate `/api/v1/health`.
+- GitHub -> Render API control bridge validated;
+- dedicated Render service created: `voicebridge-krc-media-beta-kolemasakar`;
+- Render service ID: `srv-da1kic5bedkc73d6fk60`;
+- branch verified: `agent/krc-media-transcript`;
+- plan verified: `free`;
+- initial deploy reached `live`;
+- beta `/api/v1/health` returned HTTP 200;
+- health reports `mode=closed_beta`, `subtitle_first=true`, max duration 3600 sec, concurrency 1, daily STT budget 7200 sec;
+- production `voicebridge-cloud-us` was not modified.
 
-Required secrets:
+Pending:
 
-- `KRC_MEDIA_ACTION_TOKEN`;
-- `KRC_MEDIA_BETA_CODES`;
-- `ASSEMBLYAI_API_KEY`.
+- configure `KRC_MEDIA_ACTION_TOKEN`;
+- configure `KRC_MEDIA_BETA_CODES`;
+- configure `ASSEMBLYAI_API_KEY`;
+- verify health changes from `media_transcript.configured=false` to `true`;
+- verify production VoiceBridge health remains normal after beta configuration.
 
 Exit criteria:
 
-- dedicated beta endpoint reachable;
-- health shows media beta configured;
-- production VoiceBridge health unchanged.
+- dedicated beta endpoint reachable: COMPLETE;
+- Free plan/branch isolation: COMPLETE;
+- health endpoint reachable: COMPLETE;
+- media beta `configured=true`: PENDING;
+- production VoiceBridge health unchanged: PENDING FINAL CHECK.
 
 ### A4. Live transcript validation
 
-Status: BLOCKED_BY_A3
+Status: BLOCKED_BY_A3_SECRETS
 
 Test set:
 
@@ -162,27 +163,13 @@ Tasks:
 - monitor Render bandwidth and AssemblyAI credits;
 - adjust limits only through an explicit decision update.
 
-Exit criteria:
-
-- stable operation over representative beta workload;
-- no material production regression;
-- documented resource consumption.
-
 ## Phase B - Sustainable Free Media
 
 Status: PLANNED_AFTER_BETA
 
 ### B1. Cloudflare Whisper proof of concept
 
-Compare against AssemblyAI for:
-
-- Ukrainian;
-- Russian;
-- English;
-- timestamps;
-- names/numbers/acronyms;
-- latency;
-- effective free daily capacity.
+Compare against AssemblyAI for Ukrainian, Russian, English, timestamps, names/numbers/acronyms, latency, and effective free daily capacity.
 
 ### B2. Provider-neutral transcript router
 
@@ -196,37 +183,17 @@ captions
 
 ### B3. Local Media Node proof of concept
 
-Evaluate:
-
-- faster-whisper;
-- whisper.cpp;
-- CPU-only operation;
-- optional GPU acceleration;
-- public HTTPS exposure;
-- availability and security model.
+Evaluate faster-whisper, whisper.cpp, CPU-only operation, optional GPU acceleration, public HTTPS exposure, availability, and security.
 
 ### B4. Remove permanent AssemblyAI dependency from public free path
 
-AssemblyAI may remain as:
-
-- development comparator;
-- emergency fallback;
-- optional paid reliability path.
-
-It must not be required for the intended sustainable free public mode.
+AssemblyAI may remain as development comparator, emergency fallback, or optional paid reliability path. It must not be required for the intended sustainable free public mode.
 
 ## Phase C - Public media release
 
 Status: FUTURE
 
-Public release is allowed only after:
-
-- sustainable resource model validated;
-- privacy configuration validated;
-- Free-plan ChatGPT test passed;
-- Actions runtime compatibility validated;
-- production smoke tests passed;
-- explicit user approval to promote from beta.
+Public release requires sustainable resource validation, privacy validation, Free-plan ChatGPT test, Actions runtime compatibility, production smoke tests, and explicit user approval.
 
 ## Roadmap rule
 
