@@ -1,7 +1,7 @@
 # MEDIA BETA Chat Handoff
 Канонічний документ відновлення та переходу між чатами для продовження MEDIA BETA.
 
-Version: 1.2
+Version: 1.3
 Status: ACTIVE_HANDOFF
 Checkpoint date: 2026-08-17
 
@@ -54,16 +54,15 @@ Transcript is source content only. Independent claim verification begins only af
 
 ## Current checkpoint
 
-`A3_COMPLETE / MEDIA_CONFIGURED / A4_NEXT`
+`A3_COMPLETE / A4_IN_PROGRESS / PO_PROVIDER_REMEDIATION_DEPLOYED`
 
 Dedicated beta service: `voicebridge-krc-media-beta-kolemasakar`.
 
 Service ID: `srv-da1kic5bedkc73d6fk60`.
 
-Verified:
+Base verified:
 - plan `free`;
 - branch `agent/krc-media-transcript`;
-- beta deploy live;
 - beta health HTTP 200;
 - media mode `closed_beta`;
 - `media_transcript.configured=true`;
@@ -71,28 +70,73 @@ Verified:
 - max duration 3600 sec;
 - concurrency 1;
 - daily STT 7200 sec;
-- production VoiceBridge health HTTP 200 / `status=ok`.
+- production VoiceBridge was not targeted by A4 remediation.
 
-Final A3 verification run: `32055491376`.
+## A4.1 live acceptance history
 
-A first configuration attempt failed because one tester-code entry was shorter than the required 12 characters. The value was corrected and the redeploy succeeded. No credential values are stored in this document.
+Acceptance URL:
+`https://www.youtube.com/watch?v=DZLzmQ2kwaA`
+
+Verified before media acquisition:
+- bearer token authentication PASS;
+- invalid beta code rejected PASS;
+- owner beta code accepted PASS;
+- job creation PASS.
+
+Attempt 1:
+- `FETCHING_MEDIA` -> `FAILED`;
+- `MEDIA_FETCH_FAILED`;
+- YouTube `Sign in to confirm you're not a bot`;
+- STT charged 0 seconds.
+
+Attempt 2 after `web_embedded,android_vr` fallback:
+- same YouTube anti-bot failure;
+- STT charged 0 seconds.
+
+Interpretation: blocker is YouTube ingress from Render cloud IP before captions or AssemblyAI.
+
+## Current remediation deployed
+
+The first client-only remediation was insufficient.
+
+Current R2 stack is deployed to the isolated beta service:
+- yt-dlp client `mweb`;
+- `bgutil-ytdlp-pot-provider` 1.3.1;
+- local PO Token Provider inside the same container on port 4416;
+- `yt-dlp[default]==2026.07.04`;
+- Node.js 24 enabled as EJS runtime;
+- ffmpeg retained;
+- no personal YouTube account cookies;
+- no second Render service;
+- no paid instance introduced.
+
+VoiceBridge CI after R2: PASS.
+
+Render remediation workflow run `32059276099`: PASS.
+
+R2 Render build/deploy commit: `d7864ad1625f815613deaea8043b4f1786768c61`.
+
+R2 deployment: LIVE; beta health/configuration PASS.
 
 ## Exact next task
 
-Phase: `A4 - Live transcript validation`.
+Repeat A4.1 using the SAME URL and a NEW media job after R2 deployment.
 
-First action: use a short public YouTube video with usable captions and validate the subtitle-first path without AssemblyAI STT quota use. Then test a separate video that requires AssemblyAI fallback.
+Success target:
+- `status=COMPLETED`;
+- ideally `transcript_source=youtube_captions`;
+- `stt_seconds_charged=0` for captions path.
 
-Use `05_TEST_PLAN.md` for the full A4 matrix.
+If the same anti-bot challenge persists after R2, do not loop repeated retries and do not introduce personal YouTube cookies by default. Evaluate a different ingress architecture, such as local/residential acquisition, while preserving the Free/closed-beta objectives.
 
 ## Do-not-do list
 
-Do not merge PR #8/#28 automatically, deploy beta over production, alter the published KRC GPT, expose credentials or tester codes, claim transcript tests passed without live evidence, bypass CriticProfile approval, or change priority away from closed beta unless the user decides so.
+Do not merge PR #8/#28 automatically, deploy beta over production, alter the published KRC GPT, expose credentials/tester codes, claim transcript acceptance before live evidence, bypass CriticProfile approval, or store personal YouTube cookies in repository/chat.
 
 ## Terminal markers
 
-`MEDIA_BETA_HANDOFF_V1_2`
+`MEDIA_BETA_HANDOFF_V1_3`
 
-`A4_LIVE_TRANSCRIPT_VALIDATION_NEXT`
+`A4_R2_PO_PROVIDER_DEPLOYED_RETEST_NEXT`
 
-`PRODUCTION_HEALTH_OK_DRAFT_PRS_UNMERGED`
+`PRODUCTION_ISOLATED_DRAFT_PRS_UNMERGED`
