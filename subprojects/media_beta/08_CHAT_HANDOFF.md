@@ -1,7 +1,7 @@
 # MEDIA BETA Chat Handoff
 Канонічний документ відновлення та переходу між чатами для продовження MEDIA BETA.
 
-Version: 1.5
+Version: 1.6
 Status: ACTIVE_HANDOFF
 Checkpoint date: 2026-08-17
 
@@ -32,7 +32,7 @@ Production branches and published products remain unchanged.
 
 ## Current checkpoint
 
-`A3_COMPLETE / A4_1_CLOUD_INGRESS_BLOCKED / A4_2_CLIENT_ASSISTED_DEPLOYED / LIVE_OWNER_BROWSER_ACCEPTANCE_NEXT`
+`A3_COMPLETE / A4_1_CLOUD_INGRESS_BLOCKED / A4_2_CLIENT_ASSISTED_LIVE / FIRST_BROWSER_CAPTURE_REACHED_BACKEND / WEBM_DURATION_FIX_DEPLOYED / NEW_KRCC_RETEST_NEXT`
 
 Dedicated beta service:
 - `voicebridge-krc-media-beta-kolemasakar`;
@@ -59,7 +59,8 @@ YouTube URL
  -> separate KRC MEDIA BETA browser helper
  -> same active YouTube tab captured via tester browser/network path
  -> compressed audio upload to isolated beta backend
- -> duration/source/quota validation
+ -> bounded ffmpeg normalization
+ -> reliable normalized-audio duration/source/quota validation
  -> AssemblyAI async STT
  -> timestamped transcript
  -> claim inventory
@@ -72,13 +73,16 @@ Direct reliable transcript/caption acquisition remains preferred when already av
 
 ## A4.2 implementation evidence
 
-VoiceBridge:
-- implementation commit `923389b3fdd89eef4a57b308b8fe2a98d41ce8e5`;
+VoiceBridge initial client-assisted implementation:
+- commit `923389b3fdd89eef4a57b308b8fe2a98d41ce8e5`;
 - CI run `32062552003`: SUCCESS;
-- new backend `media_client_ingest.ts` and `media_client_http.ts`;
+- backend `media_client_ingest.ts` and `media_client_http.ts`;
 - additive `server.ts` integration;
-- separate `src/media_beta_helper/` Chrome/Edge MV3 helper;
-- validated existing VoiceBridge translation extension unchanged.
+- separate `src/media_beta_helper/` Chrome/Edge MV3 helper.
+
+Current VoiceBridge duration-fix deployment:
+- commit `772901a167611f0197d1bc05cea8091da211dc47`;
+- CI run `32067365619`: SUCCESS.
 
 KRC beta Action:
 - `startMediaBetaClientTranscription`;
@@ -92,21 +96,50 @@ KRC package CI run `32063557028`: SUCCESS.
 
 ## Live Render A4.2 state
 
-Auto-deploy was intentionally disabled when the beta service was created, so an initial read-only check correctly found the previous R2 commit still live.
-
-An explicit isolated deployment then targeted only service `srv-da1kic5bedkc73d6fk60`.
-
-Deploy verification:
+Initial explicit A4.2 deployment:
 - workflow run `32063396120`: SUCCESS;
 - deploy ID `dep-da1mgebutv3s73fd2grg`;
-- exact commit `923389b3fdd89eef4a57b308b8fe2a98d41ce8e5` reached `live`;
+- commit `923389b3fdd89eef4a57b308b8fe2a98d41ce8e5` reached `live`.
+
+Current duration-fix deployment:
+- workflow run `32067505039`: SUCCESS;
+- deploy ID `dep-da1n5rou01pc73b5v73g`;
+- exact commit `772901a167611f0197d1bc05cea8091da211dc47` reached `live`;
 - health HTTP 200;
+- service status `ok`;
 - `media_client_ingest.mode=client_assisted`;
 - `media_client_ingest.configured=true`;
-- `requires_browser_helper=true`;
-- `upload_max_bytes=33554432`.
+- `requires_browser_helper=true`.
 
-The temporary deploy workflow file was removed after verification. A temporary ops branch may remain and is not the Render source branch.
+Temporary patch/deploy workflow files were removed after verification. Production VoiceBridge was not targeted.
+
+## First real owner browser test
+
+Created job:
+`KRCC_aa3b2cbc-4d4e-4f89-b6e6-4549766f34f5`.
+
+Initial state PASS:
+```text
+status=AWAITING_CLIENT
+client_upload_required=true
+stt_seconds_charged=0
+remaining daily STT=7200 sec
+```
+
+Owner installed helper 0.1.0 in Edge. Helper reached `CAPTURING` on the correct YouTube tab and browser audio upload reached backend processing.
+
+First Stop result:
+`MEDIA_DURATION_UNKNOWN: The browser-captured audio duration could not be determined.`
+
+Root cause: MediaRecorder streaming WebM/Opus may omit container-level duration metadata. Initial backend probed raw WebM before ffmpeg normalization.
+
+Fix now live:
+- normalize raw capture first;
+- hard-bound ffmpeg processing around the 60-minute limit;
+- probe duration on normalized MP3;
+- reserve STT quota only after successful duration validation.
+
+Helper 0.1.0 is unchanged and does not need reinstall. The failed KRCC job is terminal and must not be reused.
 
 ## Beta resource/security baseline
 
@@ -125,9 +158,9 @@ The temporary deploy workflow file was removed after verification. A temporary o
 
 ## Exact next task
 
-Create the first fresh client-assisted job for the same acceptance URL.
+Create a NEW fresh client-assisted job for the same acceptance URL. Do not reuse `KRCC_aa3b2cbc-4d4e-4f89-b6e6-4549766f34f5` because it is terminal FAILED.
 
-Expected response before browser upload:
+Expected new response:
 ```text
 HTTP 202
 job_id=KRCC_...
@@ -136,7 +169,9 @@ client_upload_required=true
 stt_seconds_charged=0
 ```
 
-Then install/load `KRC MEDIA BETA Helper 0.1.0` in owner Edge/Chrome, open the same YouTube video, capture a short controlled normal-speed section, Stop, and require:
+Reuse the already installed `KRC MEDIA BETA Helper 0.1.0`. Enter the new KRCC job ID and the same tester code, capture approximately 60-90 seconds at normal speed, Stop, and require:
+- upload accepted;
+- `TRANSCRIBING`;
 - `COMPLETED`;
 - non-empty timestamped segments;
 - detected language;
@@ -145,14 +180,16 @@ Then install/load `KRC MEDIA BETA Helper 0.1.0` in owner Edge/Chrome, open the s
 
 ## Do-not-do list
 
-Do not merge PR #8/#28 automatically, modify public GPT/production VoiceBridge, expose credentials/tester codes, use personal YouTube cookies, add paid proxy infrastructure, claim live browser acceptance before evidence, or bypass CriticProfile approval.
+Do not merge PR #8/#28 automatically, modify public GPT/production VoiceBridge, expose credentials/tester codes, use personal YouTube cookies, add paid proxy infrastructure, claim successful end-to-end browser transcription before evidence, or bypass CriticProfile approval.
 
 ## Terminal markers
 
-`MEDIA_BETA_HANDOFF_V1_5`
+`MEDIA_BETA_HANDOFF_V1_6`
 
-`A4_2_CLIENT_ASSISTED_DEPLOYED`
+`A4_2_CLIENT_ASSISTED_LIVE`
 
-`KRCC_OWNER_BROWSER_ACCEPTANCE_NEXT`
+`WEBM_DURATION_FIX_DEPLOYED`
+
+`NEW_KRCC_OWNER_RETEST_NEXT`
 
 `PRODUCTION_ISOLATED_DRAFT_PRS_UNMERGED`
