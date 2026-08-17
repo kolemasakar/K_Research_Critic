@@ -32,11 +32,24 @@ def test_manifest_preserves_store_first_invariants() -> None:
     assert manifest["capabilities"]["web_search"] is True
     assert manifest["capabilities"]["code_interpreter_data_analysis"] is True
     assert manifest["capabilities"]["apps"] is False
-    assert manifest["capabilities"]["actions"] is False
+    assert manifest["capabilities"]["actions"] is True
+
+    # The existing text research path remains backend/API-key free.
     assert manifest["release"]["developer_api_key_required"] is False
     assert manifest["release"]["external_backend_required"] is False
     assert manifest["release"]["production_smoke_test_passed"] is True
     assert manifest["release"]["production_smoke_tested_at"] == "2026-08-14"
+
+    # External dependencies are scoped only to the optional media input path.
+    media = manifest["release"]["media_input"]
+    assert media["enabled"] is True
+    assert media["rollout_state"] == "PREVIEW_REQUIRED"
+    assert media["external_backend_required"] is True
+    assert media["developer_provider_key_required"] is True
+    assert media["user_api_key_required"] is False
+    assert media["supported_platforms"] == ["youtube"]
+    assert set(media["supported_languages"]) == {"uk", "ru", "en"}
+    assert media["production_smoke_test_passed"] is False
 
 
 def test_instruction_package_contains_required_workflow_boundaries() -> None:
@@ -63,6 +76,20 @@ def test_instruction_package_contains_required_workflow_boundaries() -> None:
     assert 'approved_by="user"' in text
     assert "Output one complete valid JSON object" in text
     assert "Do not persist/reveal hidden chain-of-thought" in text
+
+
+def test_instruction_package_contains_media_evidence_boundaries() -> None:
+    text = (ROOT / "prompts" / "GPT_STORE_INSTRUCTIONS.md").read_text(encoding="utf-8")
+
+    assert "MEDIA PREFLIGHT: media_transcript=AVAILABLE" in text
+    assert "MEDIA PREFLIGHT: media_transcript=UNAVAILABLE" in text
+    assert "MEDIA URL INTAKE" in text
+    assert "transcript text as SOURCE CONTENT ONLY" in text
+    assert "not evidence that it is true" in text
+    assert "CLAIM VERIFICATION" in text
+    assert "VERIFIED, PARTLY_SUPPORTED, UNSUPPORTED, CONTRADICTED, MISLEADING, UNVERIFIABLE" in text
+    assert "Do not dump the full transcript unless the user explicitly asks for it" in text
+    assert "Do not store the full transcript in a checkpoint" in text
 
 
 def test_checkpoint_example_validates_and_round_trips() -> None:
@@ -127,15 +154,41 @@ def test_checkpoint_rejects_extra_review_keys() -> None:
         StoreCheckpoint.model_validate(payload)
 
 
-def test_manifest_can_be_parsed_without_secrets_or_external_actions() -> None:
+def test_manifest_can_be_parsed_without_tracked_secrets_and_scopes_external_action() -> None:
     manifest = yaml.safe_load((ROOT / "gpt_store" / "manifest.yaml").read_text(encoding="utf-8"))
     serialized = json.dumps(manifest, sort_keys=True)
     secret_name = "OPENAI" + "_API_KEY"
 
     assert secret_name not in serialized
-    assert manifest["capabilities"]["actions"] is False
+    assert manifest["capabilities"]["actions"] is True
     assert manifest["capabilities"]["apps"] is False
     assert manifest["knowledge"]["required"] is False
+    assert manifest["release"]["developer_api_key_required"] is False
+    assert manifest["release"]["external_backend_required"] is False
+    assert manifest["release"]["media_input"]["external_backend_required"] is True
+    assert manifest["release"]["media_input"]["user_api_key_required"] is False
+
+
+def test_media_action_schema_has_only_transcript_operations() -> None:
+    schema = yaml.safe_load(
+        (ROOT / "gpt_store" / "actions" / "media_transcript_openapi.yaml").read_text(encoding="utf-8")
+    )
+    paths = schema["paths"]
+
+    assert set(paths) == {
+        "/api/v1/media/transcriptions",
+        "/api/v1/media/transcriptions/{job_id}",
+        "/api/v1/media/transcriptions/{job_id}/segments",
+    }
+    assert paths["/api/v1/media/transcriptions"]["post"]["operationId"] == "startMediaTranscription"
+    assert (
+        paths["/api/v1/media/transcriptions/{job_id}"]["get"]["operationId"]
+        == "getMediaTranscriptionStatus"
+    )
+    assert (
+        paths["/api/v1/media/transcriptions/{job_id}/segments"]["get"]["operationId"]
+        == "getMediaTranscriptSegments"
+    )
 
 
 def test_store_package_validation_cli_passes() -> None:
