@@ -177,6 +177,13 @@ components:
           type: string
         provider_model:
           type: string
+        provider_data_deleted:
+          anyOf:
+            - type: boolean
+            - type: "null"
+          description: >-
+            True when the provider transcript/delete request succeeded, false when
+            cleanup failed, null while cleanup has not yet been attempted.
         media:
           type: object
           properties:
