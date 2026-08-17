@@ -1,0 +1,78 @@
+name: MEDIA BETA Client Contract Patch
+
+on:
+  push:
+    branches:
+      - agent/video-url-research
+    paths:
+      - .github/workflows/media-client-contract-patch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/video-url-research
+          fetch-depth: 0
+
+      - name: Patch beta instructions and validator
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('prompts/GPT_STORE_MEDIA_BETA_INSTRUCTIONS.md')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace('Version: 0.1-beta', 'Version: 0.2-beta', 1)
+          s = s.replace(
+              '- After a valid code is supplied, use it only as `beta_access_code` in `startMediaBetaTranscription`.',
+              '- After a valid code is supplied, use it only as `beta_access_code` in `startMediaBetaClientTranscription` and never repeat it in user-visible text.',
+              1,
+          )
+          old = '''Closed beta resource policy:\n- maximum video duration: 60 minutes;\n- maximum concurrent media jobs: 1;\n- global AssemblyAI fallback budget: 2 hours of source audio per UTC day;\n- YouTube captions are attempted first and do not consume the STT budget;\n- AssemblyAI is used only when usable source-language captions are not available;\n- STT fallback audio is optimized server-side for speech transcription;\n- daily STT quota is a beta safety guard, not a user entitlement.\n\nPreferred intake order:\n1) If reliable transcript/captions are directly available through current built-in capabilities, they may be used.\n2) Otherwise, if Media Transcript Action is AVAILABLE and a beta access code was supplied, call `startMediaBetaTranscription` with the supplied URL, the beta access code, and language_hint=auto unless the user explicitly specified uk/ru/en.\n3) Use `getMediaBetaTranscriptionStatus` to inspect job state. When COMPLETED, retrieve every page with `getMediaBetaTranscriptSegments` until next_cursor is null.\n4) If the action is still processing after bounded status checks, state that the external transcription job is not complete yet and ask the user to send "continue" to check that same job again. Do not claim ChatGPT itself is continuing work in the background.\n5) If the job fails with MEDIA_DAILY_STT_QUOTA_EXHAUSTED, explain that the daily STT fallback budget is exhausted. Do not imply that caption-backed videos are globally unavailable.\n6) If transcription is unavailable or fails for another reason, try a web-accessible transcript/caption source when available. If no reliable transcript can be obtained, state the limitation and request a transcript/audio/file from the user. Never invent video content.\n\nUse response metadata correctly:\n- transcript_source=youtube_captions means no AssemblyAI STT budget was consumed;\n- transcript_source=assemblyai_stt means STT fallback was used;\n- stt_seconds_charged is the beta STT budget reservation for that job;\n- beta_quota is diagnostic beta resource state and is not evidence about the media claim;\n- provider_data_deleted=true means the provider delete request succeeded; false means cleanup could not be confirmed; null is normal for YouTube-caption jobs.\n'''
+          new = '''Closed beta resource policy:\n- maximum captured video/audio duration: 60 minutes;\n- maximum concurrent media jobs: 1;\n- global AssemblyAI budget: 2 hours of captured source audio per UTC day;\n- reliable transcript/captions obtained directly through current built-in/web capabilities remain preferred and do not consume this beta STT budget;\n- the current A4.2 Action fallback is client-assisted browser audio, not server-side YouTube download;\n- the separate KRC MEDIA BETA browser helper captures the same active YouTube tab through the tester browser/network path and uploads only captured audio to the isolated beta backend;\n- current helper audio is normalized server-side for speech transcription and sent to AssemblyAI;\n- client-side caption extraction is a planned optimization and must not be claimed as implemented;\n- daily STT quota is a beta safety guard, not a user entitlement.\n\nPreferred intake order:\n1) If a reliable transcript/captions are directly available through current built-in/web capabilities, they may be used.\n2) Otherwise, if Media Transcript Action is AVAILABLE and a beta access code was supplied, call `startMediaBetaClientTranscription` with the supplied URL, beta access code, and language_hint=auto unless the user explicitly specified uk/ru/en.\n3) A newly created job normally returns `status=AWAITING_CLIENT`, `client_upload_required=true`, and a `KRCC_...` job ID. Tell the user to open the SAME YouTube video in Chrome/Edge, open the separate KRC MEDIA BETA Helper, enter that KRCC job ID and their tester code, press Start capture, play the video at normal speed, then press Stop when the relevant content is finished. Never ask the user for the Action bearer token or provider key.\n4) Do not call the browser-only audio upload/status endpoints yourself; they are intentionally absent from the GPT Action schema and are used only by the helper.\n5) After the user reports the helper has completed, or asks to continue/check, call `getMediaBetaClientTranscriptionStatus` for the same KRCC job. If COMPLETED, retrieve every page with `getMediaBetaClientTranscriptSegments` until next_cursor is null.\n6) If status is AWAITING_CLIENT, explain that browser capture/upload is still required. If UPLOADING or TRANSCRIBING after bounded checks, state that the external job is not complete and ask the user to send "continue" later. Do not claim ChatGPT itself continues in the background.\n7) If the job fails with MEDIA_DAILY_STT_QUOTA_EXHAUSTED, explain that the closed-beta daily STT budget is exhausted.\n8) If client-assisted transcription is unavailable or fails, try a reliable web-accessible transcript/caption source when available. If no reliable transcript can be obtained, state the limitation and request a transcript/audio/file. Never invent video content.\n\nUse response metadata correctly:\n- ingress_mode=client_assisted identifies the A4.2 browser-assisted path;\n- client_upload_required=true means the helper has not yet supplied browser audio;\n- transcript_source=assemblyai_stt means captured browser audio was transcribed by AssemblyAI;\n- stt_seconds_charged is the beta STT budget reservation based on captured-audio duration;\n- beta_quota is diagnostic beta resource state and is not evidence about the media claim;\n- provider_data_deleted=true means the provider delete request succeeded; false means cleanup could not be confirmed; null means no provider deletion result is available yet.\n'''
+          if old not in s:
+              raise SystemExit('media intake block not found')
+          s = s.replace(old, new, 1)
+          s = s.replace(
+              'The tester access code is sent only to the VoiceBridge beta access gate and is not retained in media job state.',
+              'The tester access code is sent only to the VoiceBridge beta access gate. The backend does not persist plaintext access codes in client jobs; a one-way digest may be held temporarily to enforce per-tester job ownership.',
+              1,
+          )
+          p.write_text(s, encoding='utf-8')
+
+          p = Path('scripts/validate_store_package.py')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace(
+              '_require(manifest.get("schema_version") == "0.1-beta", "media beta schema_version must be 0.1-beta")',
+              '_require(manifest.get("schema_version") == "0.2-beta", "media beta schema_version must be 0.2-beta")',
+              1,
+          )
+          old = '''    _require(beta.get("max_video_seconds") == 3600, "closed beta max video must remain 60 minutes")\n    _require(beta.get("max_concurrent_jobs") == 1, "closed beta concurrency must remain one")\n    _require(beta.get("daily_stt_seconds") == 7200, "closed beta STT budget must remain two hours/day")\n    _require(beta.get("subtitle_first") is True, "closed beta must remain subtitle-first")\n    _require(beta.get("stt_fallback") == "assemblyai", "closed beta fallback must remain AssemblyAI")\n'''
+          new = '''    _require(beta.get("ingress_mode") == "client_assisted", "closed beta must use client-assisted ingress after cloud YouTube blocking")\n    _require(beta.get("browser_helper_required") is True, "closed beta client path must require the browser helper")\n    _require(beta.get("browser_helper_job_prefix") == "KRCC_", "closed beta client jobs must use KRCC_ prefix")\n    _require(beta.get("direct_transcript_first") is True, "reliable direct transcript/caption intake must remain preferred")\n    _require(beta.get("client_caption_first") is False, "client caption extraction must not be claimed before implementation")\n    _require(beta.get("max_video_seconds") == 3600, "closed beta max video must remain 60 minutes")\n    _require(beta.get("max_concurrent_jobs") == 1, "closed beta concurrency must remain one")\n    _require(beta.get("daily_stt_seconds") == 7200, "closed beta STT budget must remain two hours/day")\n    _require(beta.get("max_client_audio_bytes") == 33554432, "closed beta client upload limit must remain 32 MiB")\n    _require(beta.get("stt_provider") == "assemblyai", "closed beta client STT provider must remain AssemblyAI")\n'''
+          if old not in s:
+              raise SystemExit('validator beta resource block not found')
+          s = s.replace(old, new, 1)
+          old = '''            "MEDIA BETA ACCESS REQUIRED",\n            "startMediaBetaTranscription",\n            "getMediaBetaTranscriptionStatus",\n            "getMediaBetaTranscriptSegments",\n            "maximum video duration: 60 minutes",\n            "global AssemblyAI fallback budget: 2 hours",\n            "YouTube captions are attempted first",\n            "Never include beta access codes",\n            "Do not store the full transcript or beta access code in a checkpoint",\n'''
+          new = '''            "MEDIA BETA ACCESS REQUIRED",\n            "startMediaBetaClientTranscription",\n            "getMediaBetaClientTranscriptionStatus",\n            "getMediaBetaClientTranscriptSegments",\n            "status=AWAITING_CLIENT",\n            "KRCC_...",\n            "maximum captured video/audio duration: 60 minutes",\n            "global AssemblyAI budget: 2 hours",\n            "client-assisted browser audio",\n            "client-side caption extraction is a planned optimization",\n            "Never include beta access codes",\n            "Do not store the full transcript or beta access code in a checkpoint",\n'''
+          if old not in s:
+              raise SystemExit('validator instruction token block not found')
+          s = s.replace(old, new, 1)
+          old = '''            "operationId: startMediaBetaTranscription",\n            "operationId: getMediaBetaTranscriptionStatus",\n            "operationId: getMediaBetaTranscriptSegments",\n            "beta_access_code",\n            "writeOnly: true",\n            "^KRCB_[A-Za-z0-9-]+$",\n            "youtube_captions",\n            "assemblyai_stt",\n            "stt_seconds_charged",\n            "beta_quota",\n'''
+          new = '''            "operationId: startMediaBetaClientTranscription",\n            "operationId: getMediaBetaClientTranscriptionStatus",\n            "operationId: getMediaBetaClientTranscriptSegments",\n            "beta_access_code",\n            "writeOnly: true",\n            "^KRCC_[A-Za-z0-9-]+$",\n            "AWAITING_CLIENT",\n            "client_assisted",\n            "client_upload_required",\n            "assemblyai_stt",\n            "stt_seconds_charged",\n            "beta_quota",\n'''
+          if old not in s:
+              raise SystemExit('validator action token block not found')
+          s = s.replace(old, new, 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add prompts/GPT_STORE_MEDIA_BETA_INSTRUCTIONS.md scripts/validate_store_package.py
+          git commit -m "Switch MEDIA BETA instructions to client-assisted flow"
+          git push origin HEAD:agent/video-url-research
