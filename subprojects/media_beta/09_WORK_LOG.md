@@ -1,7 +1,7 @@
 # MEDIA BETA Work Log
 Хронологічний журнал суттєвих робіт і перевірок підпроєкту для аудиту та відновлення контексту.
 
-Version: 1.3
+Version: 1.4
 Status: ACTIVE
 
 ## 2026-08-17 - Media URL upgrade initiated
@@ -60,14 +60,6 @@ Correction: tester-code value fixed; redeploy repeated; deployment reached live 
 
 ## 2026-08-17 - A3 final verification completed
 
-Read-only verification after correction observed:
-- deploy `dep-da1l56n40ujc73bso600` live;
-- beta health HTTP 200;
-- `media_transcript.configured=true`;
-- media mode `closed_beta`;
-- plan `free`;
-- branch isolation intact.
-
 Final A3 verification workflow run `32055491376`:
 - beta health HTTP 200;
 - beta configured true;
@@ -76,9 +68,64 @@ Final A3 verification workflow run `32055491376`:
 
 Phase A3 result: COMPLETE.
 
-Current next operational step: `A4 - Live transcript validation`.
+## 2026-08-17 - A4.1 first live media request
 
-Start with a short public YouTube video that has usable captions to validate subtitle-first without AssemblyAI STT quota consumption.
+Acceptance URL:
+`https://www.youtube.com/watch?v=DZLzmQ2kwaA`
+
+Live checks:
+- bearer token authentication PASS;
+- intentionally invalid beta code returned `MEDIA_BETA_ACCESS_DENIED` PASS;
+- owner beta code accepted PASS;
+- new job created PASS.
+
+Attempt 1 final result:
+- `FAILED`;
+- `MEDIA_FETCH_FAILED`;
+- YouTube reported `Sign in to confirm you're not a bot`;
+- failure occurred before captions/STT;
+- `stt_seconds_charged=0`.
+
+## 2026-08-17 - A4 remediation R1
+
+Applied explicit yt-dlp player clients `web_embedded,android_vr` to metadata, captions and audio acquisition.
+
+CI PASS and isolated beta redeploy PASS.
+
+Attempt 2 against the same URL:
+- `FAILED` with the same YouTube anti-bot challenge;
+- `stt_seconds_charged=0`.
+
+R1 conclusion: insufficient for Render cloud ingress.
+
+## 2026-08-17 - A4 remediation R2: PO Token Provider
+
+Current yt-dlp guidance was reviewed. Recommended route for current YouTube enforcement is a PO Token Provider with the `mweb` client. Manual per-video PO-token extraction is not the target design.
+
+Implemented in VoiceBridge beta branch:
+- yt-dlp client changed to `mweb`;
+- `bgutil-ytdlp-pot-provider` pinned to 1.3.1;
+- local bgutil HTTP provider embedded in the same Render container on port 4416;
+- `yt-dlp[default]` pinned to 2026.07.04;
+- Node.js 24 explicitly enabled as EJS runtime;
+- ffmpeg retained;
+- provider stack added without personal YouTube cookies;
+- no second Render service and no paid instance added.
+
+VoiceBridge normal CI after R2: PASS.
+
+Isolated Render remediation workflow:
+- run `32059276099`;
+- target only beta service ID `srv-da1kic5bedkc73d6fk60`;
+- Docker build/deploy of commit `d7864ad1625f815613deaea8043b4f1786768c61` completed successfully;
+- beta service reached LIVE;
+- beta health/configuration PASS.
+
+Current next operational step:
+- repeat the same A4.1 URL with a new media job;
+- inspect whether the PO provider resolves YouTube ingress;
+- if successful, validate subtitle-first and zero STT usage;
+- if the same anti-bot challenge persists, stop looping retries and evaluate a different ingress architecture before using personal cookies.
 
 ## Logging rule
 
