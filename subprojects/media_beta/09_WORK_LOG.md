@@ -1,7 +1,7 @@
 # MEDIA BETA Work Log
 Хронологічний журнал суттєвих робіт і перевірок підпроєкту для аудиту та відновлення контексту.
 
-Version: 1.7
+Version: 1.8
 Status: ACTIVE
 
 ## 2026-08-17 - Media URL upgrade initiated
@@ -52,7 +52,7 @@ The same YouTube anti-bot challenge remained. Conclusion: blocker is cloud/datac
 
 User approved browser/client-assisted ingestion for the closed beta.
 
-Current path:
+Initial path:
 ```text
 YouTube URL
  -> KRCC_ job / AWAITING_CLIENT
@@ -95,41 +95,30 @@ Helper artifact `KRC_MEDIA_BETA_Helper_0.1.0` was produced by CI.
 
 ## 2026-08-17 - KRC beta contract switched to A4.2
 
-Closed-beta Action now uses:
+Closed-beta Action uses:
 - `startMediaBetaClientTranscription`;
 - `getMediaBetaClientTranscriptionStatus`;
 - `getMediaBetaClientTranscriptSegments`.
 
-Contract semantics:
-- `KRCC_` job IDs;
-- `AWAITING_CLIENT` before helper upload;
-- browser upload/status endpoints are not GPT Actions;
-- direct reliable transcript/captions remain preferred when available;
-- client-side caption extraction is explicitly marked planned, not implemented.
-
-Media beta manifest advanced to `0.2-beta`. Privacy policy advanced to 0.3 for browser-assisted processing and local helper-code storage disclosure.
+Media beta manifest advanced to `0.2-beta`. Browser upload/status endpoints remain intentionally absent from the GPT Action schema.
 
 KRC CI run `32063557028` after these updates: SUCCESS.
 
 ## 2026-08-17 - A4.2 explicit Render deployment
-
-A read-only Render check first found the old R2 commit `d7864ad1625f815613deaea8043b4f1786768c61` still live because the beta service was created with auto-deploy disabled.
 
 An explicit isolated deployment targeted only service `srv-da1kic5bedkc73d6fk60` and exact VoiceBridge commit `923389b3fdd89eef4a57b308b8fe2a98d41ce8e5`.
 
 Deploy workflow run `32063396120`: SUCCESS.
 
 Evidence:
-- Render deploy request HTTP 201;
 - deploy ID `dep-da1mgebutv3s73fd2grg`;
 - exact commit reached `live`;
 - beta health HTTP 200;
 - `media_client_ingest.mode=client_assisted`;
 - `media_client_ingest.configured=true`;
-- `requires_browser_helper=true`;
-- `upload_max_bytes=33554432`.
+- `requires_browser_helper=true`.
 
-Temporary deployment workflow file was removed after verification. Production VoiceBridge was not targeted.
+Production VoiceBridge was not targeted.
 
 ## 2026-08-17 - First real KRCC owner browser test
 
@@ -149,53 +138,105 @@ Stop result:
 
 No AssemblyAI STT charge was recorded for this failure.
 
-## 2026-08-17 - MediaRecorder WebM duration incident resolved in backend
+## 2026-08-17 - MediaRecorder WebM duration incident resolved
 
-Root cause: browser MediaRecorder streaming WebM/Opus blobs can omit container-level duration metadata. The initial A4.2 backend probed raw WebM with ffprobe before normalization, so a valid browser capture could return unknown duration.
+Root cause: browser MediaRecorder streaming WebM/Opus blobs can omit container-level duration metadata. The initial A4.2 backend probed raw WebM with ffprobe before normalization.
 
 Backend correction:
-- write browser capture to temporary source file;
-- normalize first with ffmpeg to mono 16 kHz approximately 32 kbps MP3;
-- apply a hard processing cap of max duration plus approximately one second;
-- verify normalized file size;
+- normalize first to mono 16 kHz approximately 32 kbps MP3;
+- hard-bound processing around the 60-minute limit;
 - probe duration on normalized MP3;
-- enforce the 60-minute limit after the reliable probe;
-- reserve STT quota only after duration validation succeeds.
+- reserve STT quota only after duration validation.
 
-Helper 0.1.0 was not changed and does not require reinstall.
+VoiceBridge duration-fix CI run `32067365619`: SUCCESS.
 
-VoiceBridge duration-fix CI:
-- run `32067365619`;
-- commit `772901a167611f0197d1bc05cea8091da211dc47`;
-- browser-extension PASS;
-- cloud build/tests PASS;
-- repository-docs PASS;
-- overall SUCCESS.
-
-Explicit isolated Render redeploy:
-- workflow run `32067505039`: SUCCESS;
+Explicit isolated redeploy:
 - deploy ID `dep-da1n5rou01pc73b5v73g`;
-- exact commit `772901a167611f0197d1bc05cea8091da211dc47` reached `live`;
+- commit `772901a167611f0197d1bc05cea8091da211dc47` reached `live`;
+- health HTTP 200.
+
+## 2026-08-17 - D017 captions-first priority approved
+
+User asked why the system was not taking text from YouTube subtitles. The architecture was revised so browser captions are the primary A4.2 path and audio/AssemblyAI is fallback only.
+
+Approved order:
+```text
+open YouTube tab
+ -> browser caption track if usable
+ -> timestamped captions / STT=0
+ -> otherwise browser audio
+ -> AssemblyAI fallback
+```
+
+Reasons recorded:
+- captions avoid normal-speed playback for transcript acquisition;
+- captions avoid AssemblyAI quota;
+- captions reduce Render bandwidth/CPU;
+- YouTube caption timestamps already provide claim traceability;
+- browser origin avoids the Render/datacenter anti-bot blocker.
+
+## 2026-08-17 - Helper 0.2.0 captions-first implementation
+
+VoiceBridge branch added:
+- browser-only `POST /api/v1/media/client-transcriptions/{KRCC_job_id}/captions`;
+- backend `acceptCaptions` validation and completion path;
+- `transcript_source=youtube_captions`;
+- `caption_type=manual|auto_generated`;
+- `provider=youtube`;
+- `stt_seconds_charged=0`;
+- caption segment/timestamp/text bounds;
+- same-video and per-tester ownership checks.
+
+Helper 0.2.0 added:
+- Manifest V3 `scripting` permission with existing `activeTab`;
+- user-initiated caption extraction in the active YouTube player context;
+- best-effort caption-track selection;
+- timed-text `json3` fetch through the tester browser;
+- `Use subtitles` primary action;
+- `Audio fallback` retained;
+- source/caption-type/language/segment/STT status display.
+
+YouTube player internals are not a stable public API. Caption extraction is therefore explicitly best-effort and falls back to audio if unavailable.
+
+## 2026-08-17 - Captions-first automated validation and deployment
+
+VoiceBridge captions-first CI:
+- run `32069122559`;
+- commit `92f809440098fd42eb562a36c6feddeaa9c17155`;
+- cloud build/tests PASS;
+- browser/helper JS + manifest PASS;
+- Helper 0.2.0 package PASS;
+- repository docs PASS.
+
+Unit test verified caption completion with timestamped segments and zero STT quota charge.
+
+Explicit isolated Render deployment:
+- workflow run `32069270467`: SUCCESS;
+- deploy ID `dep-da1nf76gekts738dst5g`;
+- exact commit `92f809440098fd42eb562a36c6feddeaa9c17155` reached `live`;
 - health HTTP 200;
-- service status `ok`;
 - `media_client_ingest.mode=client_assisted`;
 - `configured=true`;
 - `requires_browser_helper=true`.
 
-The one-shot patch/deploy workflow files were removed after use. Production VoiceBridge was not targeted.
+Production VoiceBridge was not targeted.
+
+KRC beta Action contract advanced to `0.3.0-beta` to represent `youtube_captions` and `assemblyai_stt`. Media beta manifest advanced to `0.3-beta` with client captions-first marked implemented pending live browser acceptance.
 
 ## 2026-08-17 - Current next gate
 
-The failed KRCC job is terminal and must not be reused.
+Install/reload Helper 0.2.0 and create a NEW `KRCC_...` job for the same acceptance URL.
 
-Create a NEW `KRCC_...` job for the same acceptance URL, reuse the already installed helper 0.1.0, capture approximately 60-90 seconds at normal speed, then require:
-- upload accepted;
-- `TRANSCRIBING`;
+Press `Use subtitles` first and require:
 - `COMPLETED`;
+- `transcript_source=youtube_captions`;
+- manual/auto-generated caption type;
 - non-empty timestamped segments;
-- detected language;
-- sensible STT charge;
-- provider cleanup evidence.
+- source/detected language;
+- `stt_seconds_charged=0`;
+- unchanged AssemblyAI beta quota.
+
+Only if captions are unavailable/unusable should `Audio fallback` be tested.
 
 ## Logging rule
 
