@@ -1,8 +1,8 @@
 # K-Research & Critic
-Базовий опис завершеного production-продукту K-Research & Critic для дослідження та незалежної перевірки.
+Базовий опис production-продукту K-Research & Critic та додаткового режиму перевірки тверджень із відео.
 
-Version: 1.1
-Status: PRODUCTION / MAINTENANCE
+Version: 1.2
+Status: PRODUCTION CORE / MEDIA PREVIEW
 
 ## Overview
 
@@ -55,9 +55,12 @@ Free-account live validation                        PASS
 Paid-account runtime/model-switch validation        PASS
 Store discoverability                               PASS
 Production smoke test                               PASS
-Release line                                        v1.0.x
+Core release line                                   v1.0.x
 Repository mode                                     MAINTENANCE
+Optional media URL upgrade                          PREVIEW
 ```
+
+The existing text research product remains the production baseline. The optional media URL upgrade is developed as an additive input path and must pass its own release gates before public rollout.
 
 The former planned Phase 13 Modular Agent Platform has been removed from this product roadmap. General modular multi-agent platform development continues in a separate new repository named `K_Supervisor`, with a new roadmap starting from Phase 0.
 
@@ -70,11 +73,13 @@ K-Research & Critic v1.0.0
 Git tag: v1.0.0
 ```
 
-The `v1.0.0` tag must point to the finalized maintenance-synchronization commit with fully green CI.
+The `v1.0.0` tag represents the completed text-research production baseline. The media upgrade does not retroactively change that release.
 
 ## Primary Product Target
 
 K-Research & Critic is GPT Store-first.
+
+Core text mode:
 
 ```text
 GPT Store Edition
@@ -87,9 +92,13 @@ GPT Store Edition
   - user may switch available models/runtimes when exposed by the plan
 ```
 
-The Python/SQLite/provider implementation remains available as an optional standalone engineering reference runtime. It is not a dependency of the public Store path.
+Optional media URL mode adds a narrowly scoped external Media Transcript Action. That action is required only when a reliable transcript cannot be obtained through built-in capabilities and the user asks to analyze a supported video URL. Users are not asked for developer/provider API keys.
+
+The Python/SQLite/provider implementation remains available as an optional standalone engineering reference runtime. It is not a dependency of the public text Store path.
 
 ## Logical Workflow
+
+Text mode:
 
 ```text
 User task
@@ -117,7 +126,57 @@ CriticAgent
                          +-- REVIEW PROTOCOL
 ```
 
+Media URL mode adds only a source-acquisition stage before CriticProfile:
+
+```text
+Public YouTube URL
+   |
+   v
+Transcript acquisition
+   |
+   v
+Material claim inventory
+   |
+   v
+Domain/risk resolution
+   |
+   v
+CriticProfile proposal
+   |
+   v
+USER APPROVAL / EDIT / REJECT
+   |
+   v
+Existing Research -> Critic -> Report workflow
+```
+
+The transcript is evidence of what was said, not independent evidence that a factual claim is true. Material factual claims are researched against independent sources after CriticProfile approval.
+
 In the GPT Store Edition, Research and Critic are separated logical passes inside one ChatGPT runtime rather than process-isolated model instances.
+
+## Media Input Preview
+
+Initial supported media baseline:
+
+```text
+source platform: public YouTube URLs
+source languages: Ukrainian, Russian, English
+automatic language detection: enabled
+transcript traceability: timestamps / segments
+claim verification: independent research required
+```
+
+VoiceBridge is reused as the external media-ingestion adapter. Its existing browser streaming/translation path remains separate from the new prerecorded-media path.
+
+Media implementation and release gates are documented in:
+
+```text
+docs/VIDEO_INPUT_UPGRADE.md
+docs/PRIVACY_POLICY.md
+gpt_store/actions/media_transcript_openapi.yaml
+```
+
+The media mode remains PREVIEW until live transcription tests, existing-workflow regression tests, privacy configuration, provider training opt-out verification, GPT Builder Action validation, and production smoke testing pass.
 
 ## GPT Store Package
 
@@ -128,16 +187,26 @@ gpt_store/manifest.yaml
 prompts/GPT_STORE_INSTRUCTIONS.md
 gpt_store/checkpoint.py
 gpt_store/checkpoint_example.json
+gpt_store/actions/media_transcript_openapi.yaml
 scripts/validate_store_package.py
 docs/GPT_STORE_DEPLOYMENT.md
 docs/GPT_STORE_PACKAGE.md
+docs/VIDEO_INPUT_UPGRADE.md
+docs/PRIVACY_POLICY.md
 ```
 
-Production package state includes:
+Core production package state remains:
 
 ```text
 publication_state: published
 production_smoke_test_passed: true
+```
+
+Media upgrade state is tracked separately:
+
+```text
+media_input.rollout_state: PREVIEW_REQUIRED
+media_input.production_smoke_test_passed: false
 ```
 
 ## Quality Baseline
@@ -155,7 +224,7 @@ python -m scripts.validate_store_package
 coverage gate
 ```
 
-The release baseline has passed Python 3.13, Python 3.14, repository validation, GPT Store package validation, lint/type gates, and coverage checks.
+The original release baseline passed Python 3.13, Python 3.14, repository validation, GPT Store package validation, lint/type gates, and coverage checks. Media changes must preserve those gates and add media-specific validation before rollout.
 
 ## Optional Local / Standalone Setup
 
@@ -207,6 +276,8 @@ GPT Store cross-chat continuity uses the explicit user-controlled:
 K_SUPERVISOR_CHECKPOINT
 ```
 
+The media upgrade does not change checkpoint schema version 1.0. Full transcripts are not stored in checkpoints.
+
 ## Repository Structure
 
 ```text
@@ -215,7 +286,7 @@ supervisor/     orchestration core
 persistence/    persistence and SQLite reference store
 providers/      optional provider adapters
 observability/  logging and redaction
-gpt_store/      GPT Store manifest and checkpoint contract
+gpt_store/      GPT Store manifest, actions, and checkpoint contract
 models/         domain and transport contracts
 tools/          capability adapters and evidence utilities
 config/         tracked non-secret configuration
@@ -242,8 +313,8 @@ GPT Store compatibility updates
 OpenAI platform compatibility updates
 regression fixes
 documentation corrections
-narrow UX improvements
-maintenance releases v1.0.1, v1.0.2, ...
+narrow product input/UX upgrades that preserve the Research-Critic core
+maintenance releases
 ```
 
 Out of scope here:
@@ -274,6 +345,8 @@ docs/HYBRID_RESOLVER_PLAN.md
 docs/PERSISTENCE.md
 docs/GPT_STORE_DEPLOYMENT.md
 docs/GPT_STORE_PACKAGE.md
+docs/VIDEO_INPUT_UPGRADE.md
+docs/PRIVACY_POLICY.md
 docs/LOGGING.md
 ```
 
@@ -285,4 +358,4 @@ The reusable modular multi-agent platform is developed separately as:
 K_Supervisor
 ```
 
-That project starts with a clean repository, a new architecture decision set, and a new roadmap beginning at Phase 0. K-Research & Critic remains the completed production reference product and is not rewritten merely to follow future platform experiments.
+That project starts with a clean repository, a new architecture decision set, and a new roadmap beginning at Phase 0. K-Research & Critic remains the production research/critique product and does not absorb general modular-platform development.
