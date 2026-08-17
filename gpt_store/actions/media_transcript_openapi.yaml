@@ -1,0 +1,242 @@
+openapi: 3.1.0
+info:
+  title: K-Research & Critic Media Transcript API
+  version: 1.0.0
+  description: >-
+    Read-only media ingestion helper used to obtain a timestamped transcript from
+    a public YouTube URL before K-Research & Critic performs claim verification.
+servers:
+  - url: https://voicebridge-cloud-us.onrender.com
+paths:
+  /api/v1/media/transcriptions:
+    post:
+      operationId: startMediaTranscription
+      summary: Start transcription of a public YouTube video
+      description: >-
+        Starts asynchronous transcription. This action only acquires source text;
+        it does not verify whether statements in the video are true.
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+                - url
+              properties:
+                url:
+                  type: string
+                  format: uri
+                  description: Public HTTPS YouTube or youtu.be URL.
+                language_hint:
+                  type: string
+                  enum:
+                    - auto
+                    - uk
+                    - ru
+                    - en
+                  default: auto
+                  description: Use auto unless the source language is known.
+      responses:
+        "202":
+          description: Transcription job accepted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "400":
+          description: Invalid or unsupported URL/request.
+        "401":
+          description: Authentication failed.
+        "429":
+          description: Service concurrency/rate limit reached.
+        "503":
+          description: Media transcription is unavailable or not configured.
+  /api/v1/media/transcriptions/{job_id}:
+    get:
+      operationId: getMediaTranscriptionStatus
+      summary: Get media transcription job status
+      x-openai-isConsequential: false
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Job identifier returned by startMediaTranscription.
+      responses:
+        "200":
+          description: Current transcription job state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "404":
+          description: Job not found or expired.
+  /api/v1/media/transcriptions/{job_id}/segments:
+    get:
+      operationId: getMediaTranscriptSegments
+      summary: Read one page of timestamped transcript segments
+      x-openai-isConsequential: false
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+      responses:
+        "200":
+          description: Transcript segment page. Follow next_cursor until null.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - job_id
+                  - status
+                  - cursor
+                  - next_cursor
+                  - segments
+                properties:
+                  request_id:
+                    type: string
+                  job_id:
+                    type: string
+                  status:
+                    type: string
+                  cursor:
+                    type: integer
+                  next_cursor:
+                    anyOf:
+                      - type: integer
+                      - type: "null"
+                  segments:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Segment"
+        "404":
+          description: Job not found or expired.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    Job:
+      type: object
+      properties:
+        request_id:
+          type: string
+        reused:
+          type: boolean
+        job_id:
+          type: string
+        status:
+          type: string
+          enum:
+            - QUEUED
+            - FETCHING_MEDIA
+            - UPLOADING
+            - TRANSCRIBING
+            - COMPLETED
+            - FAILED
+        created_at:
+          type: string
+        updated_at:
+          type: string
+        source_url:
+          type: string
+        language_hint:
+          type: string
+        detected_language:
+          anyOf:
+            - type: string
+            - type: "null"
+        language_confidence:
+          anyOf:
+            - type: number
+            - type: "null"
+        provider:
+          type: string
+        provider_model:
+          type: string
+        media:
+          type: object
+          properties:
+            platform:
+              type: string
+            title:
+              anyOf:
+                - type: string
+                - type: "null"
+            channel:
+              anyOf:
+                - type: string
+                - type: "null"
+            duration_seconds:
+              anyOf:
+                - type: number
+                - type: "null"
+            canonical_url:
+              anyOf:
+                - type: string
+                - type: "null"
+        transcript_characters:
+          type: integer
+        segment_count:
+          type: integer
+        error:
+          anyOf:
+            - type: object
+              properties:
+                code:
+                  type: string
+                message:
+                  type: string
+                retryable:
+                  type: boolean
+            - type: "null"
+    Segment:
+      type: object
+      required:
+        - index
+        - start_ms
+        - end_ms
+        - text
+        - confidence
+      properties:
+        index:
+          type: integer
+        start_ms:
+          anyOf:
+            - type: integer
+            - type: "null"
+        end_ms:
+          anyOf:
+            - type: integer
+            - type: "null"
+        text:
+          type: string
+        confidence:
+          anyOf:
+            - type: number
+            - type: "null"
+security:
+  - bearerAuth: []
