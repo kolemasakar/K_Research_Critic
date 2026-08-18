@@ -1,7 +1,7 @@
 # MEDIA BETA Current State
 Канонічний знімок фактичного стану реалізації для відновлення роботи без припущень.
 
-Version: 2.1
+Version: 2.2
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-18
 
@@ -11,7 +11,7 @@ Current phase: `A4 - Live transcript validation`
 
 Current state:
 
-`A3_COMPLETE / A4_1_SERVER_INGRESS_BLOCKED / A4_2_CAPTIONS_FIRST_OWNER_ACCEPTANCE_PASS / GPT_STATUS_READBACK_PASS / SEGMENT_PAGINATION_227_OF_227_PASS / A4_3_AUDIO_FALLBACK_OWNER_ACCEPTANCE_PASS / ASSEMBLYAI_CLEANUP_PASS / AUDIO_ACTION_READBACK_NEXT`
+`A3_COMPLETE / A4_1_SERVER_INGRESS_BLOCKED / A4_2_CAPTIONS_FIRST_OWNER_ACCEPTANCE_PASS / GPT_STATUS_READBACK_PASS / SEGMENT_PAGINATION_227_OF_227_PASS / A4_3_AUDIO_FALLBACK_OWNER_ACCEPTANCE_PASS / ASSEMBLYAI_CLEANUP_PASS / AUDIO_GPT_STATUS_READBACK_PASS / AUDIO_SEGMENT_READBACK_NEXT`
 
 The approved MEDIA BETA architecture is captions-first browser-assisted YouTube ingestion. Direct Render/datacenter YouTube acquisition remains unsuitable because of YouTube anti-bot enforcement. The browser helper now uses the tester browser path, prefers YouTube captions, and uses browser audio plus AssemblyAI only as fallback.
 
@@ -181,13 +181,34 @@ stt_seconds_charged=98
 provider_cleanup=deleted
 ```
 
+The Action-facing status readback confirmed:
+
+```text
+status=COMPLETED
+client_upload_required=false
+transcript_source=assemblyai_stt
+provider=assemblyai
+provider_model=universal-2
+provider_data_deleted=true
+detected_language=uk
+language_confidence=0.7404
+duration_seconds=97.056
+transcript_characters=1141
+segment_count=2
+stt_seconds_charged=98
+beta_quota.used_seconds=98
+beta_quota.remaining_seconds=7102
+error=null
+```
+
 This live test confirms:
 - active-tab audio capture works;
 - browser upload works;
 - WebM/Opus normalization and duration probing work;
 - quota charging uses measured normalized capture duration;
 - AssemblyAI async transcription reaches COMPLETED;
-- provider transcript deletion succeeds;
+- provider transcript deletion succeeds and is visible through the GPT-facing contract;
+- exact post-test daily quota is visible through the GPT-facing contract;
 - timestamped transcript segments are produced.
 
 Canonical acceptance record:
@@ -227,16 +248,13 @@ Browser-only routes remain intentionally absent from the GPT Action schema.
 
 ## Remaining A4 validation
 
-Next priority: Action-facing readback of the accepted audio job.
+Next priority: Action-facing segment readback of the accepted audio job.
 
 Required immediate evidence:
-- status route returns `COMPLETED` for `KRCC_07774204-5a71-4b79-8129-f73cf4dc164d`;
-- `transcript_source=assemblyai_stt`;
-- `provider=assemblyai`;
-- `provider_data_deleted=true`;
-- `stt_seconds_charged=98`;
-- exact post-test `beta_quota.used_seconds` and `remaining_seconds` are recorded;
-- segment route exposes the audio transcript through the GPT-facing contract.
+- segment route returns `status=COMPLETED` for `KRCC_07774204-5a71-4b79-8129-f73cf4dc164d`;
+- exactly 2 segments are exposed through the GPT-facing contract;
+- segment indices and timestamps are valid and ordered;
+- final `next_cursor=null`.
 
 Other remaining gates:
 - additional UK/RU/EN/auto cases;
