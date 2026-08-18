@@ -1,7 +1,7 @@
 # MEDIA BETA A4.3 Audio Fallback Acceptance
 Живе підтвердження browser-audio fallback через AssemblyAI з перевіркою квоти та видалення provider transcript.
 
-Version: 1.0
+Version: 1.1
 Status: PASS
 Acceptance date: 2026-08-18
 
@@ -51,6 +51,31 @@ provider_cleanup=deleted
 
 The 98-second charge reflects the actual captured-audio duration measured after backend normalization. It was not hard-coded to the nominal 60-second operator target.
 
+## Action-facing status readback
+
+The GPT-facing status endpoint returned the completed audio fallback result:
+
+```text
+status=COMPLETED
+client_upload_required=false
+transcript_source=assemblyai_stt
+caption_type=null
+provider=assemblyai
+provider_model=universal-2
+provider_data_deleted=true
+detected_language=uk
+language_confidence=0.7404
+duration_seconds=97.056
+transcript_characters=1141
+segment_count=2
+stt_seconds_charged=98
+beta_quota.used_seconds=98
+beta_quota.remaining_seconds=7102
+error=null
+```
+
+This confirms that the browser-audio completion is visible through the same Action-facing contract used by the beta GPT.
+
 ## Accepted backend path
 
 ```text
@@ -69,10 +94,11 @@ Edge active-tab audio
 
 ## Provider cleanup
 
-The helper displayed:
+The helper and Action status both confirmed successful provider cleanup:
 
 ```text
-Provider cleanup = deleted
+provider_data_deleted=true
+Provider cleanup=deleted
 ```
 
 This is accepted live evidence that the backend completed its provider transcript deletion request after successful transcription.
@@ -84,12 +110,13 @@ Before this fallback test, the accepted captions path had consumed zero STT seco
 For this audio test:
 
 ```text
+measured_duration_seconds=97.056
 stt_seconds_charged=98
+beta_quota.used_seconds=98
+beta_quota.remaining_seconds=7102
 ```
 
-The charge is based on the normalized browser capture duration and therefore validates the intended quota-accounting boundary for the fallback path.
-
-A separate Action-facing status readback should still be performed to record the exact post-test `beta_quota.used_seconds` and `remaining_seconds` values in the GPT-facing contract.
+The charge is based on the normalized browser capture duration and validates the intended quota-accounting boundary for the fallback path.
 
 ## Important restart finding
 
@@ -112,7 +139,7 @@ Until then, owner/tester fallback acceptance should create the KRCC job immediat
 
 ## Acceptance conclusion
 
-PASS for A4.3 browser-audio fallback execution.
+PASS for A4.3 browser-audio fallback execution and GPT-facing status readback.
 
 Confirmed:
 - Helper 0.2.2 can switch from an old completed job to a fresh KRCC job;
@@ -122,14 +149,14 @@ Confirmed:
 - AssemblyAI fallback reaches COMPLETED;
 - Ukrainian language detection is returned;
 - transcript segments are produced;
-- measured STT duration is charged;
-- provider transcript cleanup is reported as deleted;
+- measured STT duration is charged correctly;
+- exact daily quota readback is correct;
+- provider transcript cleanup is confirmed by the Action contract;
 - production VoiceBridge and the published K-Research & Critic GPT remain unchanged.
 
 ## Remaining A4 validation
 
 This PASS does not close all MEDIA BETA release gates. Remaining work includes:
-- Action-facing status readback for this audio job and exact quota readback;
 - Action-facing audio segment pagination/readback;
 - additional UK/RU/EN/auto cases;
 - >60 minute rejection;
@@ -147,3 +174,5 @@ This PASS does not close all MEDIA BETA release gates. Remaining work includes:
 `A4_3_ASSEMBLYAI_PROVIDER_CLEANUP_PASS`
 
 `A4_3_STT_DURATION_ACCOUNTING_PASS`
+
+`A4_3_GPT_STATUS_READBACK_PASS`
