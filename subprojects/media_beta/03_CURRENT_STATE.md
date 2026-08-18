@@ -1,7 +1,7 @@
 # MEDIA BETA Current State
 Канонічний знімок фактичного стану реалізації для відновлення роботи без припущень.
 
-Version: 2.8
+Version: 2.9
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-18
 
@@ -11,7 +11,7 @@ Current phase: `A4 - Live transcript validation`
 
 Current state:
 
-`A3_COMPLETE / A4_1_SERVER_INGRESS_BLOCKED / A4_2_CAPTIONS_FIRST_OWNER_ACCEPTANCE_PASS / GPT_STATUS_READBACK_PASS / SEGMENT_PAGINATION_227_OF_227_PASS / A4_3_AUDIO_FALLBACK_OWNER_ACCEPTANCE_PASS / ASSEMBLYAI_CLEANUP_PASS / AUDIO_GPT_STATUS_READBACK_PASS / AUDIO_GPT_SEGMENT_READBACK_PASS / A4_4_RESTART_DURABILITY_PASS / CREATED_AT_CONTINUITY_PASS / A4_5_GUARD_MATRIX_PASS / A4_RU_CAPTIONS_PASS / A4_LARGE_CAPTION_PAYLOAD_PERSISTENCE_DEFECT_CLOSED / A4_EN_CAPTIONS_PASS / A4_MANUAL_CAPTIONS_CLASSIFICATION_PASS / A4_AUTO_LANGUAGE_IT_PASS / A4_LANGUAGE_SOURCE_MATRIX_PASS`
+`A3_COMPLETE / A4_1_SERVER_INGRESS_BLOCKED / A4_2_CAPTIONS_FIRST_OWNER_ACCEPTANCE_PASS / GPT_STATUS_READBACK_PASS / SEGMENT_PAGINATION_227_OF_227_PASS / A4_3_AUDIO_FALLBACK_OWNER_ACCEPTANCE_PASS / ASSEMBLYAI_CLEANUP_PASS / AUDIO_GPT_STATUS_READBACK_PASS / AUDIO_GPT_SEGMENT_READBACK_PASS / A4_4_RESTART_DURABILITY_PASS / CREATED_AT_CONTINUITY_PASS / A4_5_GUARD_MATRIX_PASS / A4_RU_CAPTIONS_PASS / A4_LARGE_CAPTION_PAYLOAD_PERSISTENCE_DEFECT_CLOSED / A4_EN_CAPTIONS_PASS / A4_MANUAL_CAPTIONS_CLASSIFICATION_PASS / A4_AUTO_LANGUAGE_IT_PASS / A4_LANGUAGE_SOURCE_MATRIX_PASS / A4_DURABLE_QUOTA_LEDGER_RESTART_PASS`
 
 The approved MEDIA BETA architecture is captions-first browser-assisted YouTube ingestion. Direct Render/datacenter YouTube acquisition remains unsuitable because of YouTube anti-bot enforcement. The browser helper uses the tester browser path, prefers YouTube captions, and uses browser audio plus AssemblyAI only as fallback.
 
@@ -51,7 +51,7 @@ Verified controls:
 - browser helper required for client-assisted ingestion;
 - durable store: Postgres;
 - waiting jobs survive beta process replacement;
-- STT charge ledger is durable.
+- STT charge ledger is durable and live restart restoration after a real charge is accepted.
 
 The temporary A4.5 quota-test limit of 60 sec/day was restored to the normal 7200 sec/day after acceptance. Restore commit: `ab43973a1328c043c382f2e8ead81587964b9a46`.
 
@@ -205,9 +205,10 @@ Accepted behavior:
 - same Job ID can be resumed by Helper 0.2.2 after restart;
 - resumed captions job reaches `COMPLETED` with 227 segments and zero STT cost;
 - completed durable job remains readable after later process replacement;
-- original `created_at` remains immutable across restart, resume and completion.
+- original `created_at` remains immutable across restart, resume and completion;
+- real AssemblyAI STT charge survives restart and is restored into the active runtime quota gate.
 
-Final regression job:
+Final created_at regression job:
 `KRCC_cad52723-cbf0-4bd6-b195-44902d11bc6b`
 
 ```text
@@ -220,7 +221,7 @@ stt_seconds_charged=0
 error=null
 ```
 
-Canonical record:
+Canonical job-state record:
 `subprojects/media_beta/12_A4_4_DURABILITY_ACCEPTANCE.md`
 
 ## A4.5 guard matrix acceptance
@@ -319,6 +320,48 @@ A4_LANGUAGE_SOURCE_MATRIX_PASS
 Canonical record:
 `subprojects/media_beta/14_A4_LANGUAGE_SOURCE_MATRIX_ACCEPTANCE.md`
 
+## A4 durable quota-ledger restart
+
+Status: PASS.
+
+Charged audio job before restart:
+`KRCC_493fcc82-adea-4de2-aee3-a671c0c54073`
+
+```text
+status=COMPLETED
+transcript_source=assemblyai_stt
+provider=assemblyai
+provider_data_deleted=true
+duration_seconds=56.376
+stt_seconds_charged=57
+beta_quota.used_seconds=57
+beta_quota.remaining_seconds=7143
+```
+
+Controlled isolated restart/deploy commit:
+`beebe6a638637e5d4d81a13826371810048d1407`
+
+After restart the same charged job remained durable with `stt_seconds_charged=57` and quota snapshot 57/7143.
+
+Fresh post-restart job:
+`KRCC_adc4c232-d2df-4382-8bbd-72d7736142ac`
+
+```text
+status=AWAITING_CLIENT
+language_hint=auto
+beta_quota.daily_limit_seconds=7200
+beta_quota.used_seconds=57
+beta_quota.remaining_seconds=7143
+```
+
+The fresh job proves the restarted runtime restored the durable daily charge from Postgres into `MediaBetaGate`.
+
+Acceptance marker:
+`A4_DURABLE_QUOTA_LEDGER_RESTART_PASS`
+
+Canonical record:
+`subprojects/media_beta/15_A4_QUOTA_LEDGER_RESTART_ACCEPTANCE.md`
+
 ## Backend routes
 
 Action-facing:
@@ -339,10 +382,11 @@ Browser-only routes remain intentionally absent from the GPT Action schema.
 
 ## Next A4 validation block
 
-Captions language/source validation is complete. Remaining A4 validation before A5:
-- durable quota-ledger restart acceptance after a newly charged audio job;
+Captions language/source validation and durable quota-ledger restart validation are complete. Remaining A4 validation before A5:
 - audio fallback process-replacement behavior during active upload/transcription;
 - STT replacement-character investigation.
+
+The fresh waiting job `KRCC_adc4c232-d2df-4382-8bbd-72d7736142ac` is available for the next isolated active-audio restart test unless it expires first.
 
 Release gates that follow/overlap later phases:
 - GPT Builder closed-beta end-to-end test;
