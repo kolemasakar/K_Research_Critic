@@ -1,9 +1,9 @@
 # MEDIA BETA Roadmap
 Дорожня карта реалізації закритого beta-медіарежиму та наступного сталого безкоштовного режиму.
 
-Version: 1.7
+Version: 1.8
 Status: ACTIVE
-Updated: 2026-08-17
+Updated: 2026-08-18
 
 ## Phase A - Closed MEDIA BETA
 
@@ -22,7 +22,7 @@ Delivered:
 
 ### A2. Resource protection
 
-Status: COMPLETE_IN_CODE
+Status: COMPLETE_IN_CODE_AND_PRIMARY_LIVE_GUARDS
 
 Current beta limits:
 - max source/capture duration = 60 min;
@@ -33,8 +33,15 @@ Current beta limits:
 - STT normalization = mono 16 kHz approximately 32 kbps;
 - temporary media cleanup;
 - provider delete request for AssemblyAI fallback;
-- transcript/job TTL;
-- access codes excluded from reports/checkpoints.
+- per-tester access codes;
+- durable Postgres job state and STT quota ledger.
+
+Live negative-path guards accepted:
+- invalid beta code;
+- wrong YouTube source;
+- >60 minute content;
+- concurrency >1;
+- daily STT quota exhaustion before provider submission.
 
 ### A3. Dedicated Render beta deployment
 
@@ -48,7 +55,7 @@ Dedicated service:
 
 ### A4. Live transcript validation
 
-Status: IN_PROGRESS_CAPTIONS_FIRST_OWNER_ACCEPTANCE
+Status: IN_PROGRESS_LANGUAGE_SOURCE_MATRIX
 
 #### A4.1 Server-side YouTube ingress
 
@@ -57,115 +64,127 @@ Status: CLOSED_AS_UNSUITABLE_FOR_CURRENT_BETA
 Acceptance URL:
 `https://www.youtube.com/watch?v=DZLzmQ2kwaA`
 
-Three server-side attempts failed before transcript acquisition with YouTube `Sign in to confirm you're not a bot` and charged 0 AssemblyAI seconds:
-- original yt-dlp;
-- `web_embedded,android_vr`;
-- `mweb` + `bgutil-ytdlp-pot-provider` 1.3.1.
+Server-side attempts from Render failed before transcript acquisition with YouTube `Sign in to confirm you're not a bot`, including PO-provider/runtime configurations. Repeated cloud/datacenter-IP retries are not an approved beta path.
 
-Diagnostic run `32060462596` / job `95480351954` proved the PO-provider/runtime wiring was functional. Repeated cloud/datacenter-IP retries are not an approved next step.
+Approved ingress is browser-assisted.
 
 #### A4.2 Client/browser-assisted ingress
 
-Status: CAPTIONS_FIRST_IMPLEMENTED / CI_PASS / DEPLOYED / HELPER_0_2_LIVE_ACCEPTANCE_NEXT
+Status: PRIMARY_OWNER_ACCEPTANCE_PASS
 
 Approved flow:
 ```text
 YouTube URL
- -> beta Action creates KRCC_ job
+ -> beta Action creates durable KRCC_ job
  -> AWAITING_CLIENT
- -> Helper 0.2.0 on same YouTube tab
+ -> Helper 0.2.2 on same YouTube tab
  -> Use subtitles first
-    -> browser caption track + timestamps
+    -> direct timed-text if usable
+    -> transcript-panel fallback otherwise
     -> /captions browser-only upload
-    -> validation
     -> COMPLETED / youtube_captions / STT=0
  -> if captions unavailable/unusable
     -> Audio fallback
     -> tabCapture + backend normalization
+    -> duration/quota checks
     -> AssemblyAI async STT
  -> timestamped transcript
+ -> GPT Action status/segments
  -> KRC claim inventory / CriticProfile workflow
 ```
 
-Implemented captions-first controls:
-- browser `activeTab` + `scripting` extraction initiated only by the tester;
-- active/requested/source caption-track selection;
-- manual vs auto-generated caption metadata;
-- browser fetch of timestamped YouTube timed-text;
-- same-video validation;
-- per-tester job ownership digest;
-- caption timestamp/text bounds;
-- `transcript_source=youtube_captions`;
-- `caption_type=manual|auto_generated`;
-- `provider=youtube`;
-- `stt_seconds_charged=0` and no STT quota reservation;
-- timestamped segment paging through the existing Action route.
+Accepted live evidence:
+- Ukrainian auto-generated captions job completed with 227 timestamped segments;
+- full Action pagination 227/227 passed;
+- captions charged zero STT seconds;
+- audio fallback completed with AssemblyAI `universal-2`;
+- measured audio duration charged correctly;
+- provider deletion request succeeded;
+- Action-facing audio segments were readable;
+- browser/helper stale-state issue fixed in Helper 0.2.2.
 
-Audio fallback remains implemented:
-- tabCapture/offscreen recording;
-- 32 MiB upload guard;
-- WebM/Opus normalization before duration probing;
-- 60-minute duration check;
-- STT quota reservation only after valid duration;
-- auto/uk/ru/en AssemblyAI async transcription;
-- provider transcript delete request.
+#### A4.3 Audio fallback acceptance
 
-Validation/deployment evidence:
-- VoiceBridge captions-first CI run `32069122559`: SUCCESS;
-- current VoiceBridge commit `92f809440098fd42eb562a36c6feddeaa9c17155`;
-- Helper `0.2.0` CI artifact produced;
-- isolated Render deploy run `32069270467`: SUCCESS;
-- deploy ID `dep-da1nf76gekts738dst5g`;
-- exact captions-first commit reached `live`;
-- health HTTP 200;
-- `media_client_ingest.mode=client_assisted`;
-- `configured=true`;
-- `requires_browser_helper=true`.
+Status: COMPLETE_FOR_PRIMARY_UKRAINIAN_SAMPLE
 
-Previous browser/audio evidence retained:
-- job `KRCC_aa3b2cbc-4d4e-4f89-b6e6-4549766f34f5` proved helper installation, active-tab capture and backend upload;
-- its `MEDIA_DURATION_UNKNOWN` failure exposed a MediaRecorder WebM metadata issue;
-- duration handling was fixed before captions-first work and the fix remains in the current commit.
+Accepted:
+- browser capture/upload;
+- WebM/Opus normalization;
+- duration probing;
+- measured quota charging;
+- AssemblyAI async transcription;
+- provider delete request;
+- Action-facing status and segments.
 
-Next acceptance sequence:
-1. install/reload Helper 0.2.0;
-2. create a NEW `KRCC_...` job for the acceptance URL;
-3. require `AWAITING_CLIENT`, `client_upload_required=true`, `stt_seconds_charged=0`;
-4. click `Use subtitles` first;
-5. require `COMPLETED`, `transcript_source=youtube_captions`, caption type, non-empty timestamped segments and `stt_seconds_charged=0`;
-6. verify the STT quota did not decrease;
-7. only if captions are unavailable, validate `Audio fallback` and AssemblyAI cleanup;
-8. then expand to UK/RU/EN/auto and guard-condition matrix.
+Open quality item:
+- `U+FFFD` replacement-character artifacts observed in returned STT text.
 
-Remaining A4 matrix:
-- owner real Helper 0.2.0 captions-first acceptance;
-- Ukrainian captions case;
+#### A4.4 Restart durability
+
+Status: COMPLETE
+
+Accepted:
+- durable Postgres KRCC job state;
+- waiting job survives isolated beta process replacement;
+- same Job ID resumes after restart;
+- completed job remains readable after later restart;
+- durable STT quota ledger enabled;
+- external `created_at` remains immutable through restart, rehydration and completion.
+
+Canonical acceptance:
+`subprojects/media_beta/12_A4_4_DURABILITY_ACCEPTANCE.md`
+
+#### A4.5 Guard matrix
+
+Status: COMPLETE
+
+Accepted live contracts:
+- invalid beta code -> HTTP 403 / `MEDIA_BETA_ACCESS_DENIED`;
+- source mismatch -> HTTP 409 / `MEDIA_CLIENT_SOURCE_MISMATCH`;
+- concurrency -> HTTP 429 / `MEDIA_TRANSCRIPT_BUSY`;
+- >60 min -> HTTP 413 / `MEDIA_DURATION_LIMIT`;
+- quota exhaustion -> `MEDIA_DAILY_STT_QUOTA_EXHAUSTED`, zero STT charge before provider use.
+
+The temporary 60-second quota used for the exhaustion test was restored to 7200 sec/day after acceptance. Production was not targeted.
+
+Canonical acceptance:
+`subprojects/media_beta/13_A4_5_GUARD_MATRIX_ACCEPTANCE.md`
+
+#### Remaining A4 matrix
+
+Pending before A4 exit:
 - Russian captions case;
 - English captions case;
-- auto language/track selection;
-- manual-caption classification;
-- auto-generated-caption classification;
-- caption-unavailable -> audio fallback;
+- explicit `auto` language/track-selection case beyond the accepted Ukrainian sample;
+- manual-caption classification case;
+- durable quota-ledger restart acceptance after a newly charged audio job;
+- audio fallback behavior if process replacement occurs during active upload/transcription;
+- STT replacement-character investigation.
+
+Already accepted and no longer pending:
+- Ukrainian auto-generated captions;
+- captions unavailable/audio fallback path;
 - successful audio fallback after duration fix;
 - >60 min rejection;
 - source mismatch rejection;
 - concurrency rejection;
 - daily STT quota exhaustion simulation;
-- provider cleanup verification for AssemblyAI fallback.
+- provider cleanup verification;
+- restart durability and `created_at` continuity.
 
-Exit criteria:
-- captions-first real browser job reaches `COMPLETED` with usable timestamps and zero STT charge;
-- audio fallback can reach `COMPLETED` when captions are unavailable;
+A4 exit criteria:
+- captions-first real browser jobs are usable across required language/source cases;
+- audio fallback remains usable when captions are unavailable;
 - language/source metadata is usable;
-- quota accounting matches the selected path;
+- quota accounting matches selected path and survives required restart checks;
 - provider cleanup is verified where AssemblyAI is used;
 - no beta/developer secret appears in reports/checkpoints/loggable payloads.
 
 ### A5. Separate GPT Builder beta
 
-Status: BLOCKED_BY_A4_LIVE_BROWSER_ACCEPTANCE
+Status: BLOCKED_BY_REMAINING_A4_MATRIX
 
-After A4 owner browser acceptance:
+After A4 acceptance:
 - create `K-Research & Critic - MEDIA BETA` separately from public GPT;
 - import beta instructions and captions-first client-assisted OpenAPI schema;
 - configure Action bearer secret;
@@ -196,7 +215,7 @@ YouTube URL
 
 Status: BLOCKED_BY_A6
 
-Owner tests first; then up to three additional tester codes. Monitor reliability, Render bandwidth, caption success rate, and AssemblyAI fallback credits. Limit changes require explicit decision update.
+Owner tests first; then up to three additional tester codes. Monitor reliability, Render bandwidth, caption success rate, AssemblyAI fallback credits and Postgres lifecycle. Limit changes require explicit decision update.
 
 ## Phase B - Sustainable Free Media
 
