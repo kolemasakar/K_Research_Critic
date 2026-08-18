@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 Дорожня карта реалізації закритого beta-медіарежиму та наступного сталого безкоштовного режиму.
 
-Version: 1.9
+Version: 2.0
 Status: ACTIVE
 Updated: 2026-08-18
 
@@ -97,7 +97,9 @@ Accepted live evidence:
 - Ukrainian auto-generated captions job completed with 227 timestamped segments;
 - full Action pagination 227/227 passed;
 - Russian auto-generated captions job completed through transcript-panel fallback with 524 segments / 19206 transcript characters;
-- captions charged zero STT seconds in accepted Ukrainian and Russian cases;
+- English manual captions job completed with 247 segments / 8872 transcript characters;
+- manual-caption classification accepted on the English case;
+- captions charged zero STT seconds in accepted Ukrainian, Russian, and English cases;
 - audio fallback completed with AssemblyAI `universal-2`;
 - measured audio duration charged correctly;
 - provider deletion request succeeded;
@@ -159,9 +161,14 @@ Status: IN_PROGRESS
 Accepted:
 - Russian auto-generated captions via YouTube transcript-panel fallback;
 - `detected_language=ru`;
-- 524 timestamped caption segments;
-- 19206 transcript characters persisted durably;
-- zero STT charge;
+- 524 timestamped Russian caption segments;
+- 19206 Russian transcript characters persisted durably;
+- English manual captions via YouTube transcript-panel path;
+- `detected_language=en`;
+- 247 English manual-caption segments;
+- 8872 English transcript characters persisted durably;
+- manual-caption classification;
+- zero STT charge for accepted caption cases;
 - immutable external `created_at` preserved;
 - large-payload durable persistence remediation validated and deployed only to isolated MEDIA BETA.
 
@@ -171,9 +178,7 @@ Canonical acceptance:
 #### Remaining A4 matrix
 
 Pending before A4 exit:
-- English captions case;
 - explicit `auto` language/track-selection case beyond the accepted Ukrainian sample;
-- manual-caption classification case;
 - durable quota-ledger restart acceptance after a newly charged audio job;
 - audio fallback behavior if process replacement occurs during active upload/transcription;
 - STT replacement-character investigation.
@@ -181,6 +186,8 @@ Pending before A4 exit:
 Already accepted and no longer pending:
 - Ukrainian auto-generated captions;
 - Russian auto-generated captions;
+- English manual captions;
+- manual-caption classification;
 - captions unavailable/audio fallback path;
 - successful audio fallback after duration fix;
 - >60 min rejection;
