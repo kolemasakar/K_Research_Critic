@@ -1,7 +1,7 @@
 # MEDIA BETA Current State
 Канонічний знімок фактичного стану реалізації для відновлення роботи без припущень.
 
-Version: 2.0
+Version: 2.1
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-18
 
@@ -11,7 +11,7 @@ Current phase: `A4 - Live transcript validation`
 
 Current state:
 
-`A3_COMPLETE / A4_1_SERVER_INGRESS_BLOCKED / A4_2_CAPTIONS_FIRST_OWNER_ACCEPTANCE_PASS / GPT_STATUS_READBACK_PASS / SEGMENT_PAGINATION_227_OF_227_PASS / AUDIO_FALLBACK_ACCEPTANCE_NEXT`
+`A3_COMPLETE / A4_1_SERVER_INGRESS_BLOCKED / A4_2_CAPTIONS_FIRST_OWNER_ACCEPTANCE_PASS / GPT_STATUS_READBACK_PASS / SEGMENT_PAGINATION_227_OF_227_PASS / A4_3_AUDIO_FALLBACK_OWNER_ACCEPTANCE_PASS / ASSEMBLYAI_CLEANUP_PASS / AUDIO_ACTION_READBACK_NEXT`
 
 The approved MEDIA BETA architecture is captions-first browser-assisted YouTube ingestion. Direct Render/datacenter YouTube acquisition remains unsuitable because of YouTube anti-bot enforcement. The browser helper now uses the tester browser path, prefers YouTube captions, and uses browser audio plus AssemblyAI only as fallback.
 
@@ -62,7 +62,7 @@ Three server-side attempts failed before transcript acquisition with YouTube `Si
 
 All charged 0 STT seconds. Diagnostic run `32060462596`, job `95480351954`, confirmed PO-provider/runtime wiring. Repeated server-side cloud-ingress retries are not an approved beta path.
 
-## Approved A4.2 flow
+## Approved A4.2/A4.3 flow
 
 ```text
 YouTube URL
@@ -76,10 +76,11 @@ YouTube URL
       COMPLETED
       transcript_source=youtube_captions
       stt_seconds_charged=0
- -> otherwise:
+ -> otherwise or under an explicit controlled fallback test:
       Audio fallback
       tabCapture
       bounded ffmpeg normalization
+      measured-duration quota reservation
       AssemblyAI async STT
       timestamped transcript
       provider delete request
@@ -94,18 +95,20 @@ Transcript text is source content only. It is evidence of what the video represe
 
 ## Browser helper
 
-Current helper: `KRC MEDIA BETA Helper 0.2.1`.
+Current helper: `KRC MEDIA BETA Helper 0.2.2`.
 
-Helper 0.2.1 adds:
+Helper 0.2.2 includes:
 - direct timed-text captions path;
 - detection of empty/blocked direct caption responses;
 - YouTube transcript-panel fallback;
 - timestamped segment extraction from the panel;
 - `Use subtitles` as the primary action;
-- `Audio fallback` only when captions are unavailable/unusable;
+- `Audio fallback` only when captions are unavailable/unusable, except controlled acceptance tests;
+- immediate persistence of a newly entered Job ID;
+- stale COMPLETED-state isolation so a prior job does not disable buttons for a new job;
 - no Action bearer token or AssemblyAI key in the extension.
 
-VoiceBridge helper packaging/validation for 0.2.1 passed on branch `agent/krc-media-transcript`.
+VoiceBridge helper packaging/validation for 0.2.2 passed on branch `agent/krc-media-transcript`.
 
 ## Live owner captions acceptance
 
@@ -130,7 +133,7 @@ error=null
 
 The direct timed-text route did not provide usable data. Helper 0.2.1 successfully completed through the YouTube transcript-panel fallback.
 
-## GPT-facing readback acceptance
+## GPT-facing captions readback acceptance
 
 The Action-facing status endpoint returned the same completed result.
 
@@ -153,6 +156,57 @@ Result:
 Canonical acceptance record:
 `subprojects/media_beta/10_A4_2_CAPTIONS_ACCEPTANCE.md`
 
+## Live owner audio fallback acceptance
+
+Accepted fresh job:
+`KRCC_07774204-5a71-4b79-8129-f73cf4dc164d`
+
+Accepted Helper 0.2.2 flow:
+
+```text
+AWAITING_CLIENT
+ -> CAPTURING
+ -> UPLOADING
+ -> TRANSCRIBING
+ -> COMPLETED
+```
+
+Final helper result:
+
+```text
+status=COMPLETED
+detected_language=uk
+segment_count=2
+stt_seconds_charged=98
+provider_cleanup=deleted
+```
+
+This live test confirms:
+- active-tab audio capture works;
+- browser upload works;
+- WebM/Opus normalization and duration probing work;
+- quota charging uses measured normalized capture duration;
+- AssemblyAI async transcription reaches COMPLETED;
+- provider transcript deletion succeeds;
+- timestamped transcript segments are produced.
+
+Canonical acceptance record:
+`subprojects/media_beta/11_A4_3_AUDIO_FALLBACK_ACCEPTANCE.md`
+
+## Render restart durability finding
+
+A prior fresh audio job reached browser `UPLOADING` and then returned `MEDIA_TRANSCRIPT_NOT_FOUND` before the 3600-second configured TTL.
+
+Client-assisted jobs are currently stored only in the backend process-memory `Map`. Render restart/spin cycles therefore lose `KRCC_...` state even when the logical job TTL has not expired.
+
+This is now a known beta durability limitation, not an AssemblyAI/audio implementation failure.
+
+Required hardening before broader rollout:
+- persist KRCC job state outside process RAM, or
+- replace the waiting-job dependency with a signed stateless upload ticket/session design.
+
+Until hardened, live fallback tests should create a fresh KRCC job immediately before capture and avoid long idle gaps.
+
 ## Backend routes
 
 Action-facing:
@@ -173,17 +227,16 @@ Browser-only routes remain intentionally absent from the GPT Action schema.
 
 ## Remaining A4 validation
 
-Next priority: validate the audio/AssemblyAI fallback on a fresh video with no usable captions.
+Next priority: Action-facing readback of the accepted audio job.
 
-Required fallback PASS evidence:
-- helper reaches audio capture and upload;
-- backend normalizes browser WebM/Opus correctly;
-- duration guard works;
-- AssemblyAI transcription reaches COMPLETED;
-- timestamped segments are readable through the Action-facing status/segments routes;
-- `stt_seconds_charged` reflects actual fallback audio duration;
-- daily beta quota decreases correctly;
-- `provider_data_deleted=true` after provider cleanup.
+Required immediate evidence:
+- status route returns `COMPLETED` for `KRCC_07774204-5a71-4b79-8129-f73cf4dc164d`;
+- `transcript_source=assemblyai_stt`;
+- `provider=assemblyai`;
+- `provider_data_deleted=true`;
+- `stt_seconds_charged=98`;
+- exact post-test `beta_quota.used_seconds` and `remaining_seconds` are recorded;
+- segment route exposes the audio transcript through the GPT-facing contract.
 
 Other remaining gates:
 - additional UK/RU/EN/auto cases;
@@ -192,9 +245,10 @@ Other remaining gates:
 - concurrency rejection;
 - quota exhaustion simulation;
 - GPT Builder closed-beta end-to-end test;
-- AssemblyAI model-training opt-out verification;
+- AssemblyAI model-training/no-training and privacy verification;
 - hosted public privacy policy URL;
-- Free-plan/paid runtime tests before public promotion.
+- Free-plan/paid runtime tests before public promotion;
+- job-state durability across Render restart/spin-down.
 
 ## Known beta limitations
 
@@ -202,7 +256,7 @@ Other remaining gates:
 - direct timed-text may return empty data even when captions exist;
 - transcript-panel fallback is therefore part of the accepted browser path;
 - audio fallback still requires normal-speed playback for timestamp alignment;
-- process-memory jobs/quota can reset on Render restart/redeploy;
+- process-memory jobs/quota can reset on Render restart/redeploy/spin cycle;
 - AssemblyAI privacy/public-release checks are not yet closed.
 
 Do not merge PR #8 or PR #28, modify the public GPT, add personal YouTube cookies, or introduce paid residential proxy ingress merely to continue A4 testing.
