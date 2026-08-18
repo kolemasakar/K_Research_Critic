@@ -1,7 +1,7 @@
 # MEDIA BETA Documentation Index
 Канонічний індекс документації підпроєкту закритого та майбутнього безкоштовного медіарежиму K-Research & Critic.
 
-Version: 1.2
+Version: 1.3
 Status: ACTIVE
 Updated: 2026-08-18
 
@@ -32,7 +32,8 @@ The published text-only K-Research & Critic product remains a separate productio
 12. `11_A4_3_AUDIO_FALLBACK_ACCEPTANCE.md` - live browser-audio/AssemblyAI fallback acceptance, duration accounting, provider cleanup, and restart-durability finding.
 13. `12_A4_4_DURABILITY_ACCEPTANCE.md` - durable Postgres restart/resume acceptance and immutable `created_at` continuity.
 14. `13_A4_5_GUARD_MATRIX_ACCEPTANCE.md` - live negative-path guard matrix for access, source, duration, concurrency, and STT quota.
-15. `14_A4_LANGUAGE_SOURCE_MATRIX_ACCEPTANCE.md` - language/source matrix evidence, beginning with Russian captions and large-payload persistence remediation.
+15. `14_A4_LANGUAGE_SOURCE_MATRIX_ACCEPTANCE.md` - completed UK/RU/EN/AUTO-IT language/source matrix and large-payload persistence remediation evidence.
+16. `15_A4_QUOTA_LEDGER_RESTART_ACCEPTANCE.md` - live real-STT-charge persistence and runtime quota restoration after isolated restart.
 
 ## Source-of-truth order
 
