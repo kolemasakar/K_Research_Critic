@@ -1,7 +1,7 @@
 # MEDIA BETA Current State
 Канонічний знімок фактичного стану реалізації для відновлення роботи без припущень.
 
-Version: 2.2
+Version: 2.3
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-18
 
@@ -11,7 +11,7 @@ Current phase: `A4 - Live transcript validation`
 
 Current state:
 
-`A3_COMPLETE / A4_1_SERVER_INGRESS_BLOCKED / A4_2_CAPTIONS_FIRST_OWNER_ACCEPTANCE_PASS / GPT_STATUS_READBACK_PASS / SEGMENT_PAGINATION_227_OF_227_PASS / A4_3_AUDIO_FALLBACK_OWNER_ACCEPTANCE_PASS / ASSEMBLYAI_CLEANUP_PASS / AUDIO_GPT_STATUS_READBACK_PASS / AUDIO_SEGMENT_READBACK_NEXT`
+`A3_COMPLETE / A4_1_SERVER_INGRESS_BLOCKED / A4_2_CAPTIONS_FIRST_OWNER_ACCEPTANCE_PASS / GPT_STATUS_READBACK_PASS / SEGMENT_PAGINATION_227_OF_227_PASS / A4_3_AUDIO_FALLBACK_OWNER_ACCEPTANCE_PASS / ASSEMBLYAI_CLEANUP_PASS / AUDIO_GPT_STATUS_READBACK_PASS / AUDIO_GPT_SEGMENT_READBACK_PASS`
 
 The approved MEDIA BETA architecture is captions-first browser-assisted YouTube ingestion. Direct Render/datacenter YouTube acquisition remains unsuitable because of YouTube anti-bot enforcement. The browser helper now uses the tester browser path, prefers YouTube captions, and uses browser audio plus AssemblyAI only as fallback.
 
@@ -201,6 +201,17 @@ beta_quota.remaining_seconds=7102
 error=null
 ```
 
+The Action-facing segment readback confirmed:
+
+```text
+status=COMPLETED
+cursor=0
+next_cursor=null
+segment_count=2
+segment 0: index=0 start_ms=5347  end_ms=64032 confidence~=0.8694
+segment 1: index=1 start_ms=64032 end_ms=96917 confidence~=0.8469
+```
+
 This live test confirms:
 - active-tab audio capture works;
 - browser upload works;
@@ -209,7 +220,10 @@ This live test confirms:
 - AssemblyAI async transcription reaches COMPLETED;
 - provider transcript deletion succeeds and is visible through the GPT-facing contract;
 - exact post-test daily quota is visible through the GPT-facing contract;
-- timestamped transcript segments are produced.
+- all audio transcript segments are readable through the GPT-facing Action route;
+- timestamps are ordered and final `next_cursor=null` is correct.
+
+Two `U+FFFD` replacement-character artifacts were visible inside the returned STT text. This is recorded as a text-quality anomaly for later provider/pipeline investigation. It does not invalidate A4.3 transport, quota, cleanup, or Action-readback acceptance.
 
 Canonical acceptance record:
 `subprojects/media_beta/11_A4_3_AUDIO_FALLBACK_ACCEPTANCE.md`
@@ -248,20 +262,16 @@ Browser-only routes remain intentionally absent from the GPT Action schema.
 
 ## Remaining A4 validation
 
-Next priority: Action-facing segment readback of the accepted audio job.
+A4.2 captions-first owner acceptance and A4.3 audio-fallback owner acceptance are both complete for the primary Ukrainian acceptance video.
 
-Required immediate evidence:
-- segment route returns `status=COMPLETED` for `KRCC_07774204-5a71-4b79-8129-f73cf4dc164d`;
-- exactly 2 segments are exposed through the GPT-facing contract;
-- segment indices and timestamps are valid and ordered;
-- final `next_cursor=null`.
-
-Other remaining gates:
+Remaining A4/release gates:
 - additional UK/RU/EN/auto cases;
+- manual-caption classification case;
 - >60 minute rejection;
 - source mismatch rejection;
 - concurrency rejection;
 - quota exhaustion simulation;
+- STT text-quality investigation for observed replacement-character artifacts;
 - GPT Builder closed-beta end-to-end test;
 - AssemblyAI model-training/no-training and privacy verification;
 - hosted public privacy policy URL;
@@ -275,6 +285,7 @@ Other remaining gates:
 - transcript-panel fallback is therefore part of the accepted browser path;
 - audio fallback still requires normal-speed playback for timestamp alignment;
 - process-memory jobs/quota can reset on Render restart/redeploy/spin cycle;
+- AssemblyAI STT returned two replacement-character text artifacts in the accepted sample; quality investigation remains open;
 - AssemblyAI privacy/public-release checks are not yet closed.
 
 Do not merge PR #8 or PR #28, modify the public GPT, add personal YouTube cookies, or introduce paid residential proxy ingress merely to continue A4 testing.
