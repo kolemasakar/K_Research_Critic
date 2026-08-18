@@ -1,7 +1,7 @@
 # MEDIA BETA A4.3 Audio Fallback Acceptance
-Живе підтвердження browser-audio fallback через AssemblyAI з перевіркою квоти та видалення provider transcript.
+Живе підтвердження browser-audio fallback через AssemblyAI з перевіркою квоти, Action readback та видалення provider transcript.
 
-Version: 1.1
+Version: 1.2
 Status: PASS
 Acceptance date: 2026-08-18
 
@@ -76,6 +76,31 @@ error=null
 
 This confirms that the browser-audio completion is visible through the same Action-facing contract used by the beta GPT.
 
+## Action-facing segment readback
+
+The GPT-facing segment route returned:
+
+```text
+status=COMPLETED
+cursor=0
+next_cursor=null
+segment_count=2
+indices=0..1
+```
+
+Segment timing readback:
+
+```text
+segment 0: start_ms=5347  end_ms=64032
+segment 1: start_ms=64032 end_ms=96917
+```
+
+Both segments include text and confidence values. Timestamps are ordered and contiguous at the segment boundary. The final `next_cursor=null` is correct because all audio transcript segments fit in the first page.
+
+Observed confidence values were approximately `0.8694` and `0.8469`.
+
+Two replacement-character artifacts (`U+FFFD`) were visible in the returned transcript text. This does not invalidate transport/pagination acceptance, but it is recorded as an STT text-quality anomaly for later provider/pipeline quality investigation before public release.
+
 ## Accepted backend path
 
 ```text
@@ -139,7 +164,7 @@ Until then, owner/tester fallback acceptance should create the KRCC job immediat
 
 ## Acceptance conclusion
 
-PASS for A4.3 browser-audio fallback execution and GPT-facing status readback.
+PASS for the complete A4.3 browser-audio fallback path, including GPT-facing status and segment readback.
 
 Confirmed:
 - Helper 0.2.2 can switch from an old completed job to a fresh KRCC job;
@@ -148,7 +173,8 @@ Confirmed:
 - WebM/Opus normalization and duration probing work;
 - AssemblyAI fallback reaches COMPLETED;
 - Ukrainian language detection is returned;
-- transcript segments are produced;
+- transcript segments are produced and readable through the GPT-facing Action route;
+- segment indices/timestamps and final pagination cursor are valid;
 - measured STT duration is charged correctly;
 - exact daily quota readback is correct;
 - provider transcript cleanup is confirmed by the Action contract;
@@ -156,13 +182,13 @@ Confirmed:
 
 ## Remaining A4 validation
 
-This PASS does not close all MEDIA BETA release gates. Remaining work includes:
-- Action-facing audio segment pagination/readback;
+A4.3 transport/processing acceptance is complete. Remaining release gates include:
 - additional UK/RU/EN/auto cases;
 - >60 minute rejection;
 - source mismatch rejection;
 - concurrency rejection;
 - daily quota exhaustion simulation;
+- STT text-quality investigation for observed replacement-character artifacts;
 - AssemblyAI no-training/privacy verification;
 - GPT Builder closed-beta end-to-end test;
 - hosted public privacy policy URL;
@@ -176,3 +202,5 @@ This PASS does not close all MEDIA BETA release gates. Remaining work includes:
 `A4_3_STT_DURATION_ACCOUNTING_PASS`
 
 `A4_3_GPT_STATUS_READBACK_PASS`
+
+`A4_3_GPT_SEGMENT_READBACK_PASS`
