@@ -1,7 +1,7 @@
 # MEDIA BETA A4.5 Guard Matrix Acceptance
 Живе підтвердження захисних перевірок closed MEDIA BETA для доступу, джерела, тривалості, конкурентності та квоти.
 
-Version: 1.2
+Version: 1.3
 Status: IN_PROGRESS
 Acceptance date: 2026-08-18
 
@@ -91,8 +91,30 @@ Result: PASS. The isolated beta rejected a second active job while one waiting j
 
 `A4_5_CONCURRENCY_PASS`
 
+## Guard 4 - source duration above 60 minutes
+
+The same waiting job was used with the correct YouTube source. A synthetic caption segment ended at `3602000 ms` (60 minutes 2 seconds), exceeding the configured `3600` second maximum.
+
+Observed HTTP response:
+
+```text
+HTTP/1.1 413 Payload Too Large
+```
+
+Observed error contract:
+
+```text
+error.code=MEDIA_DURATION_LIMIT
+error.category=MEDIA
+error.retryable=false
+message=Closed beta videos are limited to 3600 seconds.
+```
+
+Result: PASS. The request was rejected before transcript completion and consumed no STT quota.
+
+`A4_5_OVER_60_MIN_PASS`
+
 ## Remaining guards
 
 Pending:
-- `A4_5_OVER_60_MIN_PENDING`
 - `A4_5_QUOTA_EXHAUSTION_PENDING`
