@@ -1,7 +1,7 @@
 # MEDIA BETA Current State
 Канонічний знімок фактичного стану реалізації для відновлення роботи без припущень.
 
-Version: 2.7
+Version: 2.8
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-18
 
@@ -11,7 +11,7 @@ Current phase: `A4 - Live transcript validation`
 
 Current state:
 
-`A3_COMPLETE / A4_1_SERVER_INGRESS_BLOCKED / A4_2_CAPTIONS_FIRST_OWNER_ACCEPTANCE_PASS / GPT_STATUS_READBACK_PASS / SEGMENT_PAGINATION_227_OF_227_PASS / A4_3_AUDIO_FALLBACK_OWNER_ACCEPTANCE_PASS / ASSEMBLYAI_CLEANUP_PASS / AUDIO_GPT_STATUS_READBACK_PASS / AUDIO_GPT_SEGMENT_READBACK_PASS / A4_4_RESTART_DURABILITY_PASS / CREATED_AT_CONTINUITY_PASS / A4_5_GUARD_MATRIX_PASS / A4_RU_CAPTIONS_PASS / A4_LARGE_CAPTION_PAYLOAD_PERSISTENCE_DEFECT_CLOSED / A4_EN_CAPTIONS_PASS / A4_MANUAL_CAPTIONS_CLASSIFICATION_PASS`
+`A3_COMPLETE / A4_1_SERVER_INGRESS_BLOCKED / A4_2_CAPTIONS_FIRST_OWNER_ACCEPTANCE_PASS / GPT_STATUS_READBACK_PASS / SEGMENT_PAGINATION_227_OF_227_PASS / A4_3_AUDIO_FALLBACK_OWNER_ACCEPTANCE_PASS / ASSEMBLYAI_CLEANUP_PASS / AUDIO_GPT_STATUS_READBACK_PASS / AUDIO_GPT_SEGMENT_READBACK_PASS / A4_4_RESTART_DURABILITY_PASS / CREATED_AT_CONTINUITY_PASS / A4_5_GUARD_MATRIX_PASS / A4_RU_CAPTIONS_PASS / A4_LARGE_CAPTION_PAYLOAD_PERSISTENCE_DEFECT_CLOSED / A4_EN_CAPTIONS_PASS / A4_MANUAL_CAPTIONS_CLASSIFICATION_PASS / A4_AUTO_LANGUAGE_IT_PASS / A4_LANGUAGE_SOURCE_MATRIX_PASS`
 
 The approved MEDIA BETA architecture is captions-first browser-assisted YouTube ingestion. Direct Render/datacenter YouTube acquisition remains unsuitable because of YouTube anti-bot enforcement. The browser helper uses the tester browser path, prefers YouTube captions, and uses browser audio plus AssemblyAI only as fallback.
 
@@ -264,79 +264,56 @@ Canonical record:
 
 ## A4 language/source matrix
 
-### Russian auto-generated captions
-
 Status: PASS.
 
-Source:
-`https://www.youtube.com/watch?v=j_R7sBXyRyE`
-
-Accepted job:
-`KRCC_eabd86f0-5205-4311-b063-2bb04d4fe1c5`
-
-Final durable result:
+Accepted cases:
 
 ```text
-status=COMPLETED
-created_at=2026-08-18T04:20:08.793Z
-detected_language=ru
-transcript_source=youtube_captions
-caption_type=auto_generated
-provider=youtube
-duration_seconds=1381
-transcript_characters=19206
-segment_count=524
-stt_seconds_charged=0
-beta_quota.used_seconds=0
-error=null
+UK auto_generated captions   PASS
+RU auto_generated captions   PASS
+EN manual captions           PASS
+manual classification        PASS
+auto -> IT manual captions   PASS
 ```
 
-The Helper completed through the YouTube transcript-panel fallback. The 524-segment payload exposed a durable persistence boundary defect: large hex-encoded SQL was being passed to `psql -c` as one command-line argument. VoiceBridge commit `8962a323abd2d549ad372c51a054f9f5371e9ada` changed persistence to send SQL through stdin and added regression coverage. Validation and isolated MEDIA BETA deployment passed. The same external job then completed successfully with immutable `created_at` and zero STT charge.
+Russian case:
+- source `https://www.youtube.com/watch?v=j_R7sBXyRyE`;
+- job `KRCC_eabd86f0-5205-4311-b063-2bb04d4fe1c5`;
+- `detected_language=ru`;
+- `caption_type=auto_generated`;
+- 524 segments / 19206 characters;
+- STT charge zero.
 
-Closure markers:
+The Russian payload exposed the large-argument durable persistence defect. VoiceBridge commit `8962a323abd2d549ad372c51a054f9f5371e9ada` changed SQL transport to stdin. Validation and isolated deployment passed, and the same job then completed durably.
 
-```text
-A4_RU_CAPTIONS_PASS
-A4_LARGE_CAPTION_PAYLOAD_PERSISTENCE_DEFECT_CLOSED
-```
+English/manual case:
+- source `https://www.youtube.com/watch?v=eIho2S0ZahI`;
+- job `KRCC_cbd47a08-2ea6-4097-961d-c6993107579b`;
+- `detected_language=en`;
+- `caption_type=manual`;
+- 247 segments / 8872 characters;
+- STT charge zero.
 
-### English manual captions
-
-Status: PASS.
-
-Source:
-`https://www.youtube.com/watch?v=eIho2S0ZahI`
-
-Accepted job:
-`KRCC_cbd47a08-2ea6-4097-961d-c6993107579b`
-
-Final durable result:
-
-```text
-status=COMPLETED
-created_at=2026-08-18T04:48:01.521Z
-updated_at=2026-08-18T04:48:58.249Z
-language_hint=en
-detected_language=en
-transcript_source=youtube_captions
-caption_type=manual
-provider=youtube
-duration_seconds=595
-transcript_characters=8872
-segment_count=247
-stt_seconds_charged=0
-beta_quota.used_seconds=0
-beta_quota.remaining_seconds=7200
-error=null
-```
-
-The same case validates manual-caption classification as well as English captions ingestion.
+Italian auto-selection case:
+- source `https://www.youtube.com/watch?v=lLxb3lYI3lI`;
+- job `KRCC_99ef05c6-da65-4190-ae9f-db3e1cff07ab`;
+- `language_hint=auto`;
+- `detected_language=it`;
+- `caption_type=manual`;
+- duration 465 sec;
+- 74 segments / 5269 characters;
+- STT charge zero;
+- original `created_at=2026-08-18T05:11:36.054Z` preserved.
 
 Acceptance markers:
 
 ```text
+A4_RU_CAPTIONS_PASS
+A4_LARGE_CAPTION_PAYLOAD_PERSISTENCE_DEFECT_CLOSED
 A4_EN_CAPTIONS_PASS
 A4_MANUAL_CAPTIONS_CLASSIFICATION_PASS
+A4_AUTO_LANGUAGE_IT_PASS
+A4_LANGUAGE_SOURCE_MATRIX_PASS
 ```
 
 Canonical record:
@@ -362,8 +339,7 @@ Browser-only routes remain intentionally absent from the GPT Action schema.
 
 ## Next A4 validation block
 
-Guard matrix, Russian captions, English captions, and manual-caption classification are complete. Remaining A4 validation before A5:
-- explicit `auto` language/track selection case beyond the accepted Ukrainian sample;
+Captions language/source validation is complete. Remaining A4 validation before A5:
 - durable quota-ledger restart acceptance after a newly charged audio job;
 - audio fallback process-replacement behavior during active upload/transcription;
 - STT replacement-character investigation.
