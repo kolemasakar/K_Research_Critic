@@ -1,7 +1,7 @@
 # A4 Language/Source Matrix Acceptance
 Фіксує live-перевірки мов, типів субтитрів і великих caption payload у MEDIA BETA.
 
-Version: 1.0
+Version: 1.1
 Status: IN_PROGRESS
 Updated: 2026-08-18
 
@@ -121,12 +121,82 @@ Closure marker:
 
 `A4_LARGE_CAPTION_PAYLOAD_PERSISTENCE_DEFECT_CLOSED`
 
+## English captions case
+
+Status: PASS
+
+Source URL:
+`https://www.youtube.com/watch?v=eIho2S0ZahI`
+
+Job:
+`KRCC_cbd47a08-2ea6-4097-961d-c6993107579b`
+
+Initial job state:
+
+```text
+status=AWAITING_CLIENT
+created_at=2026-08-18T04:48:01.521Z
+language_hint=en
+stt_seconds_charged=0
+beta_quota.daily_limit_seconds=7200
+beta_quota.used_seconds=0
+```
+
+Helper path:
+
+```text
+Use subtitles
+ -> YouTube transcript-panel path
+ -> manual / en
+ -> POST /captions
+ -> COMPLETED
+```
+
+Helper-side completion:
+
+```text
+status=COMPLETED
+transcript_source=youtube_captions
+caption_type=manual
+detected_language=en
+segment_count=247
+stt_seconds_charged=0
+provider_cleanup=not applicable
+```
+
+Final Action-facing durable readback:
+
+```text
+status=COMPLETED
+created_at=2026-08-18T04:48:01.521Z
+updated_at=2026-08-18T04:48:58.249Z
+language_hint=en
+detected_language=en
+transcript_source=youtube_captions
+caption_type=manual
+provider=youtube
+duration_seconds=595
+transcript_characters=8872
+segment_count=247
+stt_seconds_charged=0
+beta_quota.used_seconds=0
+beta_quota.remaining_seconds=7200
+error=null
+```
+
+Acceptance results:
+
+```text
+A4_EN_CAPTIONS_PASS
+A4_MANUAL_CAPTIONS_CLASSIFICATION_PASS
+```
+
+This single live case validates both English captions ingestion and manual-caption classification.
+
 ## Remaining matrix
 
 Pending:
-- English captions case;
-- explicit `auto` language/track-selection case beyond the accepted Ukrainian sample;
-- manual-caption classification case.
+- explicit `auto` language/track-selection case beyond the accepted Ukrainian sample.
 
 ## Boundary
 
