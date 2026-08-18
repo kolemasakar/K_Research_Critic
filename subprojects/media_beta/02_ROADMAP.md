@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 Дорожня карта реалізації закритого beta-медіарежиму та наступного сталого безкоштовного режиму.
 
-Version: 2.0
+Version: 2.1
 Status: ACTIVE
 Updated: 2026-08-18
 
@@ -55,7 +55,7 @@ Dedicated service:
 
 ### A4. Live transcript validation
 
-Status: IN_PROGRESS_LANGUAGE_SOURCE_MATRIX
+Status: IN_PROGRESS_DURABILITY_AND_AUDIO_EDGE_CASES
 
 #### A4.1 Server-side YouTube ingress
 
@@ -99,7 +99,8 @@ Accepted live evidence:
 - Russian auto-generated captions job completed through transcript-panel fallback with 524 segments / 19206 transcript characters;
 - English manual captions job completed with 247 segments / 8872 transcript characters;
 - manual-caption classification accepted on the English case;
-- captions charged zero STT seconds in accepted Ukrainian, Russian, and English cases;
+- `language_hint=auto` accepted an Italian manual-caption track and persisted `detected_language=it`;
+- captions charged zero STT seconds in all accepted caption cases;
 - audio fallback completed with AssemblyAI `universal-2`;
 - measured audio duration charged correctly;
 - provider deletion request succeeded;
@@ -125,7 +126,7 @@ Open quality item:
 
 #### A4.4 Restart durability
 
-Status: COMPLETE
+Status: COMPLETE_FOR_JOB_STATE_AND_CREATED_AT
 
 Accepted:
 - durable Postgres KRCC job state;
@@ -134,6 +135,10 @@ Accepted:
 - completed job remains readable after later restart;
 - durable STT quota ledger enabled;
 - external `created_at` remains immutable through restart, rehydration and completion.
+
+Still pending:
+- live restart acceptance of the quota ledger after a newly charged audio job;
+- process-replacement behavior during active audio upload/transcription.
 
 Canonical acceptance:
 `subprojects/media_beta/12_A4_4_DURABILITY_ACCEPTANCE.md`
@@ -156,21 +161,17 @@ Canonical acceptance:
 
 #### A4.6 Language/source matrix
 
-Status: IN_PROGRESS
+Status: COMPLETE
 
 Accepted:
+- Ukrainian auto-generated captions;
 - Russian auto-generated captions via YouTube transcript-panel fallback;
-- `detected_language=ru`;
-- 524 timestamped Russian caption segments;
-- 19206 Russian transcript characters persisted durably;
-- English manual captions via YouTube transcript-panel path;
-- `detected_language=en`;
-- 247 English manual-caption segments;
-- 8872 English transcript characters persisted durably;
+- English manual captions;
 - manual-caption classification;
-- zero STT charge for accepted caption cases;
-- immutable external `created_at` preserved;
-- large-payload durable persistence remediation validated and deployed only to isolated MEDIA BETA.
+- explicit `language_hint=auto` case selecting/persisting Italian `detected_language=it`;
+- 524-segment / 19206-character large Russian payload persisted durably after remediation;
+- zero STT charge for caption cases;
+- immutable external `created_at` preserved.
 
 Canonical acceptance:
 `subprojects/media_beta/14_A4_LANGUAGE_SOURCE_MATRIX_ACCEPTANCE.md`
@@ -178,7 +179,6 @@ Canonical acceptance:
 #### Remaining A4 matrix
 
 Pending before A4 exit:
-- explicit `auto` language/track-selection case beyond the accepted Ukrainian sample;
 - durable quota-ledger restart acceptance after a newly charged audio job;
 - audio fallback behavior if process replacement occurs during active upload/transcription;
 - STT replacement-character investigation.
@@ -188,6 +188,7 @@ Already accepted and no longer pending:
 - Russian auto-generated captions;
 - English manual captions;
 - manual-caption classification;
+- `auto -> it` language/track selection;
 - captions unavailable/audio fallback path;
 - successful audio fallback after duration fix;
 - >60 min rejection;
@@ -208,7 +209,7 @@ A4 exit criteria:
 
 ### A5. Separate GPT Builder beta
 
-Status: BLOCKED_BY_REMAINING_A4_MATRIX
+Status: BLOCKED_BY_REMAINING_A4_EDGE_CASES
 
 After A4 acceptance:
 - create `K-Research & Critic - MEDIA BETA` separately from public GPT;
