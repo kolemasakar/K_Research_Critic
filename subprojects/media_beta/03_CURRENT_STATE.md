@@ -1,7 +1,7 @@
 # MEDIA BETA Current State
 Канонічний знімок фактичного стану реалізації для відновлення роботи без припущень.
 
-Version: 2.6
+Version: 2.7
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-18
 
@@ -11,7 +11,7 @@ Current phase: `A4 - Live transcript validation`
 
 Current state:
 
-`A3_COMPLETE / A4_1_SERVER_INGRESS_BLOCKED / A4_2_CAPTIONS_FIRST_OWNER_ACCEPTANCE_PASS / GPT_STATUS_READBACK_PASS / SEGMENT_PAGINATION_227_OF_227_PASS / A4_3_AUDIO_FALLBACK_OWNER_ACCEPTANCE_PASS / ASSEMBLYAI_CLEANUP_PASS / AUDIO_GPT_STATUS_READBACK_PASS / AUDIO_GPT_SEGMENT_READBACK_PASS / A4_4_RESTART_DURABILITY_PASS / CREATED_AT_CONTINUITY_PASS / A4_5_GUARD_MATRIX_PASS / A4_RU_CAPTIONS_PASS / A4_LARGE_CAPTION_PAYLOAD_PERSISTENCE_DEFECT_CLOSED`
+`A3_COMPLETE / A4_1_SERVER_INGRESS_BLOCKED / A4_2_CAPTIONS_FIRST_OWNER_ACCEPTANCE_PASS / GPT_STATUS_READBACK_PASS / SEGMENT_PAGINATION_227_OF_227_PASS / A4_3_AUDIO_FALLBACK_OWNER_ACCEPTANCE_PASS / ASSEMBLYAI_CLEANUP_PASS / AUDIO_GPT_STATUS_READBACK_PASS / AUDIO_GPT_SEGMENT_READBACK_PASS / A4_4_RESTART_DURABILITY_PASS / CREATED_AT_CONTINUITY_PASS / A4_5_GUARD_MATRIX_PASS / A4_RU_CAPTIONS_PASS / A4_LARGE_CAPTION_PAYLOAD_PERSISTENCE_DEFECT_CLOSED / A4_EN_CAPTIONS_PASS / A4_MANUAL_CAPTIONS_CLASSIFICATION_PASS`
 
 The approved MEDIA BETA architecture is captions-first browser-assisted YouTube ingestion. Direct Render/datacenter YouTube acquisition remains unsuitable because of YouTube anti-bot enforcement. The browser helper uses the tester browser path, prefers YouTube captions, and uses browser audio plus AssemblyAI only as fallback.
 
@@ -264,7 +264,9 @@ Canonical record:
 
 ## A4 language/source matrix
 
-Russian captions case: PASS.
+### Russian auto-generated captions
+
+Status: PASS.
 
 Source:
 `https://www.youtube.com/watch?v=j_R7sBXyRyE`
@@ -298,6 +300,45 @@ A4_RU_CAPTIONS_PASS
 A4_LARGE_CAPTION_PAYLOAD_PERSISTENCE_DEFECT_CLOSED
 ```
 
+### English manual captions
+
+Status: PASS.
+
+Source:
+`https://www.youtube.com/watch?v=eIho2S0ZahI`
+
+Accepted job:
+`KRCC_cbd47a08-2ea6-4097-961d-c6993107579b`
+
+Final durable result:
+
+```text
+status=COMPLETED
+created_at=2026-08-18T04:48:01.521Z
+updated_at=2026-08-18T04:48:58.249Z
+language_hint=en
+detected_language=en
+transcript_source=youtube_captions
+caption_type=manual
+provider=youtube
+duration_seconds=595
+transcript_characters=8872
+segment_count=247
+stt_seconds_charged=0
+beta_quota.used_seconds=0
+beta_quota.remaining_seconds=7200
+error=null
+```
+
+The same case validates manual-caption classification as well as English captions ingestion.
+
+Acceptance markers:
+
+```text
+A4_EN_CAPTIONS_PASS
+A4_MANUAL_CAPTIONS_CLASSIFICATION_PASS
+```
+
 Canonical record:
 `subprojects/media_beta/14_A4_LANGUAGE_SOURCE_MATRIX_ACCEPTANCE.md`
 
@@ -321,10 +362,8 @@ Browser-only routes remain intentionally absent from the GPT Action schema.
 
 ## Next A4 validation block
 
-Guard matrix and Russian captions case are complete. Remaining A4 validation before A5:
-- English captions case;
+Guard matrix, Russian captions, English captions, and manual-caption classification are complete. Remaining A4 validation before A5:
 - explicit `auto` language/track selection case beyond the accepted Ukrainian sample;
-- manual-caption classification case;
 - durable quota-ledger restart acceptance after a newly charged audio job;
 - audio fallback process-replacement behavior during active upload/transcription;
 - STT replacement-character investigation.
