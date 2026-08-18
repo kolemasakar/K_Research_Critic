@@ -1,13 +1,13 @@
 # A4 Language/Source Matrix Acceptance
 Фіксує live-перевірки мов, типів субтитрів і великих caption payload у MEDIA BETA.
 
-Version: 1.1
-Status: IN_PROGRESS
+Version: 1.2
+Status: PASS
 Updated: 2026-08-18
 
 ## Scope
 
-This record covers the remaining A4 language/source matrix after the primary Ukrainian captions, audio fallback, durability, and negative guard acceptance.
+This record covers the A4 language/source matrix after the primary Ukrainian captions, audio fallback, durability, and negative guard acceptance.
 
 Matrix targets:
 - Russian captions;
@@ -193,10 +193,80 @@ A4_MANUAL_CAPTIONS_CLASSIFICATION_PASS
 
 This single live case validates both English captions ingestion and manual-caption classification.
 
-## Remaining matrix
+## Auto language/track selection - Italian case
 
-Pending:
-- explicit `auto` language/track-selection case beyond the accepted Ukrainian sample.
+Status: PASS
+
+Source URL:
+`https://www.youtube.com/watch?v=lLxb3lYI3lI`
+
+Job:
+`KRCC_99ef05c6-da65-4190-ae9f-db3e1cff07ab`
+
+Initial job state:
+
+```text
+status=AWAITING_CLIENT
+created_at=2026-08-18T05:11:36.054Z
+language_hint=auto
+stt_seconds_charged=0
+beta_quota.daily_limit_seconds=7200
+beta_quota.used_seconds=0
+```
+
+Helper-side completion:
+
+```text
+status=COMPLETED
+transcript_source=youtube_captions
+caption_type=manual
+detected_language=it
+segment_count=74
+stt_seconds_charged=0
+provider_cleanup=not applicable
+```
+
+Final Action-facing durable readback:
+
+```text
+status=COMPLETED
+created_at=2026-08-18T05:11:36.054Z
+updated_at=2026-08-18T05:12:35.732Z
+language_hint=auto
+detected_language=it
+transcript_source=youtube_captions
+caption_type=manual
+provider=youtube
+duration_seconds=465
+transcript_characters=5269
+segment_count=74
+stt_seconds_charged=0
+beta_quota.used_seconds=0
+beta_quota.remaining_seconds=7200
+error=null
+```
+
+This case proves that an `auto` job can accept a caption language outside the explicit request-hint set (`auto/uk/ru/en`) and preserve the actual caption language as `detected_language=it`.
+
+Acceptance result:
+
+`A4_AUTO_LANGUAGE_IT_PASS`
+
+## Matrix closure
+
+All planned language/source cases passed:
+
+```text
+UK auto_generated captions   PASS
+RU auto_generated captions   PASS
+EN manual captions           PASS
+manual classification        PASS
+auto -> IT manual captions   PASS
+```
+
+Closure marker:
+
+`A4_LANGUAGE_SOURCE_MATRIX_PASS`
 
 ## Boundary
 
