@@ -1,7 +1,7 @@
 # MEDIA BETA Current State
 Канонічний знімок фактичного стану реалізації для відновлення роботи без припущень.
 
-Version: 2.5
+Version: 2.6
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-18
 
@@ -11,7 +11,7 @@ Current phase: `A4 - Live transcript validation`
 
 Current state:
 
-`A3_COMPLETE / A4_1_SERVER_INGRESS_BLOCKED / A4_2_CAPTIONS_FIRST_OWNER_ACCEPTANCE_PASS / GPT_STATUS_READBACK_PASS / SEGMENT_PAGINATION_227_OF_227_PASS / A4_3_AUDIO_FALLBACK_OWNER_ACCEPTANCE_PASS / ASSEMBLYAI_CLEANUP_PASS / AUDIO_GPT_STATUS_READBACK_PASS / AUDIO_GPT_SEGMENT_READBACK_PASS / A4_4_RESTART_DURABILITY_PASS / CREATED_AT_CONTINUITY_PASS / A4_5_GUARD_MATRIX_PASS`
+`A3_COMPLETE / A4_1_SERVER_INGRESS_BLOCKED / A4_2_CAPTIONS_FIRST_OWNER_ACCEPTANCE_PASS / GPT_STATUS_READBACK_PASS / SEGMENT_PAGINATION_227_OF_227_PASS / A4_3_AUDIO_FALLBACK_OWNER_ACCEPTANCE_PASS / ASSEMBLYAI_CLEANUP_PASS / AUDIO_GPT_STATUS_READBACK_PASS / AUDIO_GPT_SEGMENT_READBACK_PASS / A4_4_RESTART_DURABILITY_PASS / CREATED_AT_CONTINUITY_PASS / A4_5_GUARD_MATRIX_PASS / A4_RU_CAPTIONS_PASS / A4_LARGE_CAPTION_PAYLOAD_PERSISTENCE_DEFECT_CLOSED`
 
 The approved MEDIA BETA architecture is captions-first browser-assisted YouTube ingestion. Direct Render/datacenter YouTube acquisition remains unsuitable because of YouTube anti-bot enforcement. The browser helper uses the tester browser path, prefers YouTube captions, and uses browser audio plus AssemblyAI only as fallback.
 
@@ -262,6 +262,45 @@ Quota test used a temporary isolated-beta limit of 60 sec/day and a 61.092-secon
 Canonical record:
 `subprojects/media_beta/13_A4_5_GUARD_MATRIX_ACCEPTANCE.md`
 
+## A4 language/source matrix
+
+Russian captions case: PASS.
+
+Source:
+`https://www.youtube.com/watch?v=j_R7sBXyRyE`
+
+Accepted job:
+`KRCC_eabd86f0-5205-4311-b063-2bb04d4fe1c5`
+
+Final durable result:
+
+```text
+status=COMPLETED
+created_at=2026-08-18T04:20:08.793Z
+detected_language=ru
+transcript_source=youtube_captions
+caption_type=auto_generated
+provider=youtube
+duration_seconds=1381
+transcript_characters=19206
+segment_count=524
+stt_seconds_charged=0
+beta_quota.used_seconds=0
+error=null
+```
+
+The Helper completed through the YouTube transcript-panel fallback. The 524-segment payload exposed a durable persistence boundary defect: large hex-encoded SQL was being passed to `psql -c` as one command-line argument. VoiceBridge commit `8962a323abd2d549ad372c51a054f9f5371e9ada` changed persistence to send SQL through stdin and added regression coverage. Validation and isolated MEDIA BETA deployment passed. The same external job then completed successfully with immutable `created_at` and zero STT charge.
+
+Closure markers:
+
+```text
+A4_RU_CAPTIONS_PASS
+A4_LARGE_CAPTION_PAYLOAD_PERSISTENCE_DEFECT_CLOSED
+```
+
+Canonical record:
+`subprojects/media_beta/14_A4_LANGUAGE_SOURCE_MATRIX_ACCEPTANCE.md`
+
 ## Backend routes
 
 Action-facing:
@@ -282,8 +321,7 @@ Browser-only routes remain intentionally absent from the GPT Action schema.
 
 ## Next A4 validation block
 
-Guard matrix is complete. Remaining A4 validation before A5:
-- Russian captions case;
+Guard matrix and Russian captions case are complete. Remaining A4 validation before A5:
 - English captions case;
 - explicit `auto` language/track selection case beyond the accepted Ukrainian sample;
 - manual-caption classification case;
