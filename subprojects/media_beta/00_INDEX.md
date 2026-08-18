@@ -1,9 +1,9 @@
 # MEDIA BETA Documentation Index
 Канонічний індекс документації підпроєкту закритого та майбутнього безкоштовного медіарежиму K-Research & Critic.
 
-Version: 1.0
+Version: 1.1
 Status: ACTIVE
-Updated: 2026-08-17
+Updated: 2026-08-18
 
 ## Purpose
 
@@ -27,6 +27,9 @@ The published text-only K-Research & Critic product remains a separate productio
 7. `06_DECISION_LOG.md` - approved architecture and product decisions.
 8. `07_FREE_MODE_TARGET.md` - post-beta sustainable free architecture options and target design.
 9. `08_CHAT_HANDOFF.md` - canonical recovery and cross-chat continuation document.
+10. `09_WORK_LOG.md` - chronological implementation evidence.
+11. `10_A4_2_CAPTIONS_ACCEPTANCE.md` - live captions-first owner acceptance and 227/227 GPT-facing pagination evidence.
+12. `11_A4_3_AUDIO_FALLBACK_ACCEPTANCE.md` - live browser-audio/AssemblyAI fallback acceptance, duration accounting, provider cleanup, and restart-durability finding.
 
 ## Source-of-truth order
 
