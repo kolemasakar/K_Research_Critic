@@ -1,13 +1,13 @@
 # MEDIA BETA A4.4 Restart Durability Acceptance
-Живе підтвердження збереження client-assisted KRCC job після навмисного redeploy/restart beta backend і успішного продовження цього самого job до COMPLETED.
+Живе підтвердження збереження client-assisted KRCC job після навмисного redeploy/restart beta backend, продовження цього самого job до COMPLETED та незмінності created_at.
 
-Version: 1.3
-Status: PASS_WITH_FINAL_METADATA_REGRESSION_PENDING
+Version: 1.4
+Status: PASS
 Acceptance date: 2026-08-18
 
 ## Scope
 
-A4.4 verifies that a client-assisted `KRCC_...` job no longer depends exclusively on web-process RAM and can survive an isolated Render beta redeploy/restart, remain visible through the Action API, and continue through the browser captions path to completion.
+A4.4 verifies that a client-assisted `KRCC_...` job no longer depends exclusively on web-process RAM and can survive an isolated Render beta redeploy/restart, remain visible through the Action API, continue through the browser captions path to completion, and preserve its original `created_at` across rehydration.
 
 Production VoiceBridge and the published K-Research & Critic GPT were not modified.
 
@@ -23,35 +23,22 @@ restart_resilient_waiting_jobs=true
 durable_quota_ledger=true
 ```
 
-The durability provisioning/deploy workflow reached:
+## Initial restart-resume durability
 
-```text
-SUCCESS
-stage=health_pass
-diagnostic=none
-```
-
-## Initial live restart test
-
-Created before the intentional redeploy/restart:
+Initial accepted restart test job:
 
 `KRCC_d37e26da-069d-43d6-a98f-7608e544c43e`
 
-Initial state:
+Before restart:
 
 ```text
 status=AWAITING_CLIENT
-reused=false
 created_at=2026-08-18T02:55:59.880Z
 client_upload_required=true
 stt_seconds_charged=0
 ```
 
-The MEDIA BETA service was intentionally redeployed at commit:
-
-`64815f7f3efc7de1e20523a4677d38b6ca5af86d`
-
-After restart, the same Action-facing status route returned the same job in `AWAITING_CLIENT`. The same restored Job ID was then entered into Helper 0.2.2 and completed through `Use subtitles` with:
+After intentional beta redeploy/restart, the same Action-facing job remained `AWAITING_CLIENT`. Helper 0.2.2 then resumed the same Job ID through `Use subtitles` and completed with:
 
 ```text
 status=COMPLETED
@@ -64,54 +51,35 @@ stt_seconds_charged=0
 
 This proved restart-resume durability of the waiting-job captions path.
 
-## Metadata continuity defect discovery
+## Metadata continuity defect and remediation
 
-The first completed Action readback exposed one residual defect:
+The first completed Action readback exposed a metadata defect: a rehydrated in-memory job could replace the external job's original `created_at`.
 
-```text
-original created_at = 2026-08-18T02:55:59.880Z
-completed created_at = 2026-08-18T03:00:23.361Z
-```
+Remediation was implemented in two layers:
+- Postgres upsert preserves the existing durable payload's `created_at` on conflict;
+- live HTTP projections for snapshot, captions-resume, and audio-resume explicitly preserve `record.job.created_at`.
 
-The external Job ID remained stable, but the live HTTP projection exposed the internally rehydrated job timestamp instead of the durable external job timestamp.
-
-## Persistence-layer remediation
-
-The Postgres upsert was hardened so an existing durable record preserves its original `payload.created_at` on update.
-
-A regression test was added and the VoiceBridge validation workflow passed.
-
-## HTTP projection remediation
-
-A second live regression showed that the durable store retained the correct timestamp but the running HTTP projection could still expose the internal rehydrated timestamp. The HTTP-layer resume/snapshot paths were then remediated.
-
-VoiceBridge remediation code commit:
+VoiceBridge HTTP projection remediation code commit:
 
 `db57575b11638ae2a6123e9bebe78a53b1144394`
 
-Isolated MEDIA BETA deployment result:
+The remediation was validated and deployed only to the isolated MEDIA BETA service. Production was not targeted.
 
-```text
-SUCCESS
-production_not_targeted=true
-```
+## Durable completed-job readback
 
-## Durable completed-job readback after remediation
-
-Continuity test job:
+Continuity job:
 
 `KRCC_f76e37ab-84bb-439c-9226-c1baaa2e561d`
 
-Original timestamp before restart:
+Original timestamp:
 
 ```text
 created_at=2026-08-18T03:18:59.441Z
 ```
 
-After the HTTP projection remediation and a later process replacement, the Action API returned the completed job from durable state with:
+After later process replacement, the Action API returned the completed job from durable state with the same original timestamp:
 
 ```text
-job_id=KRCC_f76e37ab-84bb-439c-9226-c1baaa2e561d
 status=COMPLETED
 created_at=2026-08-18T03:18:59.441Z
 updated_at=2026-08-18T03:21:37.038Z
@@ -120,36 +88,81 @@ segment_count=227
 stt_seconds_charged=0
 ```
 
-This is a PASS for durable storage and post-restart completed-job readback of the immutable original `created_at`.
+This confirmed that the durable record itself preserved the original `created_at`.
+
+## Final end-to-end metadata regression
+
+Final regression job:
+
+`KRCC_cad52723-cbf0-4bd6-b195-44902d11bc6b`
+
+Before restart:
+
+```text
+status=AWAITING_CLIENT
+created_at=2026-08-18T03:38:41.045Z
+```
+
+An intentional isolated MEDIA BETA restart/redeploy was then performed. The same Job ID was resumed through Helper 0.2.2 using `Use subtitles`.
+
+Helper result:
+
+```text
+status=COMPLETED
+transcript_source=youtube_captions
+caption_type=auto_generated
+detected_language=uk
+segment_count=227
+stt_seconds_charged=0
+provider_cleanup=not applicable
+```
+
+Final Action-facing readback:
+
+```text
+job_id=KRCC_cad52723-cbf0-4bd6-b195-44902d11bc6b
+status=COMPLETED
+created_at=2026-08-18T03:38:41.045Z
+updated_at=2026-08-18T03:45:29.320Z
+transcript_source=youtube_captions
+caption_type=auto_generated
+provider=youtube
+detected_language=uk
+duration_seconds=663
+transcript_characters=8235
+segment_count=227
+stt_seconds_charged=0
+error=null
+```
+
+Critical equality:
+
+```text
+created_at BEFORE restart  = 2026-08-18T03:38:41.045Z
+created_at AFTER COMPLETED = 2026-08-18T03:38:41.045Z
+```
+
+Result: exact match. The `created_at` continuity defect is closed.
 
 ## Acceptance conclusion
 
+A4.4 restart durability is PASS.
+
 Confirmed:
 - KRCC waiting state survives beta web-process replacement;
-- job identity survives restart;
+- external Job ID survives restart;
 - Action-facing readback restores waiting state correctly;
 - a restored job can be resumed by Helper 0.2.2 after restart;
 - the same Job ID reaches `COMPLETED` through captions-first;
 - 227 caption segments remain available;
 - captions remain zero-STT-cost;
-- completed durable readback after remediation returns the original `created_at`;
+- completed job state remains readable after process replacement;
+- original `created_at` is immutable across restart, rehydration, completion, and subsequent Action readback;
 - production was not modified.
 
-One final end-to-end regression is still required before closing the metadata defect completely:
+## Residual durability/release work
 
-```text
-new job
- -> record original created_at
- -> intentional beta restart
- -> resume same Job ID through Helper
- -> COMPLETED
- -> Action readback
- -> created_at exactly equals original value
-```
-
-## Residual durability work
-
-After the final metadata regression, separate release hardening still includes:
+A4.4 is closed. Separate release hardening still includes:
 - audio fallback restart-boundary behavior if a process is replaced while upload/transcription is active;
 - durable quota-ledger restart acceptance after a newly charged audio job;
 - Free Postgres lifecycle/expiry management for the closed beta;
@@ -163,4 +176,6 @@ After the final metadata regression, separate release hardening still includes:
 
 `A4_4_CREATED_AT_DURABLE_READBACK_PASS`
 
-`A4_4_CREATED_AT_FINAL_E2E_REGRESSION_PENDING`
+`A4_4_CREATED_AT_FINAL_E2E_REGRESSION_PASS`
+
+`A4_4_PASS`
