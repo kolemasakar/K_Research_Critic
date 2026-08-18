@@ -1,7 +1,7 @@
 # MEDIA BETA Current State
 Канонічний знімок фактичного стану реалізації для відновлення роботи без припущень.
 
-Version: 2.4
+Version: 2.5
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-18
 
@@ -11,7 +11,7 @@ Current phase: `A4 - Live transcript validation`
 
 Current state:
 
-`A3_COMPLETE / A4_1_SERVER_INGRESS_BLOCKED / A4_2_CAPTIONS_FIRST_OWNER_ACCEPTANCE_PASS / GPT_STATUS_READBACK_PASS / SEGMENT_PAGINATION_227_OF_227_PASS / A4_3_AUDIO_FALLBACK_OWNER_ACCEPTANCE_PASS / ASSEMBLYAI_CLEANUP_PASS / AUDIO_GPT_STATUS_READBACK_PASS / AUDIO_GPT_SEGMENT_READBACK_PASS / A4_4_RESTART_DURABILITY_PASS / CREATED_AT_CONTINUITY_PASS`
+`A3_COMPLETE / A4_1_SERVER_INGRESS_BLOCKED / A4_2_CAPTIONS_FIRST_OWNER_ACCEPTANCE_PASS / GPT_STATUS_READBACK_PASS / SEGMENT_PAGINATION_227_OF_227_PASS / A4_3_AUDIO_FALLBACK_OWNER_ACCEPTANCE_PASS / ASSEMBLYAI_CLEANUP_PASS / AUDIO_GPT_STATUS_READBACK_PASS / AUDIO_GPT_SEGMENT_READBACK_PASS / A4_4_RESTART_DURABILITY_PASS / CREATED_AT_CONTINUITY_PASS / A4_5_GUARD_MATRIX_PASS`
 
 The approved MEDIA BETA architecture is captions-first browser-assisted YouTube ingestion. Direct Render/datacenter YouTube acquisition remains unsuitable because of YouTube anti-bot enforcement. The browser helper uses the tester browser path, prefers YouTube captions, and uses browser audio plus AssemblyAI only as fallback.
 
@@ -52,6 +52,8 @@ Verified controls:
 - durable store: Postgres;
 - waiting jobs survive beta process replacement;
 - STT charge ledger is durable.
+
+The temporary A4.5 quota-test limit of 60 sec/day was restored to the normal 7200 sec/day after acceptance. Restore commit: `ab43973a1328c043c382f2e8ead81587964b9a46`.
 
 ## A4.1 server-side conclusion
 
@@ -187,7 +189,7 @@ Canonical record:
 
 ## A4.4 restart durability acceptance
 
-A prior RAM-only implementation lost a fresh audio job after Render process replacement. The beta backend was hardened with a durable Postgres job store and durable STT charge ledger.
+The beta backend was hardened with a durable Postgres job store and durable STT charge ledger after the earlier RAM-only implementation lost a waiting job during process replacement.
 
 Verified health state:
 
@@ -197,19 +199,16 @@ restart_resilient_waiting_jobs=true
 durable_quota_ledger=true
 ```
 
-Live accepted behavior:
+Accepted behavior:
 - `AWAITING_CLIENT` job survives intentional beta redeploy/restart;
 - same external `KRCC_...` remains readable through Action API;
 - same Job ID can be resumed by Helper 0.2.2 after restart;
 - resumed captions job reaches `COMPLETED` with 227 segments and zero STT cost;
-- completed durable job remains readable after later process replacement.
-
-A metadata defect was discovered where rehydration could replace the original `created_at`. It was fixed in both the persistence and HTTP projection layers.
+- completed durable job remains readable after later process replacement;
+- original `created_at` remains immutable across restart, resume and completion.
 
 Final regression job:
 `KRCC_cad52723-cbf0-4bd6-b195-44902d11bc6b`
-
-Critical live regression:
 
 ```text
 created_at BEFORE restart  = 2026-08-18T03:38:41.045Z
@@ -221,10 +220,47 @@ stt_seconds_charged=0
 error=null
 ```
 
-Result: exact timestamp equality. `created_at` continuity defect is closed.
-
 Canonical record:
 `subprojects/media_beta/12_A4_4_DURABILITY_ACCEPTANCE.md`
+
+## A4.5 guard matrix acceptance
+
+All five live negative-path guards passed.
+
+Accepted contracts:
+
+```text
+invalid beta code:
+HTTP 403
+MEDIA_BETA_ACCESS_DENIED
+retryable=false
+
+source mismatch:
+HTTP 409
+MEDIA_CLIENT_SOURCE_MISMATCH
+retryable=false
+
+concurrency=1:
+HTTP 429
+MEDIA_TRANSCRIPT_BUSY
+retryable=true
+
+>60 min:
+HTTP 413
+MEDIA_DURATION_LIMIT
+retryable=false
+
+STT quota exhaustion:
+status=FAILED
+MEDIA_DAILY_STT_QUOTA_EXHAUSTED
+retryable=true
+stt_seconds_charged=0
+```
+
+Quota test used a temporary isolated-beta limit of 60 sec/day and a 61.092-second synthetic audio file. Rejection occurred before AssemblyAI use. The configured daily limit was then restored to 7200 sec/day with a successful isolated redeploy. Production was not targeted.
+
+Canonical record:
+`subprojects/media_beta/13_A4_5_GUARD_MATRIX_ACCEPTANCE.md`
 
 ## Backend routes
 
@@ -244,25 +280,23 @@ GET  /api/v1/media/client-transcriptions/{KRCC_job_id}/client-status
 
 Browser-only routes remain intentionally absent from the GPT Action schema.
 
-## Next gate: A4.5 guard matrix
+## Next A4 validation block
 
-Next validation block:
-- invalid beta access code rejection;
-- source mismatch rejection;
-- >60 minute rejection;
-- concurrency rejection;
-- quota exhaustion simulation.
-
-After guard matrix:
-- UK/RU/EN/auto language matrix;
+Guard matrix is complete. Remaining A4 validation before A5:
+- Russian captions case;
+- English captions case;
+- explicit `auto` language/track selection case beyond the accepted Ukrainian sample;
 - manual-caption classification case;
 - durable quota-ledger restart acceptance after a newly charged audio job;
 - audio fallback process-replacement behavior during active upload/transcription;
-- STT replacement-character investigation;
+- STT replacement-character investigation.
+
+Release gates that follow/overlap later phases:
 - GPT Builder closed-beta end-to-end test;
 - AssemblyAI privacy/no-training verification;
 - hosted public privacy policy URL;
-- Free-plan/paid runtime tests before public promotion.
+- Free-plan/paid runtime tests before public promotion;
+- Free Postgres lifecycle/expiry management and future migration.
 
 ## Known beta limitations
 
