@@ -1,7 +1,7 @@
 # MEDIA BETA A4.5 Guard Matrix Acceptance
 Живе підтвердження захисних перевірок closed MEDIA BETA для доступу, джерела, тривалості, конкурентності та квоти.
 
-Version: 1.1
+Version: 1.2
 Status: IN_PROGRESS
 Acceptance date: 2026-08-18
 
@@ -68,9 +68,31 @@ Result: PASS. The captions payload was rejected before source content could be a
 
 `A4_5_SOURCE_MISMATCH_PASS`
 
+## Guard 3 - concurrent active-job rejection
+
+The source-mismatch test job remained active in `AWAITING_CLIENT`. A second client-transcription request for a different YouTube video was submitted while `max_concurrent_jobs=1`.
+
+Observed HTTP response:
+
+```text
+HTTP/1.1 429 Too Many Requests
+```
+
+Observed error contract:
+
+```text
+error.code=MEDIA_TRANSCRIPT_BUSY
+error.category=MEDIA
+error.retryable=true
+message=The closed media beta is processing another video.
+```
+
+Result: PASS. The isolated beta rejected a second active job while one waiting job already occupied the single concurrency slot.
+
+`A4_5_CONCURRENCY_PASS`
+
 ## Remaining guards
 
 Pending:
 - `A4_5_OVER_60_MIN_PENDING`
-- `A4_5_CONCURRENCY_PENDING`
 - `A4_5_QUOTA_EXHAUSTION_PENDING`
