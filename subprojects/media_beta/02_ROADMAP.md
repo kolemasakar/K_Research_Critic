@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 Дорожня карта реалізації закритого beta-медіарежиму та наступного сталого безкоштовного режиму.
 
-Version: 1.8
+Version: 1.9
 Status: ACTIVE
 Updated: 2026-08-18
 
@@ -96,12 +96,14 @@ YouTube URL
 Accepted live evidence:
 - Ukrainian auto-generated captions job completed with 227 timestamped segments;
 - full Action pagination 227/227 passed;
-- captions charged zero STT seconds;
+- Russian auto-generated captions job completed through transcript-panel fallback with 524 segments / 19206 transcript characters;
+- captions charged zero STT seconds in accepted Ukrainian and Russian cases;
 - audio fallback completed with AssemblyAI `universal-2`;
 - measured audio duration charged correctly;
 - provider deletion request succeeded;
 - Action-facing audio segments were readable;
-- browser/helper stale-state issue fixed in Helper 0.2.2.
+- browser/helper stale-state issue fixed in Helper 0.2.2;
+- large caption payload persistence boundary fixed and live revalidated.
 
 #### A4.3 Audio fallback acceptance
 
@@ -150,10 +152,25 @@ The temporary 60-second quota used for the exhaustion test was restored to 7200 
 Canonical acceptance:
 `subprojects/media_beta/13_A4_5_GUARD_MATRIX_ACCEPTANCE.md`
 
+#### A4.6 Language/source matrix
+
+Status: IN_PROGRESS
+
+Accepted:
+- Russian auto-generated captions via YouTube transcript-panel fallback;
+- `detected_language=ru`;
+- 524 timestamped caption segments;
+- 19206 transcript characters persisted durably;
+- zero STT charge;
+- immutable external `created_at` preserved;
+- large-payload durable persistence remediation validated and deployed only to isolated MEDIA BETA.
+
+Canonical acceptance:
+`subprojects/media_beta/14_A4_LANGUAGE_SOURCE_MATRIX_ACCEPTANCE.md`
+
 #### Remaining A4 matrix
 
 Pending before A4 exit:
-- Russian captions case;
 - English captions case;
 - explicit `auto` language/track-selection case beyond the accepted Ukrainian sample;
 - manual-caption classification case;
@@ -163,6 +180,7 @@ Pending before A4 exit:
 
 Already accepted and no longer pending:
 - Ukrainian auto-generated captions;
+- Russian auto-generated captions;
 - captions unavailable/audio fallback path;
 - successful audio fallback after duration fix;
 - >60 min rejection;
@@ -170,7 +188,8 @@ Already accepted and no longer pending:
 - concurrency rejection;
 - daily STT quota exhaustion simulation;
 - provider cleanup verification;
-- restart durability and `created_at` continuity.
+- restart durability and `created_at` continuity;
+- large-caption-payload durable persistence boundary.
 
 A4 exit criteria:
 - captions-first real browser jobs are usable across required language/source cases;
