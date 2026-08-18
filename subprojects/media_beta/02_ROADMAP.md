@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 Дорожня карта реалізації закритого beta-медіарежиму та наступного сталого безкоштовного режиму.
 
-Version: 2.1
+Version: 2.2
 Status: ACTIVE
 Updated: 2026-08-18
 
@@ -55,7 +55,7 @@ Dedicated service:
 
 ### A4. Live transcript validation
 
-Status: IN_PROGRESS_DURABILITY_AND_AUDIO_EDGE_CASES
+Status: IN_PROGRESS_ACTIVE_AUDIO_RESTART_AND_TEXT_QUALITY
 
 #### A4.1 Server-side YouTube ingress
 
@@ -94,19 +94,18 @@ YouTube URL
 ```
 
 Accepted live evidence:
-- Ukrainian auto-generated captions job completed with 227 timestamped segments;
-- full Action pagination 227/227 passed;
-- Russian auto-generated captions job completed through transcript-panel fallback with 524 segments / 19206 transcript characters;
-- English manual captions job completed with 247 segments / 8872 transcript characters;
-- manual-caption classification accepted on the English case;
-- `language_hint=auto` accepted an Italian manual-caption track and persisted `detected_language=it`;
-- captions charged zero STT seconds in all accepted caption cases;
-- audio fallback completed with AssemblyAI `universal-2`;
-- measured audio duration charged correctly;
-- provider deletion request succeeded;
-- Action-facing audio segments were readable;
-- browser/helper stale-state issue fixed in Helper 0.2.2;
-- large caption payload persistence boundary fixed and live revalidated.
+- Ukrainian auto-generated captions with 227/227 Action-facing segments;
+- Russian auto-generated captions with 524 segments / 19206 characters;
+- English manual captions with 247 segments / 8872 characters;
+- manual-caption classification;
+- `language_hint=auto` selecting Italian `detected_language=it`;
+- zero STT charge for caption cases;
+- AssemblyAI `universal-2` audio fallback;
+- measured audio duration accounting;
+- provider deletion request;
+- Action-facing audio segment readback;
+- large-caption-payload persistence remediation;
+- browser/helper stale-state fix.
 
 #### A4.3 Audio fallback acceptance
 
@@ -126,22 +125,24 @@ Open quality item:
 
 #### A4.4 Restart durability
 
-Status: COMPLETE_FOR_JOB_STATE_AND_CREATED_AT
+Status: COMPLETE_EXCEPT_ACTIVE_AUDIO_PROCESS_REPLACEMENT
 
 Accepted:
 - durable Postgres KRCC job state;
 - waiting job survives isolated beta process replacement;
 - same Job ID resumes after restart;
 - completed job remains readable after later restart;
+- external `created_at` remains immutable through restart, rehydration and completion;
 - durable STT quota ledger enabled;
-- external `created_at` remains immutable through restart, rehydration and completion.
+- live restart restoration of a newly charged 57-second AssemblyAI job;
+- fresh post-restart job showed runtime quota `used_seconds=57`, `remaining_seconds=7143`.
 
 Still pending:
-- live restart acceptance of the quota ledger after a newly charged audio job;
 - process-replacement behavior during active audio upload/transcription.
 
-Canonical acceptance:
-`subprojects/media_beta/12_A4_4_DURABILITY_ACCEPTANCE.md`
+Canonical records:
+- `subprojects/media_beta/12_A4_4_DURABILITY_ACCEPTANCE.md`;
+- `subprojects/media_beta/15_A4_QUOTA_LEDGER_RESTART_ACCEPTANCE.md`.
 
 #### A4.5 Guard matrix
 
@@ -165,30 +166,26 @@ Status: COMPLETE
 
 Accepted:
 - Ukrainian auto-generated captions;
-- Russian auto-generated captions via YouTube transcript-panel fallback;
+- Russian auto-generated captions;
 - English manual captions;
 - manual-caption classification;
-- explicit `language_hint=auto` case selecting/persisting Italian `detected_language=it`;
-- 524-segment / 19206-character large Russian payload persisted durably after remediation;
+- `auto -> it` language/track selection;
+- large Russian caption payload persisted durably after remediation;
 - zero STT charge for caption cases;
 - immutable external `created_at` preserved.
 
 Canonical acceptance:
 `subprojects/media_beta/14_A4_LANGUAGE_SOURCE_MATRIX_ACCEPTANCE.md`
 
-#### Remaining A4 matrix
+#### Remaining A4 work
 
 Pending before A4 exit:
-- durable quota-ledger restart acceptance after a newly charged audio job;
 - audio fallback behavior if process replacement occurs during active upload/transcription;
 - STT replacement-character investigation.
 
 Already accepted and no longer pending:
-- Ukrainian auto-generated captions;
-- Russian auto-generated captions;
-- English manual captions;
+- Ukrainian, Russian, English and Italian/AUTO caption cases;
 - manual-caption classification;
-- `auto -> it` language/track selection;
 - captions unavailable/audio fallback path;
 - successful audio fallback after duration fix;
 - >60 min rejection;
@@ -196,7 +193,8 @@ Already accepted and no longer pending:
 - concurrency rejection;
 - daily STT quota exhaustion simulation;
 - provider cleanup verification;
-- restart durability and `created_at` continuity;
+- waiting/completed restart durability and `created_at` continuity;
+- durable quota-ledger restart restoration after a real STT charge;
 - large-caption-payload durable persistence boundary.
 
 A4 exit criteria:
@@ -204,6 +202,7 @@ A4 exit criteria:
 - audio fallback remains usable when captions are unavailable;
 - language/source metadata is usable;
 - quota accounting matches selected path and survives required restart checks;
+- active-audio process replacement has deterministic retry-safe behavior;
 - provider cleanup is verified where AssemblyAI is used;
 - no beta/developer secret appears in reports/checkpoints/loggable payloads.
 
