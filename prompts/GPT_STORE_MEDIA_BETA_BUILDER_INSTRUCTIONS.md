@@ -38,7 +38,7 @@ Limits: 60 min; concurrency 1; AssemblyAI fallback budget 7200 STT sec/UTC day; 
 10. If all transcript paths fail, request transcript/audio/file. Never invent video content.
 
 METADATA
-`youtube_captions` => provider=youtube, caption_type manual|auto_generated, `stt_seconds_charged=0`.
+`transcript_source=youtube_captions` => provider=youtube, caption_type manual|auto_generated, `stt_seconds_charged=0`.
 `assemblyai_stt` => provider=assemblyai; charge based on captured-audio duration.
 `provider_data_deleted=true` cleanup confirmed; false not confirmed; null is normal for captions and may occur after hard process loss.
 `beta_quota` is operational metadata, never evidence.
