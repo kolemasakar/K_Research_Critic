@@ -1,13 +1,14 @@
 # MEDIA BETA Chat Handoff
-Канонічний документ відновлення та переходу між чатами для продовження MEDIA BETA.
 
-Version: 1.7
+Canonical recovery and cross-chat continuation document for K-Research & Critic MEDIA BETA.
+
+Version: 2.0
 Status: ACTIVE_HANDOFF
-Checkpoint date: 2026-08-17
+Checkpoint date: 2026-08-20
 
 ## Recovery command
 
-`recover MEDIA BETA`
+`recover MEDIA BETA A9`
 
 ## Mandatory recovery order
 
@@ -15,192 +16,200 @@ Checkpoint date: 2026-08-17
 2. `subprojects/media_beta/03_CURRENT_STATE.md`
 3. `subprojects/media_beta/06_DECISION_LOG.md`
 4. `subprojects/media_beta/02_ROADMAP.md`
-5. `subprojects/media_beta/01_ARCHITECTURE.md`
-6. `subprojects/media_beta/04_OPERATIONS_RUNBOOK.md`
-7. `subprojects/media_beta/05_TEST_PLAN.md`
-8. `subprojects/media_beta/07_FREE_MODE_TARGET.md`
+5. `subprojects/media_beta/23_A8_OWNER_ONLY_BROWSER_ASSISTED_ACCEPTANCE.md`
+6. `subprojects/media_beta/24_A9_ZERO_CLIENT_INGESTION_PLAN.md`
+7. `subprojects/media_beta/22_OWNER_ONLY_COMPLETION_PLAN.md`
+8. `subprojects/media_beta/01_ARCHITECTURE.md`
+9. `subprojects/media_beta/04_OPERATIONS_RUNBOOK.md`
+10. `subprojects/media_beta/05_TEST_PLAN.md`
 
-Then verify live GitHub state for both draft PRs before writes.
+Then verify live GitHub state for KRC PR #8 and VoiceBridge PR #28 before any write.
 
 ## Repository context
 
-KRC: `kolemasakar/K_Research_Critic`, branch `agent/video-url-research`, draft PR #8.
+KRC:
+- repo `kolemasakar/K_Research_Critic`;
+- branch `agent/video-url-research`;
+- draft PR #8.
 
-VoiceBridge: `kolemasakar/VoiceBridge`, branch `agent/krc-media-transcript`, draft PR #28.
+VoiceBridge:
+- repo `kolemasakar/VoiceBridge`;
+- branch `agent/krc-media-transcript`;
+- draft PR #28.
 
-Production branches, production VoiceBridge, and the published KRC GPT remain unchanged.
+Production branches, production VoiceBridge, and the published text-only KRC GPT remain unchanged.
+
+Do not merge or promote either feature branch without explicit owner approval.
 
 ## Current checkpoint
 
-`A3_COMPLETE / A4_1_CLOUD_INGRESS_BLOCKED / A4_2_CAPTIONS_FIRST_IMPLEMENTED / VOICEBRIDGE_CI_GREEN / CAPTIONS_FIRST_RENDER_LIVE / HELPER_0_2_OWNER_ACCEPTANCE_NEXT`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_ZERO_CLIENT_MEDIA_ROUTER_PLANNED / A9_IMPLEMENTATION_NOT_STARTED`
+
+Current final product target:
+
+`PRIVATE OWNER-ONLY ZERO-CLIENT MEDIA ANALYSIS`
+
+## Accepted A8 baseline
+
+The private GPT has passed an actual owner-operated end-to-end browser-assisted run:
+
+```text
+public YouTube URL
+ -> private K-Research & Critic - MEDIA BETA GPT
+ -> owner-designated beta credential
+ -> KRCC job
+ -> Helper 0.2.2
+ -> captions-first transcript
+ -> complete transcript retrieval
+ -> DRAFT CriticProfile
+ -> owner APPROVE
+ -> independent Research
+ -> Critic/revision
+ -> localized final report
+```
+
+Accepted report behavior:
+- Ukrainian by default unless another response language is explicitly requested;
+- media/transcript/source language does not switch report language;
+- displayed headings localized;
+- verdict labels localized;
+- exactly one canonical verdict per material claim.
+
+Canonical acceptance:
+`23_A8_OWNER_ONLY_BROWSER_ASSISTED_ACCEPTANCE.md`.
+
+Helper 0.2.2 remains a validated baseline/fallback, not the desired final normal UX.
+
+## Accepted privacy/runtime baseline
 
 Dedicated beta service:
 - `voicebridge-krc-media-beta-kolemasakar`;
 - ID `srv-da1kic5bedkc73d6fk60`;
-- Free plan.
+- endpoint `https://voicebridge-krc-media-beta-kolemasakar.onrender.com`.
 
-Acceptance URL:
-`https://www.youtube.com/watch?v=DZLzmQ2kwaA`
+Accepted client-assisted Audio fallback:
+- AssemblyAI EU base URL `https://api.eu.assemblyai.com`;
+- Universal-2;
+- normal provider deletion confirmed;
+- durable KRCC Postgres jobs;
+- durable STT quota ledger;
+- 7200 sec/UTC day beta STT budget;
+- retry-safe forced process-loss behavior.
 
-## A4.1 conclusion
+## A9 approved direction
 
-Three server-side attempts ended with YouTube `Sign in to confirm you're not a bot`, all before AssemblyAI and all with `stt_seconds_charged=0`.
+A9 is a platform-neutral `MediaSourceRouter`, not a YouTube-only product.
 
-PO-provider diagnostic run `32060462596` / job `95480351954` verified bgutil provider, yt-dlp 2026.07.04 and Node EJS runtime were correctly wired. Server-side cloud/datacenter YouTube ingestion is closed as the current beta acceptance architecture.
-
-## Approved A4.2 captions-first architecture
+Target UX:
 
 ```text
-YouTube URL
- -> beta GPT Action creates KRCC_ job
- -> AWAITING_CLIENT
- -> Helper 0.2.0 on same YouTube tab
- -> Use subtitles first
-    -> browser caption track + timestamps
-    -> browser-only /captions upload
-    -> backend validation
-    -> COMPLETED / youtube_captions / STT=0
- -> captions unavailable/unusable
-    -> Audio fallback
-    -> tabCapture via tester browser/network path
-    -> backend normalization/duration/quota validation
-    -> AssemblyAI async STT
- -> timestamped transcript
- -> claim inventory
- -> CriticProfile
- -> user approval
- -> independent Research / Critic
+media input in ChatGPT
+ -> zero-client ingestion
+ -> transcript
+ -> requested Research/Critic workflow
+ -> result in the same conversation
 ```
 
-The caption transcript is source content only, not independent corroboration of the video's claims.
+Approved ingress modes:
 
-## Current VoiceBridge implementation
+### Public media URLs
 
-Current feature/deployed commit:
-`92f809440098fd42eb562a36c6feddeaa9c17155`
+Initial adapters:
+- YouTube public videos;
+- Instagram public Reels/posts containing video;
+- Facebook public Video/Reels;
+- Telegram public posts containing video.
 
-Captions-first CI:
-- run `32069122559`: SUCCESS;
-- cloud build/tests PASS;
-- browser/helper JS and manifest validation PASS;
-- Helper 0.2.0 package PASS;
-- repository docs PASS.
+Boundary:
+- public content only;
+- no logins/passwords/cookies/account tokens/authenticated sessions;
+- no private, friends-only, group-only or account-gated content;
+- return `UNSUPPORTED_PRIVATE_OR_AUTH_REQUIRED` when authentication is required.
 
-Current browser-only routes:
+### Local media upload
+
+Approved future ingress mode:
+`local_upload`
+
+Target:
+- local video or audio attachment;
+- embedded subtitles/text first when available;
+- otherwise audio extraction/normalization -> accepted EU STT path;
+- source media temporary and deleted after processing;
+- ChatGPT attachment transport into the Action/backend still requires a technical feasibility test.
+
+## A9 architecture audit
+
+Status: COMPLETE.
+
+VoiceBridge already contains a legacy server-side `KRCB_` flow:
+
 ```text
-POST /api/v1/media/client-transcriptions/{KRCC_job_id}/captions
-POST /api/v1/media/client-transcriptions/{KRCC_job_id}/audio
-GET  /api/v1/media/client-transcriptions/{KRCC_job_id}/client-status
+/api/v1/media/transcriptions
+ -> yt-dlp server-side
+ -> captions attempt
+ -> audio fallback
+ -> ffmpeg
+ -> AssemblyAI
+ -> transcript pages
 ```
 
-Action-facing routes remain unchanged and do not expose browser upload endpoints.
+Docker already contains yt-dlp, Node runtime support, and bgutil PO-token provider infrastructure.
 
-Caption completion semantics:
-```text
-status=COMPLETED
-transcript_source=youtube_captions
-caption_type=manual|auto_generated
-provider=youtube
-stt_seconds_charged=0
-provider_data_deleted=null
-```
+Known blockers:
+- legacy server-side AssemblyAI path is not yet aligned with the accepted EU endpoint contract;
+- KRCB jobs/quota are in-memory instead of durable Postgres state;
+- GPT Action still exposes client-assisted KRCC operations;
+- public-platform adapters require separate live acceptance.
 
-Audio fallback semantics remain:
-```text
-transcript_source=assemblyai_stt
-provider=assemblyai
-stt_seconds_charged=<captured duration reservation>
-provider_data_deleted=true|false
-```
+## A9 reachability evidence
 
-## Live Render state
+Probe job:
+`KRCB_252bb38a-aba7-4e2e-8148-b31d55974161`
 
-Captions-first deployment:
-- workflow run `32069270467`: SUCCESS;
-- deploy ID `dep-da1nf76gekts738dst5g`;
-- exact commit `92f809440098fd42eb562a36c6feddeaa9c17155` reached `live`;
-- health HTTP 200;
-- service `status=ok`;
-- `media_client_ingest.mode=client_assisted`;
-- `configured=true`;
-- `requires_browser_helper=true`.
+Result:
+`MEDIA_FETCH_FAILED: This live stream recording is not available.`
 
-Production VoiceBridge was not targeted.
+Interpretation:
+- Render reached the YouTube extractor/source;
+- no bot/login response;
+- no HTTP 403/429;
+- no PO-token failure;
+- STT charge remained zero.
 
-## Previous browser/audio evidence
+Marker:
+`A9_2A_YOUTUBE_SERVER_REACHABILITY_PARTIAL_PASS`
 
-Previous owner job:
-`KRCC_aa3b2cbc-4d4e-4f89-b6e6-4549766f34f5`.
+This does not yet prove prerecorded metadata, captions-first extraction, Audio fallback, durability, or GPT zero-client integration.
 
-Helper 0.1.0 installation, active-tab capture and backend upload were proven. The job then failed with `MEDIA_DURATION_UNKNOWN` because streaming WebM/Opus lacked reliable container duration metadata.
+## Latest verified CI before transition edits
 
-That backend issue was fixed in commit `772901a167611f0197d1bc05cea8091da211dc47` by normalizing first and probing duration afterward. The fix is included in the current captions-first commit. The old failed job must not be reused.
+KRC commit:
+`0e283509aafd52de06a7f23a398ad8758a75d875`
 
-## Helper 0.2.0
+GitHub Actions:
+`Tests #503 - SUCCESS`
 
-New user flow:
-- install/reload Helper 0.2.0;
-- enter a fresh KRCC job and tester code;
-- press `Use subtitles` first;
-- only use `Audio fallback` when captions are reported unavailable/unusable.
+Transition-document commits after that point must be checked in the next chat before their CI state is called green.
 
-Caption extraction relies on best-effort access to YouTube player caption metadata inside the open browser tab. These YouTube internals are not a stable public API, so failure is expected to degrade to audio fallback rather than terminate the media architecture.
+## Exact next task in the new chat
 
-## KRC beta contract
+1. Recover this handoff and the current-state/roadmap/decision documents.
+2. Verify current KRC and VoiceBridge branch heads and CI.
+3. Do not modify production or merge PRs.
+4. Do not automatically resume public sharing/tester work.
+5. Do not automatically start A9 implementation; wait for explicit owner instruction to continue A9.
 
-Action schema advanced to `0.3.0-beta` and recognizes:
-- `youtube_captions`;
-- `assemblyai_stt`;
-- `caption_type=manual|auto_generated`;
-- `provider=youtube|assemblyai`.
-
-Media beta manifest advanced to `0.3-beta` with client captions-first marked implemented pending live browser acceptance.
-
-The three GPT Action operations remain:
-- `startMediaBetaClientTranscription`;
-- `getMediaBetaClientTranscriptionStatus`;
-- `getMediaBetaClientTranscriptSegments`.
-
-## Beta resource/security baseline
-
-- owner + up to 3 testers;
-- 60-minute source/capture limit;
-- concurrency 1;
-- captions path consumes 0 AssemblyAI seconds;
-- AssemblyAI fallback budget 7200 sec/UTC day;
-- audio helper upload max 32 MiB;
-- no personal YouTube cookies;
-- no paid residential proxy;
-- browser helper never receives Action bearer secret or AssemblyAI key;
-- plaintext tester code excluded from backend job state; temporary SHA-256 digest enforces ownership;
-- full transcript and tester code excluded from KRC checkpoint.
-
-## Exact next task
-
-1. Install/reload `KRC MEDIA BETA Helper 0.2.0`.
-2. Create a NEW KRCC job for the acceptance URL.
-3. Verify pre-helper state: `AWAITING_CLIENT`, `client_upload_required=true`, `stt_seconds_charged=0`.
-4. Open the same YouTube video and press `Use subtitles`.
-5. Require:
-   - `COMPLETED`;
-   - `transcript_source=youtube_captions`;
-   - manual/auto-generated caption type;
-   - non-empty timestamped segments;
-   - detected/source language;
-   - `stt_seconds_charged=0`;
-   - unchanged STT quota.
-6. Only if captions fail, test `Audio fallback` and require AssemblyAI completion plus cleanup evidence.
-
-## Do-not-do list
-
-Do not merge PR #8/#28 automatically, modify public GPT/production VoiceBridge, expose credentials/tester codes, use personal YouTube cookies, add paid proxy infrastructure, claim captions-first browser acceptance before evidence, or bypass CriticProfile approval.
+When A9 implementation is authorized, the first engineering gate is privacy parity for the legacy server-side fallback: configurable AssemblyAI base URL using the accepted EU endpoint plus regression test. After that, use a normal prerecorded captioned public YouTube video for server-side metadata/captions proof.
 
 ## Terminal markers
 
-`MEDIA_BETA_HANDOFF_V1_7`
+`MEDIA_BETA_HANDOFF_V2_0`
 
-`A4_2_CAPTIONS_FIRST_RENDER_LIVE`
+`A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE`
 
-`HELPER_0_2_OWNER_ACCEPTANCE_NEXT`
+`A9_ZERO_CLIENT_MEDIA_ROUTER_PLANNED`
+
+`A9_IMPLEMENTATION_NOT_STARTED`
 
 `PRODUCTION_ISOLATED_DRAFT_PRS_UNMERGED`
