@@ -1,17 +1,18 @@
-# A9 Zero-Client YouTube Ingestion Plan
+# A9 Zero-Client Public Media URL Ingestion Plan
 
-Version: 1.0
+Version: 1.1
 Status: IN_PROGRESS
 Started: 2026-08-20
+Updated: 2026-08-20
 
 ## Product goal
 
 The final private owner-only UX must be:
 
 ```text
-YouTube URL in ChatGPT
+Public media URL in ChatGPT
  -> choose/check request type
- -> no separate video opening
+ -> no separate media opening
  -> no Helper
  -> no manual Job ID handling
  -> transcript acquisition runs server-side
@@ -20,6 +21,60 @@ YouTube URL in ChatGPT
 ```
 
 This must work equivalently from desktop and smartphone.
+
+YouTube is the first implementation adapter, not the final product boundary.
+
+## Public-only access boundary
+
+APPROVED owner decision, 2026-08-20:
+
+- support only publicly accessible media URLs/posts/channels;
+- do not use user logins, passwords, cookies, browser sessions, account tokens, or imported authenticated sessions;
+- do not attempt to bypass private, friends-only, group-only, age/account-gated, or otherwise authenticated content;
+- if media requires authentication, return an explicit unsupported/auth-required result rather than requesting credentials;
+- private-platform support is out of scope unless a future explicit owner decision changes this boundary.
+
+Target error semantic:
+
+`UNSUPPORTED_PRIVATE_OR_AUTH_REQUIRED`
+
+## Initial platform adapters
+
+Planned first group:
+- YouTube public videos;
+- Instagram public Reels/posts containing video;
+- Facebook public Video/Reels;
+- Telegram public posts containing video.
+
+Later adapters may include other public media URLs supported reliably by the ingestion layer, for example TikTok, X/Twitter, Vimeo, or other sites.
+
+Support is defined per public URL/content type, not as blanket support for an entire platform.
+
+## Target architecture
+
+```text
+Public media URL
+ -> MediaSourceRouter
+      -> detect platform/content type
+      -> platform adapter
+      -> captions/transcript when reliable
+      -> otherwise public audio/media acquisition
+ -> normalized MediaAsset
+ -> Transcript Router
+ -> requested analysis workflow
+```
+
+Normalized internal media contract should converge on:
+- platform;
+- source_url;
+- title;
+- author/channel where available;
+- duration;
+- transcript_source;
+- detected_language;
+- timestamped segments.
+
+Research/Critic should consume the normalized transcript/evidence contract and should not need platform-specific logic.
 
 ## Required user-facing modes
 
@@ -81,9 +136,11 @@ The current Builder Action exposes `/api/v1/media/client-transcriptions` and the
 
 A9 requires a GPT-facing server-side start/status/segments contract that does not require Helper during the normal path.
 
-### B4. Server-side YouTube reachability is not yet live-accepted
+### B4. Server-side public-source reachability is not yet live-accepted
 
-The existing server-side code must be re-tested on the actual isolated Render runtime. Datacenter YouTube access is known to be unstable and may fail because of bot/IP enforcement even when yt-dlp and PO-token support are correctly configured.
+The existing server-side YouTube code must be re-tested on the actual isolated Render runtime. Datacenter source access may fail because of bot/IP enforcement even when extraction tooling is correctly configured.
+
+Each additional platform adapter must receive its own public-source reachability and negative-auth-path acceptance before being marked supported.
 
 ## Implementation sequence
 
@@ -105,7 +162,7 @@ Probe order:
 2. captions-first on a known captioned video;
 3. only after EU routing is confirmed, audio fallback on a captions-unavailable case.
 
-Capture exact yt-dlp failure class if blocked: bot/login, PO token, 403, 429, format/JS, or other.
+Capture exact extraction failure class if blocked: bot/login, token, 403, 429, format/JS, or other.
 
 ### A9.3 Durable zero-client job state
 
@@ -126,44 +183,63 @@ Required durable fields include:
 
 Process replacement must not silently lose a zero-client job or duplicate quota charge.
 
-### A9.4 Unified ingestion router
+### A9.4 Unified public-media ingestion router
 
 Target behavior:
 
 ```text
 start media job
- -> server captions attempt
-      -> success: COMPLETED / youtube_captions / STT=0
+ -> detect public platform/content type
+ -> platform adapter
+ -> server captions/transcript attempt
+      -> success: COMPLETED / captions-or-transcript / STT=0
       -> unavailable:
-           server audio acquisition
+           server audio/media acquisition
             -> AssemblyAI EU
             -> COMPLETED
- -> if server YouTube acquisition is specifically blocked:
-      return explicit SERVER_MEDIA_BLOCKED / CLIENT_ASSISTED_AVAILABLE
+ -> if public acquisition is specifically blocked:
+      return explicit SERVER_MEDIA_BLOCKED
+ -> if authentication/private access is required:
+      return UNSUPPORTED_PRIVATE_OR_AUTH_REQUIRED
 ```
 
-During development, Helper remains an emergency/dev fallback. It is not part of the final normal owner UX.
+During development, Helper remains an emergency/dev fallback for the already accepted YouTube browser-assisted baseline. It is not part of the final normal owner UX.
 
 ### A9.5 GPT Action integration
 
 Expose zero-client operations to the private GPT and update Builder instructions so the normal flow is:
 
 ```text
-URL + request type
+public URL + request type
  -> start server job
  -> bounded status checks
  -> retrieve all transcript pages
  -> continue workflow automatically
 ```
 
-The GPT must not instruct the owner to open the YouTube video or use Helper unless the backend explicitly returns a temporary development fallback condition.
+The GPT must not ask for platform credentials or instruct the owner to authenticate to a source. It must not instruct the owner to open media or use Helper in the final normal path.
 
-### A9.6 Owner-only final acceptance
+### A9.6 Multi-platform adapter expansion
+
+After the YouTube zero-client path is accepted, add adapters one at a time:
+1. Instagram public video/Reels;
+2. Facebook public Video/Reels;
+3. Telegram public video posts;
+4. other public platforms only after explicit compatibility validation.
+
+Each adapter requires:
+- supported URL-pattern contract;
+- public-only positive live case;
+- auth/private negative case returning the explicit unsupported/auth-required result;
+- metadata/transcript normalization;
+- resource/privacy regression checks.
+
+### A9.7 Owner-only final acceptance
 
 Required final live test from the actual private GPT:
 
 ```text
-YouTube URL
+public media URL
  -> select/request analysis type
  -> zero extra browser/media actions by owner
  -> transcript obtained
@@ -172,15 +248,21 @@ YouTube URL
 
 For fact-check mode, the CriticProfile approval gate remains mandatory before independent research.
 
+YouTube zero-client acceptance may precede acceptance of additional platform adapters; platform support must be reported explicitly rather than implied globally.
+
 ## Final acceptance state
 
-Only after A9.1-A9.6 pass may the private product be called:
+Only after the core zero-client router and first accepted platform adapter pass may the private product be called:
 
 `OWNER_ONLY_ZERO_CLIENT_COMPLETE`
+
+Additional platform adapters receive separate support/acceptance markers.
 
 ## Non-goals for A9
 
 A9 does not require:
+- private or login-required media;
+- user cookies or authenticated platform sessions;
 - public GPT sharing;
 - external testers;
 - GPT Store publication;
