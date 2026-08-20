@@ -2,7 +2,7 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 3.3
+Version: 3.4
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-20
 
@@ -14,7 +14,14 @@ Current phase state:
 
 Accepted phase markers:
 
-`A4_CAPTIONS_FIRST_PASS / A4_AUDIO_FALLBACK_PASS / A4_GUARD_MATRIX_PASS / A4_LANGUAGE_SOURCE_MATRIX_PASS / A4_RESTART_DURABILITY_PASS / A4_DURABLE_QUOTA_LEDGER_RESTART_PASS / A4_ACTIVE_AUDIO_RETRY_SAFE_FAILURE_PASS / A4_STT_TEXT_QUALITY_DISPOSITION_PASS / A5_GPT_BUILDER_CONFIGURATION_PASS / A5_BUILDER_ACTION_START_PASS / A5_BUILDER_CAPTIONS_FIRST_PROFILE_GATE_PASS / A6_OWNER_E2E_RESEARCH_CRITIC_FINALIZATION_PASS / A7_CAPTIONS_FIRST_TESTER_ROLLOUT_READY / A7_EU_AUDIO_FALLBACK_PRIVACY_GATE_PASS / A7_TESTER1_READY`
+`A4_CAPTIONS_FIRST_PASS / A4_AUDIO_FALLBACK_PASS / A4_GUARD_MATRIX_PASS / A4_LANGUAGE_SOURCE_MATRIX_PASS / A4_RESTART_DURABILITY_PASS / A4_DURABLE_QUOTA_LEDGER_RESTART_PASS / A4_ACTIVE_AUDIO_RETRY_SAFE_FAILURE_PASS / A4_STT_TEXT_QUALITY_DISPOSITION_PASS / A5_GPT_BUILDER_CONFIGURATION_PASS / A5_BUILDER_ACTION_START_PASS / A5_BUILDER_CAPTIONS_FIRST_PROFILE_GATE_PASS / A6_OWNER_OPERATOR_E2E_USING_TESTER1_CREDENTIAL_PASS / A7_CAPTIONS_FIRST_TESTER_ROLLOUT_READY / A7_EU_AUDIO_FALLBACK_PRIVACY_GATE_PASS / A7_TESTER1_READY`
+
+Credential-attribution correction:
+- all prior MEDIA BETA live tests were executed by the owner/operator using the access code designated for `Tester 1`;
+- the separate owner-designated beta code has not yet been independently live-validated;
+- this does not revoke any technical A4/A5/A6/A7 acceptance result;
+- the owner-operated runs do not count as an independent external Tester 1 human rollout;
+- canonical correction: `subprojects/media_beta/21_CREDENTIAL_ATTRIBUTION_CORRECTION.md`.
 
 The approved MEDIA BETA architecture remains captions-first browser-assisted YouTube ingestion. Direct Render/datacenter YouTube acquisition remains unsuitable because of YouTube anti-bot enforcement. Browser audio plus AssemblyAI is fallback only when usable captions are unavailable.
 
@@ -130,6 +137,8 @@ Key accepted evidence:
 - interrupted 249.444-second job charged exactly 250 seconds with no duplicate charge;
 - historical U+FFFD anomaly was not reproduced in two fresh successful STT controls and is dispositioned as non-reproducible quality anomaly, not an A4 blocker.
 
+All of these live runs used the Tester 1 credential operated by the owner unless a specific record states otherwise.
+
 Residual hardening:
 - hard process death may leave `provider_data_deleted=null`; orphan-provider cleanup remains a release-hardening item.
 
@@ -159,6 +168,9 @@ The Builder preview correctly enforced `MEDIA BETA ACCESS REQUIRED` before Actio
 Accepted Builder-created job:
 `KRCC_8945357e-d6cf-4483-b7ca-178b81729665`
 
+Credential used for the accepted live run:
+`Tester 1 credential`, operated by the owner.
+
 The same job completed through Helper 0.2.2:
 
 ```text
@@ -172,11 +184,11 @@ stt_seconds_charged=0
 
 After `continue`, the GPT returned a DRAFT CriticProfile with `status=REVIEW_REQUIRED`, CRITICAL medical risk, source/cross-check requirements, transcription uncertainty handling, and the mandatory `1-APPROVE / 2-EDIT / 3-REJECT` stop. No independent research occurred before approval.
 
-## A6 - Owner end-to-end beta acceptance
+## A6 - Owner/operator end-to-end beta acceptance
 
-Status: PASS / COMPLETE for the first owner captions-first Builder workflow.
+Status: PASS / COMPLETE for the first owner-operated captions-first Builder workflow using the Tester 1 credential.
 
-The owner entered `1` at the profile gate.
+The owner/operator entered `1` at the profile gate.
 
 Observed continuation:
 - profile transitioned to APPROVED;
@@ -184,10 +196,15 @@ Observed continuation:
 - GPT retrieved transcript segments through the Action path;
 - independent web research began only after approval;
 - Critic/revision/finalization path completed successfully in Builder Preview;
-- owner confirmed completion as OK.
+- owner/operator confirmed completion as OK.
 
 Canonical acceptance:
 `subprojects/media_beta/18_A5_A6_GPT_BUILDER_E2E_ACCEPTANCE.md`
+
+Credential-attribution correction:
+`subprojects/media_beta/21_CREDENTIAL_ATTRIBUTION_CORRECTION.md`
+
+This acceptance validates the workflow with a valid allowlisted Tester 1 credential but does not constitute an independent external Tester 1 human run.
 
 ## A7 - Controlled tester rollout
 
@@ -199,10 +216,15 @@ Canonical rollout record:
 Canonical EU Audio acceptance:
 `subprojects/media_beta/20_A7_EU_AUDIO_PRIVACY_GATE_ACCEPTANCE.md`
 
+Credential-attribution correction:
+`subprojects/media_beta/21_CREDENTIAL_ATTRIBUTION_CORRECTION.md`
+
 Current readiness:
 - captions-first: READY for controlled external tester use;
 - Audio fallback: READY for controlled external tester use when captions are unavailable/unusable;
-- Tester 1 onboarding: READY.
+- Tester 1 credential: already live-used extensively by the owner/operator;
+- independent external Tester 1 human onboarding/run: NOT YET PERFORMED;
+- owner-designated credential: NOT YET independently live-validated.
 
 Accepted EU Audio fallback deployment:
 
@@ -216,6 +238,8 @@ status=live
 Accepted EU live job:
 
 `KRCC_a79ad701-d5a0-40ca-91f8-6fbdfc6c3bc6`
+
+This job was executed by the owner/operator using the Tester 1 credential.
 
 Final result:
 
@@ -266,13 +290,15 @@ Browser-only routes remain intentionally absent from the GPT Action schema.
 
 ## Next phase action
 
-Invite Tester 1 with a unique tester code and the Helper 0.2.2 onboarding package.
+Invite the actual external Tester 1 using the already designated Tester 1 code and Helper 0.2.2 onboarding package.
 
 Require at least:
-- one independent captions-first end-to-end flow without owner intervention beyond onboarding;
+- one independent captions-first end-to-end flow performed by Tester 1 without owner intervention beyond onboarding;
 - one additional tester-selected video;
 - normal CriticProfile approval behavior;
 - failure report if any issue occurs.
+
+The separate owner-designated credential may be smoke-tested independently, but its lack of prior use does not invalidate the accepted technical workflow.
 
 Do not mark A7 COMPLETE until external tester evidence exists and rollout reliability/resource use is acceptable.
 
