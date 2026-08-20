@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_PATH = ROOT / "gpt_store" / "manifest.yaml"
 MEDIA_BETA_MANIFEST_PATH = ROOT / "gpt_store" / "media_beta_manifest.yaml"
 MEDIA_BETA_SERVER = "https://voicebridge-krc-media-beta-kolemasakar.onrender.com"
+MEDIA_BETA_ASSEMBLYAI_EU = "https://api.eu.assemblyai.com"
 
 
 class StorePackageValidationError(RuntimeError):
@@ -172,8 +173,8 @@ def validate_store_package(root: Path = ROOT) -> dict:
             "AssemblyAI",
             "provider_data_deleted",
             "one hour",
-            "opted out of provider model training",
-            "PREVIEW / RELEASE GATE",
+            "files submitted through its European servers are not used for model training",
+            "CLOSED BETA / A7 CONTROLLED TESTER ROLLOUT",
         ],
         "media privacy policy",
     )
@@ -191,7 +192,7 @@ def validate_store_package(root: Path = ROOT) -> dict:
 
 def validate_media_beta_package(root: Path = ROOT) -> dict:
     manifest = _load_yaml(root / "gpt_store" / "media_beta_manifest.yaml", "media beta manifest")
-    _require(manifest.get("schema_version") == "0.3-beta", "media beta schema_version must be 0.3-beta")
+    _require(manifest.get("schema_version") == "0.4-beta", "media beta schema_version must be 0.4-beta")
 
     product = _mapping(manifest, "product")
     capabilities = _mapping(manifest, "capabilities")
@@ -203,34 +204,50 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(product.get("name") == "K-Research & Critic - MEDIA BETA", "closed beta product name must be isolated")
     _require(product.get("publication_state") == "closed_beta", "closed beta publication state must remain closed_beta")
     _require(product.get("primary_channel") == "chatgpt_store_unlisted_beta", "closed beta channel must remain unlisted")
+    _require(capabilities.get("web_search") is True, "closed media beta requires web search")
+    _require(capabilities.get("code_interpreter_data_analysis") is True, "closed media beta requires data analysis")
+    _require(capabilities.get("image_generation") is False, "closed media beta image generation must remain disabled")
     _require(capabilities.get("actions") is True, "closed media beta requires Actions")
     _require(capabilities.get("apps") is False, "closed media beta must not require Apps")
+
+    _require(instructions.get("version") == "0.4-beta", "closed beta instruction version must be 0.4-beta")
+    _require(instructions.get("builder_character_limit") == 8000, "closed beta Builder instruction limit must remain 8000")
 
     _require(beta.get("access_model") == "per_tester_access_code", "closed beta must use per-tester access codes")
     _require(beta.get("intended_testers") == 4, "closed beta target must remain four testers")
     _require(beta.get("ingress_mode") == "client_assisted", "closed beta must use client-assisted ingress after cloud YouTube blocking")
     _require(beta.get("browser_helper_required") is True, "closed beta client path must require the browser helper")
+    _require(beta.get("browser_helper_version") == "0.2.2", "closed beta helper must remain 0.2.2")
     _require(beta.get("browser_helper_job_prefix") == "KRCC_", "closed beta client jobs must use KRCC_ prefix")
     _require(beta.get("direct_transcript_first") is True, "reliable direct transcript/caption intake must remain preferred")
     _require(beta.get("client_caption_first") is True, "client caption extraction must remain the primary browser path")
-    _require(
-        beta.get("client_caption_first_status") == "IMPLEMENTED_PENDING_LIVE_BROWSER_ACCEPTANCE",
-        "client caption-first must remain gated by live browser acceptance",
-    )
+    _require(beta.get("client_caption_first_status") == "LIVE_ACCEPTED", "client caption-first must remain live accepted")
     _require(beta.get("max_video_seconds") == 3600, "closed beta max video must remain 60 minutes")
     _require(beta.get("max_concurrent_jobs") == 1, "closed beta concurrency must remain one")
     _require(beta.get("daily_stt_seconds") == 7200, "closed beta STT budget must remain two hours/day")
     _require(beta.get("max_client_audio_bytes") == 33554432, "closed beta client upload limit must remain 32 MiB")
+    _require(beta.get("durable_store") == "postgres", "closed beta durable store must remain postgres")
+    _require(beta.get("restart_resilient_waiting_jobs") is True, "waiting jobs must remain restart resilient")
+    _require(beta.get("durable_quota_ledger") is True, "STT quota ledger must remain durable")
+    _require(beta.get("active_audio_process_replacement") == "RETRY_SAFE_LIVE_ACCEPTED", "active audio replacement contract must remain accepted")
+    _require(beta.get("stt_text_quality_disposition") == "NON_REPRODUCIBLE_ANOMALY_ACCEPTED", "STT text quality disposition must remain accepted")
     _require(beta.get("stt_provider") == "assemblyai", "closed beta fallback STT provider must remain AssemblyAI")
+    _require(beta.get("stt_endpoint") == MEDIA_BETA_ASSEMBLYAI_EU, "closed beta STT endpoint must remain AssemblyAI EU")
+    _require(beta.get("stt_model_training_boundary") == "EU_NOT_USED_FOR_MODEL_TRAINING", "closed beta model-training boundary must remain EU no-training")
     stt_audio = _mapping(beta, "stt_audio")
     _require(stt_audio.get("channels") == 1, "closed beta STT audio must be mono")
     _require(stt_audio.get("sample_rate_hz") == 16000, "closed beta STT audio must be 16 kHz")
     _require(stt_audio.get("bitrate_kbps") == 32, "closed beta STT audio must be 32 kbps")
 
-    _require(release.get("rollout_state") == "CLOSED_BETA", "closed beta rollout state must remain CLOSED_BETA")
+    _require(release.get("rollout_state") == "CLOSED_BETA_A7_READY_FOR_TESTER1", "closed beta rollout must remain A7 READY_FOR_TESTER1")
     _require(release.get("production_core_unchanged") is True, "closed beta must preserve production core")
     _require(release.get("public_store_gpt_unchanged") is True, "closed beta must not modify public GPT")
     _require(release.get("user_api_key_required") is False, "closed beta must not request user API keys")
+    _require(release.get("a4_live_validation_complete") is True, "A4 live validation must remain accepted")
+    _require(release.get("a5_builder_validation_complete") is True, "A5 Builder validation must remain accepted")
+    _require(release.get("a6_owner_operator_e2e_complete") is True, "A6 owner/operator E2E must remain accepted")
+    _require(release.get("a7_eu_audio_privacy_gate_complete") is True, "A7 EU audio privacy gate must remain accepted")
+    _require(release.get("external_tester1_ready") is True, "Tester 1 rollout readiness must remain recorded")
     _require(release.get("merge_to_public_product_allowed") is False, "closed beta must not auto-promote to public product")
 
     _require(media_action.get("authentication") == "bearer_api_key", "closed beta action must use bearer authentication")
@@ -238,28 +255,29 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
 
     beta_instructions_path = root / str(instructions.get("file", ""))
     beta_instructions_text = beta_instructions_path.read_text(encoding="utf-8")
+    _require(len(beta_instructions_text) <= 8000, "closed beta Builder instructions must fit the 8000-character limit")
     _require_tokens(
         beta_instructions_text,
         [
-            "Version: 0.3-beta",
+            "K-Research & Critic - MEDIA BETA",
             "MEDIA BETA ACCESS REQUIRED",
             "startMediaBetaClientTranscription",
             "getMediaBetaClientTranscriptionStatus",
             "getMediaBetaClientTranscriptSegments",
-            "status=AWAITING_CLIENT",
+            "AWAITING_CLIENT",
             "KRCC_...",
-            "maximum source/captured duration: 60 minutes",
-            "global AssemblyAI fallback budget: 2 hours",
-            "Helper 0.2.0",
+            "AssemblyAI fallback budget 7200 STT sec/UTC day",
+            "Helper 0.2.2",
             "Use subtitles",
             "Audio fallback",
             "transcript_source=youtube_captions",
-            "caption_type=manual|auto_generated",
             "stt_seconds_charged=0",
-            "Never include beta access codes",
-            "Do not store the full transcript or beta access code in a checkpoint",
+            "MEDIA_CLIENT_INTERRUPTED_RETRY_REQUIRED",
+            "Never store full transcript or beta code",
+            "next_cursor=null",
+            "1=APPROVE, 2=EDIT, 3=REJECT",
         ],
-        "media beta instructions",
+        "media beta Builder instructions",
     )
 
     beta_action_path = root / str(media_action.get("schema", ""))
@@ -290,6 +308,21 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
             "beta_quota",
         ],
         "media beta Action schema",
+    )
+
+    privacy_path = root / str(media_action.get("privacy_policy_document", ""))
+    privacy_text = privacy_path.read_text(encoding="utf-8")
+    _require_tokens(
+        privacy_text,
+        [
+            "Version: 0.6",
+            "CLOSED BETA / A7 CONTROLLED TESTER ROLLOUT",
+            MEDIA_BETA_ASSEMBLYAI_EU,
+            "files submitted through its European servers are not used for model training",
+            "provider_data_deleted=true",
+            "A7 provider-routing/model-training gate",
+        ],
+        "media beta privacy policy",
     )
     return manifest
 
