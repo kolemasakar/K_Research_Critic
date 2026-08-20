@@ -2,7 +2,7 @@
 
 Roadmap for the closed MEDIA BETA and the later sustainable free-media architecture.
 
-Version: 2.6
+Version: 2.7
 Status: ACTIVE
 Updated: 2026-08-20
 
@@ -140,38 +140,51 @@ Canonical acceptance:
 
 ### A7. Controlled tester rollout
 
-Status: IN_PROGRESS_PRIVACY_GATE
+Status: READY_FOR_TESTER1
 
-Current split:
-- `CAPTIONS_FIRST`: READY for controlled external tester use;
-- `AUDIO_FALLBACK`: BLOCKED for external testers until AssemblyAI EU/no-training path is deployed and live-validated.
+Accepted rollout gates:
+- captions-first path READY;
+- separate tester-code model READY;
+- Helper 0.2.2 onboarding procedure READY;
+- failure-report template READY;
+- AssemblyAI client-assisted Audio fallback routed through `https://api.eu.assemblyai.com` in isolated beta;
+- EU Audio fallback live acceptance PASS;
+- normal provider deletion confirmed on EU live job;
+- exact measured STT quota accounting confirmed;
+- production VoiceBridge unchanged.
 
-Provider privacy finding:
-- current AssemblyAI documentation states that paid customers can self-serve opt out of model-improvement data sharing;
-- free users cannot opt out;
-- files submitted through AssemblyAI European servers are not used for model training;
-- Async STT supports `https://api.eu.assemblyai.com`.
+Accepted EU Audio fallback job:
+`KRCC_a79ad701-d5a0-40ca-91f8-6fbdfc6c3bc6`
 
-Implementation in progress on the isolated VoiceBridge beta branch:
-- client-assisted Audio fallback now supports `KRC_MEDIA_ASSEMBLYAI_BASE_URL` with the prior US endpoint retained as default;
-- beta Blueprint sets `KRC_MEDIA_ASSEMBLYAI_BASE_URL=https://api.eu.assemblyai.com`;
-- production branch/service remain unchanged;
-- deployment and one live EU Audio fallback job are still required before external tester Audio fallback is enabled.
+Accepted result:
 
-A7 rollout package:
+```text
+status=COMPLETED
+transcript_source=assemblyai_stt
+provider=assemblyai
+provider_model=universal-2
+provider_data_deleted=true
+duration_seconds=122.292
+stt_seconds_charged=123
+segment_count=3
+error=null
+```
+
+Canonical A7 records:
 - `subprojects/media_beta/19_A7_CONTROLLED_TESTER_ROLLOUT.md`;
-- unique tester codes;
-- Helper 0.2.2 onboarding;
-- failure-report template;
-- monitoring rules.
+- `subprojects/media_beta/20_A7_EU_AUDIO_PRIVACY_GATE_ACCEPTANCE.md`.
 
 Next:
-- confirm beta Render runtime has the EU endpoint configuration;
-- live-validate one client-assisted Audio fallback job through EU Async STT;
-- update privacy policy with accepted EU processing boundary;
-- then invite Tester 1 to captions-first flow and, only after EU PASS, Audio fallback where needed;
+- invite Tester 1 with a unique tester code;
+- require at least one independent captions-first end-to-end flow without owner intervention beyond onboarding;
+- require one additional tester-selected YouTube video;
+- observe CriticProfile approval behavior and failure-report usability;
+- use Audio fallback only when captions are unavailable/unusable;
 - monitor captions-vs-STT ratio, STT seconds, Render health/bandwidth, cleanup state, failures, and Postgres lifecycle;
+- expand to Tester 2/3 only after acceptable Tester 1 reliability/resource observations;
 - keep public GPT and production VoiceBridge unchanged.
+
+A7 remains incomplete until external tester evidence exists.
 
 ## Phase B - Sustainable Free Media
 
@@ -203,7 +216,7 @@ Status: FUTURE
 
 Requires:
 - sustainable resource architecture;
-- privacy/no-training validation;
+- privacy/no-training re-validation;
 - provider cleanup strategy;
 - Free-plan/paid runtime compatibility;
 - stable privacy policy URL;
