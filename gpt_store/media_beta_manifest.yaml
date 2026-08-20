@@ -65,6 +65,8 @@ beta:
   active_audio_process_replacement: RETRY_SAFE_LIVE_ACCEPTED
   stt_text_quality_disposition: NON_REPRODUCIBLE_ANOMALY_ACCEPTED
   stt_provider: assemblyai
+  stt_endpoint: https://api.eu.assemblyai.com
+  stt_model_training_boundary: EU_NOT_USED_FOR_MODEL_TRAINING
   stt_audio:
     channels: 1
     sample_rate_hz: 16000
@@ -86,13 +88,17 @@ beta:
     - A hard process loss during TRANSCRIBING returns MEDIA_CLIENT_INTERRUPTED_RETRY_REQUIRED on the same durable job; the user must start a fresh KRCC job.
 
 release:
-  rollout_state: CLOSED_BETA_A5_READY
+  rollout_state: CLOSED_BETA_A7_READY_FOR_TESTER1
   production_core_unchanged: true
   public_store_gpt_unchanged: true
   user_api_key_required: false
   developer_provider_key_required: true
   external_backend_required: true
   a4_live_validation_complete: true
+  a5_builder_validation_complete: true
+  a6_owner_operator_e2e_complete: true
+  a7_eu_audio_privacy_gate_complete: true
+  external_tester1_ready: true
   gpt_builder_beta_required: true
   browser_helper_live_test_required: true
   privacy_public_url_required_for_link_sharing: true
