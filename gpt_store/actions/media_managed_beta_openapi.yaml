@@ -1,0 +1,336 @@
+openapi: 3.1.0
+info:
+  title: K-Research & Critic Managed Media Beta API
+  version: 0.1.0-a9.2r
+  description: >-
+    Zero-client managed transcript beta. The GPT must call credit preflight first,
+    show the user the available credits, estimated cost and estimated remaining
+    balance, and wait for explicit user approval before starting a billable native
+    transcript request. No automatic AI fallback is permitted.
+servers:
+  - url: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
+paths:
+  /api/v1/media/managed/preflight:
+    post:
+      operationId: preflightManagedMediaCredits
+      summary: Read managed transcript credit balance and native cost estimate
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PreflightRequest"
+      responses:
+        "200":
+          description: Credit quote. This does not authorize transcript processing.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreditPreflight"
+        "400":
+          description: Invalid URL, language hint or beta request.
+        "401":
+          description: GPT Action authentication failed.
+        "403":
+          description: Closed-beta tester code rejected.
+        "503":
+          description: Managed transcript provider is not configured or unavailable.
+  /api/v1/media/managed/transcriptions:
+    post:
+      operationId: startManagedMediaNativeTranscription
+      summary: Spend at most one approved credit on a native managed transcript
+      description: >-
+        Call only after preflight and after the user explicitly replies 1 to approve
+        the displayed native transcript cost. The backend rejects the request unless
+        credit_consent authorizes exactly one Supadata native credit. If native
+        captions are unavailable, the job stops at AWAITING_AI_CONSENT; AI generation
+        is never started automatically.
+      x-openai-isConsequential: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NativeTranscriptRequest"
+      responses:
+        "200":
+          description: Native request completed, failed, or stopped awaiting separate AI consent.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagedJob"
+        "400":
+          description: Invalid request.
+        "401":
+          description: GPT Action authentication failed.
+        "403":
+          description: Closed-beta tester code rejected.
+        "409":
+          description: Explicit one-credit consent is missing or invalid.
+        "429":
+          description: Provider credits are exhausted or provider rate limit reached.
+        "503":
+          description: Managed transcript provider is not configured or unavailable.
+  /api/v1/media/managed/transcriptions/{job_id}:
+    get:
+      operationId: getManagedMediaTranscriptionStatus
+      summary: Read managed media job status and actual credit charge
+      x-openai-isConsequential: false
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCM_[A-Za-z0-9-]+$
+      responses:
+        "200":
+          description: Current managed media job state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagedJob"
+        "404":
+          description: Job not found.
+  /api/v1/media/managed/transcriptions/{job_id}/segments:
+    get:
+      operationId: getManagedMediaTranscriptSegments
+      summary: Read timestamped transcript segments
+      x-openai-isConsequential: false
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCM_[A-Za-z0-9-]+$
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+      responses:
+        "200":
+          description: Transcript segment page. Follow next_cursor until null.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SegmentPage"
+        "404":
+          description: Job not found.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    PreflightRequest:
+      type: object
+      additionalProperties: false
+      required: [url, beta_access_code]
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Public HTTPS media URL. A9.2R live acceptance starts with YouTube.
+        language_hint:
+          type: string
+          enum: [auto, uk, ru, en]
+          default: auto
+        beta_access_code:
+          type: string
+          minLength: 12
+          maxLength: 128
+          writeOnly: true
+          description: >-
+            Closed-beta tester code. Never echo, quote, log, checkpoint or include
+            in a report.
+    NativeTranscriptRequest:
+      allOf:
+        - $ref: "#/components/schemas/PreflightRequest"
+        - type: object
+          required: [credit_consent]
+          properties:
+            credit_consent:
+              type: object
+              additionalProperties: false
+              required: [provider, mode, max_credits]
+              properties:
+                provider:
+                  type: string
+                  const: supadata
+                mode:
+                  type: string
+                  const: native
+                max_credits:
+                  type: integer
+                  minimum: 1
+                  maximum: 1
+                  description: Hard user-approved maximum for this operation.
+    CreditPreflight:
+      type: object
+      required:
+        - provider
+        - mode
+        - plan
+        - credits_available
+        - estimated_credits
+        - credits_after_estimate
+        - can_continue
+        - consent_required
+        - consent_options
+      properties:
+        request_id:
+          type: string
+        source_url:
+          type: string
+        language_hint:
+          type: string
+          enum: [auto, uk, ru, en]
+        provider:
+          type: string
+          const: supadata
+        mode:
+          type: string
+          const: native
+        plan:
+          type: string
+        credits_available:
+          type: number
+          minimum: 0
+        estimated_credits:
+          type: integer
+          const: 1
+        credits_after_estimate:
+          type: number
+          minimum: 0
+        can_continue:
+          type: boolean
+        consent_required:
+          type: boolean
+          const: true
+        consent_options:
+          type: object
+          required: [approve, reject]
+          properties:
+            approve:
+              type: integer
+              const: 1
+            reject:
+              type: integer
+              const: 2
+    ManagedJob:
+      type: object
+      properties:
+        request_id:
+          type: string
+        job_id:
+          type: string
+          pattern: ^KRCM_[A-Za-z0-9-]+$
+        status:
+          type: string
+          enum: [COMPLETED, AWAITING_AI_CONSENT, FAILED]
+        created_at:
+          type: string
+        updated_at:
+          type: string
+        source_url:
+          type: string
+        language_hint:
+          type: string
+          enum: [auto, uk, ru, en]
+        provider:
+          type: string
+          const: supadata
+        provider_mode:
+          type: string
+          const: native
+        detected_language:
+          anyOf:
+            - type: string
+            - type: "null"
+        available_languages:
+          type: array
+          items:
+            type: string
+        credits_charged:
+          type: number
+          minimum: 0
+        credits_remaining_estimate:
+          type: number
+          minimum: 0
+        segment_count:
+          type: integer
+          minimum: 0
+        transcript_characters:
+          type: integer
+          minimum: 0
+        ai_fallback_requires_new_consent:
+          type: boolean
+          const: true
+        error:
+          anyOf:
+            - type: object
+              properties:
+                code:
+                  type: string
+                message:
+                  type: string
+                retryable:
+                  type: boolean
+            - type: "null"
+    SegmentPage:
+      type: object
+      required: [job_id, status, cursor, next_cursor, segments]
+      properties:
+        request_id:
+          type: string
+        job_id:
+          type: string
+          pattern: ^KRCM_[A-Za-z0-9-]+$
+        status:
+          type: string
+          enum: [COMPLETED, AWAITING_AI_CONSENT, FAILED]
+        cursor:
+          type: integer
+        next_cursor:
+          anyOf:
+            - type: integer
+            - type: "null"
+        segments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Segment"
+    Segment:
+      type: object
+      required: [index, start_ms, end_ms, text, confidence]
+      properties:
+        index:
+          type: integer
+        start_ms:
+          anyOf:
+            - type: integer
+            - type: "null"
+        end_ms:
+          anyOf:
+            - type: integer
+            - type: "null"
+        text:
+          type: string
+        confidence:
+          anyOf:
+            - type: number
+            - type: "null"
+security:
+  - bearerAuth: []
