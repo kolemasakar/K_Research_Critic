@@ -2,7 +2,7 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 4.0
+Version: 4.1
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-20
 
@@ -10,7 +10,7 @@ Checkpoint date: 2026-08-20
 
 Current phase state:
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_ZERO_CLIENT_MEDIA_ROUTER_PLANNED / A9_IMPLEMENTATION_NOT_STARTED`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_IMPLEMENTATION_ACTIVE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_NEXT`
 
 Current product target:
 
@@ -18,13 +18,16 @@ Current product target:
 
 The owner paused GPT public/link sharing investigation and external Tester 1/2/3 rollout. The current focus is the private product only.
 
-A8 browser-assisted operation is accepted as a working baseline. It is not the final target because Helper 0.2.2 still requires a separate browser/media action.
+A8 browser-assisted operation remains an accepted fallback baseline. It is not the final target because Helper 0.2.2 still requires a separate browser/media action.
 
 Canonical A8 acceptance:
 `subprojects/media_beta/23_A8_OWNER_ONLY_BROWSER_ASSISTED_ACCEPTANCE.md`
 
 Canonical A9 plan:
 `subprojects/media_beta/24_A9_ZERO_CLIENT_INGESTION_PLAN.md`
+
+Canonical managed-provider acceptance:
+`subprojects/media_beta/26_A9_MANAGED_PROVIDER_ACCEPTANCE.md`
 
 ## Accepted browser-assisted baseline
 
@@ -93,6 +96,12 @@ Accepted browser-assisted controls:
 - active-audio hard process loss returns retry-safe terminal failure;
 - AssemblyAI fallback routed through `https://api.eu.assemblyai.com`.
 
+Managed-provider runtime addition:
+- `SUPADATA_API_KEY` is configured only for the isolated MEDIA BETA runtime;
+- Supadata starts in `native` mode;
+- automatic managed AI fallback is disabled;
+- managed transcript operations require explicit credit consent.
+
 ## A4-A6
 
 Status: PASS / COMPLETE.
@@ -137,7 +146,7 @@ Canonical record:
 
 ## A9 - Zero-client MediaSourceRouter
 
-Status: PLANNED / IMPLEMENTATION_NOT_STARTED.
+Status: IMPLEMENTATION_ACTIVE.
 
 Final desired UX:
 
@@ -146,7 +155,9 @@ media input in ChatGPT
  -> no separate media opening
  -> no Helper
  -> no manual Job ID handling
- -> server/backend acquires or receives media
+ -> backend acquires/receives transcript source
+ -> credit preflight when a managed provider may spend credits
+ -> explicit user consent
  -> transcript
  -> requested analysis
  -> result in the same conversation
@@ -176,60 +187,113 @@ Local upload:
 - original source media should be temporary and deleted after processing;
 - ChatGPT attachment-to-Action/backend transport still requires technical feasibility validation.
 
-### A9 architecture audit
+### A9.1 - Server-side STT privacy parity
 
-Status: COMPLETE.
+Status: PASS / COMPLETE.
 
-Existing VoiceBridge code already contains a legacy server-side path:
-- endpoint family `/api/v1/media/transcriptions`;
-- job prefix `KRCB_`;
-- yt-dlp metadata/media acquisition;
-- server-side captions attempt;
-- audio fallback;
-- ffmpeg normalization;
-- AssemblyAI Universal-2;
-- paginated transcript readback.
+The VoiceBridge server-side AssemblyAI path now uses the configurable endpoint contract:
 
-Known blockers before final zero-client acceptance:
-- legacy server-side AssemblyAI endpoint is not yet aligned with the accepted configurable EU endpoint;
-- KRCB job/quota state is in-memory and must converge on durable persistence;
-- current GPT Action exposes the accepted client-assisted KRCC path, not the zero-client path;
-- each public-platform adapter needs its own positive live acceptance and auth/private negative case.
+`KRC_MEDIA_ASSEMBLYAI_BASE_URL`
 
-### A9 server-side YouTube reachability probe
+The isolated beta runtime remains configured for the accepted EU endpoint:
 
-Status: PARTIAL_PASS / REACHABILITY_CONFIRMED.
+`https://api.eu.assemblyai.com`
 
-Probe job:
-`KRCB_252bb38a-aba7-4e2e-8148-b31d55974161`
+### A9.2 - Direct Render-to-YouTube prerecorded probe
 
-The isolated Render service reached the YouTube extractor and returned:
-`This live stream recording is not available.`
+Status: BLOCKED.
 
-The result was wrapped as `MEDIA_FETCH_FAILED`, but importantly there was no bot/login, HTTP 403, HTTP 429, or PO-token failure. STT charge remained zero.
+A normal prerecorded public YouTube source was tested from the isolated Render runtime.
 
-This is evidence of extractor/source reachability only. It does not yet accept prerecorded metadata, server-side captions, server-side Audio fallback, durability, or GPT zero-client integration.
+Result:
 
-## CI state
+`Sign in to confirm you're not a bot`
 
-Latest checked KRC documentation/contract commit before this checkpoint:
-`0e283509aafd52de06a7f23a398ad8758a75d875`
+The failure occurred before metadata/captions and before STT. Charge remained zero.
 
-GitHub Actions `Tests #503`: SUCCESS.
+This supersedes the earlier partial reachability probe as the decision-relevant result for normal prerecorded YouTube ingestion from Render datacenter IPs.
 
-Checkpoint-document commits created after that success must still be allowed to run and must not be described as green until checked.
+Disposition:
 
-## Deferred / paused items
+`DIRECT_RENDER_YOUTUBE = BLOCKED_BY_DATACENTER_ANTIBOT`
 
-- GPT public/link sharing and appeal;
-- external Tester 1/2/3 rollout;
-- Free-plan compatibility;
-- public Store promotion;
-- production merge;
-- sustainable public-free Phase B/C work.
+The project will not continue blind yt-dlp player-client permutations as the primary A9 strategy.
 
-## Exact next project boundary
+### A9.2R - Managed provider native path
 
-Do not continue A9 implementation automatically at chat recovery.
+Status: PASS / COMPLETE_FOR_NATIVE_OWNER_BETA.
 
-The next chat should first recover this checkpoint and verify repository/CI state. Implementation begins only after an explicit owner command to continue A9.
+Primary provider:
+
+`Supadata`
+
+Initial mode:
+
+`native`
+
+Backend contract:
+
+```text
+POST /api/v1/media/managed/preflight
+POST /api/v1/media/managed/transcriptions
+GET  /api/v1/media/managed/transcriptions/{job_id}
+GET  /api/v1/media/managed/transcriptions/{job_id}/segments
+```
+
+Credit consent invariant:
+- preflight must show available credits;
+- preflight must show estimated operation cost;
+- preflight must show estimated balance after;
+- no billable transcript request starts before explicit owner approval;
+- native Supadata request hard cap is `credit_consent.max_credits=1`;
+- native failure must stop at `AWAITING_AI_CONSENT`;
+- managed AI fallback requires a separate future preflight and separate explicit consent.
+
+Live acceptance source:
+
+`https://www.youtube.com/watch?v=IzYyKRx7Qwg`
+
+Preflight:
+
+```text
+plan: Free (100/mo)
+credits_available: 100
+estimated_native_cost: 1
+estimated_remaining: 99
+can_continue: true
+```
+
+After explicit owner choice `1`:
+
+```text
+job_id: KRCM_705fe6a2-5ff4-47de-b6e5-b6c9bf90caa4
+status: COMPLETED
+detected_language: ru
+segment_count: 277
+credits_charged: 1
+balance_before: 100
+balance_after: 99
+ai_fallback_authorized: false
+```
+
+Timestamped segment validation passed.
+
+Canonical record:
+`26_A9_MANAGED_PROVIDER_ACCEPTANCE.md`.
+
+## Remaining A9 blockers
+
+Before final owner-only zero-client acceptance:
+- managed `KRCM_` job state must become durable/restart-safe;
+- managed credit accounting/idempotency must prevent duplicate provider spend on retries/restarts;
+- the private GPT Action must be switched from Helper/KRCC UX to managed preflight/consent/transcript UX;
+- the GPT must hide internal Job ID mechanics from the user;
+- full private-GPT end-to-end analysis must pass with only the media URL and chat choices;
+- each additional public-platform adapter needs its own positive public case and auth/private negative case;
+- local upload transport remains unvalidated.
+
+## Next task
+
+`A9.3 - Durable zero-client managed jobs and credit-safe idempotency.`
+
+After A9.3, continue to private GPT zero-client Action integration and final owner acceptance.
