@@ -1,4 +1,4 @@
-schema_version: "0.3-beta"
+schema_version: "0.4-beta"
 
 product:
   name: K-Research & Critic - MEDIA BETA
@@ -27,6 +27,7 @@ knowledge:
 
 instructions:
   file: prompts/GPT_STORE_MEDIA_BETA_INSTRUCTIONS.md
+  version: "0.4-beta"
 
 actions:
   media_transcript:
@@ -47,14 +48,20 @@ beta:
   intended_testers: 4
   ingress_mode: client_assisted
   browser_helper_required: true
+  browser_helper_version: "0.2.2"
   browser_helper_job_prefix: KRCC_
   direct_transcript_first: true
   client_caption_first: true
-  client_caption_first_status: IMPLEMENTED_PENDING_LIVE_BROWSER_ACCEPTANCE
+  client_caption_first_status: LIVE_ACCEPTED
   max_video_seconds: 3600
   max_concurrent_jobs: 1
   daily_stt_seconds: 7200
   max_client_audio_bytes: 33554432
+  durable_store: postgres
+  restart_resilient_waiting_jobs: true
+  durable_quota_ledger: true
+  active_audio_process_replacement: RETRY_SAFE_LIVE_ACCEPTED
+  stt_text_quality_disposition: NON_REPRODUCIBLE_ANOMALY_ACCEPTED
   stt_provider: assemblyai
   stt_audio:
     channels: 1
@@ -73,15 +80,18 @@ beta:
     - Browser-side YouTube caption ingestion completes with transcript_source=youtube_captions and stt_seconds_charged=0.
     - Browser audio is the fallback when usable captions are unavailable and consumes the AssemblyAI STT budget.
     - The backend determines captured-audio duration before reserving STT seconds.
-    - Daily quota state is currently process-memory beta state and may reset on service restart.
+    - Daily STT charges are persisted in the isolated Postgres ledger and restored after process replacement.
+    - A hard process loss during TRANSCRIBING returns MEDIA_CLIENT_INTERRUPTED_RETRY_REQUIRED on the same durable job; the user must start a fresh KRCC job.
 
 release:
-  rollout_state: CLOSED_BETA
+  rollout_state: CLOSED_BETA_A5_READY
   production_core_unchanged: true
   public_store_gpt_unchanged: true
   user_api_key_required: false
   developer_provider_key_required: true
   external_backend_required: true
-  live_beta_test_required: true
+  a4_live_validation_complete: true
+  gpt_builder_beta_required: true
   browser_helper_live_test_required: true
+  privacy_public_url_required_for_link_sharing: true
   merge_to_public_product_allowed: false
