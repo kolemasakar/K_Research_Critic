@@ -1,9 +1,9 @@
 # MEDIA BETA Decision Log
 Реєстр затверджених рішень щодо архітектури, beta-обмежень і майбутнього безкоштовного медіарежиму.
 
-Version: 1.1
+Version: 1.2
 Status: ACTIVE
-Updated: 2026-08-17
+Updated: 2026-08-20
 
 ## D001 - Media input is additive
 
@@ -180,3 +180,31 @@ Direct reliable transcript/caption intake remains preferred when available. Clie
 Reason:
 
 Three Render/cloud acquisition attempts, including a correctly wired current PO Token Provider, were blocked by YouTube datacenter-IP anti-bot enforcement. Client-assisted ingress avoids personal YouTube cookies, paid residential proxy infrastructure, and changes to the validated production VoiceBridge extension while preserving the Free Render beta target.
+
+## D017 - Zero-client media router is public-only and multi-platform
+
+Decision: APPROVED
+Approved: 2026-08-20
+
+The final zero-client media architecture is not limited to YouTube. It should use a platform-neutral MediaSourceRouter with adapters for explicitly validated public media URL types.
+
+Initial target adapters:
+- YouTube public videos;
+- Instagram public Reels/posts containing video;
+- Facebook public Video/Reels;
+- Telegram public posts containing video.
+
+Later public adapters may be added independently after validation.
+
+Access boundary:
+- public URLs only;
+- no user logins, passwords, cookies, authenticated browser sessions, account tokens, or imported session state;
+- no private/friends-only/group-only/account-gated content;
+- do not ask the user for platform credentials;
+- if access requires authentication, fail explicitly with `UNSUPPORTED_PRIVATE_OR_AUTH_REQUIRED`.
+
+Support must be declared per public URL/content type, not as blanket support for an entire platform.
+
+Reason:
+
+The desired product UX is source-agnostic: paste a public media link, select the analysis mode, and receive the result in ChatGPT with no extra browser/media actions. A public-only boundary keeps the system simpler, safer, easier to operate from mobile, and avoids credential/session storage and private-content access risks.
