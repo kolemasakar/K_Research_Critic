@@ -1,9 +1,9 @@
 # MEDIA BETA Documentation Index
 Канонічний індекс документації підпроєкту закритого та майбутнього безкоштовного медіарежиму K-Research & Critic.
 
-Version: 1.3
+Version: 1.4
 Status: ACTIVE
-Updated: 2026-08-18
+Updated: 2026-08-20
 
 ## Purpose
 
@@ -34,6 +34,8 @@ The published text-only K-Research & Critic product remains a separate productio
 14. `13_A4_5_GUARD_MATRIX_ACCEPTANCE.md` - live negative-path guard matrix for access, source, duration, concurrency, and STT quota.
 15. `14_A4_LANGUAGE_SOURCE_MATRIX_ACCEPTANCE.md` - completed UK/RU/EN/AUTO-IT language/source matrix and large-payload persistence remediation evidence.
 16. `15_A4_QUOTA_LEDGER_RESTART_ACCEPTANCE.md` - live real-STT-charge persistence and runtime quota restoration after isolated restart.
+17. `16_A4_ACTIVE_AUDIO_PROCESS_REPLACEMENT_ACCEPTANCE.md` - forced active-audio process-loss, retry-safe failure, and no-duplicate-quota acceptance.
+18. `17_A4_STT_TEXT_QUALITY_DISPOSITION.md` - `U+FFFD` replacement-character investigation and non-reproducible quality-anomaly disposition.
 
 ## Source-of-truth order
 
@@ -46,6 +48,12 @@ When documents disagree, use this precedence:
 5. other documents in this directory.
 
 A new chat must not infer completed work from roadmap items alone. Only `03_CURRENT_STATE.md`, live repository state, and actual CI/deployment evidence may mark work as completed.
+
+## Current phase checkpoint
+
+`A4_COMPLETE / A5_READY`
+
+A4 live transcript validation is closed. The next implementation block is A5: separate GPT Builder beta.
 
 ## Related repositories and branches
 
