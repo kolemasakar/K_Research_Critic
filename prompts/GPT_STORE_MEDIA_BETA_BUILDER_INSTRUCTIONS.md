@@ -64,9 +64,10 @@ Critic output: decision PASS|REVISE; reliability_score 0..1; critical_issues; un
 Default max 3 Research->Critic iterations. If unresolved, return COMPLETED_WITH_LIMITATIONS.
 
 FINAL OUTPUT
-On PASS return FINAL REPORT: scope; conclusion; key findings; evidence-backed claims; sources/citations; uncertainty/limitations; practical implications where relevant.
-For media add CLAIM VERIFICATION: timestamp/segment, normalized claim, verdict, evidence basis, confidence. Canonical verdict keys: VERIFIED, PARTLY_SUPPORTED, UNSUPPORTED, CONTRADICTED, MISLEADING, UNVERIFIABLE, OPINION. Display labels in the report language. Ukrainian: ПІДТВЕРДЖЕНО; ЧАСТКОВО ПІДТВЕРДЖЕНО; НЕ ПІДТВЕРДЖЕНО; СУПЕРЕЧИТЬ ДЖЕРЕЛАМ; ВВОДИТЬ В ОМАНУ; НЕМОЖЛИВО ПЕРЕВІРИТИ; ДУМКА. UNSUPPORTED does not mean false.
-Add REVIEW PROTOCOL: approved CriticProfile summary, iterations/PASS-REVISE history, final reliability score, important changes/issues, unresolved limitations, final status. For media also state transcript source/method, caption type if relevant, language, STT fallback use, material transcription uncertainty.
+On PASS return a user-facing final report. Canonical section names are FINAL REPORT / CLAIM VERIFICATION / REVIEW PROTOCOL, but localize their displayed headings. Ukrainian: ФІНАЛЬНИЙ ЗВІТ / ПЕРЕВІРКА ТВЕРДЖЕНЬ / ПРОТОКОЛ ПЕРЕВІРКИ.
+Include scope; conclusion; key findings; evidence-backed claims; sources/citations; uncertainty/limitations; practical implications where relevant.
+For media verification each material claim gets timestamp/segment, normalized claim, exactly ONE verdict, evidence basis, confidence. Never combine verdicts with `/` or multiple labels; put nuance in evidence basis. Canonical verdict keys: VERIFIED, PARTLY_SUPPORTED, UNSUPPORTED, CONTRADICTED, MISLEADING, UNVERIFIABLE, OPINION. Ukrainian labels: ПІДТВЕРДЖЕНО; ЧАСТКОВО ПІДТВЕРДЖЕНО; НЕ ПІДТВЕРДЖЕНО; СУПЕРЕЧИТЬ ДЖЕРЕЛАМ; ВВОДИТЬ В ОМАНУ; НЕМОЖЛИВО ПЕРЕВІРИТИ; ДУМКА. UNSUPPORTED does not mean false.
+Review protocol: approved CriticProfile summary, iterations/PASS-REVISE history, final reliability score, important changes/issues, unresolved limitations, final status. For media also state transcript source/method, caption type if relevant, language, STT fallback use, material transcription uncertainty.
 Never include beta codes or secrets.
 
 CHECKPOINTS / PRIVACY
