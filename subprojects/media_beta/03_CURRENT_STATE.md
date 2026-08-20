@@ -2,7 +2,7 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 3.4
+Version: 3.5
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-20
 
@@ -14,7 +14,7 @@ Current phase state:
 
 Accepted phase markers:
 
-`A4_CAPTIONS_FIRST_PASS / A4_AUDIO_FALLBACK_PASS / A4_GUARD_MATRIX_PASS / A4_LANGUAGE_SOURCE_MATRIX_PASS / A4_RESTART_DURABILITY_PASS / A4_DURABLE_QUOTA_LEDGER_RESTART_PASS / A4_ACTIVE_AUDIO_RETRY_SAFE_FAILURE_PASS / A4_STT_TEXT_QUALITY_DISPOSITION_PASS / A5_GPT_BUILDER_CONFIGURATION_PASS / A5_BUILDER_ACTION_START_PASS / A5_BUILDER_CAPTIONS_FIRST_PROFILE_GATE_PASS / A6_OWNER_OPERATOR_E2E_USING_TESTER1_CREDENTIAL_PASS / A7_CAPTIONS_FIRST_TESTER_ROLLOUT_READY / A7_EU_AUDIO_FALLBACK_PRIVACY_GATE_PASS / A7_TESTER1_READY`
+`A4_CAPTIONS_FIRST_PASS / A4_AUDIO_FALLBACK_PASS / A4_GUARD_MATRIX_PASS / A4_LANGUAGE_SOURCE_MATRIX_PASS / A4_RESTART_DURABILITY_PASS / A4_DURABLE_QUOTA_LEDGER_RESTART_PASS / A4_ACTIVE_AUDIO_RETRY_SAFE_FAILURE_PASS / A4_STT_TEXT_QUALITY_DISPOSITION_PASS / A5_GPT_BUILDER_CONFIGURATION_PASS / A5_BUILDER_ACTION_START_PASS / A5_BUILDER_CAPTIONS_FIRST_PROFILE_GATE_PASS / A5_BUILDER_MANUAL_3_ACTIONS_PASS / A5_BUILDER_MANUAL_PAGINATION_227_OF_227_PASS / A6_OWNER_OPERATOR_E2E_USING_TESTER1_CREDENTIAL_PASS / A7_CAPTIONS_FIRST_TESTER_ROLLOUT_READY / A7_EU_AUDIO_FALLBACK_PRIVACY_GATE_PASS / A7_TESTER1_READY`
 
 Credential-attribution correction:
 - all prior MEDIA BETA live tests were executed by the owner/operator using the access code designated for `Tester 1`;
@@ -183,6 +183,27 @@ stt_seconds_charged=0
 ```
 
 After `continue`, the GPT returned a DRAFT CriticProfile with `status=REVIEW_REQUIRED`, CRITICAL medical risk, source/cross-check requirements, transcription uncertainty handling, and the mandatory `1-APPROVE / 2-EDIT / 3-REJECT` stop. No independent research occurred before approval.
+
+Manual Builder test interface validation is also complete for all three GPT-facing Actions:
+
+```text
+startMediaBetaClientTranscription        PASS
+getMediaBetaClientTranscriptionStatus    PASS
+getMediaBetaClientTranscriptSegments     PASS
+```
+
+Manual transcript pagination with `limit=50` covered the complete 227-segment captions transcript:
+
+```text
+0-49    -> next_cursor=50
+50-99   -> next_cursor=100
+100-149 -> next_cursor=150
+150-199 -> next_cursor=200
+200-226 -> next_cursor=null
+```
+
+Canonical A5/A6 acceptance:
+`subprojects/media_beta/18_A5_A6_GPT_BUILDER_E2E_ACCEPTANCE.md`
 
 ## A6 - Owner/operator end-to-end beta acceptance
 
