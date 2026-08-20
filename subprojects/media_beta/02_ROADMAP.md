@@ -2,7 +2,7 @@
 
 Roadmap for the closed MEDIA BETA and the later sustainable free-media architecture.
 
-Version: 2.5
+Version: 2.6
 Status: ACTIVE
 Updated: 2026-08-20
 
@@ -140,14 +140,36 @@ Canonical acceptance:
 
 ### A7. Controlled tester rollout
 
-Status: READY
+Status: IN_PROGRESS_PRIVACY_GATE
+
+Current split:
+- `CAPTIONS_FIRST`: READY for controlled external tester use;
+- `AUDIO_FALLBACK`: BLOCKED for external testers until AssemblyAI EU/no-training path is deployed and live-validated.
+
+Provider privacy finding:
+- current AssemblyAI documentation states that paid customers can self-serve opt out of model-improvement data sharing;
+- free users cannot opt out;
+- files submitted through AssemblyAI European servers are not used for model training;
+- Async STT supports `https://api.eu.assemblyai.com`.
+
+Implementation in progress on the isolated VoiceBridge beta branch:
+- client-assisted Audio fallback now supports `KRC_MEDIA_ASSEMBLYAI_BASE_URL` with the prior US endpoint retained as default;
+- beta Blueprint sets `KRC_MEDIA_ASSEMBLYAI_BASE_URL=https://api.eu.assemblyai.com`;
+- production branch/service remain unchanged;
+- deployment and one live EU Audio fallback job are still required before external tester Audio fallback is enabled.
+
+A7 rollout package:
+- `subprojects/media_beta/19_A7_CONTROLLED_TESTER_ROLLOUT.md`;
+- unique tester codes;
+- Helper 0.2.2 onboarding;
+- failure-report template;
+- monitoring rules.
 
 Next:
-- prepare rollout checklist;
-- preserve owner code and create/confirm up to three tester codes;
-- provide tester onboarding instructions;
-- define failure-report template;
-- verify AssemblyAI privacy/no-training release gate before broader exposure of audio fallback;
+- confirm beta Render runtime has the EU endpoint configuration;
+- live-validate one client-assisted Audio fallback job through EU Async STT;
+- update privacy policy with accepted EU processing boundary;
+- then invite Tester 1 to captions-first flow and, only after EU PASS, Audio fallback where needed;
 - monitor captions-vs-STT ratio, STT seconds, Render health/bandwidth, cleanup state, failures, and Postgres lifecycle;
 - keep public GPT and production VoiceBridge unchanged.
 
