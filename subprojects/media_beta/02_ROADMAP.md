@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 Дорожня карта реалізації закритого beta-медіарежиму та наступного сталого безкоштовного режиму.
 
-Version: 2.3
+Version: 2.4
 Status: ACTIVE
 Updated: 2026-08-20
 
@@ -55,7 +55,7 @@ Dedicated service:
 
 ### A4. Live transcript validation
 
-Status: IN_PROGRESS_TEXT_QUALITY
+Status: COMPLETE
 
 #### A4.1 Server-side YouTube ingress
 
@@ -109,7 +109,7 @@ Accepted live evidence:
 
 #### A4.3 Audio fallback acceptance
 
-Status: COMPLETE_FOR_PRIMARY_UKRAINIAN_SAMPLE
+Status: COMPLETE
 
 Accepted:
 - browser capture/upload;
@@ -117,11 +117,19 @@ Accepted:
 - duration probing;
 - measured quota charging;
 - AssemblyAI async transcription;
-- provider delete request;
+- provider delete request on normal successful completion;
 - Action-facing status and segments.
 
-Open quality item:
-- `U+FFFD` replacement-character artifacts observed in returned STT text.
+Text-quality disposition:
+- original A4.3 sample recorded two `U+FFFD` replacement characters;
+- two fresh independent successful AssemblyAI jobs returned 2 segments each and `U+FFFD=0` in both cases;
+- original raw provider result is no longer available because the original KRCC job expired;
+- no deterministic current VoiceBridge encoding defect is supported by the available evidence;
+- root cause of the historical sample cannot be conclusively attributed;
+- disposition: `NON_REPRODUCIBLE QUALITY ANOMALY / NOT AN A4 BLOCKER`.
+
+Canonical text-quality record:
+`subprojects/media_beta/17_A4_STT_TEXT_QUALITY_DISPOSITION.md`
 
 #### A4.4 Restart durability
 
@@ -185,12 +193,11 @@ Accepted:
 Canonical acceptance:
 `subprojects/media_beta/14_A4_LANGUAGE_SOURCE_MATRIX_ACCEPTANCE.md`
 
-#### Remaining A4 work
+#### A4 exit
 
-Pending before A4 exit:
-- STT replacement-character (`U+FFFD`) investigation and disposition.
+Status: PASS.
 
-Already accepted and no longer pending:
+Accepted and no longer pending:
 - Ukrainian, Russian, English and Italian/AUTO caption cases;
 - manual-caption classification;
 - captions unavailable/audio fallback path;
@@ -203,9 +210,10 @@ Already accepted and no longer pending:
 - waiting/completed restart durability and `created_at` continuity;
 - durable quota-ledger restart restoration after a real STT charge;
 - large-caption-payload durable persistence boundary;
-- active-audio forced process-loss retry-safe behavior.
+- active-audio forced process-loss retry-safe behavior;
+- STT replacement-character investigation and non-reproducible-anomaly disposition.
 
-A4 exit criteria:
+A4 exit criteria satisfied:
 - captions-first real browser jobs are usable across required language/source cases;
 - audio fallback remains usable when captions are unavailable;
 - language/source metadata is usable;
@@ -213,13 +221,13 @@ A4 exit criteria:
 - active-audio process replacement has deterministic retry-safe behavior;
 - provider cleanup is verified where normal AssemblyAI completion occurs;
 - STT replacement-character anomaly is investigated and dispositioned;
-- no beta/developer secret appears in reports/checkpoints/loggable payloads.
+- no beta/developer secret appears in acceptance records.
 
 ### A5. Separate GPT Builder beta
 
-Status: BLOCKED_BY_REMAINING_A4_TEXT_QUALITY
+Status: READY
 
-After A4 acceptance:
+Next:
 - create `K-Research & Critic - MEDIA BETA` separately from public GPT;
 - import beta instructions and captions-first client-assisted OpenAPI schema;
 - configure Action bearer secret;
