@@ -2,7 +2,7 @@
 
 Canonical documentation index for the closed and future sustainable-free media mode of K-Research & Critic.
 
-Version: 1.5
+Version: 1.6
 Status: ACTIVE
 Updated: 2026-08-20
 
@@ -37,6 +37,7 @@ The published text-only K-Research & Critic product remains a separate productio
 17. `16_A4_ACTIVE_AUDIO_PROCESS_REPLACEMENT_ACCEPTANCE.md` - forced active-audio process loss, retry-safe failure, and no-duplicate-quota acceptance.
 18. `17_A4_STT_TEXT_QUALITY_DISPOSITION.md` - U+FFFD investigation and non-reproducible quality-anomaly disposition.
 19. `18_A5_A6_GPT_BUILDER_E2E_ACCEPTANCE.md` - separate GPT Builder configuration, captions-first CriticProfile gate, and first owner Research/Critic end-to-end acceptance.
+20. `19_A7_CONTROLLED_TESTER_ROLLOUT.md` - external tester onboarding, failure reporting, monitoring, and AssemblyAI EU/no-training rollout gate.
 
 ## Source-of-truth order
 
@@ -51,9 +52,9 @@ A new chat must not infer completed work from roadmap items alone. Only `03_CURR
 
 ## Current phase checkpoint
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_READY`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_IN_PROGRESS_PRIVACY_GATE`
 
-A4 live transcript validation, A5 separate GPT Builder beta, and the first owner A6 captions-first end-to-end Research/Critic run are accepted. The next block is A7 controlled tester rollout.
+A4 live transcript validation, A5 separate GPT Builder beta, and the first owner A6 captions-first end-to-end Research/Critic run are accepted. A7 controlled tester rollout is in progress. Captions-first is ready for controlled tester use; external-tester Audio fallback remains blocked until the isolated client-assisted path is deployed against AssemblyAI EU Async STT and live-validated.
 
 ## Related repositories and branches
 
