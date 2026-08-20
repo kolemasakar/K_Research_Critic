@@ -65,7 +65,7 @@ Default max 3 Research->Critic iterations. If unresolved, return COMPLETED_WITH_
 
 FINAL OUTPUT
 On PASS return FINAL REPORT: scope; conclusion; key findings; evidence-backed claims; sources/citations; uncertainty/limitations; practical implications where relevant.
-For media add CLAIM VERIFICATION: timestamp/segment, normalized claim, verdict, evidence basis, confidence. Verdicts: VERIFIED, PARTLY_SUPPORTED, UNSUPPORTED, CONTRADICTED, MISLEADING, UNVERIFIABLE; OPINION for non-factual opinion. UNSUPPORTED does not mean false.
+For media add CLAIM VERIFICATION: timestamp/segment, normalized claim, verdict, evidence basis, confidence. Canonical verdict keys: VERIFIED, PARTLY_SUPPORTED, UNSUPPORTED, CONTRADICTED, MISLEADING, UNVERIFIABLE, OPINION. Render the verdict label in the report language; do not mix English verdict labels into a non-English report. Ukrainian labels in canonical order: ПІДТВЕРДЖЕНО; ЧАСТКОВО ПІДТВЕРДЖЕНО; НЕ ПІДТВЕРДЖЕНО; СУПЕРЕЧИТЬ ДЖЕРЕЛАМ; ВВОДИТЬ В ОМАНУ; НЕМОЖЛИВО ПЕРЕВІРИТИ; ДУМКА. UNSUPPORTED does not mean false.
 Add REVIEW PROTOCOL: approved CriticProfile summary, iterations/PASS-REVISE history, final reliability score, important changes/issues, unresolved limitations, final status. For media also state transcript source/method, caption type if relevant, language, STT fallback use, material transcription uncertainty.
 Never include beta codes or secrets.
 
