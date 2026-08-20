@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 Реєстр затверджених рішень щодо архітектури, beta-обмежень і майбутнього безкоштовного медіарежиму.
 
-Version: 1.2
+Version: 1.3
 Status: ACTIVE
 Updated: 2026-08-20
 
@@ -208,3 +208,31 @@ Support must be declared per public URL/content type, not as blanket support for
 Reason:
 
 The desired product UX is source-agnostic: paste a public media link, select the analysis mode, and receive the result in ChatGPT with no extra browser/media actions. A public-only boundary keeps the system simpler, safer, easier to operate from mobile, and avoids credential/session storage and private-content access risks.
+
+## D018 - Local video/audio upload is an approved media ingress
+
+Decision: APPROVED
+Approved: 2026-08-20
+
+The MediaSourceRouter should support a separate `local_upload` ingress for video/audio files explicitly attached by the owner from local/device storage.
+
+Target behavior:
+- accept local video and audio attachments through a future validated ChatGPT/Custom GPT file-ingest transport;
+- validate file type, size, and duration before processing;
+- prefer usable embedded subtitle/text tracks before STT;
+- otherwise extract/normalize audio and use the accepted EU STT path during the current beta architecture;
+- converge on the same normalized MediaAsset/transcript/job contract used by public URL adapters;
+- do not require any platform login, cookies, browser session, or account token;
+- do not durably retain the original media file after processing unless a future explicit retention decision changes this rule.
+
+The public-only rule in D017 applies to remote platform URL adapters and does not block owner-supplied local files.
+
+Initial local-upload scope is analysis of spoken/transcribed content. Visual-frame evidence extraction from video is a separate future capability and requires its own acceptance scope.
+
+Implementation constraint:
+
+Approval is architectural only. The actual ChatGPT attachment-to-Action/backend transport, supported file types, practical size limits, desktop/mobile behavior, and deletion guarantees must be live-validated before `local_upload` is marked supported.
+
+Reason:
+
+Local upload avoids source-platform anti-bot/authentication dependencies and provides a stable source path for media already available on the owner's device. Reusing the same MediaSourceRouter and normalized transcript contract prevents a separate analysis pipeline and keeps Research/Critic source-agnostic.
