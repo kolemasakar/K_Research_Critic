@@ -2,7 +2,7 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 3.2
+Version: 3.3
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-20
 
@@ -10,11 +10,11 @@ Checkpoint date: 2026-08-20
 
 Current phase state:
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_IN_PROGRESS_PRIVACY_GATE`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_READY_FOR_TESTER1`
 
 Accepted phase markers:
 
-`A4_CAPTIONS_FIRST_PASS / A4_AUDIO_FALLBACK_PASS / A4_GUARD_MATRIX_PASS / A4_LANGUAGE_SOURCE_MATRIX_PASS / A4_RESTART_DURABILITY_PASS / A4_DURABLE_QUOTA_LEDGER_RESTART_PASS / A4_ACTIVE_AUDIO_RETRY_SAFE_FAILURE_PASS / A4_STT_TEXT_QUALITY_DISPOSITION_PASS / A5_GPT_BUILDER_CONFIGURATION_PASS / A5_BUILDER_ACTION_START_PASS / A5_BUILDER_CAPTIONS_FIRST_PROFILE_GATE_PASS / A6_OWNER_E2E_RESEARCH_CRITIC_FINALIZATION_PASS / A7_CAPTIONS_FIRST_TESTER_ROLLOUT_READY`
+`A4_CAPTIONS_FIRST_PASS / A4_AUDIO_FALLBACK_PASS / A4_GUARD_MATRIX_PASS / A4_LANGUAGE_SOURCE_MATRIX_PASS / A4_RESTART_DURABILITY_PASS / A4_DURABLE_QUOTA_LEDGER_RESTART_PASS / A4_ACTIVE_AUDIO_RETRY_SAFE_FAILURE_PASS / A4_STT_TEXT_QUALITY_DISPOSITION_PASS / A5_GPT_BUILDER_CONFIGURATION_PASS / A5_BUILDER_ACTION_START_PASS / A5_BUILDER_CAPTIONS_FIRST_PROFILE_GATE_PASS / A6_OWNER_E2E_RESEARCH_CRITIC_FINALIZATION_PASS / A7_CAPTIONS_FIRST_TESTER_ROLLOUT_READY / A7_EU_AUDIO_FALLBACK_PRIVACY_GATE_PASS / A7_TESTER1_READY`
 
 The approved MEDIA BETA architecture remains captions-first browser-assisted YouTube ingestion. Direct Render/datacenter YouTube acquisition remains unsuitable because of YouTube anti-bot enforcement. Browser audio plus AssemblyAI is fallback only when usable captions are unavailable.
 
@@ -55,7 +55,8 @@ Verified controls:
 - durable Postgres job state;
 - restart-resilient waiting/completed jobs;
 - durable STT quota ledger;
-- active-audio hard process loss returns explicit retry-safe terminal failure.
+- active-audio hard process loss returns explicit retry-safe terminal failure;
+- client-assisted AssemblyAI fallback routed through `https://api.eu.assemblyai.com` in the accepted A7 beta deployment.
 
 ## Approved media flow
 
@@ -73,7 +74,7 @@ YouTube URL
       -> tab capture
       -> server normalization
       -> duration/quota reservation
-      -> AssemblyAI Universal-2
+      -> AssemblyAI EU Universal-2
       -> timestamped transcript
       -> provider delete request on normal completion
  -> GPT status + paginated segments
@@ -188,39 +189,62 @@ Observed continuation:
 Canonical acceptance:
 `subprojects/media_beta/18_A5_A6_GPT_BUILDER_E2E_ACCEPTANCE.md`
 
-The acceptance record intentionally does not persist the full transcript, tester beta code, or complete final report text.
-
 ## A7 - Controlled tester rollout
 
-Status: IN_PROGRESS_PRIVACY_GATE.
+Status: READY_FOR_TESTER1.
 
 Canonical rollout record:
 `subprojects/media_beta/19_A7_CONTROLLED_TESTER_ROLLOUT.md`
 
-Current split:
+Canonical EU Audio acceptance:
+`subprojects/media_beta/20_A7_EU_AUDIO_PRIVACY_GATE_ACCEPTANCE.md`
+
+Current readiness:
 - captions-first: READY for controlled external tester use;
-- Audio fallback: BLOCKED for external testers pending AssemblyAI EU/no-training deployment and live validation.
+- Audio fallback: READY for controlled external tester use when captions are unavailable/unusable;
+- Tester 1 onboarding: READY.
 
-Provider privacy finding from current AssemblyAI documentation:
-- paid customers can opt out of model-improvement data sharing through Data Controls;
-- free users cannot opt out;
-- files submitted through AssemblyAI European servers are not used for model training;
-- Async STT supports `https://api.eu.assemblyai.com`.
+Accepted EU Audio fallback deployment:
 
-VoiceBridge beta-branch remediation now implemented in code/config but not yet live-accepted:
-- `src/cloud/src/media_client_ingest.ts` reads `KRC_MEDIA_ASSEMBLYAI_BASE_URL` and retains `https://api.assemblyai.com` as default when unset;
-- `render.media-beta.yaml` sets `KRC_MEDIA_ASSEMBLYAI_BASE_URL=https://api.eu.assemblyai.com` for the isolated beta service;
-- a contract test was added for endpoint override wiring;
-- production VoiceBridge/main are unchanged.
+```text
+KRC_MEDIA_ASSEMBLYAI_BASE_URL=https://api.eu.assemblyai.com
+VoiceBridge commit=7a61790221b6f75c14293360002794208efd813f
+Render deploy=dep-da3f2te417fc73e600ng
+status=live
+```
 
-Required next acceptance:
-- confirm the isolated Render beta runtime has the EU environment variable;
-- deploy the current beta branch;
-- run one new browser Audio fallback job;
-- require `COMPLETED / provider=assemblyai / provider_model=universal-2`;
-- verify expected measured STT charge and `provider_data_deleted=true` on normal completion;
-- verify production VoiceBridge remains unchanged;
-- then mark external tester Audio fallback READY.
+Accepted EU live job:
+
+`KRCC_a79ad701-d5a0-40ca-91f8-6fbdfc6c3bc6`
+
+Final result:
+
+```text
+status=COMPLETED
+transcript_source=assemblyai_stt
+provider=assemblyai
+provider_model=universal-2
+provider_data_deleted=true
+detected_language=uk
+language_confidence=0.695
+duration_seconds=122.292
+stt_seconds_charged=123
+transcript_characters=1608
+segment_count=3
+error=null
+```
+
+Quota:
+
+```text
+used before=422
+used after=545
+delta=123
+```
+
+The quota delta equals `stt_seconds_charged` and `ceil(122.292)`.
+
+Current AssemblyAI documentation states that files submitted through its European servers are not used for model training. This routing/privacy gate is therefore accepted for the controlled beta. Re-verification remains required before future public promotion.
 
 ## Backend routes
 
@@ -242,13 +266,15 @@ Browser-only routes remain intentionally absent from the GPT Action schema.
 
 ## Next phase action
 
-Complete the A7 AssemblyAI EU/no-training live gate before giving external testers access to Audio fallback.
+Invite Tester 1 with a unique tester code and the Helper 0.2.2 onboarding package.
 
-After EU fallback PASS:
-- invite Tester 1 with a unique tester code;
-- require at least one independent captions-first end-to-end flow without owner intervention beyond onboarding;
-- collect failure report if any;
-- expand to Tester 2/3 only after acceptable reliability/resource observations.
+Require at least:
+- one independent captions-first end-to-end flow without owner intervention beyond onboarding;
+- one additional tester-selected video;
+- normal CriticProfile approval behavior;
+- failure report if any issue occurs.
+
+Do not mark A7 COMPLETE until external tester evidence exists and rollout reliability/resource use is acceptable.
 
 ## Release-hardening items after/alongside A7
 
