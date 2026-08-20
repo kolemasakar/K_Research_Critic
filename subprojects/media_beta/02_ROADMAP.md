@@ -2,7 +2,7 @@
 
 Roadmap for the closed MEDIA BETA and the later sustainable free-media architecture.
 
-Version: 2.7
+Version: 2.8
 Status: ACTIVE
 Updated: 2026-08-20
 
@@ -110,18 +110,25 @@ Accepted:
 Accepted Builder job:
 `KRCC_8945357e-d6cf-4483-b7ca-178b81729665`
 
+Credential attribution:
+- the owner/operator performed this live acceptance using the code designated for `Tester 1`;
+- the owner-designated code was not the credential used.
+
 Canonical acceptance:
 `subprojects/media_beta/18_A5_A6_GPT_BUILDER_E2E_ACCEPTANCE.md`
 
+Canonical credential correction:
+`subprojects/media_beta/21_CREDENTIAL_ATTRIBUTION_CORRECTION.md`
+
 ### A6. End-to-end beta acceptance
 
-Status: COMPLETE_FOR_FIRST_OWNER_CAPTIONS_FIRST_FLOW
+Status: COMPLETE_FOR_FIRST_OWNER_OPERATED_CAPTIONS_FIRST_FLOW
 
-Accepted owner flow:
+Accepted owner-operated flow:
 
 ```text
 YouTube URL
- -> beta access
+ -> beta access using Tester 1 credential
  -> Builder Action creates KRCC job
  -> Helper captions-first completion
  -> GPT status/segments
@@ -133,7 +140,9 @@ YouTube URL
  -> finalization
 ```
 
-Owner entered standalone `1`; profile transitioned to APPROVED; the workflow continued through transcript retrieval, independent research, Critic/revision/finalization, and the owner confirmed successful completion.
+The owner/operator entered standalone `1`; profile transitioned to APPROVED; the workflow continued through transcript retrieval, independent research, Critic/revision/finalization, and the owner/operator confirmed successful completion.
+
+This validates the workflow with a valid allowlisted Tester 1 credential but does not count as an independent external Tester 1 human run.
 
 Canonical acceptance:
 `subprojects/media_beta/18_A5_A6_GPT_BUILDER_E2E_ACCEPTANCE.md`
@@ -153,8 +162,15 @@ Accepted rollout gates:
 - exact measured STT quota accounting confirmed;
 - production VoiceBridge unchanged.
 
+Credential status:
+- Tester 1 credential has already been live-used extensively by the owner/operator;
+- owner-designated credential has not yet been separately live-validated;
+- no independent external Tester 1 human run has occurred yet.
+
 Accepted EU Audio fallback job:
 `KRCC_a79ad701-d5a0-40ca-91f8-6fbdfc6c3bc6`
+
+The EU live job was also performed by the owner/operator using the Tester 1 credential.
 
 Accepted result:
 
@@ -172,10 +188,11 @@ error=null
 
 Canonical A7 records:
 - `subprojects/media_beta/19_A7_CONTROLLED_TESTER_ROLLOUT.md`;
-- `subprojects/media_beta/20_A7_EU_AUDIO_PRIVACY_GATE_ACCEPTANCE.md`.
+- `subprojects/media_beta/20_A7_EU_AUDIO_PRIVACY_GATE_ACCEPTANCE.md`;
+- `subprojects/media_beta/21_CREDENTIAL_ATTRIBUTION_CORRECTION.md`.
 
 Next:
-- invite Tester 1 with a unique tester code;
+- invite the actual external Tester 1 using the already designated Tester 1 code;
 - require at least one independent captions-first end-to-end flow without owner intervention beyond onboarding;
 - require one additional tester-selected YouTube video;
 - observe CriticProfile approval behavior and failure-report usability;
