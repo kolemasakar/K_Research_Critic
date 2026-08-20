@@ -2,7 +2,7 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 3.5
+Version: 3.6
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-20
 
@@ -10,24 +10,45 @@ Checkpoint date: 2026-08-20
 
 Current phase state:
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_READY_FOR_TESTER1`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_OWNER_ONLY_FINALIZATION_IN_PROGRESS`
 
-Accepted phase markers:
+Current product target:
 
-`A4_CAPTIONS_FIRST_PASS / A4_AUDIO_FALLBACK_PASS / A4_GUARD_MATRIX_PASS / A4_LANGUAGE_SOURCE_MATRIX_PASS / A4_RESTART_DURABILITY_PASS / A4_DURABLE_QUOTA_LEDGER_RESTART_PASS / A4_ACTIVE_AUDIO_RETRY_SAFE_FAILURE_PASS / A4_STT_TEXT_QUALITY_DISPOSITION_PASS / A5_GPT_BUILDER_CONFIGURATION_PASS / A5_BUILDER_ACTION_START_PASS / A5_BUILDER_CAPTIONS_FIRST_PROFILE_GATE_PASS / A5_BUILDER_MANUAL_3_ACTIONS_PASS / A5_BUILDER_MANUAL_PAGINATION_227_OF_227_PASS / A6_OWNER_OPERATOR_E2E_USING_TESTER1_CREDENTIAL_PASS / A7_CAPTIONS_FIRST_TESTER_ROLLOUT_READY / A7_EU_AUDIO_FALLBACK_PRIVACY_GATE_PASS / A7_TESTER1_READY`
+`PRIVATE OWNER-ONLY MEDIA BETA`
 
-Credential-attribution correction:
-- all prior MEDIA BETA live tests were executed by the owner/operator using the access code designated for `Tester 1`;
-- the separate owner-designated beta code has not yet been independently live-validated;
-- this does not revoke any technical A4/A5/A6/A7 acceptance result;
-- the owner-operated runs do not count as an independent external Tester 1 human rollout;
-- canonical correction: `subprojects/media_beta/21_CREDENTIAL_ATTRIBUTION_CORRECTION.md`.
+The owner explicitly paused investigation of GPT public/link sharing and paused the external Tester 1 rollout. The project is now being completed for private owner-only use with GPT access set to `Only me`.
 
-The approved MEDIA BETA architecture remains captions-first browser-assisted YouTube ingestion. Direct Render/datacenter YouTube acquisition remains unsuitable because of YouTube anti-bot enforcement. Browser audio plus AssemblyAI is fallback only when usable captions are unavailable.
+Canonical owner-only completion plan:
+`subprojects/media_beta/22_OWNER_ONLY_COMPLETION_PLAN.md`
 
-Production VoiceBridge and the published K-Research & Critic GPT remain unchanged. PR #8 and PR #28 remain draft and unmerged.
+## Accepted technical state
 
-## Repositories
+The core media architecture is accepted:
+
+```text
+YouTube URL
+ -> private MEDIA BETA GPT Action creates durable KRCC job
+ -> AWAITING_CLIENT
+ -> Helper 0.2.2 on the same YouTube tab
+ -> captions first
+      -> COMPLETED / youtube_captions / STT=0
+ -> if captions unavailable/unusable
+      -> Audio fallback
+      -> AssemblyAI EU Universal-2
+      -> timestamped transcript
+      -> provider delete request on normal completion
+ -> GPT status + all transcript pages
+ -> material claim inventory
+ -> DRAFT CriticProfile
+ -> explicit owner APPROVE/EDIT/REJECT
+ -> independent Research
+ -> Critic/revision loop
+ -> FINAL REPORT / CLAIM VERIFICATION / REVIEW PROTOCOL
+```
+
+Transcript text is evidence of what the video represents as being said, not independent evidence that its factual claims are true.
+
+## Repositories and production boundary
 
 KRC:
 - repo `kolemasakar/K_Research_Critic`;
@@ -41,7 +62,9 @@ VoiceBridge:
 - draft PR #28;
 - production service and `main` unchanged.
 
-## Dedicated Render beta
+Do not merge PR #8 or PR #28 as part of owner-only completion.
+
+## Dedicated beta runtime
 
 Service:
 `voicebridge-krc-media-beta-kolemasakar`
@@ -52,63 +75,16 @@ Service ID:
 Endpoint:
 `https://voicebridge-krc-media-beta-kolemasakar.onrender.com`
 
-Verified controls:
-- free Render beta service isolated from production;
+Accepted controls:
 - max duration 3600 sec;
-- max concurrent jobs 1;
+- concurrency 1;
 - AssemblyAI fallback budget 7200 sec per UTC day;
-- language hints auto/uk/ru/en;
 - Helper required for client-assisted ingestion;
 - durable Postgres job state;
 - restart-resilient waiting/completed jobs;
 - durable STT quota ledger;
-- active-audio hard process loss returns explicit retry-safe terminal failure;
-- client-assisted AssemblyAI fallback routed through `https://api.eu.assemblyai.com` in the accepted A7 beta deployment.
-
-## Approved media flow
-
-```text
-YouTube URL
- -> MEDIA BETA GPT Action creates durable KRCC job
- -> AWAITING_CLIENT
- -> Helper 0.2.2 on the same YouTube tab
- -> Use subtitles first
-      -> direct timed-text when usable
-      -> transcript-panel fallback otherwise
-      -> COMPLETED / youtube_captions / STT=0
- -> if captions unavailable/unusable
-      -> Audio fallback
-      -> tab capture
-      -> server normalization
-      -> duration/quota reservation
-      -> AssemblyAI EU Universal-2
-      -> timestamped transcript
-      -> provider delete request on normal completion
- -> GPT status + paginated segments
- -> material claim inventory
- -> DRAFT CriticProfile
- -> explicit user APPROVE/EDIT/REJECT
- -> independent Research
- -> Critic / revision loop
- -> FINAL REPORT / CLAIM VERIFICATION / REVIEW PROTOCOL
-```
-
-Transcript text is evidence of what the video represents as being said, not independent evidence that factual claims are true.
-
-## Browser helper
-
-Current helper:
-`KRC MEDIA BETA Helper 0.2.2`
-
-Accepted helper functions:
-- captions-first extraction;
-- transcript-panel fallback;
-- timestamped segment extraction;
-- Audio fallback;
-- active-tab source validation;
-- immediate Job ID persistence;
-- stale terminal-state isolation;
-- no Action bearer token or AssemblyAI key stored in the extension.
+- active-audio hard process loss returns retry-safe terminal failure;
+- AssemblyAI fallback routed through `https://api.eu.assemblyai.com`.
 
 ## A4 - Live transcript validation
 
@@ -124,221 +100,104 @@ Canonical records:
 - `16_A4_ACTIVE_AUDIO_PROCESS_REPLACEMENT_ACCEPTANCE.md`;
 - `17_A4_STT_TEXT_QUALITY_DISPOSITION.md`.
 
-Key accepted evidence:
-- UK auto captions: 227/227 segments, STT=0;
-- RU auto captions: 524 segments, STT=0;
-- EN manual captions: 247 segments, STT=0;
-- AUTO selected IT manual track correctly;
-- audio fallback completed through AssemblyAI Universal-2 with measured quota accounting and normal provider cleanup;
-- invalid code/source mismatch/concurrency/>60 min/quota guards passed;
-- durable waiting/completed state and immutable `created_at` survived required restarts;
-- real STT charge restored from durable quota ledger after restart;
-- forced process loss during TRANSCRIBING returned `FAILED / MEDIA_CLIENT_INTERRUPTED_RETRY_REQUIRED / retryable=true` on the same durable Job ID;
-- interrupted 249.444-second job charged exactly 250 seconds with no duplicate charge;
-- historical U+FFFD anomaly was not reproduced in two fresh successful STT controls and is dispositioned as non-reproducible quality anomaly, not an A4 blocker.
+Accepted evidence includes UK/RU/EN/AUTO caption cases, captions STT=0, AssemblyAI Universal-2 fallback, exact duration/quota accounting, normal provider cleanup, durable restart state, durable quota restoration, retry-safe active-audio process-loss behavior, and U+FFFD non-reproducible disposition.
 
-All of these live runs used the Tester 1 credential operated by the owner unless a specific record states otherwise.
-
-Residual hardening:
-- hard process death may leave `provider_data_deleted=null`; orphan-provider cleanup remains a release-hardening item.
+Residual limitation: a hard process death during active AssemblyAI work may leave `provider_data_deleted=null`.
 
 ## A5 - Separate GPT Builder beta
 
 Status: PASS / COMPLETE.
 
-Separate Builder identity:
+Separate GPT:
 `K-Research & Critic - MEDIA BETA`
 
 Accepted Builder configuration:
-- Builder-safe instructions file `prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md` within the current 8000-character Builder limit;
+- Builder-safe instructions within 8000-character limit;
 - web search enabled;
 - image generation disabled;
 - code interpreter/data analysis enabled;
-- API Key / Bearer Action authentication using the dedicated beta Action secret;
-- OpenAPI schema `gpt_store/actions/media_beta_openapi.yaml`;
-- Action server restricted to the isolated beta Render endpoint;
-- privacy policy URL configured;
-- Builder recognized exactly the intended GPT-facing operations:
-  - `startMediaBetaClientTranscription`;
-  - `getMediaBetaClientTranscriptionStatus`;
-  - `getMediaBetaClientTranscriptSegments`.
-
-The Builder preview correctly enforced `MEDIA BETA ACCESS REQUIRED` before Action start when no tester beta code was supplied.
-
-Accepted Builder-created job:
-`KRCC_8945357e-d6cf-4483-b7ca-178b81729665`
-
-Credential used for the accepted live run:
-`Tester 1 credential`, operated by the owner.
-
-The same job completed through Helper 0.2.2:
-
-```text
-status=COMPLETED
-transcript_source=youtube_captions
-caption_type=auto_generated
-language=uk
-segment_count=227
-stt_seconds_charged=0
-```
-
-After `continue`, the GPT returned a DRAFT CriticProfile with `status=REVIEW_REQUIRED`, CRITICAL medical risk, source/cross-check requirements, transcription uncertainty handling, and the mandatory `1-APPROVE / 2-EDIT / 3-REJECT` stop. No independent research occurred before approval.
-
-Manual Builder test interface validation is also complete for all three GPT-facing Actions:
-
-```text
-startMediaBetaClientTranscription        PASS
-getMediaBetaClientTranscriptionStatus    PASS
-getMediaBetaClientTranscriptSegments     PASS
-```
-
-Manual transcript pagination with `limit=50` covered the complete 227-segment captions transcript:
-
-```text
-0-49    -> next_cursor=50
-50-99   -> next_cursor=100
-100-149 -> next_cursor=150
-150-199 -> next_cursor=200
-200-226 -> next_cursor=null
-```
-
-Canonical A5/A6 acceptance:
-`subprojects/media_beta/18_A5_A6_GPT_BUILDER_E2E_ACCEPTANCE.md`
-
-## A6 - Owner/operator end-to-end beta acceptance
-
-Status: PASS / COMPLETE for the first owner-operated captions-first Builder workflow using the Tester 1 credential.
-
-The owner/operator entered `1` at the profile gate.
-
-Observed continuation:
-- profile transitioned to APPROVED;
-- `approved_by=user` recorded;
-- GPT retrieved transcript segments through the Action path;
-- independent web research began only after approval;
-- Critic/revision/finalization path completed successfully in Builder Preview;
-- owner/operator confirmed completion as OK.
+- API Key/Bearer Action authentication;
+- Action server restricted to isolated beta runtime;
+- privacy policy configured;
+- all three GPT-facing operations manually tested PASS;
+- manual transcript pagination confirmed 227/227 segments;
+- CriticProfile gate blocks independent research before approval.
 
 Canonical acceptance:
 `subprojects/media_beta/18_A5_A6_GPT_BUILDER_E2E_ACCEPTANCE.md`
 
-Credential-attribution correction:
+## A6 - Owner/operator E2E
+
+Status: PASS / COMPLETE.
+
+The owner/operator completed the captions-first Builder flow through CriticProfile approval, independent Research, Critic/revision and finalization.
+
+Historical live runs used the credential designated for `Tester 1`, operated by the owner. This is a credential-attribution detail only and does not revoke technical acceptance.
+
+Canonical correction:
 `subprojects/media_beta/21_CREDENTIAL_ATTRIBUTION_CORRECTION.md`
 
-This acceptance validates the workflow with a valid allowlisted Tester 1 credential but does not constitute an independent external Tester 1 human run.
+## A7 - External tester rollout
 
-## A7 - Controlled tester rollout
+Status: PAUSED_BY_OWNER.
 
-Status: READY_FOR_TESTER1.
+The external sharing restriction investigation, appeal path, private-link distribution, and Tester 1/2/3 onboarding are intentionally paused.
 
-Canonical rollout record:
-`subprojects/media_beta/19_A7_CONTROLLED_TESTER_ROLLOUT.md`
+Previously accepted external-readiness evidence remains preserved, including the EU Audio privacy gate, but no independent external tester run is required for the current owner-only target.
 
-Canonical EU Audio acceptance:
-`subprojects/media_beta/20_A7_EU_AUDIO_PRIVACY_GATE_ACCEPTANCE.md`
+## A8 - Owner-only product finalization
 
-Credential-attribution correction:
-`subprojects/media_beta/21_CREDENTIAL_ATTRIBUTION_CORRECTION.md`
+Status: IN_PROGRESS.
 
-Current readiness:
-- captions-first: READY for controlled external tester use;
-- Audio fallback: READY for controlled external tester use when captions are unavailable/unusable;
-- Tester 1 credential: already live-used extensively by the owner/operator;
-- independent external Tester 1 human onboarding/run: NOT YET PERFORMED;
-- owner-designated credential: NOT YET independently live-validated.
+The private GPT has been created successfully and is currently set to `Only me`.
 
-Accepted EU Audio fallback deployment:
+Remaining mandatory acceptance step:
+- perform one clean post-create end-to-end smoke test through the actual private GPT, not Builder Preview.
+
+Preferred credential for this final smoke test:
+- the separately designated owner credential, so the final private-product evidence matches the owner-only operating model.
+
+Required smoke path:
 
 ```text
-KRC_MEDIA_ASSEMBLYAI_BASE_URL=https://api.eu.assemblyai.com
-VoiceBridge commit=7a61790221b6f75c14293360002794208efd813f
-Render deploy=dep-da3f2te417fc73e600ng
-status=live
+private GPT
+ -> public YouTube URL
+ -> valid owner credential
+ -> KRCC job
+ -> Helper 0.2.2
+ -> captions-first completion
+ -> status + complete segments
+ -> DRAFT CriticProfile
+ -> owner APPROVE
+ -> Research
+ -> Critic
+ -> final output
 ```
 
-Accepted EU live job:
+The accepted EU Audio fallback does not need to be repeated in this final smoke test unless captions are unavailable/unusable; it already passed live validation.
 
-`KRCC_a79ad701-d5a0-40ca-91f8-6fbdfc6c3bc6`
+On PASS create a dedicated owner-only acceptance record and set:
 
-This job was executed by the owner/operator using the Tester 1 credential.
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_OWNER_ONLY_COMPLETE`
 
-Final result:
+## CI state
 
-```text
-status=COMPLETED
-transcript_source=assemblyai_stt
-provider=assemblyai
-provider_model=universal-2
-provider_data_deleted=true
-detected_language=uk
-language_confidence=0.695
-duration_seconds=122.292
-stt_seconds_charged=123
-transcript_characters=1608
-segment_count=3
-error=null
-```
+The KRC package validator was synchronized with the current media-beta v0.4 contract and AssemblyAI EU privacy wording. GitHub Actions run #469 completed successfully after the synchronization.
 
-Quota:
+## Deferred items that do not block owner-only completion
 
-```text
-used before=422
-used after=545
-delta=123
-```
+- GPT public/link sharing and any appeal;
+- external Tester 1/2/3 rollout;
+- Free-plan compatibility;
+- public Store promotion;
+- sustainable public free-media Phase B/C work;
+- merge to production `main`.
 
-The quota delta equals `stt_seconds_charged` and `ceil(122.292)`.
-
-Current AssemblyAI documentation states that files submitted through its European servers are not used for model training. This routing/privacy gate is therefore accepted for the controlled beta. Re-verification remains required before future public promotion.
-
-## Backend routes
-
-Action-facing:
-```text
-POST /api/v1/media/client-transcriptions
-GET  /api/v1/media/client-transcriptions/{KRCC_job_id}
-GET  /api/v1/media/client-transcriptions/{KRCC_job_id}/segments
-```
-
-Browser-only:
-```text
-POST /api/v1/media/client-transcriptions/{KRCC_job_id}/captions
-POST /api/v1/media/client-transcriptions/{KRCC_job_id}/audio
-GET  /api/v1/media/client-transcriptions/{KRCC_job_id}/client-status
-```
-
-Browser-only routes remain intentionally absent from the GPT Action schema.
-
-## Next phase action
-
-Invite the actual external Tester 1 using the already designated Tester 1 code and Helper 0.2.2 onboarding package.
-
-Require at least:
-- one independent captions-first end-to-end flow performed by Tester 1 without owner intervention beyond onboarding;
-- one additional tester-selected video;
-- normal CriticProfile approval behavior;
-- failure report if any issue occurs.
-
-The separate owner-designated credential may be smoke-tested independently, but its lack of prior use does not invalidate the accepted technical workflow.
-
-Do not mark A7 COMPLETE until external tester evidence exists and rollout reliability/resource use is acceptable.
-
-## Release-hardening items after/alongside A7
-
-- orphan-provider cleanup strategy after hard process loss;
-- hosted/publicly stable privacy policy URL if required by sharing mode;
-- Free-plan/paid runtime compatibility tests before public promotion;
-- Free Postgres lifecycle/expiry management and future migration;
-- continued monitoring for recurrent STT text-quality artifacts.
-
-## Known beta limitations
+## Known private-beta limitations
 
 - YouTube browser caption interfaces may change;
-- direct timed-text may be empty even when captions exist;
-- transcript-panel fallback is part of the accepted browser path;
-- audio fallback requires normal-speed playback for timestamp alignment;
+- captions remain preferred before Audio fallback;
+- Audio fallback requires normal-speed playback for timestamp alignment;
+- AssemblyAI fallback quota is finite;
 - Free Postgres is temporary beta infrastructure;
-- hard process death can leave provider cleanup state unconfirmed;
-- AssemblyAI remains a finite-credit beta fallback and is not the intended mandatory sustainable public free dependency.
-
-Do not merge PR #8 or PR #28, modify the public GPT, add personal YouTube cookies, or introduce paid residential proxy ingress merely to continue the beta.
+- hard process death may leave provider cleanup unconfirmed.
