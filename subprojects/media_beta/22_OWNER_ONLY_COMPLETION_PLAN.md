@@ -1,89 +1,81 @@
 # MEDIA BETA Owner-Only Completion Plan
 
-Version: 1.0
-Status: IN_PROGRESS
+Version: 1.1
+Status: COMPLETE_BASELINE / SUPERSEDED_BY_A9
 Updated: 2026-08-20
 
 ## Decision
 
-The owner has paused investigation of GPT public/link sharing and paused the external Tester 1 rollout.
+The owner paused GPT public/link sharing investigation and external Tester 1/2/3 rollout. The active product target remains private owner-only use with GPT access set to `Only me`.
 
-The immediate project target is now a fully usable private owner-only MEDIA BETA product with ChatGPT access set to `Only me`.
+This plan originally defined completion around the browser-assisted Helper flow. That baseline has now passed and is recorded in:
 
-External sharing, appeal/review of the sharing restriction, independent tester rollout, Free-plan compatibility, and public Store promotion are outside the current completion boundary.
+`subprojects/media_beta/23_A8_OWNER_ONLY_BROWSER_ASSISTED_ACCEPTANCE.md`
 
-## Owner-only completion boundary
+The owner subsequently clarified that the final product target is zero-client media ingestion. Final product completion therefore moved to A9:
 
-The owner-only product is considered COMPLETE when all of the following are true:
+`subprojects/media_beta/24_A9_ZERO_CLIENT_INGESTION_PLAN.md`
 
-1. The separate `K-Research & Critic - MEDIA BETA` GPT exists as a created private GPT and remains accessible only to the owner.
-2. The GPT-facing Actions remain configured to the isolated MEDIA BETA Render backend.
-3. A post-create owner smoke test is completed through the private GPT itself, not only Builder Preview.
-4. That smoke test proves the normal private workflow:
+## A8 result
+
+Status: PASS / BASELINE COMPLETE.
+
+Accepted private owner path:
 
 ```text
 private GPT
  -> public YouTube URL
- -> valid owner-authorized beta credential
+ -> owner-designated beta credential
  -> KRCC job
  -> Helper 0.2.2
- -> captions-first when usable
- -> GPT status + complete segment retrieval
+ -> captions-first transcript
+ -> complete transcript retrieval
  -> DRAFT CriticProfile
- -> explicit owner approval
+ -> owner APPROVE
  -> independent Research
- -> Critic
- -> final output
+ -> Critic/revision
+ -> localized final report
 ```
 
-5. The accepted EU Audio fallback remains available for owner use when captions are unavailable/unusable:
+The accepted AssemblyAI Audio fallback remains routed through:
+
+`https://api.eu.assemblyai.com`
+
+The browser-assisted path remains a validated fallback/development baseline, but it is not the final normal UX.
+
+## Final owner-only product target
+
+The desired final flow is now:
 
 ```text
-AssemblyAI base URL=https://api.eu.assemblyai.com
-provider=assemblyai
-provider_model=universal-2
-normal completion requires provider_data_deleted=true
+media input in ChatGPT
+ -> zero-client ingestion
+ -> transcript
+ -> requested Research/Critic workflow
+ -> result in the same conversation
 ```
 
-6. CI for the active KRC feature branch is green after synchronization of the media-beta package and privacy contract.
+Approved input directions:
+- public media URLs through a platform-neutral `MediaSourceRouter`;
+- initial public URL adapters: YouTube, Instagram, Facebook, Telegram;
+- public sources only, with no user logins/cookies/sessions/tokens;
+- local video/audio upload as a separate `local_upload` ingress mode.
 
-## Credential note
+Private/auth-required media must return:
 
-Historical live acceptance was performed by the owner/operator using the credential designated for `Tester 1`.
+`UNSUPPORTED_PRIVATE_OR_AUTH_REQUIRED`
 
-For semantic cleanup of the owner-only product, the final private smoke test should preferably use the separately designated owner credential. This is a credential-attribution cleanup, not a prerequisite for the already accepted technical A4/A5/A6 results.
+## Deferred items
 
-No plaintext credential is to be stored in project documentation.
+The following remain outside the current completion boundary:
+- public/link GPT sharing and appeal work;
+- external tester rollout;
+- Free-plan compatibility;
+- public Store promotion;
+- merge of KRC PR #8 or VoiceBridge PR #28 into production `main`.
 
-## Not required for owner-only completion
+## Canonical transition state
 
-The following are explicitly deferred and do not block `OWNER_ONLY_COMPLETE`:
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_ZERO_CLIENT_MEDIA_ROUTER_PLANNED / A9_IMPLEMENTATION_NOT_STARTED`
 
-- `Anyone with the link` sharing;
-- GPT public sharing / Store publishing;
-- appeal or investigation of the current sharing restriction;
-- external Tester 1/2/3 onboarding;
-- Free-plan compatibility testing;
-- public-production promotion of the media feature;
-- merge of KRC PR #8 or VoiceBridge PR #28 into production `main`;
-- sustainable public free-media architecture Phase B/C work.
-
-## Residual operational hardening
-
-The following remain documented limitations for the private owner-only beta unless separately closed:
-
-- hard process loss during active AssemblyAI transcription can leave provider cleanup unconfirmed (`provider_data_deleted=null`);
-- Free Postgres is temporary beta infrastructure and may require lifecycle/migration work later;
-- AssemblyAI fallback quota is finite;
-- YouTube browser caption interfaces can change;
-- captions remain preferred and should be used before Audio fallback.
-
-These limitations do not prevent private owner operation because retry-safe failure, durable job state, durable quota accounting, EU provider routing, normal provider deletion, and captions-first zero-STT operation have already been live validated.
-
-## Final acceptance record
-
-After the post-create private GPT smoke test passes, create a dedicated owner-only acceptance record and set the canonical state to:
-
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_OWNER_ONLY_COMPLETE`
-
-Do not resume external sharing/tester rollout without a new explicit owner decision.
+Do not resume external sharing/tester rollout or production merge without a new explicit owner decision.
