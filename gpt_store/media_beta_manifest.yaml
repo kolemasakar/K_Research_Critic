@@ -26,8 +26,10 @@ knowledge:
   files: []
 
 instructions:
-  file: prompts/GPT_STORE_MEDIA_BETA_INSTRUCTIONS.md
+  file: prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md
+  canonical_reference: prompts/GPT_STORE_MEDIA_BETA_INSTRUCTIONS.md
   version: "0.4-beta"
+  builder_character_limit: 8000
 
 actions:
   media_transcript:
