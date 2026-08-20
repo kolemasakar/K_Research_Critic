@@ -1,9 +1,9 @@
 # MEDIA BETA Roadmap
 Дорожня карта реалізації закритого beta-медіарежиму та наступного сталого безкоштовного режиму.
 
-Version: 2.2
+Version: 2.3
 Status: ACTIVE
-Updated: 2026-08-18
+Updated: 2026-08-20
 
 ## Phase A - Closed MEDIA BETA
 
@@ -55,7 +55,7 @@ Dedicated service:
 
 ### A4. Live transcript validation
 
-Status: IN_PROGRESS_ACTIVE_AUDIO_RESTART_AND_TEXT_QUALITY
+Status: IN_PROGRESS_TEXT_QUALITY
 
 #### A4.1 Server-side YouTube ingress
 
@@ -125,7 +125,7 @@ Open quality item:
 
 #### A4.4 Restart durability
 
-Status: COMPLETE_EXCEPT_ACTIVE_AUDIO_PROCESS_REPLACEMENT
+Status: COMPLETE
 
 Accepted:
 - durable Postgres KRCC job state;
@@ -135,14 +135,22 @@ Accepted:
 - external `created_at` remains immutable through restart, rehydration and completion;
 - durable STT quota ledger enabled;
 - live restart restoration of a newly charged 57-second AssemblyAI job;
-- fresh post-restart job showed runtime quota `used_seconds=57`, `remaining_seconds=7143`.
+- fresh post-restart job showed runtime quota `used_seconds=57`, `remaining_seconds=7143`;
+- forced active-audio process loss during `TRANSCRIBING` produces deterministic terminal `FAILED`;
+- failure code is `MEDIA_CLIENT_INTERRUPTED_RETRY_REQUIRED` with `retryable=true`;
+- same durable Job ID remains readable after resume;
+- measured 250-second STT reservation was not duplicated after process replacement.
 
-Still pending:
-- process-replacement behavior during active audio upload/transcription.
+Accepted active-audio job:
+`KRCC_8da975c7-e338-4d02-8783-3b30d7071dce`
 
 Canonical records:
 - `subprojects/media_beta/12_A4_4_DURABILITY_ACCEPTANCE.md`;
-- `subprojects/media_beta/15_A4_QUOTA_LEDGER_RESTART_ACCEPTANCE.md`.
+- `subprojects/media_beta/15_A4_QUOTA_LEDGER_RESTART_ACCEPTANCE.md`;
+- `subprojects/media_beta/16_A4_ACTIVE_AUDIO_PROCESS_REPLACEMENT_ACCEPTANCE.md`.
+
+Residual release-hardening note:
+- after a hard process death, `provider_data_deleted` can remain null because the killed runtime cannot record provider cleanup; orphan-provider cleanup is tracked separately and does not reopen the retry-safety acceptance.
 
 #### A4.5 Guard matrix
 
@@ -180,8 +188,7 @@ Canonical acceptance:
 #### Remaining A4 work
 
 Pending before A4 exit:
-- audio fallback behavior if process replacement occurs during active upload/transcription;
-- STT replacement-character investigation.
+- STT replacement-character (`U+FFFD`) investigation and disposition.
 
 Already accepted and no longer pending:
 - Ukrainian, Russian, English and Italian/AUTO caption cases;
@@ -192,10 +199,11 @@ Already accepted and no longer pending:
 - source mismatch rejection;
 - concurrency rejection;
 - daily STT quota exhaustion simulation;
-- provider cleanup verification;
+- provider cleanup verification for normal AssemblyAI completion;
 - waiting/completed restart durability and `created_at` continuity;
 - durable quota-ledger restart restoration after a real STT charge;
-- large-caption-payload durable persistence boundary.
+- large-caption-payload durable persistence boundary;
+- active-audio forced process-loss retry-safe behavior.
 
 A4 exit criteria:
 - captions-first real browser jobs are usable across required language/source cases;
@@ -203,12 +211,13 @@ A4 exit criteria:
 - language/source metadata is usable;
 - quota accounting matches selected path and survives required restart checks;
 - active-audio process replacement has deterministic retry-safe behavior;
-- provider cleanup is verified where AssemblyAI is used;
+- provider cleanup is verified where normal AssemblyAI completion occurs;
+- STT replacement-character anomaly is investigated and dispositioned;
 - no beta/developer secret appears in reports/checkpoints/loggable payloads.
 
 ### A5. Separate GPT Builder beta
 
-Status: BLOCKED_BY_REMAINING_A4_EDGE_CASES
+Status: BLOCKED_BY_REMAINING_A4_TEXT_QUALITY
 
 After A4 acceptance:
 - create `K-Research & Critic - MEDIA BETA` separately from public GPT;
