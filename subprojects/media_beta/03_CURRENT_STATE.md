@@ -2,7 +2,7 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 3.1
+Version: 3.2
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-20
 
@@ -10,11 +10,11 @@ Checkpoint date: 2026-08-20
 
 Current phase state:
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_READY`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_IN_PROGRESS_PRIVACY_GATE`
 
 Accepted phase markers:
 
-`A4_CAPTIONS_FIRST_PASS / A4_AUDIO_FALLBACK_PASS / A4_GUARD_MATRIX_PASS / A4_LANGUAGE_SOURCE_MATRIX_PASS / A4_RESTART_DURABILITY_PASS / A4_DURABLE_QUOTA_LEDGER_RESTART_PASS / A4_ACTIVE_AUDIO_RETRY_SAFE_FAILURE_PASS / A4_STT_TEXT_QUALITY_DISPOSITION_PASS / A5_GPT_BUILDER_CONFIGURATION_PASS / A5_BUILDER_ACTION_START_PASS / A5_BUILDER_CAPTIONS_FIRST_PROFILE_GATE_PASS / A6_OWNER_E2E_RESEARCH_CRITIC_FINALIZATION_PASS`
+`A4_CAPTIONS_FIRST_PASS / A4_AUDIO_FALLBACK_PASS / A4_GUARD_MATRIX_PASS / A4_LANGUAGE_SOURCE_MATRIX_PASS / A4_RESTART_DURABILITY_PASS / A4_DURABLE_QUOTA_LEDGER_RESTART_PASS / A4_ACTIVE_AUDIO_RETRY_SAFE_FAILURE_PASS / A4_STT_TEXT_QUALITY_DISPOSITION_PASS / A5_GPT_BUILDER_CONFIGURATION_PASS / A5_BUILDER_ACTION_START_PASS / A5_BUILDER_CAPTIONS_FIRST_PROFILE_GATE_PASS / A6_OWNER_E2E_RESEARCH_CRITIC_FINALIZATION_PASS / A7_CAPTIONS_FIRST_TESTER_ROLLOUT_READY`
 
 The approved MEDIA BETA architecture remains captions-first browser-assisted YouTube ingestion. Direct Render/datacenter YouTube acquisition remains unsuitable because of YouTube anti-bot enforcement. Browser audio plus AssemblyAI is fallback only when usable captions are unavailable.
 
@@ -190,6 +190,38 @@ Canonical acceptance:
 
 The acceptance record intentionally does not persist the full transcript, tester beta code, or complete final report text.
 
+## A7 - Controlled tester rollout
+
+Status: IN_PROGRESS_PRIVACY_GATE.
+
+Canonical rollout record:
+`subprojects/media_beta/19_A7_CONTROLLED_TESTER_ROLLOUT.md`
+
+Current split:
+- captions-first: READY for controlled external tester use;
+- Audio fallback: BLOCKED for external testers pending AssemblyAI EU/no-training deployment and live validation.
+
+Provider privacy finding from current AssemblyAI documentation:
+- paid customers can opt out of model-improvement data sharing through Data Controls;
+- free users cannot opt out;
+- files submitted through AssemblyAI European servers are not used for model training;
+- Async STT supports `https://api.eu.assemblyai.com`.
+
+VoiceBridge beta-branch remediation now implemented in code/config but not yet live-accepted:
+- `src/cloud/src/media_client_ingest.ts` reads `KRC_MEDIA_ASSEMBLYAI_BASE_URL` and retains `https://api.assemblyai.com` as default when unset;
+- `render.media-beta.yaml` sets `KRC_MEDIA_ASSEMBLYAI_BASE_URL=https://api.eu.assemblyai.com` for the isolated beta service;
+- a contract test was added for endpoint override wiring;
+- production VoiceBridge/main are unchanged.
+
+Required next acceptance:
+- confirm the isolated Render beta runtime has the EU environment variable;
+- deploy the current beta branch;
+- run one new browser Audio fallback job;
+- require `COMPLETED / provider=assemblyai / provider_model=universal-2`;
+- verify expected measured STT charge and `provider_data_deleted=true` on normal completion;
+- verify production VoiceBridge remains unchanged;
+- then mark external tester Audio fallback READY.
+
 ## Backend routes
 
 Action-facing:
@@ -208,24 +240,18 @@ GET  /api/v1/media/client-transcriptions/{KRCC_job_id}/client-status
 
 Browser-only routes remain intentionally absent from the GPT Action schema.
 
-## Next phase
+## Next phase action
 
-A7 - Controlled tester rollout.
+Complete the A7 AssemblyAI EU/no-training live gate before giving external testers access to Audio fallback.
 
-Status:
-`READY`
-
-Next block:
-- preserve owner-only beta until rollout checklist is ready;
-- prepare up to three additional tester codes;
-- define tester onboarding instructions and failure-report format;
-- verify provider privacy/no-training gate before broader exposure of the AssemblyAI fallback;
-- monitor Render health/bandwidth, captions-vs-STT ratio, STT usage, failure rate, cleanup state, and Postgres lifecycle;
-- keep public GPT and production VoiceBridge unchanged.
+After EU fallback PASS:
+- invite Tester 1 with a unique tester code;
+- require at least one independent captions-first end-to-end flow without owner intervention beyond onboarding;
+- collect failure report if any;
+- expand to Tester 2/3 only after acceptable reliability/resource observations.
 
 ## Release-hardening items after/alongside A7
 
-- AssemblyAI privacy/no-training verification;
 - orphan-provider cleanup strategy after hard process loss;
 - hosted/publicly stable privacy policy URL if required by sharing mode;
 - Free-plan/paid runtime compatibility tests before public promotion;
