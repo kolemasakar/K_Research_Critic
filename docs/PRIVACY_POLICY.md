@@ -1,8 +1,8 @@
 # PRIVACY_POLICY
 Політика конфіденційності додаткового режиму обробки відеопосилань у K-Research & Critic.
 
-Version: 0.5
-Status: CLOSED BETA / A5 CONFIGURATION / RELEASE GATE
+Version: 0.6
+Status: CLOSED BETA / A7 CONTROLLED TESTER ROLLOUT
 Effective candidate date: 2026-08-20
 
 ## 1. Scope
@@ -30,7 +30,7 @@ public YouTube URL
     -> helper captures audio from the same active YouTube tab
     -> helper uploads captured audio to isolated VoiceBridge MEDIA BETA
     -> VoiceBridge normalizes audio for speech transcription
-    -> AssemblyAI async transcription
+    -> AssemblyAI EU async transcription through https://api.eu.assemblyai.com
  -> timestamped transcript returned to K-Research & Critic
 ```
 
@@ -71,9 +71,12 @@ The current beta path uses:
 - the isolated VoiceBridge MEDIA BETA service as the media-ingestion adapter;
 - isolated Postgres storage for durable media-job state and STT charge accounting;
 - YouTube as the public source and caption source viewed by the tester in their browser;
-- AssemblyAI Universal-2 only when browser captions are unavailable/unusable and audio fallback is invoked.
+- AssemblyAI Universal-2 only when browser captions are unavailable/unusable and audio fallback is invoked;
+- the AssemblyAI European Async STT endpoint `https://api.eu.assemblyai.com` for the accepted closed-beta Audio fallback path.
 
-Third-party processing is also subject to applicable provider privacy, security, and data-processing terms.
+Current AssemblyAI documentation states that files submitted through its European servers are not used for model training. The isolated MEDIA BETA EU routing was live-validated on 2026-08-20 before enabling external-tester Audio fallback.
+
+Third-party processing remains subject to applicable provider privacy, security, data-processing, and service terms. Provider terms/configuration must be re-checked before any future public production promotion.
 
 ## 6. Data Minimization
 
@@ -89,7 +92,8 @@ When captions are usable:
 When audio fallback is required:
 - the helper captures audio only, not video frames;
 - the helper records Opus audio at approximately 32 kbps and uploads only after the tester stops capture;
-- VoiceBridge normalizes the uploaded audio to speech-oriented mono 16 kHz audio at approximately 32 kbps for provider transcription.
+- VoiceBridge normalizes the uploaded audio to speech-oriented mono 16 kHz audio at approximately 32 kbps for provider transcription;
+- the accepted closed-beta provider request is routed through the AssemblyAI EU endpoint.
 
 The helper validates that the active tab is YouTube. The backend checks that the active-tab source identifies the same YouTube video as the KRCC job before accepting captions or audio.
 
@@ -127,6 +131,8 @@ The media job exposes `provider_data_deleted` so the service can distinguish suc
 
 For `transcript_source=youtube_captions`, `provider_data_deleted=null` is normal because no AssemblyAI transcript was created.
 
+The accepted A7 EU Audio fallback live job completed with `provider_data_deleted=true`.
+
 A hard beta process loss while AssemblyAI transcription is active can leave `provider_data_deleted=null` because the killed process cannot complete or record the provider-delete request. The durable KRCC job then returns `MEDIA_CLIENT_INTERRUPTED_RETRY_REQUIRED` and must not be resumed. Provider-side orphan cleanup after such hard process loss remains a separate release-hardening item.
 
 If AssemblyAI provider deletion fails or cannot be confirmed, provider-side retention is governed by AssemblyAI's then-current data-retention policy. K-Research & Critic must not claim third-party deletion succeeded when `provider_data_deleted` is not true.
@@ -146,13 +152,17 @@ The current closed beta intentionally limits shared external-resource use:
 
 These are beta safety controls and may change only through an explicit project decision.
 
-## 10. Model-Training Release Gate
+## 10. Model-Training Gate
 
-Before public production rollout of any AssemblyAI-backed fallback path, the AssemblyAI project used by this feature must be verified as opted out of provider model training or otherwise configured under terms that prohibit training on submitted media.
+For the current controlled beta, the AssemblyAI-backed fallback path is configured to the provider's European Async STT endpoint:
 
-A successful captions-only path does not remove this gate while AssemblyAI remains an available production fallback.
+`https://api.eu.assemblyai.com`
 
-Until that configuration is verified, this document and the media feature remain RELEASE GATE and must not be represented as a completed public privacy configuration.
+Current AssemblyAI documentation states that files submitted through its European servers are not used for model training.
+
+The isolated MEDIA BETA EU routing was live-validated on 2026-08-20 with a normal completed Audio fallback job, measured quota accounting, and provider deletion confirmation. This closes the A7 provider-routing/model-training gate for controlled external beta testing.
+
+This is not a permanent public-release waiver. Before any future public production rollout, the provider's then-current terms, endpoint behavior, retention, data-use rules, account configuration, and applicable privacy requirements must be verified again.
 
 ## 11. User Responsibilities
 
@@ -176,7 +186,7 @@ Personal YouTube account cookies are not part of the approved beta architecture.
 
 ## 13. Changes
 
-Material changes to media processors, browser-helper behavior, retention, supported source types, access controls, or data use require a policy update and new release validation before public rollout.
+Material changes to media processors, browser-helper behavior, retention, supported source types, access controls, data residency, or data use require a policy update and new release validation before public rollout.
 
 ## 14. Contact
 
