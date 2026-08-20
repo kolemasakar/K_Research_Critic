@@ -1,12 +1,12 @@
 # MEDIA BETA Roadmap
 
-Roadmap for the closed MEDIA BETA and later optional public/sustainable media work.
+Roadmap for the private MEDIA BETA and later optional public/sustainable media work.
 
-Version: 2.9
+Version: 3.0
 Status: ACTIVE
 Updated: 2026-08-20
 
-## Phase A - Closed MEDIA BETA
+## Phase A - Private MEDIA BETA
 
 ### A1. Architecture and isolation
 
@@ -24,7 +24,7 @@ Delivered:
 
 Status: COMPLETE_IN_CODE_AND_PRIMARY_LIVE_GUARDS
 
-Accepted controls:
+Accepted controls include:
 - max source/capture duration 60 min;
 - concurrency 1;
 - AssemblyAI fallback budget 7200 sec per UTC day;
@@ -33,8 +33,8 @@ Accepted controls:
 - mono 16 kHz speech normalization at about 32 kbps;
 - provider delete request on normal AssemblyAI completion;
 - access-code guard;
-- durable Postgres job state and STT quota ledger;
-- negative-path guards for invalid code, wrong source, >60 min, concurrency, and quota exhaustion.
+- durable Postgres job state and STT quota ledger for the accepted KRCC path;
+- negative-path guards for invalid code, wrong source, duration, concurrency, and quota exhaustion.
 
 ### A3. Dedicated Render beta deployment
 
@@ -49,21 +49,20 @@ Dedicated service:
 
 Status: COMPLETE
 
-Accepted:
-- captions-first browser-assisted ingestion;
-- UK/RU/EN/AUTO language/source cases;
-- zero STT charge for captions;
-- Audio fallback through AssemblyAI Universal-2;
-- duration/quota accounting;
+Accepted browser-assisted intake:
+- captions-first UK/RU/EN/AUTO cases;
+- captions STT charge 0;
+- AssemblyAI Universal-2 Audio fallback;
+- AssemblyAI EU endpoint acceptance;
+- exact duration/quota accounting;
 - provider cleanup on normal completion;
-- Action status/segment readback;
-- durable restart/resume behavior;
-- durable quota-ledger restoration;
+- status/segment readback;
+- durable restart/resume and quota-ledger restoration;
 - forced active-audio process loss -> retry-safe deterministic failure;
 - no duplicate STT charge after process replacement;
 - U+FFFD anomaly dispositioned as non-reproducible/non-blocking.
 
-Canonical records: `10_...` through `17_...` in this directory.
+Canonical records: `10_...` through `17_...` plus `20_A7_EU_AUDIO_PRIVACY_GATE_ACCEPTANCE.md`.
 
 ### A5. Separate GPT Builder beta
 
@@ -71,75 +70,118 @@ Status: COMPLETE
 
 Accepted:
 - separate `K-Research & Critic - MEDIA BETA` GPT;
-- Builder-safe instructions under the 8000-character limit;
+- Builder-safe instructions below the 8000-character limit;
 - web search enabled;
-- image generation disabled;
-- code interpreter/data analysis enabled;
 - API Key/Bearer Action auth;
 - isolated beta Action server;
-- privacy policy URL configured;
-- all three GPT-facing operations recognized and manually tested;
-- manual transcript pagination 227/227 segments confirmed;
-- Builder-created KRCC job interoperates with Helper 0.2.2;
-- CriticProfile approval gate blocks independent research before approval.
-
-Canonical acceptance: `18_A5_A6_GPT_BUILDER_E2E_ACCEPTANCE.md`.
+- privacy policy configured;
+- three GPT-facing operations manually tested;
+- transcript pagination confirmed;
+- CriticProfile approval gate enforced;
+- Ukrainian default response language;
+- localized report headings and verdict labels;
+- exactly one verdict per material claim.
 
 ### A6. Owner/operator end-to-end acceptance
 
 Status: COMPLETE
 
-Accepted owner-operated flow:
-
-```text
-YouTube URL
- -> valid allowlisted credential
- -> Builder Action
- -> Helper captions-first completion
- -> GPT status/segments
- -> DRAFT CriticProfile
- -> owner APPROVE
- -> independent web research
- -> Critic/revision
- -> finalization
-```
-
-Historical live tests were performed by the owner/operator using the credential designated for Tester 1. This does not invalidate the technical acceptance. Canonical correction: `21_CREDENTIAL_ATTRIBUTION_CORRECTION.md`.
+The owner completed the full Research/Critic flow after transcript intake and explicit CriticProfile approval.
 
 ### A7. Controlled external tester rollout
 
 Status: PAUSED_BY_OWNER
 
-Previously accepted readiness gates remain valid:
-- captions-first READY;
-- Helper 0.2.2 onboarding READY;
-- AssemblyAI Audio fallback routed through `https://api.eu.assemblyai.com`;
-- EU Audio fallback live acceptance PASS;
-- normal provider deletion and exact STT quota accounting confirmed.
+Previously accepted readiness evidence remains valid, but external Tester 1/2/3 onboarding, GPT sharing/publication investigation, and appeal work are paused by owner decision.
 
-External Tester 1/2/3 onboarding, GPT link sharing, public sharing restriction investigation, and appeal work are paused by explicit owner decision on 2026-08-20.
+### A8. Owner-only browser-assisted baseline
 
-A7 is not required for the current owner-only completion target.
+Status: COMPLETE / BASELINE ACCEPTED
 
-### A8. Owner-only product finalization
+Accepted private owner path:
 
-Status: IN_PROGRESS
+```text
+private GPT
+ -> public YouTube URL
+ -> owner-designated credential
+ -> KRCC job
+ -> Helper 0.2.2
+ -> captions-first transcript
+ -> DRAFT CriticProfile
+ -> owner APPROVE
+ -> Research/Critic
+ -> localized final report
+```
 
-Target state: private `K-Research & Critic - MEDIA BETA` usable only by the owner.
+Canonical acceptance:
+`23_A8_OWNER_ONLY_BROWSER_ASSISTED_ACCEPTANCE.md`.
 
-Required before `OWNER_ONLY_COMPLETE`:
-- GPT remains `Only me`;
-- one post-create end-to-end smoke test through the actual private GPT (not only Builder Preview);
-- preferably use the separately designated owner credential for semantic cleanup;
-- verify KRCC creation, Helper 0.2.2, captions-first completion, complete transcript retrieval, CriticProfile gate, owner approval, Research/Critic, and final output;
-- keep the accepted EU Audio fallback available for captions-unavailable cases;
-- active KRC feature-branch CI remains green.
+A8 proves the current product works end-to-end, but Helper is not part of the final desired normal UX.
 
-Canonical plan: `22_OWNER_ONLY_COMPLETION_PLAN.md`.
+### A9. Zero-client MediaSourceRouter
 
-On PASS create owner-only acceptance and set:
+Status: PLANNED / IMPLEMENTATION_NOT_STARTED
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_OWNER_ONLY_COMPLETE`
+Canonical plan:
+`24_A9_ZERO_CLIENT_INGESTION_PLAN.md`.
+
+Final target:
+
+```text
+media input in ChatGPT
+ -> MediaSourceRouter
+ -> zero-client transcript acquisition
+ -> requested analysis workflow
+ -> result in the same conversation
+```
+
+Approved ingress directions:
+- public media URL adapters;
+- `local_upload` for local video/audio.
+
+Initial public URL adapters:
+1. YouTube public videos;
+2. Instagram public Reels/posts containing video;
+3. Facebook public Video/Reels;
+4. Telegram public posts containing video.
+
+Access boundary:
+- public sources only;
+- no user logins, passwords, cookies, authenticated browser sessions, account tokens, or imported session state;
+- auth/private content returns `UNSUPPORTED_PRIVATE_OR_AUTH_REQUIRED`.
+
+Approved local-upload direction:
+- local video/audio attachment;
+- inspect embedded subtitles/text first where available;
+- otherwise extract/normalize audio and use the accepted EU STT path;
+- temporary source media deleted after processing;
+- attachment-to-Action/backend transport still requires technical feasibility validation.
+
+#### A9.0 Architecture audit
+
+Status: COMPLETE
+
+VoiceBridge already contains a legacy server-side `KRCB_` path using yt-dlp, captions-first logic, audio fallback, ffmpeg, and paginated transcript readback.
+
+Known blockers before final zero-client acceptance:
+- server-side legacy AssemblyAI path must use the accepted configurable EU endpoint;
+- `KRCB_` job/quota state is in-memory and must converge on durable persistence;
+- current GPT Action exposes the client-assisted KRCC path;
+- each public platform adapter requires its own live positive and auth/private negative acceptance.
+
+#### A9.2a Server-side YouTube reachability probe
+
+Status: PARTIAL_PASS / REACHABILITY_CONFIRMED
+
+Probe job:
+`KRCB_252bb38a-aba7-4e2e-8148-b31d55974161`
+
+The isolated Render service reached the YouTube extractor and returned a source-specific yt-dlp error:
+`This live stream recording is not available.`
+
+No bot/login, HTTP 403, HTTP 429, or PO-token failure was returned. STT charge remained zero.
+
+This confirms server-side YouTube extractor reachability for that probe, but does not yet accept prerecorded metadata, captions-first extraction, audio fallback, durability, or GPT integration.
 
 ## Phase B - Sustainable Free Media
 
@@ -149,16 +191,18 @@ Potential future work:
 - caption-path hardening;
 - Cloudflare Whisper proof of concept;
 - provider-neutral transcript router;
-- local Media Node / residential ingress proof of concept;
-- remove permanent AssemblyAI dependency from any future public free path.
-
-None of Phase B blocks owner-only completion.
+- owner-controlled local media processing where practical;
+- remove permanent dependence on exhaustible paid STT credits from any future public free path.
 
 ## Phase C - Public media release
 
 Status: PAUSED / FUTURE
 
 Would require a new explicit owner decision plus sharing/publication resolution, sustainable resource architecture, privacy re-validation, runtime-plan compatibility, stable public privacy-policy delivery, production smoke tests, and explicit promotion approval.
+
+## Current transition marker
+
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_ZERO_CLIENT_MEDIA_ROUTER_PLANNED / A9_IMPLEMENTATION_NOT_STARTED`
 
 ## Roadmap rule
 
