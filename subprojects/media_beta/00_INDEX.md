@@ -2,7 +2,7 @@
 
 Canonical documentation index for the closed and future sustainable-free media mode of K-Research & Critic.
 
-Version: 1.7
+Version: 1.8
 Status: ACTIVE
 Updated: 2026-08-20
 
@@ -28,7 +28,7 @@ The published text-only K-Research & Critic product remains a separate productio
 8. `07_FREE_MODE_TARGET.md` - post-beta sustainable free architecture options and target design.
 9. `08_CHAT_HANDOFF.md` - canonical recovery and cross-chat continuation document.
 10. `09_WORK_LOG.md` - chronological implementation evidence.
-11. `10_A4_2_CAPTIONS_ACCEPTANCE.md` - live captions-first owner acceptance and 227/227 GPT-facing pagination evidence.
+11. `10_A4_2_CAPTIONS_ACCEPTANCE.md` - live captions-first acceptance and 227/227 GPT-facing pagination evidence.
 12. `11_A4_3_AUDIO_FALLBACK_ACCEPTANCE.md` - live browser-audio/AssemblyAI fallback acceptance, duration accounting, and provider cleanup.
 13. `12_A4_4_DURABILITY_ACCEPTANCE.md` - durable Postgres restart/resume acceptance and immutable `created_at` continuity.
 14. `13_A4_5_GUARD_MATRIX_ACCEPTANCE.md` - negative-path guard matrix for access, source, duration, concurrency, and STT quota.
@@ -36,9 +36,10 @@ The published text-only K-Research & Critic product remains a separate productio
 16. `15_A4_QUOTA_LEDGER_RESTART_ACCEPTANCE.md` - real-STT-charge persistence and runtime quota restoration after isolated restart.
 17. `16_A4_ACTIVE_AUDIO_PROCESS_REPLACEMENT_ACCEPTANCE.md` - forced active-audio process loss, retry-safe failure, and no-duplicate-quota acceptance.
 18. `17_A4_STT_TEXT_QUALITY_DISPOSITION.md` - U+FFFD investigation and non-reproducible quality-anomaly disposition.
-19. `18_A5_A6_GPT_BUILDER_E2E_ACCEPTANCE.md` - separate GPT Builder configuration, captions-first CriticProfile gate, and first owner Research/Critic end-to-end acceptance.
+19. `18_A5_A6_GPT_BUILDER_E2E_ACCEPTANCE.md` - separate GPT Builder configuration, captions-first CriticProfile gate, and first owner-operated Research/Critic end-to-end acceptance.
 20. `19_A7_CONTROLLED_TESTER_ROLLOUT.md` - external tester onboarding, failure reporting, monitoring, and rollout rules.
 21. `20_A7_EU_AUDIO_PRIVACY_GATE_ACCEPTANCE.md` - isolated AssemblyAI EU Audio fallback deployment, live completion, quota, and provider-cleanup acceptance.
+22. `21_CREDENTIAL_ATTRIBUTION_CORRECTION.md` - canonical correction that prior owner-operated live tests used the credential designated for Tester 1, while the owner-designated credential remains separately untested.
 
 ## Source-of-truth order
 
@@ -55,7 +56,7 @@ A new chat must not infer completed work from roadmap items alone. Only `03_CURR
 
 `A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_READY_FOR_TESTER1`
 
-A4 live transcript validation, A5 separate GPT Builder beta, and the first owner A6 end-to-end Research/Critic flow are accepted. The A7 AssemblyAI EU/no-training Audio fallback gate is also accepted. The next block is the first independent external tester run.
+A4 live transcript validation, A5 separate GPT Builder beta, and the first owner-operated A6 end-to-end Research/Critic flow are accepted. Those prior live tests were performed by the owner/operator using the Tester 1 credential. The A7 AssemblyAI EU/no-training Audio fallback gate is accepted. The next block remains the first independent external Tester 1 run.
 
 ## Related repositories and branches
 
@@ -73,4 +74,4 @@ VoiceBridge backend dependency:
 
 ## Non-negotiable boundary
 
-Do not merge or publish the media feature merely because implementation or owner beta acceptance passes. Controlled tester rollout, runtime-plan compatibility, and explicit promotion approval remain separate gates.
+Do not merge or publish the media feature merely because implementation or owner/operator beta acceptance passes. Controlled tester rollout, runtime-plan compatibility, and explicit promotion approval remain separate gates.
