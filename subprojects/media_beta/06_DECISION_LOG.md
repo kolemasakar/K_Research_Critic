@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 Реєстр затверджених рішень щодо архітектури, beta-обмежень і майбутнього безкоштовного медіарежиму.
 
-Version: 1.3
+Version: 1.4
 Status: ACTIVE
 Updated: 2026-08-20
 
@@ -236,3 +236,65 @@ Approval is architectural only. The actual ChatGPT attachment-to-Action/backend 
 Reason:
 
 Local upload avoids source-platform anti-bot/authentication dependencies and provides a stable source path for media already available on the owner's device. Reusing the same MediaSourceRouter and normalized transcript contract prevents a separate analysis pipeline and keeps Research/Critic source-agnostic.
+
+## D019 - Managed transcript provider is the primary A9 YouTube ingress for owner beta
+
+Decision: APPROVED
+Approved: 2026-08-20
+
+Direct Render-to-YouTube acquisition for a normal prerecorded public video is treated as blocked by YouTube datacenter-IP anti-bot enforcement after the A9.2 live probe returned a bot/login challenge before metadata or captions.
+
+For the owner-only A9 beta, use a managed transcript provider abstraction instead of continuing blind yt-dlp player-client permutations as the primary strategy.
+
+Primary initial provider:
+
+`Supadata`
+
+Initial provider mode:
+
+`native`
+
+The provider is an implementation detail behind the MediaSourceRouter/managed transcript contract. The architecture must permit later provider replacement or fallback without changing the Research/Critic workflow.
+
+Live acceptance on `https://www.youtube.com/watch?v=IzYyKRx7Qwg` completed with 277 timestamped segments and detected language `ru`.
+
+Reason:
+
+This path achieved the required zero-client public YouTube transcript acquisition from the isolated backend without browser Helper, YouTube cookies, login/session state, or owner-managed residential proxy infrastructure.
+
+## D020 - Managed provider credits require explicit user consent
+
+Decision: APPROVED
+Approved: 2026-08-20
+
+A managed provider operation that may consume credits must not start automatically after the user pastes a media URL.
+
+Required preflight UX:
+- show current available credits;
+- show estimated credit cost for the proposed operation;
+- show estimated remaining balance;
+- ask for explicit user choice `1 = approve`, `2 = reject`;
+- perform no billable transcript operation before approval.
+
+For Supadata native mode the backend hard limit is:
+
+`credit_consent.max_credits = 1`
+
+If native captions/transcript are unavailable, the system must stop at `AWAITING_AI_CONSENT`. It must not automatically transition to a higher-cost AI-generated transcript.
+
+Any managed AI fallback requires a new cost estimate and a second explicit user approval.
+
+Live acceptance:
+
+```text
+plan: Free (100/mo)
+balance before: 100
+approved native cap: 1
+credits charged: 1
+balance after: 99
+AI fallback authorized: false
+```
+
+Reason:
+
+Provider credits are a scarce shared beta resource. Explicit per-operation consent makes the cost visible to the user, prevents accidental fallback spend, and gives the backend a machine-enforceable maximum charge boundary.
