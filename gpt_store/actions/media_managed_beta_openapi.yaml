@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: K-Research & Critic Managed Media Beta API
-  version: 0.2.0-a9.5
+  version: 0.2.1-a9.5
   description: >-
     Owner-only zero-client managed transcript beta. The GPT must call credit
     preflight first, show the user the available credits, estimated cost and
@@ -42,11 +42,10 @@ paths:
       operationId: startManagedMediaNativeTranscription
       summary: Spend at most one approved credit on a native managed transcript
       description: >-
-        Call only after preflight and after the user explicitly replies 1 to
-        approve the displayed native transcript cost. The backend rejects the
-        request unless credit_consent authorizes exactly one Supadata native
-        credit. If native captions are unavailable, the job stops at
-        AWAITING_AI_CONSENT; AI generation is never started automatically.
+        Call only after a successful credit preflight and the user's explicit
+        approval. The request is capped at one Supadata native credit. If native
+        captions are unavailable, return AWAITING_AI_CONSENT. Never start AI
+        transcription automatically.
       x-openai-isConsequential: true
       requestBody:
         required: true
