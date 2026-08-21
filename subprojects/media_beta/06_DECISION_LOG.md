@@ -1,9 +1,9 @@
 # MEDIA BETA Decision Log
 Реєстр затверджених рішень щодо архітектури, beta-обмежень і майбутнього безкоштовного медіарежиму.
 
-Version: 1.4
+Version: 1.5
 Status: ACTIVE
-Updated: 2026-08-20
+Updated: 2026-08-21
 
 ## D001 - Media input is additive
 
@@ -298,3 +298,45 @@ AI fallback authorized: false
 Reason:
 
 Provider credits are a scarce shared beta resource. Explicit per-operation consent makes the cost visible to the user, prevents accidental fallback spend, and gives the backend a machine-enforceable maximum charge boundary.
+
+## D021 - Managed media jobs are durable and duplicate starts are credit-safe
+
+Decision: APPROVED / LIVE_ACCEPTED
+Accepted: 2026-08-21
+
+The owner-only managed zero-client path must persist `KRCM_` job state and timestamped segments in Postgres and must preserve idempotency across runtime replacement.
+
+Required invariants:
+- a completed managed job remains readable after backend restart/process replacement;
+- timestamped transcript segments remain readable after restart;
+- the managed request key identifies an already completed request across processes;
+- a duplicate start returns the existing durable job instead of starting another provider request;
+- an interrupted/uncertain in-flight provider request must never be automatically replayed when its credit outcome is uncertain;
+- provider credit consumption remains bounded by the explicit user-approved operation cap.
+
+Final live acceptance used one approved Supadata native request and then deliberately replaced the runtime provider key with an invalid value before restart and duplicate replay.
+
+Accepted evidence:
+
+```text
+live_code: 7736f2e7acc5abbb3415e3753d0ca022c1b8d7b2
+job_id: KRCM_6f359971-b061-4db8-b4a2-9f6422f351b6
+status: COMPLETED
+detected_language: ru
+segment_count: 277
+credits_charged: 1
+provider_balance_before: 99
+provider_balance_after: 98
+durable_read_before_restart: PASS
+durable_read_after_restart: PASS
+duplicate_reuse_with_invalid_provider_key: PASS
+valid_provider_key_restore: PASS
+```
+
+Because the duplicate request succeeded while the provider key was intentionally invalid, the duplicate path demonstrably reused the stored completed job rather than making a second valid provider request.
+
+The accepted implementation also hardens `psql` result parsing so durable reservation reads select the actual seven-field `RETURNING` row rather than assuming the final stdout line is data.
+
+Reason:
+
+Zero-client GPT integration is not safe if a backend restart can lose the transcript or cause an automatic duplicate paid provider call. Durable state plus restart-safe idempotency closes that cost and reliability risk before the private GPT is switched to the managed path.
