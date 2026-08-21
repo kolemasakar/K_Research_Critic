@@ -28,7 +28,7 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert manifest["release"]["a9_5_private_gpt_integration_complete"] is False
 
 
-def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gate() -> None:
+def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates() -> None:
     schema = yaml.safe_load(
         (ROOT / "gpt_store" / "actions" / "media_managed_beta_openapi.yaml").read_text(
             encoding="utf-8"
@@ -41,6 +41,8 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gate()
         "/api/v1/media/managed/transcriptions",
         "/api/v1/media/managed/transcriptions/{job_id}",
         "/api/v1/media/managed/transcriptions/{job_id}/segments",
+        "/api/v1/media/managed/transcriptions/{job_id}/ai-preflight",
+        "/api/v1/media/managed/transcriptions/{job_id}/ai",
     }
     assert paths["/api/v1/media/managed/preflight"]["post"]["operationId"] == (
         "preflightManagedMediaCredits"
@@ -48,6 +50,16 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gate()
     start = paths["/api/v1/media/managed/transcriptions"]["post"]
     assert start["operationId"] == "startManagedMediaNativeTranscription"
     assert start["x-openai-isConsequential"] is True
+
+    ai_preflight = paths[
+        "/api/v1/media/managed/transcriptions/{job_id}/ai-preflight"
+    ]["get"]
+    assert ai_preflight["operationId"] == "preflightManagedMediaAiCredits"
+    assert ai_preflight["x-openai-isConsequential"] is False
+
+    ai_start = paths["/api/v1/media/managed/transcriptions/{job_id}/ai"]["post"]
+    assert ai_start["operationId"] == "startManagedMediaAiTranscription"
+    assert ai_start["x-openai-isConsequential"] is True
 
     preflight = schema["components"]["schemas"]["PreflightRequest"]
     assert preflight["required"] == ["url"]
@@ -58,10 +70,30 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gate()
     assert "allOf" not in native
     assert set(native["required"]) == {"url", "credit_consent"}
     assert "beta_access_code" not in native["properties"]
-    consent = native["properties"]["credit_consent"]["properties"]
-    assert consent["provider"]["const"] == "supadata"
-    assert consent["mode"]["const"] == "native"
-    assert consent["max_credits"]["maximum"] == 1
+    native_consent = native["properties"]["credit_consent"]["properties"]
+    assert native_consent["provider"]["const"] == "supadata"
+    assert native_consent["mode"]["const"] == "native"
+    assert native_consent["max_credits"]["const"] == 1
+
+    ai_request = schema["components"]["schemas"]["AiTranscriptRequest"]
+    assert ai_request["type"] == "object"
+    assert "allOf" not in ai_request
+    assert ai_request["required"] == ["credit_consent"]
+    assert "beta_access_code" not in ai_request["properties"]
+    ai_consent = ai_request["properties"]["credit_consent"]["properties"]
+    assert ai_consent["provider"]["const"] == "supadata"
+    assert ai_consent["mode"]["const"] == "generate"
+    assert ai_consent["max_credits"]["const"] == 40
+
+    ai_quote = schema["components"]["schemas"]["AiCreditPreflight"]["properties"]
+    assert ai_quote["estimated_credits"]["const"] == 40
+    assert ai_quote["maximum_credits"]["const"] == 40
+    assert ai_quote["credits_per_minute"]["const"] == 2
+    assert ai_quote["maximum_duration_minutes"]["const"] == 20
+    assert ai_quote["conservative_maximum"]["const"] is True
+
+    job = schema["components"]["schemas"]["ManagedJob"]["properties"]
+    assert set(job["provider_mode"]["enum"]) == {"native", "generate"}
 
 
 def test_private_builder_instructions_fit_limit_and_forbid_legacy_normal_flow() -> None:
@@ -72,7 +104,10 @@ def test_private_builder_instructions_fit_limit_and_forbid_legacy_normal_flow() 
     assert len(text) <= 8000
     assert "preflightManagedMediaCredits" in text
     assert "startManagedMediaNativeTranscription" in text
-    assert "getManagedMediaTranscriptSegments" in text
+    assert "preflightManagedMediaAiCredits" in text
+    assert "startManagedMediaAiTranscription" in text
+    assert "mode=generate, max_credits=40" in text
+    assert "DO NOT reuse native `1`" in text
     assert "Do NOT ask the user for beta access code" in text
     assert "Do not expose `KRCM_...` Job IDs" in text
     assert "Do not fall back to Helper in the normal owner flow" in text
