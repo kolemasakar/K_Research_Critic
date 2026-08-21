@@ -2,99 +2,103 @@
 
 Canonical documentation index for K-Research & Critic media-input work.
 
-Version: 2.0
+Version: 2.1
 Status: ACTIVE
-Updated: 2026-08-20
+Updated: 2026-08-21
 
 ## Purpose
 
-This directory is the self-contained documentation root for the MEDIA BETA and future zero-client media ingestion work.
+This directory is the self-contained documentation root for MEDIA BETA and the owner-only zero-client media ingestion work.
 
 It covers:
-- the accepted private browser-assisted baseline;
-- the planned zero-client `MediaSourceRouter`;
-- public media URL adapters;
-- local video/audio upload direction;
+- accepted browser-assisted A8 baseline;
+- zero-client A9 managed ingestion;
+- credit consent and durable managed jobs;
+- private GPT Action integration;
+- future public platform adapters and local upload;
 - later sustainable/free media architecture.
 
 The published text-only K-Research & Critic product remains a separate production baseline and must not be changed implicitly by this subproject.
 
 ## Canonical reading order
 
-1. `README.md` - scope, goals, boundaries, and quick orientation.
-2. `01_ARCHITECTURE.md` - system components, data flow, trust boundaries, and production isolation.
+1. `README.md` - scope and orientation.
+2. `01_ARCHITECTURE.md` - components, data flow, trust boundaries and isolation.
 3. `02_ROADMAP.md` - phased implementation and release gates.
-4. `03_CURRENT_STATE.md` - exact implementation state at the latest checkpoint.
-5. `04_OPERATIONS_RUNBOOK.md` - Render, secrets, GPT Builder, deployment, rollback, and operational procedures.
-6. `05_TEST_PLAN.md` - automated and live acceptance tests.
-7. `06_DECISION_LOG.md` - approved architecture and product decisions.
-8. `07_FREE_MODE_TARGET.md` - post-beta sustainable free architecture options and target design.
-9. `08_CHAT_HANDOFF.md` - canonical recovery and cross-chat continuation document.
+4. `03_CURRENT_STATE.md` - exact latest implementation checkpoint.
+5. `04_OPERATIONS_RUNBOOK.md` - deployment and operational procedures.
+6. `05_TEST_PLAN.md` - automated/live acceptance plan.
+7. `06_DECISION_LOG.md` - approved architecture/product decisions.
+8. `07_FREE_MODE_TARGET.md` - later sustainable/free architecture direction.
+9. `08_CHAT_HANDOFF.md` - recovery/cross-chat continuation.
 10. `09_WORK_LOG.md` - chronological implementation evidence.
-11. `10_A4_2_CAPTIONS_ACCEPTANCE.md` - live captions-first acceptance.
-12. `11_A4_3_AUDIO_FALLBACK_ACCEPTANCE.md` - live Audio fallback acceptance.
-13. `12_A4_4_DURABILITY_ACCEPTANCE.md` - durable restart/resume acceptance.
-14. `13_A4_5_GUARD_MATRIX_ACCEPTANCE.md` - negative-path guard matrix.
+11. `10_A4_2_CAPTIONS_ACCEPTANCE.md` - captions-first A4 acceptance.
+12. `11_A4_3_AUDIO_FALLBACK_ACCEPTANCE.md` - Audio fallback acceptance.
+13. `12_A4_4_DURABILITY_ACCEPTANCE.md` - browser-assisted durability.
+14. `13_A4_5_GUARD_MATRIX_ACCEPTANCE.md` - negative guards.
 15. `14_A4_LANGUAGE_SOURCE_MATRIX_ACCEPTANCE.md` - language/source matrix.
-16. `15_A4_QUOTA_LEDGER_RESTART_ACCEPTANCE.md` - durable STT quota restoration.
-17. `16_A4_ACTIVE_AUDIO_PROCESS_REPLACEMENT_ACCEPTANCE.md` - forced process-loss acceptance.
+16. `15_A4_QUOTA_LEDGER_RESTART_ACCEPTANCE.md` - durable quota restoration.
+17. `16_A4_ACTIVE_AUDIO_PROCESS_REPLACEMENT_ACCEPTANCE.md` - process-loss acceptance.
 18. `17_A4_STT_TEXT_QUALITY_DISPOSITION.md` - STT text-quality disposition.
-19. `18_A5_A6_GPT_BUILDER_E2E_ACCEPTANCE.md` - Builder and first Research/Critic E2E acceptance.
-20. `19_A7_CONTROLLED_TESTER_ROLLOUT.md` - external tester rollout plan, currently paused.
-21. `20_A7_EU_AUDIO_PRIVACY_GATE_ACCEPTANCE.md` - AssemblyAI EU Audio fallback acceptance.
-22. `21_CREDENTIAL_ATTRIBUTION_CORRECTION.md` - historical credential attribution correction.
-23. `22_OWNER_ONLY_COMPLETION_PLAN.md` - A8 completion plan, now baseline-complete and superseded by A9 final target.
-24. `23_A8_OWNER_ONLY_BROWSER_ASSISTED_ACCEPTANCE.md` - accepted private browser-assisted owner baseline.
-25. `24_A9_ZERO_CLIENT_INGESTION_PLAN.md` - zero-client public-media/local-upload target plan.
-26. `25_A9_CHAT_TRANSITION_BOOTSTRAP.md` - current new-chat recovery bootstrap.
+19. `18_A5_A6_GPT_BUILDER_E2E_ACCEPTANCE.md` - Builder/A6 Research-Critic acceptance.
+20. `19_A7_CONTROLLED_TESTER_ROLLOUT.md` - external tester rollout plan, paused.
+21. `20_A7_EU_AUDIO_PRIVACY_GATE_ACCEPTANCE.md` - AssemblyAI EU Audio acceptance.
+22. `21_CREDENTIAL_ATTRIBUTION_CORRECTION.md` - historical credential correction.
+23. `22_OWNER_ONLY_COMPLETION_PLAN.md` - A8 completion plan, baseline-complete.
+24. `23_A8_OWNER_ONLY_BROWSER_ASSISTED_ACCEPTANCE.md` - accepted browser-assisted owner baseline.
+25. `24_A9_ZERO_CLIENT_INGESTION_PLAN.md` - current A9 zero-client plan/state sequence.
+26. `25_A9_CHAT_TRANSITION_BOOTSTRAP.md` - A9 transition bootstrap.
+27. `26_A9_MANAGED_PROVIDER_ACCEPTANCE.md` - Supadata native managed acceptance.
+28. `27_A9_DURABLE_MANAGED_ACCEPTANCE.md` - durable KRCM/idempotency acceptance.
+29. `28_A9_5_PRIVATE_GPT_ACTION_INTEGRATION.md` - A9.5 package/backend preflight checkpoint; private GPT live E2E pending.
 
-## Source-of-truth order
+## Source-of-truth precedence
 
-When documents disagree, use this precedence:
-1. current code and CI state on the active feature branches;
+When documents disagree:
+1. current code, live isolated runtime evidence and CI on active feature branches;
 2. `03_CURRENT_STATE.md`;
 3. `06_DECISION_LOG.md`;
-4. `02_ROADMAP.md`;
-5. `08_CHAT_HANDOFF.md`;
-6. phase acceptance records and other documents.
+4. `24_A9_ZERO_CLIENT_INGESTION_PLAN.md`;
+5. `02_ROADMAP.md`;
+6. `08_CHAT_HANDOFF.md`;
+7. phase acceptance records and other documents.
 
-A new chat must not infer completed work from roadmap items alone. Only current repository/CI state, `03_CURRENT_STATE.md`, and actual acceptance evidence may mark work complete.
+Do not mark a phase complete from roadmap text alone.
 
 ## Current phase checkpoint
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_ZERO_CLIENT_MEDIA_ROUTER_PLANNED / A9_IMPLEMENTATION_NOT_STARTED`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PACKAGE_AND_BACKEND_PREFLIGHT_READY / A9_5_PRIVATE_GPT_LIVE_CONFIG_PENDING`
 
-A8 proves the private GPT works end-to-end with Helper 0.2.2. The final desired normal UX is A9 zero-client ingestion, so the whole media project is not yet complete.
+Current next task:
 
-Approved A9 ingress directions:
-- public media URLs through `MediaSourceRouter`;
-- initial public adapters: YouTube, Instagram, Facebook, Telegram;
-- public-only policy with no user logins/cookies/sessions/tokens;
-- local video/audio upload through future `local_upload` ingress.
+`Update actual private GPT Builder to the managed A9.5 package and execute owner zero-client E2E acceptance.`
 
-## New-chat recovery
+A billable transcript acceptance requires a fresh credit preflight and explicit owner option `1` before the transcript endpoint may be called.
 
-Use:
+## Current A9 security/UX boundaries
 
-`recover MEDIA BETA A9`
-
-Then read:
-`subprojects/media_beta/25_A9_CHAT_TRANSITION_BOOTSTRAP.md`
+- public URL sources only unless `local_upload` is later separately accepted;
+- current live-accepted zero-client public adapter: YouTube;
+- no platform login/password/cookies/authenticated sessions/account tokens;
+- no user-facing beta access code in the private owner zero-client flow;
+- private Action bearer remains mandatory;
+- owner beta admission is injected server-side only after bearer authentication;
+- Supadata native cost hard cap is one approved credit;
+- no automatic managed AI fallback;
+- A8 Helper 0.2.2 remains fallback evidence, not normal A9 UX.
 
 ## Related repositories and branches
 
-K-Research & Critic:
-- repository `kolemasakar/K_Research_Critic`;
-- production branch `main`;
-- media feature branch `agent/video-url-research`;
+KRC:
+- `kolemasakar/K_Research_Critic`;
+- branch `agent/video-url-research`;
 - draft PR #8.
 
-VoiceBridge backend dependency:
-- repository `kolemasakar/VoiceBridge`;
-- production branch `main`;
-- media feature branch `agent/krc-media-transcript`;
+VoiceBridge:
+- `kolemasakar/VoiceBridge`;
+- branch `agent/krc-media-transcript`;
 - draft PR #28.
 
 ## Non-negotiable boundary
 
-Do not merge or publish the media feature, resume external tester/public-sharing work, use user platform credentials, or modify production merely because the private browser-assisted baseline passed. Those require separate explicit owner decisions.
+Do not merge or publish the media feature, resume external tester/public-sharing work, expose credentials, bypass the credit-consent gate, use private platform sessions, or modify production merely because private backend preflight passed. Those require separate explicit decisions and acceptance gates.
