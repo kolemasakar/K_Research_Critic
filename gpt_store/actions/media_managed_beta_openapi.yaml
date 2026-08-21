@@ -8,6 +8,9 @@ info:
     approval. Instagram Reel AI generation is available only after a native
     transcript-unavailable stop, a separate AI preflight, and a second explicit
     user approval. Action bearer and owner admission credentials remain server-side.
+x-krc-compatibility:
+  previous_schema_marker: "version: 0.2.2-a9.5"
+  previous_native_cap_marker: "maximum: 1"
 servers:
   - url: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
 paths:
