@@ -53,9 +53,12 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gate()
     assert preflight["required"] == ["url"]
     assert "beta_access_code" not in preflight["properties"]
 
-    consent = schema["components"]["schemas"]["NativeTranscriptRequest"]["allOf"][1][
-        "properties"
-    ]["credit_consent"]["properties"]
+    native = schema["components"]["schemas"]["NativeTranscriptRequest"]
+    assert native["type"] == "object"
+    assert "allOf" not in native
+    assert set(native["required"]) == {"url", "credit_consent"}
+    assert "beta_access_code" not in native["properties"]
+    consent = native["properties"]["credit_consent"]["properties"]
     assert consent["provider"]["const"] == "supadata"
     assert consent["mode"]["const"] == "native"
     assert consent["max_credits"]["maximum"] == 1
