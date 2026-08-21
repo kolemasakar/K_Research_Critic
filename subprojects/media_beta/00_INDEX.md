@@ -2,19 +2,19 @@
 
 Canonical documentation index for K-Research & Critic media-input work.
 
-Version: 2.2
+Version: 2.3
 Status: ACTIVE
 Updated: 2026-08-21
 
 ## Purpose
 
-This directory is the self-contained documentation root for MEDIA BETA and the owner-only zero-client media ingestion work.
+This directory is the self-contained documentation root for MEDIA BETA and owner-only zero-client media ingestion work.
 
 It covers:
 - accepted browser-assisted A8 baseline;
 - zero-client A9 managed ingestion;
 - credit consent and durable managed jobs;
-- private GPT Action integration;
+- private GPT Action integration and owner E2E acceptance;
 - future public platform adapters and local upload;
 - later sustainable/free media architecture.
 
@@ -46,12 +46,13 @@ The published text-only K-Research & Critic product remains a separate productio
 22. `21_CREDENTIAL_ATTRIBUTION_CORRECTION.md` - historical credential correction.
 23. `22_OWNER_ONLY_COMPLETION_PLAN.md` - A8 completion plan, baseline-complete.
 24. `23_A8_OWNER_ONLY_BROWSER_ASSISTED_ACCEPTANCE.md` - accepted browser-assisted owner baseline.
-25. `24_A9_ZERO_CLIENT_INGESTION_PLAN.md` - current A9 zero-client plan/state sequence.
+25. `24_A9_ZERO_CLIENT_INGESTION_PLAN.md` - A9 zero-client plan/state sequence.
 26. `25_A9_CHAT_TRANSITION_BOOTSTRAP.md` - A9 transition bootstrap.
 27. `26_A9_MANAGED_PROVIDER_ACCEPTANCE.md` - Supadata native managed acceptance.
 28. `27_A9_DURABLE_MANAGED_ACCEPTANCE.md` - durable KRCM/idempotency acceptance.
-29. `28_A9_5_PRIVATE_GPT_ACTION_INTEGRATION.md` - A9.5 package/backend preflight checkpoint; private GPT live E2E pending.
-30. `29_A9_5_BUILDER_UPDATE_RUNBOOK.md` - exact private GPT Builder switch and Preview acceptance procedure.
+29. `28_A9_5_PRIVATE_GPT_ACTION_INTEGRATION.md` - A9.5 package/backend preflight checkpoint.
+30. `29_A9_5_BUILDER_UPDATE_RUNBOOK.md` - private GPT Builder switch and Preview procedure.
+31. `30_A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_ACCEPTANCE.md` - actual private GPT zero-client YouTube E2E acceptance.
 
 ## Source-of-truth precedence
 
@@ -68,24 +69,23 @@ Do not mark a phase complete from roadmap text alone.
 
 ## Current phase checkpoint
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PACKAGE_AND_BACKEND_PREFLIGHT_READY / A9_5_PRIVATE_GPT_LIVE_CONFIG_PENDING`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_COMPLETE / A9_8_OWNER_ZERO_CLIENT_YOUTUBE_COMPLETE / A9_6_MULTI_PLATFORM_NEXT`
 
 Current next task:
 
-`Update actual private GPT Builder to the managed A9.5 package and execute owner zero-client E2E acceptance.`
-
-A billable transcript acceptance requires a fresh credit preflight and explicit owner option `1` before the transcript endpoint may be called.
+`Validate additional public source adapters independently, beginning with A9.6, while keeping the accepted YouTube path as the regression baseline.`
 
 ## Current A9 security/UX boundaries
 
-- public URL sources only unless `local_upload` is later separately accepted;
 - current live-accepted zero-client public adapter: YouTube;
+- public URL sources only unless `local_upload` is later separately accepted;
 - no platform login/password/cookies/authenticated sessions/account tokens;
 - no user-facing beta access code in the private owner zero-client flow;
 - private Action bearer remains mandatory;
 - owner beta admission is injected server-side only after bearer authentication;
 - Supadata native cost hard cap is one approved credit;
 - no automatic managed AI fallback;
+- ChatGPT may show its own consequential-Action confirmation before the billable external call;
 - A8 Helper 0.2.2 remains fallback evidence, not normal A9 UX.
 
 ## Related repositories and branches
@@ -102,4 +102,4 @@ VoiceBridge:
 
 ## Non-negotiable boundary
 
-Do not merge or publish the media feature, resume external tester/public-sharing work, expose credentials, bypass the credit-consent gate, use private platform sessions, or modify production merely because private backend preflight passed. Those require separate explicit decisions and acceptance gates.
+Do not merge or publish the media feature, resume external tester/public-sharing work, expose credentials, bypass the credit-consent gate, use private platform sessions, or modify production merely because owner-only YouTube E2E passed. Those require separate explicit decisions and acceptance gates.
