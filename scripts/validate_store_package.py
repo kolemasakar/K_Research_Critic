@@ -266,7 +266,7 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require_tokens(
         action_text,
         [
-            "version: 0.2.0-a9.5",
+            "version: 0.2.2-a9.5",
             "operationId: preflightManagedMediaCredits",
             "operationId: startManagedMediaNativeTranscription",
             "operationId: getManagedMediaTranscriptionStatus",
