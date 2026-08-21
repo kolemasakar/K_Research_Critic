@@ -1,22 +1,20 @@
 openapi: 3.1.0
 info:
   title: K-Research & Critic Managed Media Beta API
-  version: 0.2.2-a9.5
+  version: 0.3.0-a9.6
   description: >-
-    Owner-only zero-client managed transcript beta. The GPT must call credit
-    preflight first, show the user the available credits, estimated cost and
-    estimated remaining balance, and wait for explicit user approval before
-    starting a billable native transcript request. The Action bearer credential
-    authenticates the private GPT; the owner beta admission code is injected
-    server-side and is never requested from or exposed to the user. No automatic
-    AI fallback is permitted.
+    Owner-only zero-client managed transcript beta for public YouTube and Instagram.
+    Native transcript processing always requires credit preflight and explicit user
+    approval. Instagram Reel AI generation is available only after a native
+    transcript-unavailable stop, a separate AI preflight, and a second explicit
+    user approval. Action bearer and owner admission credentials remain server-side.
 servers:
   - url: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
 paths:
   /api/v1/media/managed/preflight:
     post:
       operationId: preflightManagedMediaCredits
-      summary: Read managed transcript credit balance and native cost estimate
+      summary: Read managed native transcript credit balance and cost estimate
       x-openai-isConsequential: false
       requestBody:
         required: true
@@ -26,13 +24,13 @@ paths:
               $ref: "#/components/schemas/PreflightRequest"
       responses:
         "200":
-          description: Credit quote. This does not authorize transcript processing.
+          description: Native credit quote. This does not authorize transcript processing.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/CreditPreflight"
         "400":
-          description: Invalid URL or language hint.
+          description: Invalid or unsupported media URL or language hint.
         "401":
           description: Private GPT Action authentication failed.
         "503":
@@ -42,10 +40,9 @@ paths:
       operationId: startManagedMediaNativeTranscription
       summary: Spend at most one approved credit on a native managed transcript
       description: >-
-        Call only after a successful credit preflight and the user's explicit
-        approval. The request is capped at one Supadata native credit. If native
-        captions are unavailable, return AWAITING_AI_CONSENT. Never start AI
-        transcription automatically.
+        Call only after native credit preflight and explicit user approval. The
+        request is capped at one Supadata native credit. If native captions are
+        unavailable, return AWAITING_AI_CONSENT. Never start AI automatically.
       x-openai-isConsequential: true
       requestBody:
         required: true
@@ -65,7 +62,7 @@ paths:
         "401":
           description: Private GPT Action authentication failed.
         "409":
-          description: Explicit one-credit consent is missing or invalid.
+          description: Explicit one-credit native consent is missing or invalid.
         "429":
           description: Provider credits are exhausted or provider rate limit reached.
         "503":
@@ -73,15 +70,10 @@ paths:
   /api/v1/media/managed/transcriptions/{job_id}:
     get:
       operationId: getManagedMediaTranscriptionStatus
-      summary: Read managed media job status and actual credit charge
+      summary: Read managed media job status and actual cumulative credit charge
       x-openai-isConsequential: false
       parameters:
-        - name: job_id
-          in: path
-          required: true
-          schema:
-            type: string
-            pattern: ^KRCM_[A-Za-z0-9-]+$
+        - $ref: "#/components/parameters/JobId"
       responses:
         "200":
           description: Current managed media job state.
@@ -94,15 +86,10 @@ paths:
   /api/v1/media/managed/transcriptions/{job_id}/segments:
     get:
       operationId: getManagedMediaTranscriptSegments
-      summary: Read timestamped transcript segments
+      summary: Read timestamped managed transcript segments
       x-openai-isConsequential: false
       parameters:
-        - name: job_id
-          in: path
-          required: true
-          schema:
-            type: string
-            pattern: ^KRCM_[A-Za-z0-9-]+$
+        - $ref: "#/components/parameters/JobId"
         - name: cursor
           in: query
           required: false
@@ -127,11 +114,83 @@ paths:
                 $ref: "#/components/schemas/SegmentPage"
         "404":
           description: Job not found.
+  /api/v1/media/managed/transcriptions/{job_id}/ai-preflight:
+    get:
+      operationId: preflightManagedMediaAiCredits
+      summary: Read separate Instagram Reel AI credit ceiling before AI consent
+      description: >-
+        Call only after the native job returns AWAITING_AI_CONSENT. This reads the
+        provider balance and conservative Instagram Reel AI ceiling. It does not
+        start AI transcription or authorize any AI credit spend.
+      x-openai-isConsequential: false
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+      responses:
+        "200":
+          description: Separate AI credit quote. This does not authorize AI processing.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiCreditPreflight"
+        "401":
+          description: Private GPT Action authentication failed.
+        "404":
+          description: Job not found.
+        "409":
+          description: Job is not awaiting separate AI consent.
+        "422":
+          description: Current AI fallback does not support this source type.
+        "503":
+          description: Managed AI transcript provider is unavailable.
+  /api/v1/media/managed/transcriptions/{job_id}/ai:
+    post:
+      operationId: startManagedMediaAiTranscription
+      summary: Start consent-gated AI transcription for an Instagram Reel
+      description: >-
+        Call only after AI preflight and a new explicit user approval. The consent
+        is separate from native approval and capped at 40 credits. This endpoint
+        never runs automatically and reuses an already completed AI job.
+      x-openai-isConsequential: true
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiTranscriptRequest"
+      responses:
+        "200":
+          description: AI transcript request completed, processing, failed, or reused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagedJob"
+        "401":
+          description: Private GPT Action authentication failed.
+        "404":
+          description: Job not found.
+        "409":
+          description: Separate AI credit consent is missing, invalid, or not applicable.
+        "422":
+          description: Current AI fallback does not support this source type.
+        "429":
+          description: Balance is below the conservative AI credit ceiling.
+        "503":
+          description: Managed AI transcript provider is unavailable.
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
+  parameters:
+    JobId:
+      name: job_id
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^KRCM_[A-Za-z0-9-]+$
   schemas:
     PreflightRequest:
       type: object
@@ -141,7 +200,7 @@ components:
         url:
           type: string
           format: uri
-          description: Public HTTPS media URL. Current live-accepted adapter is YouTube.
+          description: Public HTTPS YouTube or Instagram Reel/video URL.
         language_hint:
           type: string
           enum: [auto, uk, ru, en]
@@ -154,7 +213,7 @@ components:
         url:
           type: string
           format: uri
-          description: Public HTTPS media URL. Current live-accepted adapter is YouTube.
+          description: Public HTTPS YouTube or Instagram Reel/video URL.
         language_hint:
           type: string
           enum: [auto, uk, ru, en]
@@ -172,9 +231,28 @@ components:
               const: native
             max_credits:
               type: integer
-              minimum: 1
-              maximum: 1
-              description: Hard user-approved maximum for this operation.
+              const: 1
+              description: Hard user-approved maximum for this native operation.
+    AiTranscriptRequest:
+      type: object
+      additionalProperties: false
+      required: [credit_consent]
+      properties:
+        credit_consent:
+          type: object
+          additionalProperties: false
+          required: [provider, mode, max_credits]
+          properties:
+            provider:
+              type: string
+              const: supadata
+            mode:
+              type: string
+              const: generate
+            max_credits:
+              type: integer
+              const: 40
+              description: Separate conservative user-approved maximum for Instagram Reel AI transcription.
     CreditPreflight:
       type: object
       required:
@@ -218,15 +296,79 @@ components:
           type: boolean
           const: true
         consent_options:
-          type: object
-          required: [approve, reject]
-          properties:
-            approve:
-              type: integer
-              const: 1
-            reject:
-              type: integer
-              const: 2
+          $ref: "#/components/schemas/ConsentOptions"
+    AiCreditPreflight:
+      type: object
+      required:
+        - job_id
+        - source_url
+        - provider
+        - mode
+        - plan
+        - credits_available
+        - estimated_credits
+        - maximum_credits
+        - credits_per_minute
+        - maximum_duration_minutes
+        - credits_after_estimate
+        - conservative_maximum
+        - can_continue
+        - consent_required
+        - consent_options
+      properties:
+        request_id:
+          type: string
+        job_id:
+          type: string
+          pattern: ^KRCM_[A-Za-z0-9-]+$
+        source_url:
+          type: string
+        provider:
+          type: string
+          const: supadata
+        mode:
+          type: string
+          const: generate
+        plan:
+          type: string
+        credits_available:
+          type: number
+          minimum: 0
+        estimated_credits:
+          type: integer
+          const: 40
+        maximum_credits:
+          type: integer
+          const: 40
+        credits_per_minute:
+          type: integer
+          const: 2
+        maximum_duration_minutes:
+          type: integer
+          const: 20
+        credits_after_estimate:
+          type: number
+          minimum: 0
+        conservative_maximum:
+          type: boolean
+          const: true
+        can_continue:
+          type: boolean
+        consent_required:
+          type: boolean
+          const: true
+        consent_options:
+          $ref: "#/components/schemas/ConsentOptions"
+    ConsentOptions:
+      type: object
+      required: [approve, reject]
+      properties:
+        approve:
+          type: integer
+          const: 1
+        reject:
+          type: integer
+          const: 2
     ManagedJob:
       type: object
       properties:
@@ -252,7 +394,7 @@ components:
           const: supadata
         provider_mode:
           type: string
-          const: native
+          enum: [native, generate]
         detected_language:
           anyOf:
             - type: string
@@ -264,6 +406,7 @@ components:
         credits_charged:
           type: number
           minimum: 0
+          description: Cumulative managed credits charged to this job, including native and AI when used.
         credits_remaining_estimate:
           type: number
           minimum: 0
@@ -279,7 +422,6 @@ components:
           minimum: 0
         ai_fallback_requires_new_consent:
           type: boolean
-          const: true
         error:
           anyOf:
             - type: object
