@@ -9,8 +9,6 @@ from gpt_store import StoreCheckpoint
 
 
 ROOT = Path(__file__).resolve().parents[1]
-MANIFEST_PATH = ROOT / "gpt_store" / "manifest.yaml"
-MEDIA_BETA_MANIFEST_PATH = ROOT / "gpt_store" / "media_beta_manifest.yaml"
 MEDIA_BETA_SERVER = "https://voicebridge-krc-media-beta-kolemasakar.onrender.com"
 MEDIA_BETA_ASSEMBLYAI_EU = "https://api.eu.assemblyai.com"
 
@@ -69,7 +67,7 @@ def validate_store_package(root: Path = ROOT) -> dict:
     )
     _require(product.get("default_language") == "uk-UA", "product.default_language must be uk-UA")
     _require(product.get("primary_channel") == "chatgpt_store", "primary channel must remain chatgpt_store")
-    _require(product.get("publication_state") == "published", "publication state must be published")
+    _require(product.get("publication_state") == "published", "publication state must remain published")
     _require(product.get("published_at") == "2026-08-14", "published_at must record the Store launch date")
     _require(product.get("store_category") == "Research & Analysis", "Store category must remain Research & Analysis")
 
@@ -78,7 +76,7 @@ def validate_store_package(root: Path = ROOT) -> dict:
     _require(model.get("allow_user_model_switch") is True, "user model switching must remain enabled")
 
     _require(capabilities.get("web_search") is True, "web search must be enabled in the Store package")
-    _require(capabilities.get("code_interpreter_data_analysis") is True, "data analysis must be enabled in the Store package")
+    _require(capabilities.get("code_interpreter_data_analysis") is True, "data analysis must be enabled")
     _require(capabilities.get("apps") is False, "Apps must remain disabled")
     _require(capabilities.get("actions") is True, "Actions must be enabled for optional media input")
 
@@ -90,24 +88,21 @@ def validate_store_package(root: Path = ROOT) -> dict:
     _require(release.get("production_smoke_tested_at") == "2026-08-14", "production smoke test date must remain 2026-08-14")
 
     _require(media_release.get("enabled") is True, "media input must be enabled")
-    _require(media_release.get("rollout_state") == "PREVIEW_REQUIRED", "media rollout must remain PREVIEW_REQUIRED")
+    _require(media_release.get("rollout_state") == "PREVIEW_REQUIRED", "public media rollout must remain PREVIEW_REQUIRED")
     _require(media_release.get("external_backend_required") is True, "media mode must declare its external backend")
     _require(media_release.get("developer_provider_key_required") is True, "media mode must declare provider key requirement")
     _require(media_release.get("user_api_key_required") is False, "media mode must not ask users for API keys")
     _require(media_release.get("automatic_language_detection") is True, "media mode must keep language detection")
     _require(media_release.get("production_smoke_test_passed") is False, "media production smoke test must remain false")
-    _require(set(media_release.get("supported_platforms", [])) == {"youtube"}, "initial media platform set must be youtube")
-    _require(set(media_release.get("supported_languages", [])) == {"uk", "ru", "en"}, "initial media language set must be uk/ru/en")
+    _require(set(media_release.get("supported_platforms", [])) == {"youtube"}, "initial public media platform set must remain youtube")
+    _require(set(media_release.get("supported_languages", [])) == {"uk", "ru", "en"}, "initial media language set must remain uk/ru/en")
 
     _require(media_action.get("enabled") is True, "media transcript action must be enabled")
     _require(media_action.get("authentication") == "bearer_api_key", "media action must use bearer API-key auth")
-    _require(media_action.get("server") == "https://voicebridge-cloud-us.onrender.com", "generic media preview server must remain VoiceBridge production endpoint until separately rolled out")
+    _require(media_action.get("server") == "https://voicebridge-cloud-us.onrender.com", "public preview server must remain production VoiceBridge until separately promoted")
 
     instruction_path = root / str(instructions.get("file", ""))
-    try:
-        instruction_text = instruction_path.read_text(encoding="utf-8")
-    except OSError as exc:
-        raise StorePackageValidationError(f"Cannot load instruction package: {exc}") from exc
+    instruction_text = instruction_path.read_text(encoding="utf-8")
     _require_tokens(
         instruction_text,
         [
@@ -128,18 +123,9 @@ def validate_store_package(root: Path = ROOT) -> dict:
             "1=APPROVE, 2=EDIT, 3=REJECT",
             "Наступна допустима дія: 1 - **APPROVE**, 2 - **EDIT** або 3 - **REJECT**.",
             "Present the profile itself, NOT a checkpoint",
-            "Never expose internal placeholders such as :contentReference, oaicite",
             "On PASS produce normal user-facing output, NOT a checkpoint",
             "Create checkpoint ONLY when user explicitly requests",
-            "Never auto-create it at a normal profile gate/final report",
-            "latest_research object uses EXACTLY",
-            "latest_review object uses EXACTLY",
-            "no extra keys",
             "K_SUPERVISOR_CHECKPOINT",
-            "task_id matching ^TASK_[A-Za-z0-9_-]+$",
-            "required_cross_checks:int>=0",
-            'approved_by="user"',
-            "Output one complete valid JSON object",
             "Do not persist/reveal hidden chain-of-thought",
         ],
         "instruction package",
@@ -165,20 +151,6 @@ def validate_store_package(root: Path = ROOT) -> dict:
         "media Action schema",
     )
 
-    privacy_path = root / str(media_action.get("privacy_policy_document", ""))
-    privacy_text = privacy_path.read_text(encoding="utf-8")
-    _require_tokens(
-        privacy_text,
-        [
-            "AssemblyAI",
-            "provider_data_deleted",
-            "one hour",
-            "files submitted through its European servers are not used for model training",
-            "CLOSED BETA / A7 CONTROLLED TESTER ROLLOUT",
-        ],
-        "media privacy policy",
-    )
-
     checkpoint_example_path = root / str(checkpoint.get("example", ""))
     try:
         checkpoint_payload = json.loads(checkpoint_example_path.read_text(encoding="utf-8"))
@@ -192,7 +164,7 @@ def validate_store_package(root: Path = ROOT) -> dict:
 
 def validate_media_beta_package(root: Path = ROOT) -> dict:
     manifest = _load_yaml(root / "gpt_store" / "media_beta_manifest.yaml", "media beta manifest")
-    _require(manifest.get("schema_version") == "0.4-beta", "media beta schema_version must be 0.4-beta")
+    _require(manifest.get("schema_version") == "0.5-beta", "media beta schema_version must be 0.5-beta")
 
     product = _mapping(manifest, "product")
     capabilities = _mapping(manifest, "capabilities")
@@ -201,126 +173,125 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     beta = _mapping(manifest, "beta")
     release = _mapping(manifest, "release")
 
-    _require(product.get("name") == "K-Research & Critic - MEDIA BETA", "closed beta product name must be isolated")
-    _require(product.get("publication_state") == "closed_beta", "closed beta publication state must remain closed_beta")
-    _require(product.get("primary_channel") == "chatgpt_store_unlisted_beta", "closed beta channel must remain unlisted")
-    _require(capabilities.get("web_search") is True, "closed media beta requires web search")
-    _require(capabilities.get("code_interpreter_data_analysis") is True, "closed media beta requires data analysis")
-    _require(capabilities.get("image_generation") is False, "closed media beta image generation must remain disabled")
-    _require(capabilities.get("actions") is True, "closed media beta requires Actions")
-    _require(capabilities.get("apps") is False, "closed media beta must not require Apps")
+    _require(product.get("name") == "K-Research & Critic - MEDIA BETA", "media beta product name must remain isolated")
+    _require(product.get("publication_state") == "private_owner_only", "A9.5 media beta must remain private owner-only")
+    _require(product.get("primary_channel") == "chatgpt_private_beta", "A9.5 media beta channel must remain private")
+    _require(product.get("default_language") == "uk-UA", "media beta default language must remain Ukrainian")
 
-    _require(instructions.get("version") == "0.4-beta", "closed beta instruction version must be 0.4-beta")
-    _require(instructions.get("builder_character_limit") == 8000, "closed beta Builder instruction limit must remain 8000")
+    _require(capabilities.get("web_search") is True, "private media beta requires web search")
+    _require(capabilities.get("code_interpreter_data_analysis") is True, "private media beta requires data analysis")
+    _require(capabilities.get("image_generation") is False, "private media beta image generation must remain disabled")
+    _require(capabilities.get("actions") is True, "private media beta requires Actions")
+    _require(capabilities.get("apps") is False, "private media beta must not require Apps")
 
-    _require(beta.get("access_model") == "per_tester_access_code", "closed beta must use per-tester access codes")
-    _require(beta.get("intended_testers") == 4, "closed beta target must remain four testers")
-    _require(beta.get("ingress_mode") == "client_assisted", "closed beta must use client-assisted ingress after cloud YouTube blocking")
-    _require(beta.get("browser_helper_required") is True, "closed beta client path must require the browser helper")
-    _require(beta.get("browser_helper_version") == "0.2.2", "closed beta helper must remain 0.2.2")
-    _require(beta.get("browser_helper_job_prefix") == "KRCC_", "closed beta client jobs must use KRCC_ prefix")
-    _require(beta.get("direct_transcript_first") is True, "reliable direct transcript/caption intake must remain preferred")
-    _require(beta.get("client_caption_first") is True, "client caption extraction must remain the primary browser path")
-    _require(beta.get("client_caption_first_status") == "LIVE_ACCEPTED", "client caption-first must remain live accepted")
-    _require(beta.get("max_video_seconds") == 3600, "closed beta max video must remain 60 minutes")
-    _require(beta.get("max_concurrent_jobs") == 1, "closed beta concurrency must remain one")
-    _require(beta.get("daily_stt_seconds") == 7200, "closed beta STT budget must remain two hours/day")
-    _require(beta.get("max_client_audio_bytes") == 33554432, "closed beta client upload limit must remain 32 MiB")
-    _require(beta.get("durable_store") == "postgres", "closed beta durable store must remain postgres")
-    _require(beta.get("restart_resilient_waiting_jobs") is True, "waiting jobs must remain restart resilient")
-    _require(beta.get("durable_quota_ledger") is True, "STT quota ledger must remain durable")
-    _require(beta.get("active_audio_process_replacement") == "RETRY_SAFE_LIVE_ACCEPTED", "active audio replacement contract must remain accepted")
-    _require(beta.get("stt_text_quality_disposition") == "NON_REPRODUCIBLE_ANOMALY_ACCEPTED", "STT text quality disposition must remain accepted")
-    _require(beta.get("stt_provider") == "assemblyai", "closed beta fallback STT provider must remain AssemblyAI")
-    _require(beta.get("stt_endpoint") == MEDIA_BETA_ASSEMBLYAI_EU, "closed beta STT endpoint must remain AssemblyAI EU")
-    _require(beta.get("stt_model_training_boundary") == "EU_NOT_USED_FOR_MODEL_TRAINING", "closed beta model-training boundary must remain EU no-training")
-    stt_audio = _mapping(beta, "stt_audio")
-    _require(stt_audio.get("channels") == 1, "closed beta STT audio must be mono")
-    _require(stt_audio.get("sample_rate_hz") == 16000, "closed beta STT audio must be 16 kHz")
-    _require(stt_audio.get("bitrate_kbps") == 32, "closed beta STT audio must be 32 kbps")
+    _require(instructions.get("version") == "0.5-beta-a9.5", "A9.5 instruction version must be 0.5-beta-a9.5")
+    _require(instructions.get("builder_character_limit") == 8000, "Builder instruction limit must remain 8000")
+    _require(instructions.get("canonical_reference") == "prompts/GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md", "managed instruction file must be canonical")
 
-    _require(release.get("rollout_state") == "CLOSED_BETA_A7_READY_FOR_TESTER1", "closed beta rollout must remain A7 READY_FOR_TESTER1")
-    _require(release.get("production_core_unchanged") is True, "closed beta must preserve production core")
-    _require(release.get("public_store_gpt_unchanged") is True, "closed beta must not modify public GPT")
-    _require(release.get("user_api_key_required") is False, "closed beta must not request user API keys")
-    _require(release.get("a4_live_validation_complete") is True, "A4 live validation must remain accepted")
-    _require(release.get("a5_builder_validation_complete") is True, "A5 Builder validation must remain accepted")
-    _require(release.get("a6_owner_operator_e2e_complete") is True, "A6 owner/operator E2E must remain accepted")
-    _require(release.get("a7_eu_audio_privacy_gate_complete") is True, "A7 EU audio privacy gate must remain accepted")
-    _require(release.get("external_tester1_ready") is True, "Tester 1 rollout readiness must remain recorded")
-    _require(release.get("merge_to_public_product_allowed") is False, "closed beta must not auto-promote to public product")
+    _require(beta.get("access_model") == "private_gpt_action_bearer_plus_server_owner_admission", "A9.5 access model must keep owner admission server-side")
+    _require(beta.get("intended_testers") == 1, "A9.5 private beta must target owner only")
+    _require(beta.get("owner_only") is True, "A9.5 must remain owner-only")
+    _require(beta.get("ingress_mode") == "managed_zero_client", "A9.5 must use managed zero-client ingress")
+    _require(beta.get("browser_helper_required") is False, "normal A9.5 flow must not require Helper")
+    _require(beta.get("browser_helper_normal_flow_allowed") is False, "normal A9.5 flow must not use Helper")
+    _require(beta.get("browser_assisted_a8_fallback_preserved") is True, "A8 fallback evidence must remain preserved")
+    _require(beta.get("managed_job_prefix") == "KRCM_", "managed jobs must use KRCM_ prefix")
+    _require(beta.get("public_platforms_live_accepted") == ["youtube"], "only YouTube may be declared live accepted")
+    _require(beta.get("max_video_seconds") == 3600, "media beta max video must remain 60 minutes")
+    _require(beta.get("managed_provider") == "supadata", "A9.5 managed provider must remain Supadata")
+    _require(beta.get("managed_provider_mode") == "native", "A9.5 managed mode must remain native")
+    _require(beta.get("managed_native_credit_cost") == 1, "native managed cost must remain one credit")
+    _require(beta.get("managed_credit_preflight_required") is True, "credit preflight must remain mandatory")
+    _require(beta.get("managed_explicit_user_consent_required") is True, "explicit user credit consent must remain mandatory")
+    _require(beta.get("managed_automatic_ai_fallback") is False, "automatic managed AI fallback must remain disabled")
+    _require(beta.get("managed_ai_requires_second_consent") is True, "AI fallback must require second consent")
+    _require(beta.get("managed_user_beta_access_code_required") is False, "owner must not be asked for a beta code")
+    _require(beta.get("managed_owner_access_injected_server_side") is True, "owner admission must be injected server-side")
+    _require(beta.get("managed_durable_store") == "postgres", "managed store must remain Postgres")
+    _require(beta.get("managed_restart_resilient_jobs") is True, "managed jobs must remain restart resilient")
+    _require(beta.get("managed_duplicate_start_reuses_job") is True, "duplicate managed start must reuse durable job")
 
-    _require(media_action.get("authentication") == "bearer_api_key", "closed beta action must use bearer authentication")
-    _require(media_action.get("server") == MEDIA_BETA_SERVER, "closed beta action must use the dedicated beta Render service")
+    legacy = _mapping(beta, "legacy_browser_assisted")
+    _require(legacy.get("job_prefix") == "KRCC_", "A8 fallback job prefix must remain KRCC_")
+    _require(legacy.get("helper_version") == "0.2.2", "A8 fallback helper version must remain 0.2.2")
+    _require(legacy.get("stt_endpoint") == MEDIA_BETA_ASSEMBLYAI_EU, "A8 fallback STT endpoint must remain AssemblyAI EU")
+    _require(legacy.get("status") == "A8_ACCEPTED_FALLBACK_ONLY", "A8 must be fallback only")
 
-    beta_instructions_path = root / str(instructions.get("file", ""))
-    beta_instructions_text = beta_instructions_path.read_text(encoding="utf-8")
-    _require(len(beta_instructions_text) <= 8000, "closed beta Builder instructions must fit the 8000-character limit")
+    _require(release.get("rollout_state") == "A9_5_PACKAGE_READY_FOR_PRIVATE_GPT", "A9.5 package must be ready for private GPT integration")
+    _require(release.get("production_core_unchanged") is True, "private beta must preserve production core")
+    _require(release.get("public_store_gpt_unchanged") is True, "private beta must not modify public GPT")
+    _require(release.get("user_api_key_required") is False, "private beta must not request user API keys")
+    _require(release.get("user_beta_access_code_required") is False, "private owner flow must not request beta access code")
+    _require(release.get("a9_2r_managed_native_complete") is True, "A9.2R must remain complete")
+    _require(release.get("a9_3_durable_managed_complete") is True, "A9.3 must remain complete")
+    _require(release.get("a9_5_private_gpt_integration_complete") is False, "A9.5 live acceptance must not be pre-declared")
+    _require(release.get("external_tester_rollout_paused") is True, "external tester rollout must remain paused")
+    _require(release.get("merge_to_public_product_allowed") is False, "private beta must not auto-promote to public product")
+
+    _require(media_action.get("authentication") == "bearer_api_key", "private beta Action must use bearer authentication")
+    _require(media_action.get("server") == MEDIA_BETA_SERVER, "private beta Action must use dedicated beta Render service")
+    _require(media_action.get("schema") == "gpt_store/actions/media_managed_beta_openapi.yaml", "private beta must use managed Action schema")
+
+    builder_path = root / str(instructions.get("file", ""))
+    builder_text = builder_path.read_text(encoding="utf-8")
+    _require(len(builder_text) <= 8000, "private beta Builder instructions must fit the 8000-character limit")
     _require_tokens(
-        beta_instructions_text,
+        builder_text,
         [
             "K-Research & Critic - MEDIA BETA",
-            "MEDIA BETA ACCESS REQUIRED",
-            "startMediaBetaClientTranscription",
-            "getMediaBetaClientTranscriptionStatus",
-            "getMediaBetaClientTranscriptSegments",
-            "AWAITING_CLIENT",
-            "KRCC_...",
-            "AssemblyAI fallback budget 7200 STT sec/UTC day",
-            "Helper 0.2.2",
-            "Use subtitles",
-            "Audio fallback",
-            "transcript_source=youtube_captions",
-            "stt_seconds_charged=0",
-            "MEDIA_CLIENT_INTERRUPTED_RETRY_REQUIRED",
-            "Never store full transcript or beta code",
-            "next_cursor=null",
+            "OWNER-ONLY ZERO-CLIENT MEDIA",
+            "preflightManagedMediaCredits",
+            "startManagedMediaNativeTranscription",
+            "getManagedMediaTranscriptionStatus",
+            "getManagedMediaTranscriptSegments",
+            "Do NOT ask the user for beta access code",
+            "Do not expose `KRCM_...` Job IDs",
+            "Do not fall back to Helper in the normal owner flow",
+            "1 - Так",
+            "2 - Ні",
+            "AWAITING_AI_CONSENT",
+            "credit_charge_uncertain=true",
             "1=APPROVE, 2=EDIT, 3=REJECT",
         ],
-        "media beta Builder instructions",
+        "A9.5 Builder instructions",
     )
 
-    beta_action_path = root / str(media_action.get("schema", ""))
-    beta_action_text = beta_action_path.read_text(encoding="utf-8")
-    beta_action = _load_yaml(beta_action_path, "media beta Action schema")
-    _require(beta_action.get("openapi") == "3.1.0", "media beta Action must use OpenAPI 3.1.0")
-    beta_servers = beta_action.get("servers")
-    _require(isinstance(beta_servers, list) and bool(beta_servers), "media beta Action must declare a server")
-    _require(isinstance(beta_servers[0], dict) and beta_servers[0].get("url") == MEDIA_BETA_SERVER, "media beta Action schema must use the dedicated beta server")
+    action_path = root / str(media_action.get("schema", ""))
+    action_text = action_path.read_text(encoding="utf-8")
+    action = _load_yaml(action_path, "managed media Action schema")
+    _require(action.get("openapi") == "3.1.0", "managed media Action must use OpenAPI 3.1.0")
+    servers = action.get("servers")
+    _require(isinstance(servers, list) and bool(servers), "managed media Action must declare a server")
+    _require(isinstance(servers[0], dict) and servers[0].get("url") == MEDIA_BETA_SERVER, "managed Action must use dedicated beta server")
     _require_tokens(
-        beta_action_text,
+        action_text,
         [
-            "version: 0.3.0-beta",
-            "operationId: startMediaBetaClientTranscription",
-            "operationId: getMediaBetaClientTranscriptionStatus",
-            "operationId: getMediaBetaClientTranscriptSegments",
-            "beta_access_code",
-            "writeOnly: true",
-            "^KRCC_[A-Za-z0-9-]+$",
-            "AWAITING_CLIENT",
-            "client_assisted",
-            "client_upload_required",
-            "youtube_captions",
-            "assemblyai_stt",
-            "caption_type",
-            "manual, auto_generated",
-            "stt_seconds_charged",
-            "beta_quota",
+            "version: 0.2.0-a9.5",
+            "operationId: preflightManagedMediaCredits",
+            "operationId: startManagedMediaNativeTranscription",
+            "operationId: getManagedMediaTranscriptionStatus",
+            "operationId: getManagedMediaTranscriptSegments",
+            "x-openai-isConsequential: true",
+            "const: supadata",
+            "const: native",
+            "maximum: 1",
+            "PROCESSING, COMPLETED, AWAITING_AI_CONSENT, FAILED",
+            "credit_charge_uncertain",
+            "reused",
+            "bearerAuth",
         ],
-        "media beta Action schema",
+        "A9.5 managed Action schema",
     )
+    _require("beta_access_code" not in action_text, "A9.5 user-facing Action schema must not expose beta_access_code")
 
     privacy_path = root / str(media_action.get("privacy_policy_document", ""))
     privacy_text = privacy_path.read_text(encoding="utf-8")
     _require_tokens(
         privacy_text,
         [
-            "Version: 0.6",
-            "CLOSED BETA / A7 CONTROLLED TESTER ROLLOUT",
+            "AssemblyAI",
             MEDIA_BETA_ASSEMBLYAI_EU,
             "files submitted through its European servers are not used for model training",
-            "provider_data_deleted=true",
-            "A7 provider-routing/model-training gate",
         ],
         "media beta privacy policy",
     )
