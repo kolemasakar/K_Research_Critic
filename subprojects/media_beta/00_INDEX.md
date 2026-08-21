@@ -2,7 +2,7 @@
 
 Canonical documentation index for K-Research & Critic media-input work.
 
-Version: 2.1
+Version: 2.2
 Status: ACTIVE
 Updated: 2026-08-21
 
@@ -51,6 +51,7 @@ The published text-only K-Research & Critic product remains a separate productio
 27. `26_A9_MANAGED_PROVIDER_ACCEPTANCE.md` - Supadata native managed acceptance.
 28. `27_A9_DURABLE_MANAGED_ACCEPTANCE.md` - durable KRCM/idempotency acceptance.
 29. `28_A9_5_PRIVATE_GPT_ACTION_INTEGRATION.md` - A9.5 package/backend preflight checkpoint; private GPT live E2E pending.
+30. `29_A9_5_BUILDER_UPDATE_RUNBOOK.md` - exact private GPT Builder switch and Preview acceptance procedure.
 
 ## Source-of-truth precedence
 
