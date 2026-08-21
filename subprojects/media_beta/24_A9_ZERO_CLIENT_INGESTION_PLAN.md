@@ -1,13 +1,13 @@
 # A9 Zero-Client Public Media URL and Local Upload Ingestion Plan
 
-Version: 1.3
-Status: IN_PROGRESS
+Version: 1.4
+Status: YOUTUBE_OWNER_PATH_COMPLETE / MULTI_PLATFORM_NEXT
 Started: 2026-08-20
 Updated: 2026-08-21
 
 ## Product goal
 
-Final private owner-only UX:
+Accepted private owner-only UX for the first source adapter:
 
 ```text
 public media URL in ChatGPT
@@ -18,6 +18,7 @@ public media URL in ChatGPT
  -> no beta-code prompt
  -> managed credit preflight when provider credits may be spent
  -> explicit user consent
+ -> ChatGPT consequential-Action confirmation when shown by the platform
  -> transcript acquisition
  -> K-Research & Critic workflow
  -> result in the same conversation
@@ -37,7 +38,7 @@ This restriction does not prevent a future owner-supplied `local_upload` path.
 
 ## Supported and planned source adapters
 
-Live accepted for owner zero-client backend:
+Live accepted in the actual private GPT:
 - YouTube public prerecorded video through managed native transcript provider.
 
 Planned, not yet accepted:
@@ -49,7 +50,7 @@ Planned, not yet accepted:
 
 Support must be reported per adapter; do not imply universal platform support.
 
-## Current normalized backend path
+## Accepted normalized YouTube path
 
 ```text
 public YouTube URL
@@ -61,23 +62,15 @@ public YouTube URL
  -> durable KRCM_ job + timestamped segments in Postgres
  -> Action status/segment retrieval
  -> Research/Critic workflow
+ -> final report in the same private GPT conversation
 ```
 
-Current provider:
-`Supadata`
+Current provider: `Supadata`.
+Current mode: `native`.
+Current native cost cap: `1 credit`.
+Automatic managed AI fallback: `DISABLED`.
 
-Current mode:
-`native`
-
-Current native cost cap:
-`1 credit`
-
-Automatic managed AI fallback:
-`DISABLED`
-
-Native unavailability must stop at:
-`AWAITING_AI_CONSENT`
-
+Native unavailability must stop at `AWAITING_AI_CONSENT`.
 Any future AI generation requires a new cost preflight and a second explicit user approval.
 
 ## Credit consent invariant
@@ -106,32 +99,25 @@ For current Supadata native mode the backend additionally enforces:
 
 Status: COMPLETE.
 
-The legacy server-side `KRCB_` path and the accepted browser-assisted `KRCC_` path were audited. The browser-assisted path remains a validated A8 fallback baseline only.
+The legacy server-side `KRCB_` path and accepted browser-assisted `KRCC_` path were audited. Browser-assisted ingress remains a validated A8 fallback baseline only.
 
 ### A9.1 - Server-side AssemblyAI EU parity
 
 Status: PASS / COMPLETE.
 
-The server-side fallback path uses configurable `KRC_MEDIA_ASSEMBLYAI_BASE_URL`; isolated beta is configured for the accepted EU endpoint.
-
 ### A9.2 - Direct Render-to-YouTube probe
 
 Status: BLOCKED / CLOSED AS PRIMARY STRATEGY.
 
-A normal prerecorded public YouTube source returned the YouTube bot/login challenge from Render before metadata/captions/STT.
-
 Disposition:
-
-`DIRECT_RENDER_YOUTUBE = BLOCKED_BY_DATACENTER_ANTIBOT`
-
-Blind yt-dlp player-client permutations are not the primary A9 route.
+`DIRECT_RENDER_YOUTUBE = BLOCKED_BY_DATACENTER_ANTIBOT`.
 
 ### A9.2R - Managed provider native route
 
 Status: PASS / COMPLETE_FOR_NATIVE_OWNER_BETA.
 
 Live acceptance source:
-`https://www.youtube.com/watch?v=IzYyKRx7Qwg`
+`https://www.youtube.com/watch?v=IzYyKRx7Qwg`.
 
 Accepted result:
 - Supadata native transcript;
@@ -149,14 +135,13 @@ Canonical record:
 Status: PASS / COMPLETE.
 
 Accepted live code:
-`7736f2e7acc5abbb3415e3753d0ca022c1b8d7b2`
+`7736f2e7acc5abbb3415e3753d0ca022c1b8d7b2`.
 
 Accepted proof:
 - durable `KRCM_` job and segments before restart;
-- runtime restart;
 - same job/segments after restart;
-- duplicate start reused the same completed job while provider key was intentionally invalid;
-- provider balance changed only by the one approved request, 99 -> 98;
+- duplicate start reused stored completion while provider key was intentionally invalid;
+- provider balance changed only by the one approved request, `99 -> 98`;
 - uncertain interrupted provider requests are not auto-replayed.
 
 Canonical record:
@@ -164,75 +149,73 @@ Canonical record:
 
 ### A9.5 - Private GPT Action integration
 
-Status: PACKAGE_AND_BACKEND_PREFLIGHT_READY / PRIVATE_GPT_LIVE_CONFIG_PENDING.
+Status: PASS / COMPLETE.
 
-VoiceBridge accepted implementation:
-`970d7cc5819a623ec1d3cc7a70aceb44bfe311b9`
-
-Backend live acceptance proved:
+Backend acceptance proved:
 - bearer authentication remains mandatory;
 - user beta access code is not required;
 - owner beta admission is injected server-side only after bearer authentication;
-- managed preflight works with URL + language hint only;
-- health `ok`;
-- Supadata/native estimated cost 1;
-- credits available 98;
-- estimated after 97;
-- preflight spent zero transcript credits.
+- managed preflight works without a user beta code;
+- credit/idempotency protections remain intact.
 
-KRC private GPT package now contains:
-- managed OpenAPI schema without user-facing `beta_access_code`;
-- Builder instructions for zero-client flow;
-- mandatory 1/2 credit gate;
-- no visible `KRCM_` Job ID;
-- no Helper in normal owner flow;
-- no auto AI fallback;
-- all transcript pages retrieved internally;
-- fact-check CriticProfile gate preserved.
+Actual private GPT Builder acceptance proved:
+- A9.5 managed schema imported successfully after Builder-compatibility fixes;
+- four managed operations available;
+- bearer API-key authentication preserved;
+- zero-client instructions installed;
+- GPT remained owner-only/private;
+- private-GPT preflight returned `98 -> 97` for a one-credit native request.
 
-KRC Tests #545: SUCCESS.
+Actual private-GPT E2E acceptance proved:
+- owner pasted the YouTube URL and selected fact-check mode;
+- GPT performed credit preflight;
+- owner explicitly replied `1`;
+- ChatGPT showed the platform consequential-Action `Allow` confirmation;
+- native transcript completed with `277` segments, source language `ru`;
+- exactly `1` credit was charged, provider balance `98 -> 97`;
+- GPT created timestamped material claims;
+- GPT produced a DRAFT CriticProfile and stopped at the required approval gate;
+- after owner approval, GPT performed independent research and produced the final fact-check in the same chat;
+- final fact-check reliability score was `0.91`;
+- final status was `PASS / COMPLETED`.
 
-Canonical record:
-`28_A9_5_PRIVATE_GPT_ACTION_INTEGRATION.md`.
-
-A9.5 is not complete until the actual private GPT Builder is updated and the owner runs a real private-GPT end-to-end acceptance.
+Canonical records:
+- `28_A9_5_PRIVATE_GPT_ACTION_INTEGRATION.md`;
+- `29_A9_5_BUILDER_UPDATE_RUNBOOK.md`;
+- `30_A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_ACCEPTANCE.md`.
 
 ### A9.6 - Multi-platform adapters
 
-Status: NOT STARTED.
+Status: NEXT / NOT STARTED.
 
-After YouTube private-GPT zero-client acceptance, validate adapters independently:
-- Instagram;
-- Facebook;
-- Telegram;
-- later public platforms only after separate compatibility proof.
+Validate adapters independently:
+- Instagram public Reels/video posts;
+- Facebook public Video/Reels;
+- Telegram public video posts.
 
-Each adapter requires public positive case, auth/private negative case, normalized transcript metadata, and privacy/resource regression checks.
+Each adapter requires:
+- public positive case;
+- auth/private negative case;
+- normalized transcript metadata;
+- timestamp behavior;
+- privacy/resource regression checks;
+- same chat UX without Helper or beta-code prompt.
 
 ### A9.7 - Local upload
 
 Status: ARCHITECTURE_APPROVED / TRANSPORT_NOT VALIDATED.
 
-Target:
+The ChatGPT attachment-to-Action/backend transport must be validated before local upload is marked supported.
 
-```text
-local audio/video attachment
- -> validate type/size/duration
- -> embedded subtitle/text first
- -> otherwise temporary audio normalization
- -> accepted EU STT path when required
- -> normalized transcript
- -> delete temporary media
- -> same Research/Critic workflow
-```
+### A9.8 - Owner-only final acceptance for first source path
 
-The ChatGPT attachment-to-Action/backend transport must be validated before this is marked supported.
+Status: PASS / COMPLETE_FOR_YOUTUBE.
 
-### A9.8 - Owner-only final acceptance
+Acceptance marker:
 
-Status: PENDING.
+`OWNER_ONLY_ZERO_CLIENT_YOUTUBE = COMPLETE`
 
-First accepted final test must occur from the actual private GPT:
+The accepted sequence was:
 
 ```text
 public YouTube URL
@@ -241,28 +224,22 @@ public YouTube URL
  -> no manual Job ID
  -> credit quote displayed
  -> explicit owner 1/2 decision
- -> if 1: transcript obtained
- -> requested analysis completed in same chat
+ -> one native transcript credit
+ -> CriticProfile approval gate
+ -> requested fact-check completed in same chat
 ```
 
-For fact-check mode, CriticProfile approval remains mandatory before independent research.
+This is the first complete owner-only zero-client source path. Other adapters receive separate acceptance markers.
 
-## Final acceptance marker
+## Non-goals for current gate
 
-Only after actual private-GPT end-to-end acceptance may the first source path be marked:
-
-`OWNER_ONLY_ZERO_CLIENT_COMPLETE`
-
-Additional platform adapters and `local_upload` receive separate acceptance markers.
-
-## Non-goals for current A9 gate
-
-A9 does not require:
+Current completion does not authorize:
 - private/login-required platform media;
 - user cookies or authenticated source sessions;
 - external testers;
 - public GPT publication;
 - merge to `main`;
+- production VoiceBridge changes;
 - automatic paid/AI fallback;
-- visual-frame evidence extraction in the first local-upload path;
+- visual-frame evidence extraction;
 - permanent public free-media architecture.
