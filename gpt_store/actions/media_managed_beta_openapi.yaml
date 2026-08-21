@@ -1,12 +1,15 @@
 openapi: 3.1.0
 info:
   title: K-Research & Critic Managed Media Beta API
-  version: 0.1.0-a9.2r
+  version: 0.2.0-a9.5
   description: >-
-    Zero-client managed transcript beta. The GPT must call credit preflight first,
-    show the user the available credits, estimated cost and estimated remaining
-    balance, and wait for explicit user approval before starting a billable native
-    transcript request. No automatic AI fallback is permitted.
+    Owner-only zero-client managed transcript beta. The GPT must call credit
+    preflight first, show the user the available credits, estimated cost and
+    estimated remaining balance, and wait for explicit user approval before
+    starting a billable native transcript request. The Action bearer credential
+    authenticates the private GPT; the owner beta admission code is injected
+    server-side and is never requested from or exposed to the user. No automatic
+    AI fallback is permitted.
 servers:
   - url: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
 paths:
@@ -29,11 +32,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/CreditPreflight"
         "400":
-          description: Invalid URL, language hint or beta request.
+          description: Invalid URL or language hint.
         "401":
-          description: GPT Action authentication failed.
-        "403":
-          description: Closed-beta tester code rejected.
+          description: Private GPT Action authentication failed.
         "503":
           description: Managed transcript provider is not configured or unavailable.
   /api/v1/media/managed/transcriptions:
@@ -41,11 +42,11 @@ paths:
       operationId: startManagedMediaNativeTranscription
       summary: Spend at most one approved credit on a native managed transcript
       description: >-
-        Call only after preflight and after the user explicitly replies 1 to approve
-        the displayed native transcript cost. The backend rejects the request unless
-        credit_consent authorizes exactly one Supadata native credit. If native
-        captions are unavailable, the job stops at AWAITING_AI_CONSENT; AI generation
-        is never started automatically.
+        Call only after preflight and after the user explicitly replies 1 to
+        approve the displayed native transcript cost. The backend rejects the
+        request unless credit_consent authorizes exactly one Supadata native
+        credit. If native captions are unavailable, the job stops at
+        AWAITING_AI_CONSENT; AI generation is never started automatically.
       x-openai-isConsequential: true
       requestBody:
         required: true
@@ -55,7 +56,7 @@ paths:
               $ref: "#/components/schemas/NativeTranscriptRequest"
       responses:
         "200":
-          description: Native request completed, failed, or stopped awaiting separate AI consent.
+          description: Native request completed, processing, failed, or stopped awaiting separate AI consent.
           content:
             application/json:
               schema:
@@ -63,9 +64,7 @@ paths:
         "400":
           description: Invalid request.
         "401":
-          description: GPT Action authentication failed.
-        "403":
-          description: Closed-beta tester code rejected.
+          description: Private GPT Action authentication failed.
         "409":
           description: Explicit one-credit consent is missing or invalid.
         "429":
@@ -119,7 +118,7 @@ paths:
             type: integer
             minimum: 1
             maximum: 50
-            default: 20
+            default: 50
       responses:
         "200":
           description: Transcript segment page. Follow next_cursor until null.
@@ -138,24 +137,16 @@ components:
     PreflightRequest:
       type: object
       additionalProperties: false
-      required: [url, beta_access_code]
+      required: [url]
       properties:
         url:
           type: string
           format: uri
-          description: Public HTTPS media URL. A9.2R live acceptance starts with YouTube.
+          description: Public HTTPS media URL. Current live-accepted adapter is YouTube.
         language_hint:
           type: string
           enum: [auto, uk, ru, en]
           default: auto
-        beta_access_code:
-          type: string
-          minLength: 12
-          maxLength: 128
-          writeOnly: true
-          description: >-
-            Closed-beta tester code. Never echo, quote, log, checkpoint or include
-            in a report.
     NativeTranscriptRequest:
       allOf:
         - $ref: "#/components/schemas/PreflightRequest"
@@ -240,7 +231,7 @@ components:
           pattern: ^KRCM_[A-Za-z0-9-]+$
         status:
           type: string
-          enum: [COMPLETED, AWAITING_AI_CONSENT, FAILED]
+          enum: [PROCESSING, COMPLETED, AWAITING_AI_CONSENT, FAILED]
         created_at:
           type: string
         updated_at:
@@ -270,6 +261,10 @@ components:
         credits_remaining_estimate:
           type: number
           minimum: 0
+        credit_charge_uncertain:
+          type: boolean
+        reused:
+          type: boolean
         segment_count:
           type: integer
           minimum: 0
@@ -301,7 +296,7 @@ components:
           pattern: ^KRCM_[A-Za-z0-9-]+$
         status:
           type: string
-          enum: [COMPLETED, AWAITING_AI_CONSENT, FAILED]
+          enum: [PROCESSING, COMPLETED, AWAITING_AI_CONSENT, FAILED]
         cursor:
           type: integer
         next_cursor:
