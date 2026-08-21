@@ -1,13 +1,13 @@
-schema_version: "0.4-beta"
+schema_version: "0.5-beta"
 
 product:
   name: K-Research & Critic - MEDIA BETA
   description: |-
-    Закрите тестування перевірки тверджень із YouTube-відео для обмеженої групи тестерів.
-    (closed media-input beta for K-Research & Critic.)
+    Приватне owner-only тестування аналізу публічних YouTube-відео без Helper і ручного Job ID.
+    (owner-only zero-client media-input beta for K-Research & Critic.)
   default_language: uk-UA
-  primary_channel: chatgpt_store_unlisted_beta
-  publication_state: closed_beta
+  primary_channel: chatgpt_private_beta
+  publication_state: private_owner_only
 
 model:
   policy: user_plan
@@ -27,14 +27,14 @@ knowledge:
 
 instructions:
   file: prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md
-  canonical_reference: prompts/GPT_STORE_MEDIA_BETA_INSTRUCTIONS.md
-  version: "0.4-beta"
+  canonical_reference: prompts/GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md
+  version: "0.5-beta-a9.5"
   builder_character_limit: 8000
 
 actions:
   media_transcript:
     enabled: true
-    schema: gpt_store/actions/media_beta_openapi.yaml
+    schema: gpt_store/actions/media_managed_beta_openapi.yaml
     authentication: bearer_api_key
     server: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
     privacy_policy_document: docs/PRIVACY_POLICY.md
@@ -46,60 +46,64 @@ checkpoint:
   example: gpt_store/checkpoint_example.json
 
 beta:
-  access_model: per_tester_access_code
-  intended_testers: 4
-  ingress_mode: client_assisted
-  browser_helper_required: true
-  browser_helper_version: "0.2.2"
-  browser_helper_job_prefix: KRCC_
-  direct_transcript_first: true
-  client_caption_first: true
-  client_caption_first_status: LIVE_ACCEPTED
+  access_model: private_gpt_action_bearer_plus_server_owner_admission
+  intended_testers: 1
+  owner_only: true
+  ingress_mode: managed_zero_client
+  browser_helper_required: false
+  browser_helper_normal_flow_allowed: false
+  browser_assisted_a8_fallback_preserved: true
+  managed_job_prefix: KRCM_
+  public_platforms_live_accepted:
+    - youtube
   max_video_seconds: 3600
-  max_concurrent_jobs: 1
-  daily_stt_seconds: 7200
-  max_client_audio_bytes: 33554432
-  durable_store: postgres
-  restart_resilient_waiting_jobs: true
-  durable_quota_ledger: true
-  active_audio_process_replacement: RETRY_SAFE_LIVE_ACCEPTED
-  stt_text_quality_disposition: NON_REPRODUCIBLE_ANOMALY_ACCEPTED
-  stt_provider: assemblyai
-  stt_endpoint: https://api.eu.assemblyai.com
-  stt_model_training_boundary: EU_NOT_USED_FOR_MODEL_TRAINING
-  stt_audio:
-    channels: 1
-    sample_rate_hz: 16000
-    bitrate_kbps: 32
-  access_code_handling:
-    min_length: 12
-    user_visible: true
+  managed_provider: supadata
+  managed_provider_mode: native
+  managed_native_credit_cost: 1
+  managed_credit_preflight_required: true
+  managed_explicit_user_consent_required: true
+  managed_automatic_ai_fallback: false
+  managed_ai_requires_second_consent: true
+  managed_user_beta_access_code_required: false
+  managed_owner_access_injected_server_side: true
+  managed_durable_store: postgres
+  managed_restart_resilient_jobs: true
+  managed_duplicate_start_reuses_job: true
+  provider_balance_after_a9_3_acceptance: 98
+  legacy_browser_assisted:
+    job_prefix: KRCC_
+    helper_version: "0.2.2"
+    daily_stt_seconds: 7200
+    durable_store: postgres
+    stt_provider: assemblyai
+    stt_endpoint: https://api.eu.assemblyai.com
+    status: A8_ACCEPTED_FALLBACK_ONLY
+  credential_handling:
+    action_bearer_server_side: true
+    owner_beta_admission_server_side: true
+    provider_key_server_side: true
     never_echo: true
     never_checkpoint: true
     never_log: true
-    backend_plaintext_persisted: false
-    backend_job_ownership_digest: sha256
-  quota_notes:
-    - Direct reliable transcript/caption intake does not consume the beta STT budget.
-    - Browser-side YouTube caption ingestion completes with transcript_source=youtube_captions and stt_seconds_charged=0.
-    - Browser audio is the fallback when usable captions are unavailable and consumes the AssemblyAI STT budget.
-    - The backend determines captured-audio duration before reserving STT seconds.
-    - Daily STT charges are persisted in the isolated Postgres ledger and restored after process replacement.
-    - A hard process loss during TRANSCRIBING returns MEDIA_CLIENT_INTERRUPTED_RETRY_REQUIRED on the same durable job; the user must start a fresh KRCC job.
 
 release:
-  rollout_state: CLOSED_BETA_A7_READY_FOR_TESTER1
+  rollout_state: A9_5_PACKAGE_READY_FOR_PRIVATE_GPT
   production_core_unchanged: true
   public_store_gpt_unchanged: true
   user_api_key_required: false
+  user_beta_access_code_required: false
   developer_provider_key_required: true
   external_backend_required: true
   a4_live_validation_complete: true
   a5_builder_validation_complete: true
   a6_owner_operator_e2e_complete: true
-  a7_eu_audio_privacy_gate_complete: true
-  external_tester1_ready: true
-  gpt_builder_beta_required: true
-  browser_helper_live_test_required: true
-  privacy_public_url_required_for_link_sharing: true
+  a8_browser_assisted_owner_baseline_complete: true
+  a9_1_server_stt_eu_complete: true
+  a9_2_direct_youtube_blocked: true
+  a9_2r_managed_native_complete: true
+  a9_3_durable_managed_complete: true
+  a9_5_private_gpt_integration_complete: false
+  a9_8_owner_zero_client_acceptance_complete: false
+  external_tester_rollout_paused: true
+  gpt_builder_private_update_required: true
   merge_to_public_product_allowed: false
