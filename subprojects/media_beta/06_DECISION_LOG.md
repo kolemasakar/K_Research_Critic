@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 Реєстр затверджених рішень щодо архітектури, beta-обмежень і майбутнього безкоштовного медіарежиму.
 
-Version: 1.5
+Version: 1.6
 Status: ACTIVE
 Updated: 2026-08-21
 
@@ -340,3 +340,38 @@ The accepted implementation also hardens `psql` result parsing so durable reserv
 Reason:
 
 Zero-client GPT integration is not safe if a backend restart can lose the transcript or cause an automatic duplicate paid provider call. Durable state plus restart-safe idempotency closes that cost and reliability risk before the private GPT is switched to the managed path.
+
+## D022 - Private owner zero-client Action hides beta admission behind bearer authentication
+
+Decision: APPROVED / BACKEND_PREFLIGHT_LIVE_ACCEPTED
+Accepted: 2026-08-21
+
+For the private owner-only A9.5 path, the normal user must not be asked to enter the historical `OWNER_...` beta admission code.
+
+Required security and UX contract:
+- the private GPT Action bearer credential remains mandatory;
+- missing or invalid bearer authentication is rejected before any owner admission is injected;
+- after successful bearer authentication, the isolated backend may inject the configured owner beta admission code server-side for managed preflight/start requests that do not contain one;
+- the underlying `MediaBetaGate`, access-code digest, durable request key and credit/idempotency protections remain in force;
+- the GPT-facing OpenAPI schema must not expose `beta_access_code`;
+- the user must never be asked for the Action bearer, owner admission code or provider API key;
+- external tester rollout remains paused and this owner-only rule does not silently redefine the earlier multi-tester A7 access model.
+
+Live backend acceptance:
+
+```text
+live_code: 970d7cc5819a623ec1d3cc7a70aceb44bfe311b9
+health: ok
+user_beta_access_code_required: false
+owner_access_injected_server_side: true
+provider: supadata/native
+credits_available: 98
+estimated_native_cost: 1
+estimated_after: 97
+transcript_endpoint_called: false
+credits_spent: 0
+```
+
+Reason:
+
+The target product contract is URL plus chat choices only. Requiring the owner to copy a beta code would preserve a manual infrastructure step that A9 exists to remove. Bearer-first server-side owner admission removes that UX dependency without exposing credentials or weakening the managed credit gate.
