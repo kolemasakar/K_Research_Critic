@@ -76,7 +76,12 @@ paths:
       summary: Read managed media job status and actual cumulative credit charge
       x-openai-isConsequential: false
       parameters:
-        - $ref: "#/components/parameters/JobId"
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCM_[A-Za-z0-9-]+$
       responses:
         "200":
           description: Current managed media job state.
@@ -92,7 +97,12 @@ paths:
       summary: Read timestamped managed transcript segments
       x-openai-isConsequential: false
       parameters:
-        - $ref: "#/components/parameters/JobId"
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCM_[A-Za-z0-9-]+$
         - name: cursor
           in: query
           required: false
@@ -127,7 +137,12 @@ paths:
         start AI transcription or authorize any AI credit spend.
       x-openai-isConsequential: false
       parameters:
-        - $ref: "#/components/parameters/JobId"
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCM_[A-Za-z0-9-]+$
       responses:
         "200":
           description: Separate AI credit quote. This does not authorize AI processing.
@@ -155,7 +170,12 @@ paths:
         never runs automatically and reuses an already completed AI job.
       x-openai-isConsequential: true
       parameters:
-        - $ref: "#/components/parameters/JobId"
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCM_[A-Za-z0-9-]+$
       requestBody:
         required: true
         content:
@@ -186,14 +206,6 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
-  parameters:
-    JobId:
-      name: job_id
-      in: path
-      required: true
-      schema:
-        type: string
-        pattern: ^KRCM_[A-Za-z0-9-]+$
   schemas:
     PreflightRequest:
       type: object
