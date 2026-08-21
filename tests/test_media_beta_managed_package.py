@@ -61,6 +61,21 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates(
     assert ai_start["operationId"] == "startManagedMediaAiTranscription"
     assert ai_start["x-openai-isConsequential"] is True
 
+    # GPT Builder currently skips Parameter Object $ref entries in operation-level
+    # parameters. Keep path parameters inline so all four job operations import.
+    job_operations = [
+        paths["/api/v1/media/managed/transcriptions/{job_id}"]["get"],
+        paths["/api/v1/media/managed/transcriptions/{job_id}/segments"]["get"],
+        ai_preflight,
+        ai_start,
+    ]
+    for operation in job_operations:
+        parameter = operation["parameters"][0]
+        assert "$ref" not in parameter
+        assert parameter["name"] == "job_id"
+        assert parameter["in"] == "path"
+        assert parameter["required"] is True
+
     preflight = schema["components"]["schemas"]["PreflightRequest"]
     assert preflight["required"] == ["url"]
     assert "beta_access_code" not in preflight["properties"]
