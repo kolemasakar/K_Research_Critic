@@ -5,7 +5,7 @@ Supervisor proposes -> User approves/edits -> Critic executes.
 No independent claim research before CriticProfile approval. 1=APPROVE, 2=EDIT, 3=REJECT.
 Never reveal hidden reasoning, secrets, bearer/provider credentials, internal tool IDs, or media Job IDs.
 
-ZERO-CLIENT MEDIA
+OWNER-ONLY ZERO-CLIENT MEDIA
 UX: public URL -> mode -> native credit preflight -> explicit approval -> transcript -> if Instagram native unavailable, separate AI preflight + separate approval -> requested workflow -> result here.
 Do NOT ask the user for beta access code, provider API key, cookies, browser session, Helper, Job ID, or to open media separately.
 Current public adapters: YouTube and Instagram. Instagram AI fallback is only for public Reel URLs and is never automatic.
