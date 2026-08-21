@@ -2,15 +2,15 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 4.1
+Version: 4.2
 Status: ACTIVE_CHECKPOINT
-Checkpoint date: 2026-08-20
+Checkpoint date: 2026-08-21
 
 ## Executive state
 
 Current phase state:
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_IMPLEMENTATION_ACTIVE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_NEXT`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_IMPLEMENTATION_ACTIVE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_GPT_ACTION_NEXT`
 
 Current product target:
 
@@ -28,6 +28,9 @@ Canonical A9 plan:
 
 Canonical managed-provider acceptance:
 `subprojects/media_beta/26_A9_MANAGED_PROVIDER_ACCEPTANCE.md`
+
+Canonical A9.3 durability acceptance:
+`subprojects/media_beta/27_A9_DURABLE_MANAGED_ACCEPTANCE.md`
 
 ## Accepted browser-assisted baseline
 
@@ -100,7 +103,10 @@ Managed-provider runtime addition:
 - `SUPADATA_API_KEY` is configured only for the isolated MEDIA BETA runtime;
 - Supadata starts in `native` mode;
 - automatic managed AI fallback is disabled;
-- managed transcript operations require explicit credit consent.
+- managed transcript operations require explicit credit consent;
+- `KRCM_` job and segment state is durable in Postgres;
+- managed duplicate starts reuse durable state across runtime restart;
+- A9.3 live acceptance consumed exactly one approved native credit and left the provider balance at 98.
 
 ## A4-A6
 
@@ -253,17 +259,7 @@ Live acceptance source:
 
 `https://www.youtube.com/watch?v=IzYyKRx7Qwg`
 
-Preflight:
-
-```text
-plan: Free (100/mo)
-credits_available: 100
-estimated_native_cost: 1
-estimated_remaining: 99
-can_continue: true
-```
-
-After explicit owner choice `1`:
+Initial managed-provider acceptance:
 
 ```text
 job_id: KRCM_705fe6a2-5ff4-47de-b6e5-b6c9bf90caa4
@@ -281,19 +277,67 @@ Timestamped segment validation passed.
 Canonical record:
 `26_A9_MANAGED_PROVIDER_ACCEPTANCE.md`.
 
+### A9.3 - Durable managed jobs and credit-safe idempotency
+
+Status: PASS / COMPLETE.
+
+Accepted isolated live code:
+
+`7736f2e7acc5abbb3415e3753d0ca022c1b8d7b2`
+
+Final live acceptance:
+
+```text
+job_id: KRCM_6f359971-b061-4db8-b4a2-9f6422f351b6
+status: COMPLETED
+detected_language: ru
+segment_count: 277
+credits_charged: 1
+provider_balance_before: 99
+provider_balance_after: 98
+```
+
+Acceptance proved:
+- durable `KRCM_` job read before restart;
+- durable timestamped segments before restart;
+- isolated runtime restart with an intentionally invalid provider key;
+- same job and segments readable after restart;
+- duplicate start succeeded by reusing the same durable completed job while the provider key was invalid;
+- therefore the duplicate path did not require a second valid provider call;
+- valid provider key was restored;
+- final provider balance changed by exactly one approved credit.
+
+The reservation parser was hardened to select the actual seven-field PostgreSQL returned row rather than assuming the final `psql` stdout line is data. Regression coverage was added before live acceptance.
+
+Canonical record:
+`27_A9_DURABLE_MANAGED_ACCEPTANCE.md`.
+
 ## Remaining A9 blockers
 
 Before final owner-only zero-client acceptance:
-- managed `KRCM_` job state must become durable/restart-safe;
-- managed credit accounting/idempotency must prevent duplicate provider spend on retries/restarts;
 - the private GPT Action must be switched from Helper/KRCC UX to managed preflight/consent/transcript UX;
 - the GPT must hide internal Job ID mechanics from the user;
 - full private-GPT end-to-end analysis must pass with only the media URL and chat choices;
 - each additional public-platform adapter needs its own positive public case and auth/private negative case;
 - local upload transport remains unvalidated.
 
+The managed YouTube backend path is now durable and credit-safe enough for private GPT integration.
+
 ## Next task
 
-`A9.3 - Durable zero-client managed jobs and credit-safe idempotency.`
+`A9.5 - Private GPT Action zero-client integration.`
 
-After A9.3, continue to private GPT zero-client Action integration and final owner acceptance.
+Normal target flow:
+
+```text
+public YouTube URL
+ -> private GPT
+ -> analysis-mode choice
+ -> managed credit preflight
+ -> explicit approval when one credit may be spent
+ -> managed start/status/segments handled internally
+ -> no Helper
+ -> no manual Job ID
+ -> requested Research/Critic workflow
+ -> result in the same ChatGPT conversation
+```
