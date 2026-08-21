@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: K-Research & Critic Managed Media Beta API
-  version: 0.2.1-a9.5
+  version: 0.2.2-a9.5
   description: >-
     Owner-only zero-client managed transcript beta. The GPT must call credit
     preflight first, show the user the available credits, estimated cost and
@@ -147,27 +147,34 @@ components:
           enum: [auto, uk, ru, en]
           default: auto
     NativeTranscriptRequest:
-      allOf:
-        - $ref: "#/components/schemas/PreflightRequest"
-        - type: object
-          required: [credit_consent]
+      type: object
+      additionalProperties: false
+      required: [url, credit_consent]
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Public HTTPS media URL. Current live-accepted adapter is YouTube.
+        language_hint:
+          type: string
+          enum: [auto, uk, ru, en]
+          default: auto
+        credit_consent:
+          type: object
+          additionalProperties: false
+          required: [provider, mode, max_credits]
           properties:
-            credit_consent:
-              type: object
-              additionalProperties: false
-              required: [provider, mode, max_credits]
-              properties:
-                provider:
-                  type: string
-                  const: supadata
-                mode:
-                  type: string
-                  const: native
-                max_credits:
-                  type: integer
-                  minimum: 1
-                  maximum: 1
-                  description: Hard user-approved maximum for this operation.
+            provider:
+              type: string
+              const: supadata
+            mode:
+              type: string
+              const: native
+            max_credits:
+              type: integer
+              minimum: 1
+              maximum: 1
+              description: Hard user-approved maximum for this operation.
     CreditPreflight:
       type: object
       required:
