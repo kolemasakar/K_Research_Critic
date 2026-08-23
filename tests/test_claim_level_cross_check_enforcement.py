@@ -31,7 +31,7 @@ def test_media_builder_requires_traceable_evidence_origins_and_localized_protoco
     assert "A systematic review/meta-analysis counts as one evidence origin" in text
     assert "TRACEABILITY:" in text
     assert "every evidence origin counted in `achieved_independent` MUST be visible" in text
-    assert "`achieved_independent` cannot exceed the number of visibly traceable" in text
+    assert "achieved cannot exceed visible independent origins" in text
     assert "Critic checks the ledger claim-by-claim and verifies traceability" in text
     assert "untraceable PASS count" in text
     assert "`ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ`" in text
@@ -44,8 +44,9 @@ def test_media_builder_localizes_user_visible_labels() -> None:
         ROOT / "prompts" / "GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md"
     ).read_text(encoding="utf-8")
 
-    assert "headings, table titles/columns, CriticProfile field labels" in text
+    assert "Report language controls ALL user-visible text/labels" in text
     assert "Canonical English keys stay internal" in text
+    assert "Localize CriticProfile field labels too" in text
     assert "Do not show `Claim-level summary`" in text
     assert "raw CriticProfile keys such as `profile_id`, `risk_level`, `required_cross_checks`, `approved_at`" in text
 
