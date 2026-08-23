@@ -2,7 +2,7 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 5.0
+Version: 5.1
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-23
 
@@ -23,7 +23,7 @@ Not accepted yet:
 
 Repository `main`, external tester rollout, and production VoiceBridge remain outside the current merge gate.
 
-The actual main `K-Research & Critic` Builder has now been manually synchronized with the hardened clean Core candidate and passed the final NEW-chat runtime regression for CriticProfile gating, claim-level cross-check enforcement, evidence-origin traceability, and mandatory protocol summary.
+The main `K-Research & Critic` has passed final Core traceability runtime acceptance. The same traceability contract is now implemented in the MEDIA BETA branch instructions/tests but still requires manual private-Builder resynchronization and a NEW-chat runtime regression.
 
 ## Repositories and isolation boundary
 
@@ -103,7 +103,7 @@ Canonical record: `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md`.
 
 ## MEDIA BETA claim-level cross-check enforcement
 
-Status: PASS / RUNTIME_ACCEPTED_PRIVATE_OWNER_BETA.
+Status: PASS / RUNTIME_ACCEPTED_PRIVATE_OWNER_BETA for the prior claim-level contract.
 
 The Builder contract requires a ledger for EACH material factual claim before verdict:
 
@@ -128,7 +128,38 @@ Observed acceptance evidence included a real `Cross-check: 1/3 - SHORTFALL` and 
 Canonical contract: `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md`.
 Canonical runtime record: `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md`.
 
-`cross_check_claim_level_runtime_accepted=true` for MEDIA BETA.
+`cross_check_claim_level_runtime_accepted=true` remains historical acceptance for this prior contract.
+
+## MEDIA BETA traceability alignment
+
+Status: IMPLEMENTED_IN_BRANCH / RUNTIME_PENDING.
+
+The MEDIA BETA Research/Critic instructions are now aligned with the traceability contract already accepted in the main Core:
+- every evidence origin counted in `achieved_independent` must be visible and traceable by source title/citation to that claim;
+- achieved count cannot exceed visibly traceable independent evidence origins;
+- duplicates/derivative reporting do not increase the count;
+- a systematic review/meta-analysis counts as one evidence origin unless specific underlying studies were independently inspected and cited;
+- Critic verifies evidence-origin traceability before PASS;
+- an untraceable PASS count blocks unconditional PASS;
+- Review Protocol MUST contain `Claim | Required | Achieved independent | Exception` for every material factual claim.
+
+Updated branch artifacts:
+- `prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md`;
+- `prompts/GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md` version `0.3.5-a9.6`;
+- `gpt_store/media_beta_manifest.yaml`;
+- claim-level/package regression tests.
+
+Manifest compatibility versions remain `schema_version: 0.6-beta` and instruction version `0.6-beta-a9.6`.
+
+Canonical alignment record: `37_MEDIA_BETA_TRACEABILITY_ALIGNMENT.md`.
+
+Current runtime markers:
+
+`MEDIA_BETA_TRACEABILITY_HARDENING_CODE = IMPLEMENTED`
+
+`MEDIA_BETA_TRACEABILITY_HARDENING_RUNTIME = PENDING`
+
+`gpt_builder_private_update_required = true`
 
 ## Main Core GPT runtime acceptance
 
@@ -149,19 +180,8 @@ Accepted behavior:
 - final reliability score was `0.88`;
 - remaining evidence scarcity was stated explicitly.
 
-Traceable PASS examples:
-- claim 1: Buijze 2016 + Collier 2015 + El-Ansary 2024 -> `3/3`;
-- claim 2: El-Ansary 2024 + Janský 1996 + Brenner 1999 -> `3/3`;
-- claim 3: Buijze 2016 only -> `1/3 SHORTFALL`.
-
-A minor Markdown rendering defect collapsed the visible table header text, but all four logical columns and values were present. This is non-blocking.
-
 Canonical hardening record: `35_CORE_RUNTIME_TRACEABILITY_HARDENING.md`.
 Canonical runtime acceptance: `36_CORE_TRACEABILITY_RUNTIME_ACCEPTANCE.md`.
-
-`CORE_CLAIM_LEVEL_ENFORCEMENT_RUNTIME = ACCEPTED`
-
-`CORE_TRACEABILITY_HARDENING_CODE = PASS`
 
 `CORE_TRACEABILITY_HARDENING_RUNTIME = ACCEPTED`
 
@@ -223,8 +243,12 @@ A separately authorized Facebook AI generate request failed with `MANAGED_PROVID
 
 `CORE_TRACEABILITY_HARDENING_RUNTIME = ACCEPTED`
 
+`MEDIA_BETA_TRACEABILITY_HARDENING_CODE = IMPLEMENTED`
+
+`MEDIA_BETA_TRACEABILITY_HARDENING_RUNTIME = PENDING`
+
 These markers do not authorize repository merge, external testers, production VoiceBridge changes, private/authenticated media, automatic AI fallback, Facebook, Telegram, or local upload.
 
 ## Next task
 
-`Resume A9.6 Facebook remediation without replaying any uncertain-charge operation.`
+`Manually resynchronize the private K-Research & Critic - MEDIA BETA Builder with the updated Builder instructions and run one NEW-chat traceability regression. After PASS, resume A9.6 Facebook remediation without replaying any uncertain-charge operation.`
