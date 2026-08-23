@@ -5,84 +5,13 @@ on:
   pull_request:
 
 permissions:
-  contents: write
-  issues: write
-  pull-requests: write
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  h2-doc-state:
-    name: A9.7-H2 documentation state
-    if: (github.event_name == 'pull_request' && github.head_ref == 'agent/video-url-research') || (github.event_name == 'push' && github.ref == 'refs/heads/agent/video-url-research')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout feature branch
-        uses: actions/checkout@v6
-        with:
-          ref: agent/video-url-research
-          fetch-depth: 0
-
-      - name: Apply once if old Facebook state remains
-        run: |
-          set -euo pipefail
-          if ! grep -q 'managed_facebook_live_accepted: false' gpt_store/media_beta_manifest.yaml; then
-            echo 'A9.7-H2 source state already applied.'
-            exit 0
-          fi
-          python .github/scripts/a9_7_h2_docs_patch.py
-          allowed='^(gpt_store/media_beta_manifest.yaml|scripts/validate_store_package.py|tests/test_media_beta_managed_package.py|subprojects/media_beta/00_INDEX.md|subprojects/media_beta/03_CURRENT_STATE.md|subprojects/media_beta/41_A9_7_FACEBOOK_COBALT_LIVE_ACCEPTANCE.md)$'
-          changed="$(git status --short | awk '{print $2}')"
-          test -n "$changed"
-          while IFS= read -r path; do
-            [[ "$path" =~ $allowed ]] || { echo "unexpected path: $path"; exit 1; }
-          done <<< "$changed"
-          git diff --check
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add gpt_store/media_beta_manifest.yaml scripts/validate_store_package.py tests/test_media_beta_managed_package.py subprojects/media_beta/00_INDEX.md subprojects/media_beta/03_CURRENT_STATE.md subprojects/media_beta/41_A9_7_FACEBOOK_COBALT_LIVE_ACCEPTANCE.md
-          git commit -m 'A9.7-H2 record Facebook Cobalt live acceptance'
-          git push origin HEAD:agent/video-url-research
-
-  h2-audit:
-    name: A9.7-H2 visible audit
-    if: github.event_name == 'push' && github.ref == 'refs/heads/agent/video-url-research'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout feature branch
-        uses: actions/checkout@v6
-        with:
-          ref: agent/video-url-research
-          persist-credentials: false
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.13'
-          cache: pip
-          cache-dependency-path: requirements.txt
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
-      - name: Run H2 gates
-        id: gate
-        run: |
-          set -euo pipefail
-          python -m scripts.validate_repository
-          python -m scripts.validate_store_package
-          python -m pytest -q | tee /tmp/pytest.txt
-          tail -n 2 /tmp/pytest.txt
-      - name: Report H2 audit
-        if: always()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          if [[ '${{ steps.gate.outcome }}' == 'success' ]]; then result=PASS; else result=FAIL; fi
-          gh pr comment 8 --repo kolemasakar/K_Research_Critic --body "A9.7-H2 Facebook Cobalt documentation/state audit: **${result}**. validate_repository + validate_store_package + full pytest executed on feature-branch documentation state. No provider/media/STT/Render/production/main/merge action was executed by H2."
-
   pytest:
     name: Tests / Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
@@ -91,21 +20,25 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.13", "3.14"]
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
           persist-credentials: false
+
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
           cache-dependency-path: requirements.txt
+
       - name: Install runtime test dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
+
       - name: Run full pytest suite
         run: python -m pytest -q
 
@@ -113,11 +46,13 @@ jobs:
     name: Quality gates
     runs-on: ubuntu-latest
     timeout-minutes: 12
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
           persist-credentials: false
+
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -126,19 +61,26 @@ jobs:
           cache-dependency-path: |
             requirements.txt
             requirements-dev.txt
+
       - name: Install development dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.txt
+
       - name: Dependency integrity
         run: python -m pip check
+
       - name: Ruff correctness lint
         run: python -m ruff check . --select E9,F63,F7,F82
+
       - name: Mypy typed boundary check
         run: python -m mypy models config gpt_store
+
       - name: Validate repository policy
         run: python -m scripts.validate_repository
+
       - name: Validate GPT Store package
         run: python -m scripts.validate_store_package
+
       - name: Run coverage gate
         run: python -m pytest --cov --cov-report=term-missing --cov-fail-under=70
