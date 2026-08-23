@@ -1,7 +1,7 @@
 # K-Research & Critic
 Базовий опис завершеного production-продукту K-Research & Critic для дослідження та незалежної перевірки.
 
-Version: 1.4
+Version: 1.5
 Status: PRODUCTION / MAINTENANCE
 Updated: 2026-08-23
 
@@ -34,19 +34,12 @@ Evidence-origin traceability                        PASS
 Systematic-review double-counting protection        PASS
 Critic REVISE -> PASS loop                          PASS
 Ukrainian headings/table/profile-field localization PASS
-```
-
-A previously accepted request-log Action is now being removed from the public product because ChatGPT's external Action consent screen interrupts the normal UX for new users.
-
-Target public state:
-
-```text
 Actions                                             DISABLED
-automatic request logging                           DISABLED
-Apps                                                DISABLED
+script.google.com consent interruption              ABSENT
+Repository main / public Builder sync               COMPLETE
 ```
 
-The repository already contains the target no-Action Instructions. Manual Builder synchronization is still required before repository/public Builder sync can be marked complete.
+The previously tested request-log Action was removed from the public product because ChatGPT's external Action consent screen interrupted the normal UX for new users.
 
 ## Public Workflow
 
@@ -75,7 +68,7 @@ Critic
    +---- PASS ------> Final report + Review protocol
 ```
 
-No request-log Action belongs in the target public workflow.
+No request-log Action belongs in the active public workflow.
 
 Risk floors:
 
@@ -110,7 +103,7 @@ GPT Store Edition
   - no developer-owned API key required
   - no mandatory external backend
   - Apps disabled
-  - Actions disabled in target public configuration
+  - Actions disabled
   - no pinned model identifier
   - user-plan model policy
 ```
@@ -128,17 +121,19 @@ Public GPT
  -> Google Sheet `K-Research & Critic — Request Log`
 ```
 
-It is now classified as:
+Current classification:
 
 ```text
-IMPLEMENTED / TESTED / DISABLED_DUE_TO_USER_CONSENT_UX
+IMPLEMENTED / TESTED / RETAINED / DISABLED_DUE_TO_USER_CONSENT_UX
 ```
 
-The implementation remains in the repository for reference and possible future reuse outside the public Action-consent path. It is not part of the target active Builder configuration.
+The implementation remains in the repository for reference and possible future reuse outside the public Action-consent path. It is not part of the active Builder configuration.
+
+Post-disable NEW-chat verification confirmed that the standard CriticProfile gate appears directly and no `script.google.com` consent screen appears.
 
 ## GPT Store Package
 
-Active target package files:
+Active package files:
 
 ```text
 gpt_store/manifest.yaml
@@ -159,17 +154,18 @@ prompts/GPT_STORE_REQUEST_LOG_ADDENDUM.md
 docs/REQUEST_LOG_MVP.md
 docs/PRIVACY_POLICY_REQUEST_LOG.md
 docs/REQUEST_LOG_MVP_RUNTIME_ACCEPTANCE_2026-08-23.md
+docs/REQUEST_LOG_DISABLEMENT_DECISION_2026-08-23.md
 ```
 
 ## Current Synchronization State
 
 ```text
-repository target actions=false                 COMPLETE
+repository actions=false                       COMPLETE
 request logging removed from repo Instructions COMPLETE
-public Builder Action removal                  PENDING MANUAL STEP
-public Builder Instructions resync             PENDING MANUAL STEP
-post-disable NEW-chat smoke test               PENDING
-repository_matches_current_public_builder      false until completion
+public Builder Action removal                  COMPLETE
+public Builder Instructions resync             COMPLETE
+post-disable NEW-chat smoke test               PASS
+repository_matches_current_public_builder      true
 ```
 
 ## Checkpoint and Recovery
