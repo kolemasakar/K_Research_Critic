@@ -45,10 +45,11 @@ def test_manifest_preserves_store_first_invariants() -> None:
     assert release["report_label_localization_runtime_accepted"] is True
     assert release["request_log_runtime_accepted"] is True
     assert release["request_log_public_enabled"] is False
-    assert release["repository_matches_current_public_builder"] is False
+    assert release["request_log_disablement_runtime_accepted"] is True
+    assert release["repository_matches_current_public_builder"] is True
 
 
-def test_instruction_package_matches_target_public_core_runtime() -> None:
+def test_instruction_package_matches_accepted_public_core_runtime() -> None:
     text = (ROOT / "prompts" / "GPT_STORE_INSTRUCTIONS.md").read_text(encoding="utf-8")
 
     assert len(text) <= 8000
@@ -73,11 +74,11 @@ def test_instruction_package_matches_target_public_core_runtime() -> None:
     assert "Наступна допустима дія: 1 - **APPROVE**" not in text
 
 
-def test_manifest_declares_target_core_contract() -> None:
+def test_manifest_declares_accepted_core_contract() -> None:
     manifest = yaml.safe_load((ROOT / "gpt_store" / "manifest.yaml").read_text(encoding="utf-8"))
     instructions = manifest["instructions"]
 
-    assert instructions["version"] == "2.2-request-log-disabled-pending-builder-sync"
+    assert instructions["version"] == "2.2-request-log-disabled-runtime-accepted"
     assert instructions["builder_character_limit"] == 8000
     assert instructions["default_report_language"] == "uk-UA"
     assert instructions["report_language_follows_source_language"] is False
@@ -181,6 +182,7 @@ def test_manifest_can_be_parsed_without_secrets_or_active_actions() -> None:
     assert manifest["knowledge"]["required"] is False
     assert manifest["request_log_mvp"]["prototype_retained"] is True
     assert manifest["request_log_mvp"]["public_enabled_target"] is False
+    assert manifest["request_log_mvp"]["disablement_runtime_accepted"] is True
 
 
 def test_store_package_validation_cli_passes() -> None:
