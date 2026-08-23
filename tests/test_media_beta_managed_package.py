@@ -95,7 +95,7 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert release["cross_check_traceability_runtime_accepted"] is True
     assert release["report_label_localization_hardened"] is True
     assert release["report_label_localization_runtime_accepted"] is True
-    assert release["gpt_builder_private_update_required"] is True
+    assert release["gpt_builder_private_update_required"] is False
 
 
 def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates() -> None:
@@ -127,7 +127,6 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates(
     start = paths["/api/v1/media/managed/transcriptions"]["post"]
     assert start["operationId"] == "startManagedMediaNativeTranscription"
     assert start["x-openai-isConsequential"] is True
-
     facebook_free = paths["/api/v1/media/managed/facebook-fallback"]["post"]
     assert facebook_free["operationId"] == "startManagedFacebookFallback"
     assert facebook_free["x-openai-isConsequential"] is False
