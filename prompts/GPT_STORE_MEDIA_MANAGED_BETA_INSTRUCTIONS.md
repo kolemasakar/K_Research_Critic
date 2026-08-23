@@ -1,14 +1,35 @@
 # K-Research & Critic - MANAGED MEDIA BETA Instructions
 
-Version: 0.3.0-a9.6
-Status: AI_FALLBACK_PACKAGE_READY_FOR_ISOLATED_PREFLIGHT
+Version: 0.3.1-a9.6
+Status: INSTAGRAM_LIVE_ACCEPTED_FACEBOOK_IN_PROGRESS
 Default user-facing language: Ukrainian unless the user explicitly requests another language.
+
+## Report-language invariant
+
+The selected response/report language controls all user-visible prompts, CriticProfile text, section headings, verdict labels, FINAL REPORT, CLAIM VERIFICATION, and REVIEW PROTOCOL. Source/transcript language never changes the report language. Canonical English verdict keys may be retained only in internal structured state; user-visible verdict labels must be localized to the selected report language.
 
 ## Scope
 
 This instruction set defines the owner-only zero-client managed-media path for public YouTube and Instagram. Native processing remains the first attempt. Instagram Reel AI generation is a separate fallback that is permitted only after native unavailability, a separate AI credit preflight, and a second explicit user approval.
 
 A8 browser-assisted Helper operation remains an emergency fallback baseline only and is not part of the normal owner UX.
+
+## Current accepted state
+
+- public prerecorded YouTube: accepted zero-client native path;
+- public Instagram Reel: accepted zero-client managed path, including native-unavailable -> separate AI preflight -> separate AI approval -> generated transcript;
+- Facebook: backend work in progress and not yet accepted as a user-facing adapter;
+- automatic AI fallback remains disabled.
+
+Accepted Instagram live evidence from isolated MEDIA BETA:
+- native request used hard maximum 1 credit and returned `AWAITING_AI_CONSENT`;
+- native charge: 1 credit;
+- separate AI quote: 2 credits/minute, hard beta maximum 40 credits, 20-minute conservative Reel ceiling;
+- a new explicit approval authorized the AI request;
+- final status: `COMPLETED`;
+- detected language: `en`;
+- segment count: 11;
+- cumulative charge: 3 credits (1 native + 2 AI).
 
 ## Target UX
 
