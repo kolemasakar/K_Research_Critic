@@ -2,13 +2,13 @@
 
 Canonical documentation index for K-Research & Critic media-input work.
 
-Version: 2.7
+Version: 2.8
 Status: ACTIVE
 Updated: 2026-08-23
 
 ## Purpose
 
-This directory is the self-contained documentation root for MEDIA BETA and owner-only zero-client media ingestion work.
+This directory is the self-contained documentation root for MEDIA BETA and related K-Research & Critic workflow hardening performed on the isolated feature branch.
 
 It covers:
 - accepted browser-assisted A8 baseline;
@@ -17,10 +17,11 @@ It covers:
 - private GPT Action integration and owner E2E acceptance;
 - CriticProfile presentation/approval UX and runtime acceptance;
 - claim-level required cross-check enforcement/auditability;
+- clean Core Builder extraction and runtime hardening;
 - additional public platform adapters and local upload;
 - later sustainable/free media architecture.
 
-The published K-Research & Critic product remains a separate production baseline and must not be changed implicitly by this subproject.
+The published K-Research & Critic product and repository `main` remain separate production baselines and must not be changed implicitly by this subproject.
 
 ## Canonical reading order
 
@@ -38,19 +39,21 @@ The published K-Research & Critic product remains a separate production baseline
 12. `31_CRITICPROFILE_GATE_UX_UPDATE.md` - two-stage CriticProfile UX contract.
 13. `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md` - actual private GPT runtime acceptance of the gate.
 14. `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md` - claim-level required/achieved/exception enforcement contract.
-15. `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md` - actual private GPT runtime PASS of claim-level enforcement.
+15. `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md` - actual private MEDIA BETA runtime PASS of claim-level enforcement.
+16. `35_CORE_RUNTIME_TRACEABILITY_HARDENING.md` - main Core runtime auditability finding and traceability/protocol-table hardening.
 
 ## Source-of-truth precedence
 
 When documents disagree:
-1. current code, live isolated runtime evidence and CI on active feature branches;
+1. current code, live runtime evidence and CI on active feature branches;
 2. `03_CURRENT_STATE.md`;
-3. `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md` for actual claim-level runtime evidence;
-4. `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md` for current cross-check behavior;
-5. `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md` for actual gate runtime evidence;
-6. `31_CRITICPROFILE_GATE_UX_UPDATE.md` for CriticProfile UX behavior;
-7. `06_DECISION_LOG.md`;
-8. roadmap/handoff/phase records.
+3. `35_CORE_RUNTIME_TRACEABILITY_HARDENING.md` for current Core traceability state;
+4. `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md` for MEDIA BETA claim-level runtime evidence;
+5. `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md` for claim-level cross-check behavior;
+6. `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md` for gate runtime evidence;
+7. `31_CRITICPROFILE_GATE_UX_UPDATE.md` for CriticProfile UX behavior;
+8. `06_DECISION_LOG.md`;
+9. roadmap/handoff/phase records.
 
 Do not mark a phase complete from roadmap text alone.
 
@@ -74,16 +77,18 @@ Do not mark a phase complete from roadmap text alone.
 - floors: `LOW>=0`, `MEDIUM>=1`, `HIGH>=2`, `CRITICAL>=3`;
 - each material factual claim has its own `required / achieved_independent / exception` ledger;
 - independence is based on underlying evidence, not number of URLs/articles;
-- duplicates, syndication, repeated reporting of one study/source, and source media/transcript do not count separately;
-- `achieved_independent < required` must be visible as `SHORTFALL`, with reason, confidence adjustment and qualified conclusion;
+- `achieved_independent < required` is visible as `SHORTFALL`, with reason, confidence adjustment and qualified conclusion;
 - Critic verifies the ledger claim-by-claim;
-- unconditional PASS is forbidden for hidden or unqualified material shortfalls;
-- fact-check output exposes `Cross-check: achieved/required - PASS|SHORTFALL`;
-- actual private-GPT claim-level runtime acceptance passed on 2026-08-23.
+- unconditional PASS is forbidden for hidden/unqualified material shortfalls;
+- every counted evidence origin must be visibly traceable to the claim;
+- achieved count cannot exceed visibly traceable independent evidence origins;
+- review protocol must contain `Claim | Required | Achieved independent | Exception` for every material factual claim.
 
 ## Core candidate track
 
-General accepted improvements are being extracted into `prompts/GPT_STORE_CORE_BUILDER_INSTRUCTIONS.md` for the main `K-Research & Critic` without Media Beta operational logic. This candidate remains branch-only until separate manual synchronization and runtime acceptance.
+The main `K-Research & Critic` was manually synchronized with the first clean Core candidate and runtime-tested. Core claim-level enforcement worked, but protocol auditability/traceability required one additional hardening pass.
+
+The branch now contains the hardened `prompts/GPT_STORE_CORE_BUILDER_INSTRUCTIONS.md` and green automated tests. The actual main GPT still requires a new manual Builder synchronization and one final regression run before Core traceability is runtime-accepted.
 
 ## Current A9 security/UX boundaries
 
@@ -106,4 +111,4 @@ VoiceBridge: `kolemasakar/VoiceBridge`, branch `agent/krc-media-transcript`, dra
 
 ## Non-negotiable boundary
 
-Do not merge or publish the media feature, resume external tester/public-sharing work, expose credentials, bypass any provider credit-consent gate, use private platform sessions, or modify production merely because owner-only YouTube/Instagram paths passed. Those require separate explicit decisions and acceptance gates.
+Do not merge the media feature, resume external tester/public-sharing work, expose credentials, bypass any provider credit-consent gate, use private platform sessions, or change repository `main` without a separate explicit decision.
