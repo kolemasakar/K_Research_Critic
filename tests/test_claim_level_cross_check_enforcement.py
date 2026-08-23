@@ -37,7 +37,7 @@ def test_managed_reference_requires_claim_level_cross_check_ledger() -> None:
     assert "Cross-check: achieved/required - PASS|SHORTFALL" in text
 
 
-def test_manifest_declares_claim_level_enforcement_pending_runtime_acceptance() -> None:
+def test_manifest_declares_claim_level_runtime_acceptance() -> None:
     manifest = yaml.safe_load(
         (ROOT / "gpt_store" / "media_beta_manifest.yaml").read_text(encoding="utf-8")
     )
@@ -53,4 +53,5 @@ def test_manifest_declares_claim_level_enforcement_pending_runtime_acceptance() 
         "exception",
     ]
     assert release["cross_check_claim_level_enforcement_hardened"] is True
-    assert release["cross_check_claim_level_runtime_accepted"] is False
+    assert release["cross_check_claim_level_runtime_accepted"] is True
+    assert release["gpt_builder_private_update_required"] is False
