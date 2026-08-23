@@ -1,15 +1,15 @@
 # GPT_STORE_DEPLOYMENT
 Документ визначає основну GPT Store-модель розгортання K-Research & Critic без обов'язкового developer API key.
 
-Version: 1.5
-Status: REQUEST-LOG DISABLEMENT PENDING MANUAL BUILDER SYNC
+Version: 1.6
+Status: ACTIVE / PUBLIC CORE SYNCHRONIZED / ACTIONS DISABLED
 Updated: 2026-08-23
 
 ## 1. Decision
 
 K-Research & Critic is GPT Store-first.
 
-Target runtime policy:
+Current runtime policy:
 
 ```text
 channel: chatgpt_store
@@ -22,7 +22,7 @@ apps: false
 actions: false
 ```
 
-The request-log Action is intentionally removed from the target public configuration because ChatGPT's external-Action consent screen interrupts the normal UX for new users.
+The request-log Action is disabled because ChatGPT's external-Action consent screen interrupts the normal UX for new users.
 
 ## 2. Canonical Active Public Package
 
@@ -37,7 +37,7 @@ docs/GPT_STORE_PACKAGE.md
 
 The request-log implementation remains in the repository as a tested inactive prototype.
 
-## 3. Target Builder Workflow
+## 3. Current Builder Workflow
 
 ```text
 request
@@ -51,7 +51,7 @@ request
  -> review protocol
 ```
 
-No automatic `logRequest` call occurs in the target public Builder.
+No automatic `logRequest` call occurs in the current public Builder.
 
 ## 4. Historical Request Log Prototype
 
@@ -74,6 +74,7 @@ prompts/GPT_STORE_REQUEST_LOG_ADDENDUM.md
 docs/REQUEST_LOG_MVP.md
 docs/PRIVACY_POLICY_REQUEST_LOG.md
 docs/REQUEST_LOG_MVP_RUNTIME_ACCEPTANCE_2026-08-23.md
+docs/REQUEST_LOG_DISABLEMENT_DECISION_2026-08-23.md
 ```
 
 ## 5. Evidence Contract
@@ -103,28 +104,21 @@ For Ukrainian reports use, where applicable:
 Твердження | Потрібно | Отримано незалежних | Виняток
 ```
 
-## 7. Current Manual Deployment Step
+## 7. Disablement Runtime Acceptance
 
-GitHub commits do not automatically update the Custom GPT.
+The owner removed the configured `logRequest` Action, synchronized current `main/prompts/GPT_STORE_INSTRUCTIONS.md`, saved/updated the public GPT, and ran a NEW-chat smoke test.
 
-Required manual Builder operations:
-
-```text
-1. remove the configured `logRequest` Action;
-2. replace Builder Instructions with current `main/prompts/GPT_STORE_INSTRUCTIONS.md`;
-3. save/update the public GPT;
-4. open a NEW chat and verify that no script.google.com consent screen appears;
-5. verify the normal CriticProfile gate appears directly;
-6. only then mark repository/public Builder synchronization complete.
-```
-
-Until this is done:
+Observed result:
 
 ```text
-repository target actions=false
-actual public Builder may still contain Action
-repository_matches_current_public_builder=false
+script.google.com consent screen            ABSENT
+CriticProfile gate appears directly         PASS
+Actions                                     DISABLED
+REQUEST LOGGING instruction block           ABSENT
+repository/public Builder synchronization   COMPLETE
 ```
+
+The first response in the NEW chat was the expected CriticProfile gate without an external Action consent interruption.
 
 ## 8. Validation
 
@@ -137,4 +131,6 @@ python -m pytest
 
 ## 9. Publication Boundary
 
-The product remains published. Any future external Action must be separately approved with its user-consent UX treated as part of the product design.
+The product remains published. Manual Builder synchronization is the actual deployment step for instruction/Action changes; GitHub commits do not automatically update the Custom GPT.
+
+Any future external Action must be separately approved with its user-consent UX treated as part of the product design.
