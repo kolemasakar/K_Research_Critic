@@ -69,10 +69,10 @@ def test_required_cross_checks_are_enforced_and_auditable() -> None:
     assert "LOW>=0, MEDIUM>=1, HIGH>=2, CRITICAL>=3" in core
     assert "CRITICAL>=3, HIGH>=2, MEDIUM>=1, LOW>=0" in media
     assert "independent underlying evidence sources" in core
-    assert "Count independent underlying sources" in media
+    assert "independent underlying evidence" in media
     assert "state the shortfall" in core
-    assert "state the shortfall" in media
+    assert "set exception=SHORTFALL" in media
     assert "cross-check compliance" in core
-    assert "cross-check compliance" in media
+    assert "claim-by-claim" in media
     assert "required versus achieved cross-checks" in core
-    assert "required/achieved cross-checks" in media
+    assert "per-claim required/achieved/exception summary" in media
