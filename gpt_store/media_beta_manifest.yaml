@@ -162,9 +162,9 @@ release:
   cross_check_claim_level_enforcement_hardened: true
   cross_check_claim_level_runtime_accepted: true
   cross_check_traceability_hardened: true
-  cross_check_traceability_runtime_accepted: false
+  cross_check_traceability_runtime_accepted: true
   report_label_localization_hardened: true
-  report_label_localization_runtime_accepted: false
+  report_label_localization_runtime_accepted: true
   external_tester_rollout_paused: true
-  gpt_builder_private_update_required: true
+  gpt_builder_private_update_required: false
   merge_to_public_product_allowed: false
