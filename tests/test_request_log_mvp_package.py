@@ -10,7 +10,7 @@ def test_request_log_manifest_contract() -> None:
     manifest = yaml.safe_load((ROOT / "gpt_store" / "manifest.yaml").read_text(encoding="utf-8"))
     request_log = manifest["request_log_mvp"]
 
-    assert request_log["status"] == "DISABLED_DUE_TO_USER_CONSENT_UX_PENDING_BUILDER_SYNC"
+    assert request_log["status"] == "DISABLED_DUE_TO_USER_CONSENT_UX_RUNTIME_ACCEPTED"
     assert request_log["public_enabled_target"] is False
     assert request_log["prototype_retained"] is True
     assert request_log["historical_runtime_acceptance_preserved"] is True
@@ -24,13 +24,19 @@ def test_request_log_manifest_contract() -> None:
     assert request_log["logging_failure_blocks_core_workflow"] is False
     assert request_log["google_sheet_created"] is True
     assert request_log["apps_script_deployed"] is True
-    assert request_log["builder_action_currently_configured"] is True
-    assert request_log["builder_action_disable_pending_manual_step"] is True
+    assert request_log["builder_action_currently_configured"] is False
+    assert request_log["builder_action_disable_pending_manual_step"] is False
     assert request_log["builder_action_test_passed"] is True
     assert request_log["google_sheet_write_test_passed"] is True
     assert request_log["runtime_new_chat_test_passed"] is True
     assert request_log["workflow_reply_dedup_verified"] is True
     assert request_log["runtime_accepted"] is True
+    assert request_log["builder_instructions_synced_after_disablement"] is True
+    assert request_log["public_gpt_updated_after_disablement"] is True
+    assert request_log["disablement_new_chat_test_passed"] is True
+    assert request_log["disablement_consent_screen_absent"] is True
+    assert request_log["disablement_criticprofile_gate_direct"] is True
+    assert request_log["disablement_runtime_accepted"] is True
 
 
 def test_apps_script_prototype_is_retained() -> None:
