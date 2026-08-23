@@ -1,7 +1,7 @@
 # ROADMAP
 План завершеного розвитку K-Research & Critic та межі подальшого maintenance.
 
-Version: 1.11
+Version: 1.12
 Status: MAINTENANCE
 Updated: 2026-08-23
 
@@ -28,7 +28,7 @@ The previously planned Modular Agent Platform is no longer Phase 13 of this prod
 - Contracts, task states, evidence, limitations, and failures remain explicit.
 - Private chain-of-thought is never required for auditability.
 - Cross-chat continuation uses the explicit checkpoint contract when requested.
-- Optional request accounting must remain best-effort and must never block Research/Critic execution.
+- Request accounting is optional observability: it is best-effort and must never block Research/Critic execution.
 
 ## 3. Completed Core
 
@@ -78,9 +78,9 @@ Delivered:
 
 ## 7. Current Public Core Runtime Baseline
 
-Status: ACCEPTED / PRE-REQUEST-LOG BASELINE
+Status: ACCEPTED / SYNCHRONIZED TO REPOSITORY MAIN
 
-Accepted Core behavior remains:
+Accepted public behavior:
 
 ```text
 two-stage CriticProfile gate                 PASS
@@ -92,9 +92,10 @@ systematic-review double-counting protection PASS
 Critic REVISE -> PASS loop                   PASS
 Ukrainian report/profile/table localization  PASS
 COMPLETED_WITH_LIMITATIONS when required     PASS
+optional request-log Action                  PASS
 ```
 
-The repository now contains the next prepublish Builder instructions with request logging integrated, so `main` is intentionally ahead of the currently published Builder until the manual Builder update is completed.
+The repository and current public Builder are synchronized for the accepted Public Core plus Request Log MVP.
 
 ## 8. Maintenance Scope
 
@@ -112,18 +113,18 @@ maintenance releases v1.0.x
 
 ## 8.1 Narrow Product Improvement - Request Accounting MVP
 
-Status: BUILDER ACTION WRITE TEST PASS / INSTRUCTIONS SYNC + PUBLIC UPDATE + NEW-CHAT RUNTIME ACCEPTANCE PENDING
+Status: RUNTIME_ACCEPTED
 
-Approved architecture:
+Accepted architecture:
 
 ```text
 Public K-Research & Critic
-  -> best-effort GPT Action
+  -> best-effort GPT Action `logRequest`
   -> Google Apps Script Web App
   -> Google Sheet
 ```
 
-Created Google Sheet:
+Google Sheet:
 
 ```text
 K-Research & Critic — Request Log
@@ -142,7 +143,7 @@ Columns:
 Коротка узагальнена тема запиту
 ```
 
-MVP decisions:
+Accepted MVP decisions:
 - authentication: none;
 - `user_name`: `none` until a separately approved reliable identity mechanism exists;
 - full prompts/conversations are not stored;
@@ -153,7 +154,7 @@ MVP decisions:
 - logging failure or user denial is non-blocking and must not alter Research/Critic results;
 - standalone `1/2/3` workflow replies are not new logged requests.
 
-Implemented package:
+Canonical package:
 
 ```text
 integrations/request_log/google_apps_script/Code.gs
@@ -162,33 +163,21 @@ prompts/GPT_STORE_REQUEST_LOG_ADDENDUM.md
 prompts/GPT_STORE_INSTRUCTIONS.md
 docs/REQUEST_LOG_MVP.md
 docs/PRIVACY_POLICY_REQUEST_LOG.md
+docs/REQUEST_LOG_MVP_RUNTIME_ACCEPTANCE_2026-08-23.md
 ```
 
-Technical activation status:
+Runtime acceptance on 2026-08-23:
 
 ```text
-Google Sheet                              CREATED
-Apps Script Web App                       DEPLOYED
-Authentication                            NONE
-Execute as                                OWNER
-Access                                    ANYONE
-OpenAPI Builder validation                PASS
-Builder logRequest Action configuration   PASS
-Builder direct Action test                PASS
-Google Sheet physical write test          PASS
-first test request_number                  1
-first test timestamp                       2026-08-23 17:45:37 Europe/Kyiv
+Builder OpenAPI validation                  PASS
+Builder direct Action write                 PASS
+NEW-chat substantive request logging        PASS
+request_number=2 physical Sheet write       PASS
+standalone `1` created no row 3             PASS
+1 substantive request -> exactly 1 row      PASS
 ```
 
-Remaining activation steps:
-1. replace the public GPT Builder Instructions with current `prompts/GPT_STORE_INSTRUCTIONS.md`;
-2. save/update the public GPT so the configured Action and new Instructions become live;
-3. run a NEW-chat substantive research request;
-4. confirm one request-log consent interaction according to ChatGPT Action UX, then verify exactly one new row is written;
-5. verify standalone `1` does not create another row;
-6. if PASS, mark `capabilities.actions=true`, request-log runtime accepted, and repository/public Builder synchronized.
-
-Important UX property: because this is an external Action, ChatGPT may require the user to authorize sharing the generalized topic with `script.google.com`. The test UI offered `Allow once` and `Always allow`; this consent behavior is platform-controlled and cannot be silently disabled by the GPT instructions.
+Important UX property: because this is an external Action, ChatGPT may require the user to authorize sharing the generalized topic with `script.google.com`. This consent behavior is platform-controlled.
 
 ## 9. Modular Agent Platform Transfer
 
@@ -217,6 +206,7 @@ GPT_STORE_PACKAGE.md
 LOGGING.md
 REQUEST_LOG_MVP.md
 PRIVACY_POLICY_REQUEST_LOG.md
+REQUEST_LOG_MVP_RUNTIME_ACCEPTANCE_2026-08-23.md
 ```
 
 ## 12. Current Implementation State
@@ -225,16 +215,16 @@ PRIVACY_POLICY_REQUEST_LOG.md
 Phase 0-12                                COMPLETE
 GPT Store publication                    COMPLETE
 2026-08-23 public Core runtime hardening ACCEPTED
+GitHub main / public Builder Core sync   COMPLETE
 Request-log Google Sheet                 CREATED
-Request-log repository package           IMPLEMENTED
+Request-log repository package           COMPLETE
 Apps Script Web App deployment           COMPLETE
 OpenAPI endpoint configuration           COMPLETE
 Builder Action configuration/test        PASS
 Google Sheet write test                  PASS
-Request logging integrated in repo Core  COMPLETE
-Public Builder Instructions resync       PENDING MANUAL BUILDER STEP
-Public GPT update                         PENDING MANUAL BUILDER STEP
-Request-log NEW-chat runtime acceptance  PENDING
+Public Builder Instructions sync         COMPLETE
+Public GPT update                         COMPLETE
+Request-log NEW-chat runtime acceptance  ACCEPTED
 Future Modular Agent Platform            MOVED TO K_Supervisor
 Current repository mode                  MAINTENANCE
 ```
