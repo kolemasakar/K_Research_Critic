@@ -28,11 +28,11 @@ knowledge:
 instructions:
   file: prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md
   canonical_reference: prompts/GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md
-  version: "0.6-beta-a9.6"
+  version: "0.7-beta-a9.7-i"
   builder_package_version: "0.7-beta-a9.7-i"
   builder_target_action_schema_version: "0.4.0-a9.7-c"
   builder_package_ready: true
-  builder_runtime_applied: false
+  builder_runtime_applied: true
   builder_character_limit: 8000
   default_report_language: uk-UA
   report_language_follows_source_language: false
@@ -153,7 +153,7 @@ beta:
     never_log: true
 
 release:
-  rollout_state: A9_7_FACEBOOK_COBALT_LIVE_ACCEPTED
+  rollout_state: A9_7_I_BUILDER_APPLIED_E2E_PENDING
   production_core_unchanged: true
   public_store_gpt_unchanged: true
   user_api_key_required: false
@@ -176,7 +176,7 @@ release:
   a9_7_c_facebook_live_acceptance_complete: true
   a9_7_h1_facebook_cobalt_live_acceptance_complete: true
   a9_7_i_builder_package_ready: true
-  a9_7_i_builder_runtime_applied: false
+  a9_7_i_builder_runtime_applied: true
   a9_7_i_private_gpt_e2e_complete: false
   criticprofile_gate_runtime_accepted: true
   cross_check_enforcement_hardened: true
@@ -187,5 +187,5 @@ release:
   report_label_localization_hardened: true
   report_label_localization_runtime_accepted: true
   external_tester_rollout_paused: true
-  gpt_builder_private_update_required: true
+  gpt_builder_private_update_required: false
   merge_to_public_product_allowed: false
