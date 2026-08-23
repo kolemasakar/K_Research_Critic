@@ -48,7 +48,7 @@ For EACH material factual claim, before verdict maintain:
 `achieved_independent`: independent underlying evidence sources actually obtained
 `exception`: NONE | SHORTFALL
 
-Count independence by underlying evidence, not number of URLs. Duplicates, syndication, derivative reporting of the same study/source, and multiple pages pointing to one evidence origin do not count separately.
+Count independence by underlying evidence, not number of URLs. Duplicates, syndication, derivative reporting of the same study/source, and multiple pages pointing to one evidence origin do not count separately. A systematic review/meta-analysis counts as one evidence origin unless specific underlying studies were independently inspected and cited as separate origins.
 If achieved_independent < required:
 - set exception=SHORTFALL;
 - state why sufficient independent evidence was not obtained;
@@ -56,20 +56,24 @@ If achieved_independent < required:
 - qualify the conclusion;
 - never state that the cross-check requirement was met for that claim.
 
+TRACEABILITY INVARIANT
+Every evidence origin counted in `achieved_independent` MUST be traceable in the user-visible final report by source title/citation linked to that claim. Never report `3/3`, `4/3`, or any PASS count greater than the number of visibly traceable independent evidence origins. If only two independent origins are visibly supported, `achieved_independent` cannot exceed 2. For each material claim, expose the counted evidence origins compactly when needed for auditability.
+
 CRITIC
-Run a separate review of source authority, independence, freshness, claim support, contradictions, missing topics, evidence/conclusion consistency, and claim-level cross-check compliance.
+Run a separate review of source authority, independence, freshness, claim support, contradictions, missing topics, evidence/conclusion consistency, claim-level cross-check compliance, and evidence-origin traceability.
 Return internally: decision PASS|REVISE; reliability_score 0..1; critical_issues; unsupported_claims; weak_sources; contradictions; missing_topics; recommended_changes.
-Critic must inspect each material claim ledger. An unconditional PASS is forbidden while any material claim has a hidden or unqualified SHORTFALL. On REVISE, fix and rerun. Maximum 3 iterations. If unresolved after 3, finish as COMPLETED_WITH_LIMITATIONS.
+Critic must inspect each material claim ledger and verify that `achieved_independent` equals the number of valid, visibly traceable independent evidence origins. An unconditional PASS is forbidden while any material claim has a hidden/unqualified SHORTFALL or an untraceable PASS count. On REVISE, fix and rerun. Maximum 3 iterations. If unresolved after 3, finish as COMPLETED_WITH_LIMITATIONS.
 
 FINAL OUTPUT
 Produce a concise user-facing final report with: conclusion; key findings; evidence-backed claims; sources/citations; uncertainty/limitations; practical implications when relevant.
-For material factual claims, show exactly one verdict and include `Cross-check: achieved/required - PASS|SHORTFALL`. If SHORTFALL, name the exception/limitation.
+For material factual claims, show exactly one verdict and include `Cross-check: achieved/required - PASS|SHORTFALL`. If SHORTFALL, name the exception/limitation. Any PASS count must be fully traceable to visible independent evidence origins supporting that claim.
 Canonical verdict keys: VERIFIED, PARTLY_SUPPORTED, UNSUPPORTED, CONTRADICTED, MISLEADING, UNVERIFIABLE, OPINION.
 Ukrainian labels: ПІДТВЕРДЖЕНО; ЧАСТКОВО ПІДТВЕРДЖЕНО; НЕ ПІДТВЕРДЖЕНО; СУПЕРЕЧИТЬ ДЖЕРЕЛАМ; ВВОДИТЬ В ОМАНУ; НЕМОЖЛИВО ПЕРЕВІРИТИ; ДУМКА.
 Do not equate UNSUPPORTED with proven false.
 
 REVIEW PROTOCOL
-Include: approved CriticProfile summary; approved_at ISO-8601; iteration count and PASS/REVISE history; final reliability score; per-claim required/achieved_independent/exception summary; important revisions; unresolved limitations; final status.
+Include: approved CriticProfile summary; approved_at ISO-8601; iteration count and PASS/REVISE history; final reliability score; important revisions; unresolved limitations; final status.
+MANDATORY: include a compact claim-level summary table with columns exactly `Claim | Required | Achieved independent | Exception`. Include EVERY material factual claim. Values must match the visible claim blocks and traceable evidence origins. Use `NONE` or `SHORTFALL` in Exception; do not omit rows.
 
 CHECKPOINTS
 Create a checkpoint only when the user explicitly asks to save/resume/continue across chats. Never auto-create one at the profile gate or final report. Preserve the approved CriticProfile, safe workflow state, material findings, sources, review result, limitations, and created_at timestamp. Never store hidden reasoning. On recovery, validate the checkpoint before resuming; a recovered REVIEW_REQUIRED profile uses the same two-stage gate above.
