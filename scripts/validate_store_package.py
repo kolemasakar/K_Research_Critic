@@ -32,6 +32,7 @@ def validate_store_package(root: Path = ROOT) -> dict:
     release = _mapping(manifest, "release")
     instructions = _mapping(manifest, "instructions")
     checkpoint = _mapping(manifest, "checkpoint")
+    request_log = _mapping(manifest, "request_log_mvp")
 
     _require(product.get("name") == "K-Research & Critic", "product.name must be K-Research & Critic")
     description = product.get("description")
@@ -55,9 +56,10 @@ def validate_store_package(root: Path = ROOT) -> dict:
         "data analysis must be enabled in the Store package",
     )
     _require(capabilities.get("apps") is False, "Apps must remain disabled for the core package")
-    _require(capabilities.get("actions") is False, "Actions must remain disabled for the core package")
+    _require(capabilities.get("actions") is True, "The accepted public package must expose the request-log Action")
     _require(release.get("developer_api_key_required") is False, "Store package must not require a developer API key")
-    _require(release.get("external_backend_required") is False, "Store package must not require an external backend")
+    _require(release.get("external_backend_required") is False, "Research/Critic must not require the optional logging backend")
+    _require(release.get("privacy_policy_url_required_by_package") is True, "public Action requires a privacy-policy URL")
     _require(release.get("free_user_compatible") is True, "Store package must remain Free-user compatible")
     _require(release.get("production_smoke_test_passed") is True, "production smoke test must be recorded as passed")
     _require(release.get("production_smoke_tested_at") == "2026-08-14", "launch smoke-test date must remain recorded")
@@ -66,7 +68,17 @@ def validate_store_package(root: Path = ROOT) -> dict:
     _require(release.get("cross_check_claim_level_runtime_accepted") is True, "claim-level cross-check runtime must be accepted")
     _require(release.get("cross_check_traceability_runtime_accepted") is True, "traceability runtime must be accepted")
     _require(release.get("report_label_localization_runtime_accepted") is True, "report-label localization runtime must be accepted")
+    _require(release.get("request_log_runtime_accepted") is True, "request-log runtime must be accepted")
     _require(release.get("repository_matches_current_public_builder") is True, "repository must match the accepted public Builder")
+
+    _require(request_log.get("status") == "RUNTIME_ACCEPTED", "request-log MVP status must be RUNTIME_ACCEPTED")
+    _require(request_log.get("authentication") == "none", "request-log MVP authentication must remain none")
+    _require(request_log.get("full_prompt_storage") is False, "request-log MVP must not store full prompts")
+    _require(request_log.get("logging_failure_blocks_core_workflow") is False, "request-log failure must remain non-blocking")
+    _require(request_log.get("builder_action_configured") is True, "request-log Action must be configured")
+    _require(request_log.get("runtime_new_chat_test_passed") is True, "request-log NEW-chat test must pass")
+    _require(request_log.get("workflow_reply_dedup_verified") is True, "workflow reply de-duplication must be verified")
+    _require(request_log.get("runtime_accepted") is True, "request-log runtime must be accepted")
 
     _require(instructions.get("builder_character_limit") == 8000, "Builder character limit must be 8000")
     _require(instructions.get("default_report_language") == "uk-UA", "default report language must be uk-UA")
@@ -106,6 +118,10 @@ def validate_store_package(root: Path = ROOT) -> dict:
         "Localize CriticProfile field labels",
         "COMPLETED_WITH_LIMITATIONS",
         "Only when explicitly asked to save/resume across chats",
+        "REQUEST LOGGING",
+        "call `logRequest` exactly once",
+        "Do not log standalone workflow replies",
+        "NON-BLOCKING",
     ]
     for token in required_instruction_tokens:
         _require(token in instruction_text, f"instruction package is missing required token: {token}")
