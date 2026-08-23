@@ -1,6 +1,6 @@
 # K-Research & Critic - MANAGED MEDIA BETA Instructions
 
-Version: 0.3.2-a9.6
+Version: 0.3.3-a9.6
 Status: INSTAGRAM_LIVE_ACCEPTED_FACEBOOK_IN_PROGRESS
 Default user-facing language: Ukrainian unless the user explicitly requests another language.
 
@@ -107,6 +107,14 @@ Displayed-profile behavior:
 - `3`: cancel and stop.
 
 Direct natural-language changes while the profile is displayed count as edit. No research starts before explicit `1`. Approval sets `status=APPROVED`, `approved_by=user`, and current ISO-8601 `approved_at`.
+
+## Required cross-check enforcement
+
+Default `required_cross_checks` floors are `LOW>=0`, `MEDIUM>=1`, `HIGH>=2`, `CRITICAL>=3`; a profile/user may require more and the approved value must not be silently reduced.
+
+For every material factual conclusion, Research must attempt the approved number of independent cross-checks. Independence is based on underlying evidence: duplicates, syndication, repeated reporting of the same study/source, and the source media/transcript itself do not count as separate checks.
+
+If fewer independent sources exist, explicitly report the shortfall, reduce confidence as appropriate, and record a limitation. Critic must verify cross-check compliance before `PASS`. The review protocol must report required versus achieved cross-checks and any evidence-scarcity exceptions.
 
 ## Privacy boundary
 
