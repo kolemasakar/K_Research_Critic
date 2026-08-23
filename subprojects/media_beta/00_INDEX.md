@@ -2,7 +2,7 @@
 
 Canonical documentation index for K-Research & Critic media-input work.
 
-Version: 2.6
+Version: 2.7
 Status: ACTIVE
 Updated: 2026-08-23
 
@@ -38,17 +38,19 @@ The published K-Research & Critic product remains a separate production baseline
 12. `31_CRITICPROFILE_GATE_UX_UPDATE.md` - two-stage CriticProfile UX contract.
 13. `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md` - actual private GPT runtime acceptance of the gate.
 14. `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md` - claim-level required/achieved/exception enforcement contract.
+15. `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md` - actual private GPT runtime PASS of claim-level enforcement.
 
 ## Source-of-truth precedence
 
 When documents disagree:
 1. current code, live isolated runtime evidence and CI on active feature branches;
 2. `03_CURRENT_STATE.md`;
-3. `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md` for current cross-check behavior;
-4. `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md` for actual gate runtime evidence;
-5. `31_CRITICPROFILE_GATE_UX_UPDATE.md` for CriticProfile UX behavior;
-6. `06_DECISION_LOG.md`;
-7. roadmap/handoff/phase records.
+3. `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md` for actual claim-level runtime evidence;
+4. `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md` for current cross-check behavior;
+5. `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md` for actual gate runtime evidence;
+6. `31_CRITICPROFILE_GATE_UX_UPDATE.md` for CriticProfile UX behavior;
+7. `06_DECISION_LOG.md`;
+8. roadmap/handoff/phase records.
 
 Do not mark a phase complete from roadmap text alone.
 
@@ -77,7 +79,11 @@ Do not mark a phase complete from roadmap text alone.
 - Critic verifies the ledger claim-by-claim;
 - unconditional PASS is forbidden for hidden or unqualified material shortfalls;
 - fact-check output exposes `Cross-check: achieved/required - PASS|SHORTFALL`;
-- claim-level runtime acceptance remains pending after Builder resynchronization.
+- actual private-GPT claim-level runtime acceptance passed on 2026-08-23.
+
+## Core candidate track
+
+General accepted improvements are being extracted into `prompts/GPT_STORE_CORE_BUILDER_INSTRUCTIONS.md` for the main `K-Research & Critic` without Media Beta operational logic. This candidate remains branch-only until separate manual synchronization and runtime acceptance.
 
 ## Current A9 security/UX boundaries
 
