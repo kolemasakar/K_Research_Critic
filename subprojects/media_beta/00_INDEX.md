@@ -2,7 +2,7 @@
 
 Canonical documentation index for K-Research & Critic media-input work.
 
-Version: 2.4
+Version: 2.5
 Status: ACTIVE
 Updated: 2026-08-23
 
@@ -15,7 +15,8 @@ It covers:
 - zero-client A9 managed ingestion;
 - credit consent and durable managed jobs;
 - private GPT Action integration and owner E2E acceptance;
-- CriticProfile presentation/approval UX;
+- CriticProfile presentation/approval UX and runtime acceptance;
+- required cross-check enforcement/auditability;
 - additional public platform adapters and local upload;
 - later sustainable/free media architecture.
 
@@ -54,19 +55,21 @@ The published K-Research & Critic product remains a separate production baseline
 29. `28_A9_5_PRIVATE_GPT_ACTION_INTEGRATION.md` - A9.5 package/backend preflight checkpoint.
 30. `29_A9_5_BUILDER_UPDATE_RUNBOOK.md` - private GPT Builder switch and Preview procedure.
 31. `30_A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_ACCEPTANCE.md` - actual private GPT zero-client YouTube E2E acceptance.
-32. `31_CRITICPROFILE_GATE_UX_UPDATE.md` - two-stage CriticProfile direct-run/review/edit UX contract.
+32. `31_CRITICPROFILE_GATE_UX_UPDATE.md` - two-stage CriticProfile direct-run/review/edit UX contract and cross-check enforcement.
+33. `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md` - actual private GPT runtime acceptance of the new gate.
 
 ## Source-of-truth precedence
 
 When documents disagree:
 1. current code, live isolated runtime evidence and CI on active feature branches;
 2. `03_CURRENT_STATE.md`;
-3. `31_CRITICPROFILE_GATE_UX_UPDATE.md` for CriticProfile UX behavior;
-4. `06_DECISION_LOG.md`;
-5. `24_A9_ZERO_CLIENT_INGESTION_PLAN.md`;
-6. `02_ROADMAP.md`;
-7. `08_CHAT_HANDOFF.md`;
-8. phase acceptance records and other documents.
+3. `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md` for actual gate runtime evidence;
+4. `31_CRITICPROFILE_GATE_UX_UPDATE.md` for CriticProfile UX and cross-check contract;
+5. `06_DECISION_LOG.md`;
+6. `24_A9_ZERO_CLIENT_INGESTION_PLAN.md`;
+7. `02_ROADMAP.md`;
+8. `08_CHAT_HANDOFF.md`;
+9. phase acceptance records and other documents.
 
 Do not mark a phase complete from roadmap text alone.
 
@@ -86,7 +89,18 @@ Current next media task:
 - option `1` explicitly approves the current profile before research;
 - option `2` displays the profile and enters the review/edit menu;
 - option `3` cancels without research;
-- recovered `PROFILE_REVIEW_REQUIRED` checkpoints use the same gate.
+- recovered `PROFILE_REVIEW_REQUIRED` checkpoints use the same gate;
+- actual private-GPT runtime acceptance passed on 2026-08-23.
+
+## Required cross-check contract
+
+- default floors: `LOW>=0`, `MEDIUM>=1`, `HIGH>=2`, `CRITICAL>=3`;
+- approved `required_cross_checks` is mandatory for material factual conclusions;
+- independence is based on underlying evidence, not number of URLs/articles;
+- duplicates, syndication, repeated reporting of one study/source, and source media/transcript do not count separately;
+- evidence scarcity must be explicit, confidence adjusted, and the limitation recorded;
+- Critic verifies compliance before PASS;
+- review protocol reports required/achieved cross-checks and exceptions.
 
 ## Current A9 security/UX boundaries
 
