@@ -1,8 +1,8 @@
 # CriticProfile Gate UX Update
 
-Version: 1.0
+Version: 1.1
 Date: 2026-08-23
-Status: IMPLEMENTED_IN_BRANCH_PENDING_RUNTIME_ACCEPTANCE
+Status: RUNTIME_ACCEPTED_PRIVATE_OWNER_BETA
 
 ## Goal
 
@@ -59,6 +59,23 @@ approved_at = current ISO-8601 timestamp
 
 The profile may not be described as approved before explicit option `1`.
 
+## Required cross-check enforcement
+
+`required_cross_checks` is an evidence-control requirement, not advisory text.
+
+Default risk floors:
+
+- `LOW >= 0`;
+- `MEDIUM >= 1`;
+- `HIGH >= 2`;
+- `CRITICAL >= 3`.
+
+A profile or user may require more. The configured requirement must not be silently reduced.
+
+For each material factual conclusion, Research must attempt the approved number of independent cross-checks. Independence is based on the underlying evidence source: duplicate publications, syndications, articles repeating the same study/source, and the source media/transcript itself do not count as separate independent checks.
+
+If fewer independent sources exist, the final output must state the shortfall, lower confidence as appropriate, and record the evidence scarcity as a limitation. Critic must verify cross-check compliance before `PASS`. The review protocol must summarize required versus achieved cross-checks and explicit exceptions.
+
 ## Scope
 
 This UX rule applies to:
@@ -88,9 +105,17 @@ PASS requires:
 5. Either-menu `3` stops without research.
 6. Media workflow preserves all transcript/provider credit gates before this profile gate.
 7. Ukrainian remains the default user-facing language and report/verdict localization remains unchanged.
+8. `required_cross_checks` is enforced and audited rather than only repeated in the profile/protocol.
+
+## Runtime acceptance
+
+Owner runtime acceptance passed on 2026-08-23 in the actual private `K-Research & Critic - MEDIA BETA` Custom GPT.
+
+Canonical runtime record:
+`32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md`.
 
 ## Production boundary
 
-Implemented only in `agent/video-url-research` / draft PR #8 until separate runtime acceptance and explicit promotion decision.
+Runtime-accepted only in the private owner beta / `agent/video-url-research` / draft PR #8. Promotion still requires a separate explicit owner decision.
 
 Public GPT, `main`, and production VoiceBridge are unchanged.
