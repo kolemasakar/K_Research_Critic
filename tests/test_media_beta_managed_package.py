@@ -24,8 +24,16 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert manifest["beta"]["managed_explicit_user_consent_required"] is True
     assert manifest["beta"]["managed_automatic_ai_fallback"] is False
     assert manifest["beta"]["managed_user_beta_access_code_required"] is False
+    assert manifest["beta"]["public_platforms_live_accepted"] == [
+        "youtube",
+        "instagram",
+    ]
+    assert manifest["beta"]["managed_instagram_ai_fallback_live_accepted"] is True
     assert manifest["release"]["a9_3_durable_managed_complete"] is True
-    assert manifest["release"]["a9_5_private_gpt_integration_complete"] is False
+    assert manifest["release"]["a9_5_private_gpt_integration_complete"] is True
+    assert manifest["release"]["a9_8_owner_zero_client_acceptance_complete"] is True
+    assert manifest["release"]["a9_6_instagram_managed_complete"] is True
+    assert manifest["release"]["a9_6_facebook_complete"] is False
 
 
 def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates() -> None:
@@ -117,6 +125,8 @@ def test_private_builder_instructions_fit_limit_and_forbid_legacy_normal_flow() 
     ).read_text(encoding="utf-8")
 
     assert len(text) <= 8000
+    assert "REPORT LANGUAGE INVARIANT" in text
+    assert "Source/transcript language never controls report language" in text
     assert "preflightManagedMediaCredits" in text
     assert "startManagedMediaNativeTranscription" in text
     assert "preflightManagedMediaAiCredits" in text
