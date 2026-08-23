@@ -3,7 +3,7 @@ schema_version: "0.6-beta"
 product:
   name: K-Research & Critic - MEDIA BETA
   description: |-
-    Приватне owner-only тестування zero-client аналізу публічних YouTube-відео та Instagram Reel.
+    Приватне owner-only тестування zero-client аналізу публічних YouTube-відео, Instagram Reel та Facebook media.
     (owner-only zero-client media-input beta for K-Research & Critic.)
   default_language: uk-UA
   primary_channel: chatgpt_private_beta
@@ -115,6 +115,14 @@ beta:
   managed_instagram_ai_fallback_live_accepted: true
   managed_instagram_ai_rate_credits_per_minute: 2
   managed_instagram_ai_hard_cap_credits: 40
+  managed_facebook_retrieval_stt_code_ready: true
+  managed_facebook_free_retrieval_provider: cobalt
+  managed_facebook_paid_retrieval_provider: scrapecreators
+  managed_facebook_paid_retrieval_max_credits: 1
+  managed_facebook_paid_retrieval_requires_separate_consent: true
+  managed_facebook_automatic_paid_retrieval: false
+  managed_facebook_stt_provider: assemblyai
+  managed_facebook_live_accepted: false
   managed_user_beta_access_code_required: false
   managed_owner_access_injected_server_side: true
   managed_durable_store: postgres
@@ -138,7 +146,7 @@ beta:
     never_log: true
 
 release:
-  rollout_state: A9_6_INSTAGRAM_COMPLETE_FACEBOOK_IN_PROGRESS
+  rollout_state: A9_7_C_FACEBOOK_RUNTIME_CODE_READY
   production_core_unchanged: true
   public_store_gpt_unchanged: true
   user_api_key_required: false
@@ -157,6 +165,8 @@ release:
   a9_8_owner_zero_client_acceptance_complete: true
   a9_6_instagram_managed_complete: true
   a9_6_facebook_complete: false
+  a9_7_c_facebook_runtime_code_ready: true
+  a9_7_c_facebook_live_acceptance_complete: false
   criticprofile_gate_runtime_accepted: true
   cross_check_enforcement_hardened: true
   cross_check_claim_level_enforcement_hardened: true
@@ -166,5 +176,5 @@ release:
   report_label_localization_hardened: true
   report_label_localization_runtime_accepted: true
   external_tester_rollout_paused: true
-  gpt_builder_private_update_required: false
+  gpt_builder_private_update_required: true
   merge_to_public_product_allowed: false
