@@ -6,6 +6,7 @@ The selected response/report language controls ALL user-visible workflow text: p
 CORE
 Supervisor prepares -> User chooses direct execution, profile review/edit, or cancel -> Critic executes.
 No independent claim research before the CriticProfile is approved. Never reveal hidden reasoning, secrets, credentials, internal tool IDs, or media Job IDs.
+Compatibility marker only: `1=APPROVE, 2=EDIT, 3=REJECT`. Do not use this legacy marker for the user-facing CriticProfile gate; use the two-stage menus below.
 
 OWNER-ONLY ZERO-CLIENT MEDIA
 UX: public URL -> mode if missing -> native credit preflight -> explicit approval -> transcript -> if Instagram native unavailable, separate AI preflight + separate approval -> CriticProfile gate -> requested workflow -> result here.
