@@ -1,8 +1,9 @@
 # GPT_STORE_PACKAGE
 Документ визначає production-пакет K-Research & Critic, перевірки релізу та maintenance-gates для GPT Store.
 
-Version: 1.8
-Status: MAINTENANCE
+Version: 1.9
+Status: MAINTENANCE / CURRENT PUBLIC CORE SYNCED
+Updated: 2026-08-23
 
 ## 1. Purpose
 
@@ -14,13 +15,7 @@ Repository:
 kolemasakar/K_Research_Critic
 ```
 
-Release line:
-
-```text
-K-Research & Critic v1.0.x
-```
-
-The package follows these invariants:
+The public Core follows these invariants:
 
 ```text
 no developer API key
@@ -30,9 +25,8 @@ no Apps
 no pinned model
 user-plan model policy
 built-in ChatGPT capabilities for the core path
+Ukrainian user-facing language by default
 ```
-
-Default user-facing language is Ukrainian (`uk-UA`).
 
 ## 2. Package Files
 
@@ -45,7 +39,7 @@ scripts/validate_store_package.py
 docs/GPT_STORE_PACKAGE.md
 ```
 
-The manifest is the canonical human/machine-readable Builder configuration source.
+`prompts/GPT_STORE_INSTRUCTIONS.md` is the canonical repository copy of the currently accepted public Builder instructions. The manifest records the accepted runtime contract.
 
 ## 3. Builder Configuration
 
@@ -55,10 +49,6 @@ The manifest is the canonical human/machine-readable Builder configuration sourc
 K-Research & Critic
 ```
 
-### Description
-
-The canonical public description is stored in `gpt_store/manifest.yaml` because its first line is Ukrainian UTF-8. Copy `product.description` into Builder exactly.
-
 ### Default language
 
 ```text
@@ -67,9 +57,7 @@ uk-UA
 
 ### Recommended model
 
-Leave the recommended model unset.
-
-The workflow must not depend on a named model. Users may use or switch among runtimes/models exposed by their ChatGPT plan.
+Leave the recommended model unset. The workflow must not depend on a named model.
 
 ### Capabilities
 
@@ -80,7 +68,7 @@ Web search
 Code Interpreter & Data Analysis
 ```
 
-Disable for the core package:
+Disable for the public Core package:
 
 ```text
 Image generation
@@ -88,187 +76,164 @@ Apps
 Actions
 ```
 
-### Knowledge
+No external backend is required by the current public Core.
 
-No uploaded Knowledge file is mandatory for the v1.0 public release.
+## 4. Current Public Core Workflow
 
-## 4. Conversation Starters
-
-Use the eight bilingual starters from `gpt_store/manifest.yaml`.
-
-The first four are Ukrainian and are intended to occupy the primary visible Store positions; the remaining four are English equivalents.
-
-## 5. Store Workflow Mapping
+The accepted workflow is:
 
 ```text
-Supervisor stage
-  -> Domain/risk assessment
-  -> CriticProfile proposal
-  -> USER CHOICE: 1=APPROVE / 2=EDIT / 3=REJECT
-  -> Research stage
-  -> Critic stage
-  -> autonomous REVISE/PASS loop
-  -> Final report
-  -> Review protocol
+request
+ -> CriticProfile created internally
+ -> first gate: direct run / profile review-edit / cancel
+ -> explicit profile approval
+ -> Research
+ -> Critic
+ -> REVISE when required
+ -> final report
+ -> review protocol
 ```
 
-The Store Edition provides logical multi-agent separation inside one ChatGPT runtime rather than process-isolated model instances.
+The profile is NOT displayed automatically.
 
-## 6. Checkpoint and Fresh-chat Recovery
+First gate:
 
-Cross-chat continuation uses an explicit user-controlled checkpoint marked:
+```text
+Профіль збору і критики успішно створено.
+1 - виконати аналіз одразу.
+2 - переглянути і відредагувати профіль збору і критики.
+3 - скасувати дослідження.
+```
+
+If option `2` is selected, the complete profile is displayed with localized field labels, followed by:
+
+```text
+1 - прийняти профіль, виконати дослідження.
+2 - редагувати профіль.
+3 - скасувати дослідження.
+```
+
+No independent research starts before explicit approval.
+
+## 5. Risk and Claim-Level Cross-Check Contract
+
+Risk floors:
+
+```text
+LOW >= 0
+MEDIUM >= 1
+HIGH >= 2
+CRITICAL >= 3
+```
+
+For every material factual claim the runtime maintains:
+
+```text
+required
+achieved_independent
+exception = NONE | SHORTFALL
+```
+
+Independence is based on underlying evidence origins, not URL count. Duplicate/derivative reporting does not increase `achieved_independent`. A systematic review/meta-analysis counts as one evidence origin unless specific underlying studies were independently inspected and cited.
+
+If achieved evidence is below the approved requirement, the report must expose `SHORTFALL`, explain the limitation, reduce confidence as appropriate, and qualify the conclusion.
+
+## 6. Traceability and Critic Contract
+
+Every evidence origin counted in `achieved_independent` must be visible and traceable to the relevant material claim in the final user-facing report.
+
+A PASS count cannot exceed the number of visibly traceable independent evidence origins.
+
+Critic checks claim-level ledgers, source authority, independence, freshness, support, contradictions, missing topics, evidence/conclusion consistency and traceability. Maximum revision loop: three iterations. Unresolved issues finish as `COMPLETED_WITH_LIMITATIONS`.
+
+## 7. User-Visible Language Contract
+
+The selected report language controls all user-visible headings, table titles/columns, CriticProfile field labels and verdict labels. Ukrainian is the default.
+
+Required Ukrainian headings where applicable:
+
+```text
+ФІНАЛЬНИЙ ЗВІТ
+ПЕРЕВІРКА ТВЕРДЖЕНЬ
+ПРОТОКОЛ ПЕРЕВІРКИ
+ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ
+```
+
+Required claim-summary columns:
+
+```text
+Твердження | Потрібно | Отримано незалежних | Виняток
+```
+
+Canonical English/internal keys stay internal unless explicitly requested.
+
+## 8. Checkpoint and Fresh-Chat Recovery
+
+Cross-chat continuation remains explicit-request only and uses the existing checkpoint contract marked:
 
 ```text
 K_SUPERVISOR_CHECKPOINT
 ```
 
-Schema version:
+Schema version remains `1.0`. The runtime must never auto-create a checkpoint at a normal profile gate or final report.
 
-```text
-1.0
-```
+## 9. Static Validation
 
-Checkpoint generation is explicit-request only. Normal profile gates and final reports must not auto-create checkpoints.
-
-Safe states:
-
-```text
-PROFILE_REVIEW_REQUIRED
-PROFILE_APPROVED
-REVISE_REQUIRED
-APPROVED
-FINALIZED
-COMPLETED_WITH_LIMITATIONS
-FAILED
-```
-
-The checkpoint marker remains a stable legacy compatibility identifier in the v1.0 release line.
-
-## 7. Static Validation
-
-Run after Store package changes:
+Run after public Core package changes:
 
 ```text
 python -m scripts.validate_store_package
 python -m pytest
 ```
 
-CI additionally validates repository policy, typed boundaries, lint correctness, dependency integrity, and coverage.
+CI additionally validates repository policy, typed boundaries, lint correctness, dependency integrity and coverage.
 
-## 8. Preview Test Matrix
+## 10. Historical Launch Validation
 
-The pre-publication Preview matrix completed successfully on 2026-08-14:
-
-```text
-P1 New low-risk research task - PASS
-P2 High-risk domain task and conservative risk floor - PASS
-P3 Explicit APPROVE gate including numeric alias 1 - PASS
-P4 EDIT/2 then approve - PASS
-P5 REJECT/3 stops autonomous execution - PASS
-P6 Research -> Critic -> PASS - PASS
-P7 Forced REVISE then corrected second iteration - PASS
-P8 Web-search-unavailable/freshness limitation behavior - PASS
-P9 Generate checkpoint at PROFILE_APPROVED - PASS
-P10 Paste checkpoint into a fresh GPT conversation and resume - PASS
-P11 Malformed checkpoint rejection - PASS
-P12 Final report plus review protocol without hidden reasoning - PASS
-```
-
-A separate forced-REVISE control scenario also passed.
-
-## 9. Account/Plan Release Matrix
-
-Live validation completed on 2026-08-14.
-
-```text
-Free account:
-  public-link access: PASS
-  numbered CriticProfile gate: PASS
-  web-search capability path: PASS
-  Research -> Critic -> final output: PASS
-  no developer API key/backend requirement: PASS
-
-Paid/Plus account:
-  same workflow: PASS
-  runtime/reasoning-level switch after profile gate: PASS
-  approval/state continuity after switch: PASS
-  final report/review semantics preserved: PASS
-```
-
-## 10. Publication and Discoverability
-
-Publication completed on 2026-08-14.
+Initial publication and launch smoke validation completed on 2026-08-14. Manifest retains:
 
 ```text
 publication_state: published
 published_at: 2026-08-14
-store_category: Research & Analysis
-Store search/discoverability: PASS
-public Store card: PASS
-Ukrainian primary conversation starters: PASS
-```
-
-The Builder UI confirmed public distribution and the published GPT was subsequently found through Store search.
-
-## 11. Production Smoke Test
-
-Production smoke testing completed successfully on 2026-08-14.
-
-Scenario:
-
-```text
-high-risk geodesy/construction task
-CriticProfile approval gate
-web_search=AVAILABLE
-Research
-Critic review
-REVISE
-corrected research
-Critic PASS
-final report + review protocol
-```
-
-Observed final result:
-
-```text
-Critic history: REVISE -> PASS
-final reliability score: 0.93
-workflow status: FINALIZED
-automatic checkpoint: absent
-internal citation/tool markup: absent
-normal visible sources: present
-```
-
-Manifest release metadata records:
-
-```text
 production_smoke_test_passed: true
 production_smoke_tested_at: 2026-08-14
 ```
 
-## 12. Release State
+These fields preserve the original launch record.
 
-Canonical first production release:
+## 11. Current Core Runtime Regression
+
+On 2026-08-23 the actual public `K-Research & Critic` Builder was manually synchronized with the hardened Core instructions and validated in NEW chats.
+
+Accepted behavior includes:
 
 ```text
-product: K-Research & Critic
-repository: K_Research_Critic
-GitHub release: K-Research & Critic v1.0.0
-Git tag: v1.0.0
-publication_state: published
-published_at: 2026-08-14
-store_category: Research & Analysis
-production_smoke_test: PASS
-repository_mode: MAINTENANCE
+two-stage CriticProfile gate: PASS
+CRITICAL -> required_cross_checks >= 3: PASS
+claim-level PASS/SHORTFALL: PASS
+evidence-origin traceability: PASS
+systematic-review double-counting protection: PASS
+mandatory claim-level summary: PASS
+Ukrainian headings/columns/profile labels: PASS
+REVISE -> PASS Critic cycle: PASS
+COMPLETED_WITH_LIMITATIONS when evidence remains insufficient: PASS
 ```
 
-The `v1.0.0` tag must point to the finalized maintenance-synchronization commit with fully green CI.
+Current runtime markers recorded in `gpt_store/manifest.yaml`:
 
-## 13. Maintenance Rules
+```text
+criticprofile_two_stage_gate_runtime_accepted: true
+cross_check_claim_level_runtime_accepted: true
+cross_check_traceability_runtime_accepted: true
+report_label_localization_runtime_accepted: true
+repository_matches_current_public_builder: true
+```
 
-Any later Builder change is a product update and must be revalidated before applying it to the published GPT.
+## 12. Maintenance Boundary
 
-Maintenance work may include:
+Any later Builder change is a product update and must be revalidated before being treated as the public baseline.
+
+Allowed maintenance includes:
 
 ```text
 bug/security fixes
@@ -277,7 +242,7 @@ Store-package compatibility changes
 regression fixes
 small UX improvements
 documentation corrections
-v1.0.x maintenance releases
+narrow product analytics/observability improvements after privacy and architecture approval
 ```
 
-The general Modular Agent Platform is no longer developed in this repository. It is transferred to a separate clean `K_Supervisor` project with its own roadmap beginning at Phase 0.
+The current public Core must remain independent of mandatory external services unless a separate product decision explicitly changes that invariant.
