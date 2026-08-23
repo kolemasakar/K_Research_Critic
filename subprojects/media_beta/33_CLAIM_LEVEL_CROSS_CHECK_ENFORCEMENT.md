@@ -1,12 +1,14 @@
 # Claim-Level Cross-Check Enforcement
 
-Version: 1.0
+Version: 1.1
 Date: 2026-08-23
-Status: IMPLEMENTED_IN_BRANCH_PENDING_RUNTIME_ACCEPTANCE
+Status: RUNTIME_ACCEPTED_PRIVATE_OWNER_BETA
 
 ## Trigger
 
-Runtime test of the CRITICAL medical query `Досліди, чи справді холодний душ покращує імунітет.` showed that the profile-level requirement `required_cross_checks >= 3` was created correctly, but the final report only demonstrated three-source compliance for the overall conclusion. Some individual material claims were supported by one study while the protocol still returned an unconditional `PASS`.
+Runtime testing of the CRITICAL medical query `Досліди, чи справді холодний душ покращує імунітет.` first showed that the profile-level requirement `required_cross_checks >= 3` was created correctly, but individual material claims could still rely on one study while the protocol returned an unconditional `PASS`.
+
+The contract was then hardened claim-by-claim and the actual private `K-Research & Critic - MEDIA BETA` Builder was resynchronized. A repeated runtime test passed the required behavior.
 
 ## Required behavior
 
@@ -50,6 +52,19 @@ The review protocol must summarize per-claim `required / achieved_independent / 
 
 A user or approved CriticProfile may raise this value. It must never be silently lowered.
 
+## Runtime acceptance evidence
+
+Repeated owner-only private-GPT test after Builder synchronization produced:
+- `risk_level=CRITICAL`;
+- `required_cross_checks=3` per material claim;
+- visible claim-level `Cross-check: achieved/required - PASS|SHORTFALL`;
+- a concrete `1/3 - SHORTFALL` for the claim interpreting the 29% sick-leave result;
+- an explicit reason for the shortfall;
+- no false claim that 3/3 had been achieved for that claim;
+- final status `COMPLETED_WITH_LIMITATIONS` rather than unconditional `PASS`.
+
+Canonical runtime record: `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md`.
+
 ## Regression protection
 
 Automated tests assert:
@@ -58,10 +73,10 @@ Automated tests assert:
 - shortfall behavior is mandatory;
 - unconditional PASS on hidden/unqualified shortfall is forbidden;
 - claim output exposes achieved/required status;
-- manifest marks claim-level runtime acceptance false until a new private-GPT runtime test passes.
+- manifest records claim-level runtime acceptance after live PASS.
 
 ## Production boundary
 
-Implemented only in `agent/video-url-research` / draft PR #8.
+Accepted only in the private owner `K-Research & Critic - MEDIA BETA` and branch `agent/video-url-research` / draft PR #8.
 
-The actual private `K-Research & Critic - MEDIA BETA` Builder must be synchronized again before runtime acceptance of this stronger contract. Public GPT, `main`, and production VoiceBridge remain unchanged.
+Public GPT, `main`, and production VoiceBridge remain unchanged pending a separate owner decision.
