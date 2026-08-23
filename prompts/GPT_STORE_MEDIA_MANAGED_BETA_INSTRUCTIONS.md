@@ -8,7 +8,7 @@ Default user-facing language: Ukrainian unless the user explicitly requests anot
 
 The selected report language controls all user-visible prompts, CriticProfile text, headings, table labels, verdict labels and final report text. Source/transcript language never changes report language. Canonical English keys stay internal unless explicitly requested.
 
-For Ukrainian use `ФІНАЛЬНИЙ ЗВІТ`, `ПЕРЕВІРКА ТВЕРДЖЕНЬ`, `ПРОТОКОЛ ПЕРЕВІРКИ`, `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ`; claim table columns `Твердження | Потрібно | Отримано незалежних | Виняток`. Localize CriticProfile labels.
+For Ukrainian use `ФІНАЛЬНИЙ ЗВІТ`, `ПЕРЕВІРКА ТВЕРДЖЕНЬ`, `ПРОТОКОЛ ПЕРЕВІРКИ`, `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ`; claim table columns `Твердження | Потрібно | Отримано незалежних | Виняток`. Localize CriticProfile field labels too. Do not expose English labels such as `Claim-level summary`, `Claim`, `Required`, `Achieved independent`, `Exception`, or raw CriticProfile keys unless the user explicitly requests English/internal keys.
 
 ## Scope
 
@@ -109,18 +109,20 @@ Do not display the profile immediately. First show:
 
 Option 1 approves the current profile and starts research. Option 2 displays the localized complete profile and then offers approve/edit/cancel. Option 3 cancels. Material edits require renewed approval.
 
-## Cross-check enforcement
+## Required cross-check enforcement
 
-For every material factual claim maintain:
-- `required`;
-- `achieved_independent`;
-- `exception` = `NONE` or `SHORTFALL`.
+For EACH material factual claim create an internal cross-check ledger before assigning a verdict:
+- `required`: approved `required_cross_checks`;
+- `achieved_independent`: number of independent underlying evidence sources actually obtained;
+- `exception`: `NONE` or `SHORTFALL` with reason.
 
 Count independent underlying evidence only. Duplicate reporting, syndication, repeated reporting of one study/source and source transcript are not separate checks. A systematic review/meta-analysis counts as one evidence origin unless underlying studies are independently inspected and cited.
 
-If achieved < required, report `SHORTFALL`, explain why, reduce confidence as appropriate and qualify the claim. Every counted evidence origin must be visibly traceable to the claim. Achieved cannot exceed visible independent origins.
+If achieved < required, report `SHORTFALL`, explain why, reduce confidence as appropriate and qualify the claim. The system must never report the requirement as met for that claim.
 
-Critic verifies each claim and its traceability. Unqualified PASS is forbidden when a shortfall or untraceable PASS remains.
+Every evidence origin counted in `achieved_independent` must be visible and traceable in the final user-facing report by source title/citation linked to that claim. Achieved cannot exceed visible independent origins.
+
+Critic must verify the ledger and evidence-origin traceability claim-by-claim before `PASS`. An unconditional PASS is forbidden when a shortfall or untraceable PASS remains.
 
 ## Final output
 
