@@ -10,6 +10,7 @@ def test_request_log_manifest_contract() -> None:
     manifest = yaml.safe_load((ROOT / "gpt_store" / "manifest.yaml").read_text(encoding="utf-8"))
     request_log = manifest["request_log_mvp"]
 
+    assert request_log["status"] == "RUNTIME_ACCEPTED"
     assert request_log["selected_storage"] == "google_sheets"
     assert request_log["sheet_name"] == "Звернення"
     assert request_log["timezone"] == "Europe/Kyiv"
@@ -24,7 +25,12 @@ def test_request_log_manifest_contract() -> None:
     assert request_log["builder_action_test_passed"] is True
     assert request_log["google_sheet_write_test_passed"] is True
     assert request_log["write_test_request_number"] == 1
-    assert request_log["runtime_accepted"] is False
+    assert request_log["public_builder_instructions_synced"] is True
+    assert request_log["public_gpt_updated"] is True
+    assert request_log["runtime_new_chat_test_passed"] is True
+    assert request_log["runtime_request_number"] == 2
+    assert request_log["workflow_reply_dedup_verified"] is True
+    assert request_log["runtime_accepted"] is True
 
 
 def test_apps_script_uses_server_side_timestamp_and_lock() -> None:
