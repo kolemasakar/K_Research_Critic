@@ -17,30 +17,39 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert manifest["actions"]["media_transcript"]["schema"] == (
         "gpt_store/actions/media_managed_beta_openapi.yaml"
     )
-    assert manifest["instructions"]["profile_gate_mode"] == "two_stage_direct_or_review"
-    assert manifest["instructions"]["profile_auto_display"] is False
-    assert manifest["instructions"]["profile_direct_run_approves_profile"] is True
-    assert manifest["instructions"]["profile_review_option"] == 2
-    assert manifest["instructions"]["profile_cancel_option"] == 3
-    assert manifest["instructions"]["recovered_review_required_uses_same_gate"] is True
-    assert manifest["instructions"]["required_cross_checks_enforced"] is True
-    assert manifest["instructions"]["cross_check_independence_required"] is True
-    assert manifest["instructions"]["cross_check_shortfall_must_be_reported"] is True
-    assert manifest["instructions"]["cross_check_protocol_summary_required"] is True
-    assert manifest["instructions"]["cross_check_claim_level_ledger_required"] is True
-    assert manifest["instructions"]["cross_check_claim_level_output_required"] is True
-    assert manifest["instructions"]["cross_check_unqualified_pass_on_shortfall_forbidden"] is True
-    assert manifest["instructions"]["cross_check_traceability_required"] is True
-    assert manifest["instructions"]["cross_check_achieved_cannot_exceed_visible_origins"] is True
-    assert manifest["instructions"]["cross_check_systematic_review_counts_as_one_origin"] is True
-    assert manifest["instructions"]["cross_check_protocol_table_required"] is True
-    assert manifest["instructions"]["cross_check_protocol_table_columns"] == [
-        "Claim",
-        "Required",
-        "Achieved independent",
-        "Exception",
+    instructions = manifest["instructions"]
+    assert instructions["profile_gate_mode"] == "two_stage_direct_or_review"
+    assert instructions["profile_auto_display"] is False
+    assert instructions["profile_direct_run_approves_profile"] is True
+    assert instructions["profile_review_option"] == 2
+    assert instructions["profile_cancel_option"] == 3
+    assert instructions["recovered_review_required_uses_same_gate"] is True
+    assert instructions["required_cross_checks_enforced"] is True
+    assert instructions["cross_check_independence_required"] is True
+    assert instructions["cross_check_shortfall_must_be_reported"] is True
+    assert instructions["cross_check_protocol_summary_required"] is True
+    assert instructions["cross_check_claim_level_ledger_required"] is True
+    assert instructions["cross_check_claim_level_output_required"] is True
+    assert instructions["cross_check_unqualified_pass_on_shortfall_forbidden"] is True
+    assert instructions["cross_check_traceability_required"] is True
+    assert instructions["cross_check_achieved_cannot_exceed_visible_origins"] is True
+    assert instructions["cross_check_systematic_review_counts_as_one_origin"] is True
+    assert instructions["cross_check_protocol_table_required"] is True
+    assert instructions["user_visible_labels_localized_to_report_language"] is True
+    assert instructions["criticprofile_field_labels_localized_to_report_language"] is True
+    assert instructions["ukrainian_required_headings"] == [
+        "ФІНАЛЬНИЙ ЗВІТ",
+        "ПЕРЕВІРКА ТВЕРДЖЕНЬ",
+        "ПРОТОКОЛ ПЕРЕВІРКИ",
+        "ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ",
     ]
-    assert manifest["instructions"]["cross_check_floor_by_risk"] == {
+    assert instructions["cross_check_protocol_table_columns"] == [
+        "Твердження",
+        "Потрібно",
+        "Отримано незалежних",
+        "Виняток",
+    ]
+    assert instructions["cross_check_floor_by_risk"] == {
         "LOW": 0,
         "MEDIUM": 1,
         "HIGH": 2,
@@ -53,23 +62,23 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert manifest["beta"]["managed_explicit_user_consent_required"] is True
     assert manifest["beta"]["managed_automatic_ai_fallback"] is False
     assert manifest["beta"]["managed_user_beta_access_code_required"] is False
-    assert manifest["beta"]["public_platforms_live_accepted"] == [
-        "youtube",
-        "instagram",
-    ]
+    assert manifest["beta"]["public_platforms_live_accepted"] == ["youtube", "instagram"]
     assert manifest["beta"]["managed_instagram_ai_fallback_live_accepted"] is True
-    assert manifest["release"]["a9_3_durable_managed_complete"] is True
-    assert manifest["release"]["a9_5_private_gpt_integration_complete"] is True
-    assert manifest["release"]["a9_8_owner_zero_client_acceptance_complete"] is True
-    assert manifest["release"]["a9_6_instagram_managed_complete"] is True
-    assert manifest["release"]["a9_6_facebook_complete"] is False
-    assert manifest["release"]["criticprofile_gate_runtime_accepted"] is True
-    assert manifest["release"]["cross_check_enforcement_hardened"] is True
-    assert manifest["release"]["cross_check_claim_level_enforcement_hardened"] is True
-    assert manifest["release"]["cross_check_claim_level_runtime_accepted"] is True
-    assert manifest["release"]["cross_check_traceability_hardened"] is True
-    assert manifest["release"]["cross_check_traceability_runtime_accepted"] is False
-    assert manifest["release"]["gpt_builder_private_update_required"] is True
+    release = manifest["release"]
+    assert release["a9_3_durable_managed_complete"] is True
+    assert release["a9_5_private_gpt_integration_complete"] is True
+    assert release["a9_8_owner_zero_client_acceptance_complete"] is True
+    assert release["a9_6_instagram_managed_complete"] is True
+    assert release["a9_6_facebook_complete"] is False
+    assert release["criticprofile_gate_runtime_accepted"] is True
+    assert release["cross_check_enforcement_hardened"] is True
+    assert release["cross_check_claim_level_enforcement_hardened"] is True
+    assert release["cross_check_claim_level_runtime_accepted"] is True
+    assert release["cross_check_traceability_hardened"] is True
+    assert release["cross_check_traceability_runtime_accepted"] is False
+    assert release["report_label_localization_hardened"] is True
+    assert release["report_label_localization_runtime_accepted"] is False
+    assert release["gpt_builder_private_update_required"] is True
 
 
 def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates() -> None:
@@ -161,6 +170,10 @@ def test_private_builder_instructions_fit_limit_and_use_two_stage_profile_gate()
     assert len(text) <= 8000
     assert "REPORT LANGUAGE INVARIANT" in text
     assert "Source/transcript language never controls report language" in text
+    assert "Canonical English keys stay internal" in text
+    assert "`ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ`" in text
+    assert "`Твердження | Потрібно | Отримано незалежних | Виняток`" in text
+    assert "raw CriticProfile keys such as `profile_id`, `risk_level`, `required_cross_checks`, `approved_at`" in text
     assert "preflightManagedMediaCredits" in text
     assert "startManagedMediaNativeTranscription" in text
     assert "preflightManagedMediaAiCredits" in text
@@ -188,4 +201,3 @@ def test_private_builder_instructions_fit_limit_and_use_two_stage_profile_gate()
     assert "Cross-check: achieved/required - PASS|SHORTFALL" in text
     assert "TRACEABILITY:" in text
     assert "A systematic review/meta-analysis counts as one evidence origin" in text
-    assert "Claim | Required | Achieved independent | Exception" in text
