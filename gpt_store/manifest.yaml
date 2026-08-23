@@ -29,6 +29,39 @@ knowledge:
 
 instructions:
   file: prompts/GPT_STORE_INSTRUCTIONS.md
+  version: "2.0-core-runtime-accepted"
+  builder_character_limit: 8000
+  default_report_language: uk-UA
+  report_language_follows_source_language: false
+  user_visible_labels_localized_to_report_language: true
+  criticprofile_field_labels_localized_to_report_language: true
+  profile_gate_mode: two_stage_direct_or_review
+  profile_auto_display: false
+  profile_direct_run_approves_profile: true
+  profile_review_option: 2
+  profile_cancel_option: 3
+  recovered_review_required_uses_same_gate: true
+  required_cross_checks_enforced: true
+  cross_check_independence_required: true
+  cross_check_claim_level_ledger_required: true
+  cross_check_claim_level_output_required: true
+  cross_check_shortfall_must_be_reported: true
+  cross_check_unqualified_pass_on_shortfall_forbidden: true
+  cross_check_traceability_required: true
+  cross_check_achieved_cannot_exceed_visible_origins: true
+  cross_check_systematic_review_counts_as_one_origin: true
+  cross_check_protocol_table_required: true
+  cross_check_protocol_table_heading_uk: ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ
+  cross_check_protocol_table_columns:
+    - Твердження
+    - Потрібно
+    - Отримано незалежних
+    - Виняток
+  cross_check_floor_by_risk:
+    LOW: 0
+    MEDIUM: 1
+    HIGH: 2
+    CRITICAL: 3
 
 checkpoint:
   schema_version: "1.0"
@@ -56,3 +89,9 @@ release:
   public_publish_is_manual: true
   production_smoke_test_passed: true
   production_smoke_tested_at: "2026-08-14"
+  latest_core_runtime_regression_passed_at: "2026-08-23"
+  criticprofile_two_stage_gate_runtime_accepted: true
+  cross_check_claim_level_runtime_accepted: true
+  cross_check_traceability_runtime_accepted: true
+  report_label_localization_runtime_accepted: true
+  repository_matches_current_public_builder: true
