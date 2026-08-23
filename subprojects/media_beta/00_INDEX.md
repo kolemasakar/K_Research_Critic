@@ -2,9 +2,9 @@
 
 Canonical documentation index for K-Research & Critic media-input work.
 
-Version: 2.3
+Version: 2.4
 Status: ACTIVE
-Updated: 2026-08-21
+Updated: 2026-08-23
 
 ## Purpose
 
@@ -15,10 +15,11 @@ It covers:
 - zero-client A9 managed ingestion;
 - credit consent and durable managed jobs;
 - private GPT Action integration and owner E2E acceptance;
-- future public platform adapters and local upload;
+- CriticProfile presentation/approval UX;
+- additional public platform adapters and local upload;
 - later sustainable/free media architecture.
 
-The published text-only K-Research & Critic product remains a separate production baseline and must not be changed implicitly by this subproject.
+The published K-Research & Critic product remains a separate production baseline and must not be changed implicitly by this subproject.
 
 ## Canonical reading order
 
@@ -53,39 +54,53 @@ The published text-only K-Research & Critic product remains a separate productio
 29. `28_A9_5_PRIVATE_GPT_ACTION_INTEGRATION.md` - A9.5 package/backend preflight checkpoint.
 30. `29_A9_5_BUILDER_UPDATE_RUNBOOK.md` - private GPT Builder switch and Preview procedure.
 31. `30_A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_ACCEPTANCE.md` - actual private GPT zero-client YouTube E2E acceptance.
+32. `31_CRITICPROFILE_GATE_UX_UPDATE.md` - two-stage CriticProfile direct-run/review/edit UX contract.
 
 ## Source-of-truth precedence
 
 When documents disagree:
 1. current code, live isolated runtime evidence and CI on active feature branches;
 2. `03_CURRENT_STATE.md`;
-3. `06_DECISION_LOG.md`;
-4. `24_A9_ZERO_CLIENT_INGESTION_PLAN.md`;
-5. `02_ROADMAP.md`;
-6. `08_CHAT_HANDOFF.md`;
-7. phase acceptance records and other documents.
+3. `31_CRITICPROFILE_GATE_UX_UPDATE.md` for CriticProfile UX behavior;
+4. `06_DECISION_LOG.md`;
+5. `24_A9_ZERO_CLIENT_INGESTION_PLAN.md`;
+6. `02_ROADMAP.md`;
+7. `08_CHAT_HANDOFF.md`;
+8. phase acceptance records and other documents.
 
 Do not mark a phase complete from roadmap text alone.
 
 ## Current phase checkpoint
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_COMPLETE / A9_8_OWNER_ZERO_CLIENT_YOUTUBE_COMPLETE / A9_6_MULTI_PLATFORM_NEXT`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_COMPLETE / A9_8_OWNER_ZERO_CLIENT_YOUTUBE_COMPLETE / A9_6_INSTAGRAM_MANAGED_COMPLETE / A9_6_FACEBOOK_IN_PROGRESS`
 
-Current next task:
+Current next media task:
 
-`Validate additional public source adapters independently, beginning with A9.6, while keeping the accepted YouTube path as the regression baseline.`
+`Complete Facebook isolated remediation and acceptance while preserving YouTube and Instagram as regression baselines.`
+
+## Current CriticProfile UX
+
+- CriticProfile is mandatory before independent research;
+- it is created internally but not displayed automatically;
+- first menu offers direct analysis, profile review/edit, or cancel;
+- option `1` explicitly approves the current profile before research;
+- option `2` displays the profile and enters the review/edit menu;
+- option `3` cancels without research;
+- recovered `PROFILE_REVIEW_REQUIRED` checkpoints use the same gate.
 
 ## Current A9 security/UX boundaries
 
-- current live-accepted zero-client public adapter: YouTube;
+- live-accepted zero-client public adapters: YouTube and Instagram Reel;
+- Facebook remains in progress and is not user-facing accepted;
 - public URL sources only unless `local_upload` is later separately accepted;
 - no platform login/password/cookies/authenticated sessions/account tokens;
 - no user-facing beta access code in the private owner zero-client flow;
 - private Action bearer remains mandatory;
 - owner beta admission is injected server-side only after bearer authentication;
 - Supadata native cost hard cap is one approved credit;
+- Instagram AI fallback requires a separate quote and separate explicit consent;
 - no automatic managed AI fallback;
-- ChatGPT may show its own consequential-Action confirmation before the billable external call;
+- ChatGPT may show its own consequential-Action confirmation before a billable external call;
 - A8 Helper 0.2.2 remains fallback evidence, not normal A9 UX.
 
 ## Related repositories and branches
@@ -102,4 +117,4 @@ VoiceBridge:
 
 ## Non-negotiable boundary
 
-Do not merge or publish the media feature, resume external tester/public-sharing work, expose credentials, bypass the credit-consent gate, use private platform sessions, or modify production merely because owner-only YouTube E2E passed. Those require separate explicit decisions and acceptance gates.
+Do not merge or publish the media feature, resume external tester/public-sharing work, expose credentials, bypass any provider credit-consent gate, use private platform sessions, or modify production merely because owner-only YouTube/Instagram paths passed. Those require separate explicit decisions and acceptance gates.
