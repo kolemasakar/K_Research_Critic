@@ -43,6 +43,13 @@ instructions:
   cross_check_independence_required: true
   cross_check_shortfall_must_be_reported: true
   cross_check_protocol_summary_required: true
+  cross_check_claim_level_ledger_required: true
+  cross_check_claim_level_output_required: true
+  cross_check_unqualified_pass_on_shortfall_forbidden: true
+  cross_check_ledger_fields:
+    - required
+    - achieved_independent
+    - exception
   cross_check_floor_by_risk:
     LOW: 0
     MEDIUM: 1
@@ -135,6 +142,8 @@ release:
   a9_6_facebook_complete: false
   criticprofile_gate_runtime_accepted: true
   cross_check_enforcement_hardened: true
+  cross_check_claim_level_enforcement_hardened: true
+  cross_check_claim_level_runtime_accepted: false
   external_tester_rollout_paused: true
   gpt_builder_private_update_required: true
   merge_to_public_product_allowed: false
