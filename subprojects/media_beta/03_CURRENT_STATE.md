@@ -2,7 +2,7 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 5.3
+Version: 5.4
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-23
 
@@ -10,14 +10,14 @@ Checkpoint date: 2026-08-23
 
 Current phase state:
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_COMPLETE / A9_8_OWNER_ZERO_CLIENT_YOUTUBE_COMPLETE / A9_6_INSTAGRAM_MANAGED_COMPLETE / A9_6_FACEBOOK_IN_PROGRESS`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_COMPLETE / A9_8_OWNER_ZERO_CLIENT_YOUTUBE_COMPLETE / A9_6_INSTAGRAM_MANAGED_COMPLETE / A9_6_FACEBOOK_DEFERRED_NOT_ACCEPTED`
 
 Accepted owner-only zero-client adapters:
 - public prerecorded YouTube;
 - public Instagram Reel through managed native first, with separately authorized AI fallback only when native transcript is unavailable.
 
-Not accepted yet:
-- Facebook public Video/Reels;
+Deferred / not accepted:
+- Facebook public Video/Reels — remediation explicitly deferred by owner on 2026-08-23;
 - Telegram public video posts;
 - local audio/video attachment.
 
@@ -83,16 +83,7 @@ Canonical records:
 
 Default user-facing report language is Ukrainian unless the user explicitly requests another language.
 
-The selected report language controls ALL user-visible workflow text including:
-- prompts;
-- CriticProfile presentation;
-- section headings;
-- table titles and columns;
-- CriticProfile field labels;
-- verdict labels;
-- final report;
-- claim verification;
-- review protocol.
+The selected report language controls ALL user-visible workflow text including prompts, CriticProfile presentation, section headings, table titles and columns, CriticProfile field labels, verdict labels, final report, claim verification, and review protocol.
 
 Canonical English/internal keys remain internal unless explicitly requested.
 
@@ -179,23 +170,24 @@ PASS for isolated owner beta. Accepted flow: native 1 credit -> `AWAITING_AI_CON
 
 ### A9.6 - Facebook
 
-IN_PROGRESS / NOT_ACCEPTED.
+DEFERRED BY OWNER / NOT_ACCEPTED.
 
-A separately authorized Facebook AI generate request failed with:
-- `MANAGED_PROVIDER_TRANSCRIPT_INVALID`;
+Owner decision on 2026-08-23: skip Facebook remediation for now. No deployment, fresh quote, billable acceptance call, or private GPT Facebook E2E is authorized by this checkpoint.
+
+Preserved technical state for future resumption:
+- prior separately authorized Facebook AI generate request failed with `MANAGED_PROVIDER_TRANSCRIPT_INVALID`;
 - `segments=0`;
-- `credit_charge_uncertain=true`.
+- `credit_charge_uncertain=true`;
+- automatic retry/replay remains prohibited;
+- nested async-result parser remediation remains available in VoiceBridge commit `f6b32c2a03425deaecadd10fc902671d62eaab5d`;
+- latest recorded isolated deploy attempt of that remediation failed.
 
-Automatic retry/replay is prohibited. Nested async-result parser remediation exists in VoiceBridge commit `f6b32c2a03425deaecadd10fc902671d62eaab5d`, but the latest recorded isolated deploy attempt failed.
+When/if the owner resumes Facebook work, continue from the preserved remediation sequence; do not replay the uncertain-charge operation.
+
+Canonical deferral record: `40_FACEBOOK_REMEDIATION_DEFERRED.md`.
 
 ## Next task
 
-Resume A9.6 Facebook remediation without replaying the uncertain-charge operation:
-1. deploy parser remediation without a billable provider call;
-2. verify isolated service health/capability;
-3. obtain a fresh credit quote;
-4. require fresh explicit authorization;
-5. execute one fresh acceptance test;
-6. only after backend PASS, run private GPT E2E.
+Facebook remediation is intentionally skipped for now. No replacement engineering task is implied by this checkpoint; select the next project direction explicitly.
 
 These markers do NOT authorize repository merge, external tester rollout, production VoiceBridge changes, private/authenticated media, automatic AI fallback, Facebook acceptance, Telegram, or local upload.
