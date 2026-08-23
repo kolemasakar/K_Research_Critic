@@ -2,7 +2,7 @@
 
 Canonical documentation index for K-Research & Critic media-input work.
 
-Version: 3.1
+Version: 3.2
 Status: ACTIVE
 Updated: 2026-08-23
 
@@ -18,7 +18,7 @@ It covers:
 - CriticProfile presentation/approval UX and runtime acceptance;
 - claim-level cross-check enforcement/auditability;
 - Core and MEDIA BETA evidence-origin traceability;
-- report-language label localization across both Builder variants;
+- Ukrainian-default report-label localization across both Builder variants;
 - additional public platform adapters and later sustainable/free media architecture.
 
 The published K-Research & Critic product and repository `main` remain separate production baselines and must not be changed implicitly by this subproject.
@@ -44,22 +44,24 @@ The published K-Research & Critic product and repository `main` remain separate 
 17. `36_CORE_TRACEABILITY_RUNTIME_ACCEPTANCE.md` - final Core traceability NEW-chat PASS.
 18. `37_MEDIA_BETA_TRACEABILITY_ALIGNMENT.md` - MEDIA BETA alignment to the accepted Core traceability contract.
 19. `38_REPORT_LANGUAGE_LABEL_LOCALIZATION_HARDENING.md` - Ukrainian-default visible heading/table/field-label hardening for both Core and MEDIA BETA.
+20. `39_REPORT_LANGUAGE_AND_MEDIA_TRACEABILITY_RUNTIME_ACCEPTANCE.md` - final dual-GPT localization PASS and MEDIA BETA traceability runtime acceptance.
 
 ## Source-of-truth precedence
 
 When documents disagree:
 1. current code, live runtime evidence and CI on active feature branches;
 2. `03_CURRENT_STATE.md`;
-3. `38_REPORT_LANGUAGE_LABEL_LOCALIZATION_HARDENING.md` for current visible-language requirements and pending runtime gate;
-4. `37_MEDIA_BETA_TRACEABILITY_ALIGNMENT.md` for MEDIA BETA traceability contract;
-5. `36_CORE_TRACEABILITY_RUNTIME_ACCEPTANCE.md` for accepted main Core traceability evidence;
-6. `35_CORE_RUNTIME_TRACEABILITY_HARDENING.md`;
-7. `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md`;
-8. `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md`;
-9. `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md`;
-10. `31_CRITICPROFILE_GATE_UX_UPDATE.md`;
-11. `06_DECISION_LOG.md`;
-12. roadmap/handoff/phase records.
+3. `39_REPORT_LANGUAGE_AND_MEDIA_TRACEABILITY_RUNTIME_ACCEPTANCE.md` for latest dual-GPT runtime acceptance;
+4. `38_REPORT_LANGUAGE_LABEL_LOCALIZATION_HARDENING.md` for the visible-language contract;
+5. `37_MEDIA_BETA_TRACEABILITY_ALIGNMENT.md` for the MEDIA BETA traceability contract;
+6. `36_CORE_TRACEABILITY_RUNTIME_ACCEPTANCE.md` for accepted main Core traceability evidence;
+7. `35_CORE_RUNTIME_TRACEABILITY_HARDENING.md`;
+8. `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md`;
+9. `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md`;
+10. `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md`;
+11. `31_CRITICPROFILE_GATE_UX_UPDATE.md`;
+12. `06_DECISION_LOG.md`;
+13. roadmap/handoff/phase records.
 
 Do not mark a phase complete from roadmap text alone.
 
@@ -67,44 +69,39 @@ Do not mark a phase complete from roadmap text alone.
 
 `A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_COMPLETE / A9_8_OWNER_ZERO_CLIENT_YOUTUBE_COMPLETE / A9_6_INSTAGRAM_MANAGED_COMPLETE / A9_6_FACEBOOK_IN_PROGRESS`
 
-## Required cross-check / traceability contract
+## Accepted Research/Critic contract
 
-- floors: `LOW>=0`, `MEDIUM>=1`, `HIGH>=2`, `CRITICAL>=3`;
+- two-stage CriticProfile gate runtime accepted;
+- floors `LOW>=0`, `MEDIUM>=1`, `HIGH>=2`, `CRITICAL>=3`;
 - each material factual claim has `required / achieved_independent / exception`;
-- independence is based on underlying evidence, not URLs;
+- independence is based on underlying evidence, not URL count;
 - shortfalls are visible and qualified;
-- every counted evidence origin must be visibly traceable to its claim;
+- every counted evidence origin is visibly traceable to its claim;
 - achieved cannot exceed visible independent origins;
-- a systematic review/meta-analysis is one origin unless underlying studies were separately inspected and cited;
-- Critic checks the ledger and traceability claim-by-claim.
+- systematic-review derivative evidence is not double-counted;
+- Critic checks each material claim before PASS.
 
-## Report-language label contract
+## Report-language contract
 
-Default report language is Ukrainian unless the user explicitly requests another language. All user-visible headings, table titles/columns and CriticProfile field labels follow the selected report language; canonical English keys remain internal.
+Default report language is Ukrainian unless explicitly changed by the user. User-visible headings, table titles/columns and CriticProfile field labels follow the selected report language; canonical English keys remain internal.
 
 For Ukrainian reports use:
 - `ФІНАЛЬНИЙ ЗВІТ`;
 - `ПЕРЕВІРКА ТВЕРДЖЕНЬ`;
 - `ПРОТОКОЛ ПЕРЕВІРКИ`;
 - `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ`;
-- claim-level columns `Твердження | Потрібно | Отримано незалежних | Виняток`.
+- `Твердження | Потрібно | Отримано незалежних | Виняток`.
 
-Do not expose `Claim-level summary`, `Claim`, `Required`, `Achieved independent`, `Exception` or raw CriticProfile keys as Ukrainian user-visible labels unless explicitly requested.
+Both actual Custom GPTs passed NEW-chat visual localization regression.
 
 ## Runtime status
 
-Main Core evidence-origin traceability remains accepted.
-
-The latest MEDIA BETA regression demonstrated traceability logic and the four-column summary correctly, but exposed English visible labels. That run is not final acceptance of the complete updated language contract.
-
-Current markers:
 - `CORE_TRACEABILITY_HARDENING_RUNTIME = ACCEPTED`;
+- `CORE_REPORT_LABEL_LOCALIZATION_RUNTIME = ACCEPTED`;
 - `MEDIA_BETA_TRACEABILITY_LOGIC_RUNTIME = PASS`;
-- `MEDIA_BETA_REPORT_LABEL_LOCALIZATION_CODE = IMPLEMENTED`;
-- `MEDIA_BETA_REPORT_LABEL_LOCALIZATION_RUNTIME = PENDING`;
-- `MEDIA_BETA_TRACEABILITY_HARDENING_RUNTIME = PENDING_FINAL_LANGUAGE_REGRESSION`.
-
-Both actual Custom GPT Builder instruction sets require manual resynchronization with their latest branch Builder files before the localization runtime gate.
+- `MEDIA_BETA_TRACEABILITY_HARDENING_RUNTIME = ACCEPTED`;
+- `MEDIA_BETA_REPORT_LABEL_LOCALIZATION_RUNTIME = ACCEPTED`;
+- `gpt_builder_private_update_required = false`.
 
 ## Current A9 security/UX boundaries
 
@@ -117,6 +114,7 @@ Both actual Custom GPT Builder instruction sets require manual resynchronization
 - Supadata native cap remains 1 approved credit;
 - Instagram AI fallback requires separate quote and explicit consent;
 - no automatic managed AI fallback;
+- `credit_charge_uncertain=true` operations are never auto-retried;
 - A8 Helper remains fallback evidence only.
 
 ## Related repositories and branches
@@ -124,6 +122,10 @@ Both actual Custom GPT Builder instruction sets require manual resynchronization
 KRC: `kolemasakar/K_Research_Critic`, branch `agent/video-url-research`, draft PR #8.
 VoiceBridge: `kolemasakar/VoiceBridge`, branch `agent/krc-media-transcript`, draft PR #28.
 
+## Next task
+
+A9.6 Facebook remediation: deploy parser remediation without billable replay, verify health, obtain fresh quote, require fresh explicit authorization, then run one fresh acceptance test.
+
 ## Non-negotiable boundary
 
-Do not merge the media feature, resume external tester/public-sharing work, expose credentials, bypass credit consent, use private platform sessions, or change repository `main` without a separate explicit decision.
+Do not merge the media feature, resume external tester/public-sharing work, expose credentials, bypass credit consent, use private platform sessions, replay uncertain-charge operations, or change repository `main` without a separate explicit decision.
