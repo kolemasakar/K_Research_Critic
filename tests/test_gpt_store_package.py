@@ -32,10 +32,11 @@ def test_manifest_preserves_store_first_invariants() -> None:
     assert manifest["capabilities"]["web_search"] is True
     assert manifest["capabilities"]["code_interpreter_data_analysis"] is True
     assert manifest["capabilities"]["apps"] is False
-    assert manifest["capabilities"]["actions"] is False
+    assert manifest["capabilities"]["actions"] is True
     release = manifest["release"]
     assert release["developer_api_key_required"] is False
     assert release["external_backend_required"] is False
+    assert release["privacy_policy_url_required_by_package"] is True
     assert release["production_smoke_test_passed"] is True
     assert release["production_smoke_tested_at"] == "2026-08-14"
     assert release["latest_core_runtime_regression_passed_at"] == "2026-08-23"
@@ -43,7 +44,8 @@ def test_manifest_preserves_store_first_invariants() -> None:
     assert release["cross_check_claim_level_runtime_accepted"] is True
     assert release["cross_check_traceability_runtime_accepted"] is True
     assert release["report_label_localization_runtime_accepted"] is True
-    assert release["repository_matches_current_public_builder"] is False
+    assert release["request_log_runtime_accepted"] is True
+    assert release["repository_matches_current_public_builder"] is True
 
 
 def test_instruction_package_matches_accepted_public_core_runtime() -> None:
@@ -68,6 +70,8 @@ def test_instruction_package_matches_accepted_public_core_runtime() -> None:
     assert "Only when explicitly asked to save/resume across chats" in text
     assert "REQUEST LOGGING" in text
     assert "call `logRequest` exactly once" in text
+    assert "Do not log standalone workflow replies" in text
+    assert "NON-BLOCKING" in text
     assert "CAPABILITY PREFLIGHT" not in text
     assert "Наступна допустима дія: 1 - **APPROVE**" not in text
 
@@ -76,7 +80,7 @@ def test_manifest_declares_accepted_core_contract() -> None:
     manifest = yaml.safe_load((ROOT / "gpt_store" / "manifest.yaml").read_text(encoding="utf-8"))
     instructions = manifest["instructions"]
 
-    assert instructions["version"] == "2.1-request-log-mvp-prepublish"
+    assert instructions["version"] == "2.1-request-log-mvp-runtime-accepted"
     assert instructions["builder_character_limit"] == 8000
     assert instructions["default_report_language"] == "uk-UA"
     assert instructions["report_language_follows_source_language"] is False
@@ -169,15 +173,17 @@ def test_checkpoint_rejects_extra_review_keys() -> None:
         StoreCheckpoint.model_validate(payload)
 
 
-def test_manifest_can_be_parsed_without_secrets_or_external_actions() -> None:
+def test_manifest_can_be_parsed_without_secrets_and_with_only_accepted_action() -> None:
     manifest = yaml.safe_load((ROOT / "gpt_store" / "manifest.yaml").read_text(encoding="utf-8"))
     serialized = json.dumps(manifest, sort_keys=True)
     secret_name = "OPENAI" + "_API_KEY"
 
     assert secret_name not in serialized
-    assert manifest["capabilities"]["actions"] is False
+    assert manifest["capabilities"]["actions"] is True
     assert manifest["capabilities"]["apps"] is False
     assert manifest["knowledge"]["required"] is False
+    assert manifest["request_log_mvp"]["authentication"] == "none"
+    assert manifest["request_log_mvp"]["full_prompt_storage"] is False
 
 
 def test_store_package_validation_cli_passes() -> None:
