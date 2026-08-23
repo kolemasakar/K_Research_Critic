@@ -17,6 +17,12 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert manifest["actions"]["media_transcript"]["schema"] == (
         "gpt_store/actions/media_managed_beta_openapi.yaml"
     )
+    assert manifest["instructions"]["profile_gate_mode"] == "two_stage_direct_or_review"
+    assert manifest["instructions"]["profile_auto_display"] is False
+    assert manifest["instructions"]["profile_direct_run_approves_profile"] is True
+    assert manifest["instructions"]["profile_review_option"] == 2
+    assert manifest["instructions"]["profile_cancel_option"] == 3
+    assert manifest["instructions"]["recovered_review_required_uses_same_gate"] is True
     assert manifest["beta"]["ingress_mode"] == "managed_zero_client"
     assert manifest["beta"]["browser_helper_required"] is False
     assert manifest["beta"]["managed_job_prefix"] == "KRCM_"
