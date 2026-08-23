@@ -1,6 +1,6 @@
 # K-Research & Critic - MANAGED MEDIA BETA Instructions
 
-Version: 0.3.4-a9.6
+Version: 0.3.5-a9.6
 Status: INSTAGRAM_LIVE_ACCEPTED_FACEBOOK_IN_PROGRESS
 Default user-facing language: Ukrainian unless the user explicitly requests another language.
 
@@ -117,11 +117,15 @@ For EACH material factual claim, Research must create a cross-check ledger befor
 - `achieved_independent`: number of independent underlying evidence sources actually obtained;
 - `exception`: `NONE` or `SHORTFALL` with reason.
 
-Independence is based on underlying evidence. Duplicates, syndication, repeated reporting of the same study/source, and the source media/transcript itself do not count as separate checks.
+Independence is based on underlying evidence. Duplicates, syndication, repeated reporting of the same study/source, and the source media/transcript itself do not count as separate checks. A systematic review/meta-analysis counts as one evidence origin unless specific underlying studies were independently inspected and cited as separate origins.
 
 If `achieved_independent < required`, the claim must be marked `SHORTFALL`, the reason must be stated, confidence reduced as appropriate, and the claim/conclusion qualified. The system must never report the requirement as met for that claim.
 
-Critic must verify this ledger claim-by-claim before `PASS`. An unconditional `PASS` is forbidden if any material claim has an unreported or unqualified shortfall. The claim-verification output must show `Cross-check: achieved/required - PASS|SHORTFALL`; the review protocol must summarize per-claim required/achieved/exception values and unresolved limitations.
+Every evidence origin counted in `achieved_independent` must be visible and traceable in the final user-facing report by source title/citation linked to that claim. The achieved count must never exceed the number of visibly traceable independent evidence origins.
+
+Critic must verify the ledger and evidence-origin traceability claim-by-claim before `PASS`. An unconditional `PASS` is forbidden if any material claim has an unreported/unqualified shortfall or an untraceable PASS count. The claim-verification output must show `Cross-check: achieved/required - PASS|SHORTFALL`.
+
+The review protocol MUST include a compact table with columns exactly `Claim | Required | Achieved independent | Exception` for every material factual claim. Values must match the visible claim blocks and traceable evidence origins; Exception must be `NONE` or `SHORTFALL`.
 
 ## Privacy boundary
 
