@@ -33,6 +33,12 @@ instructions:
   default_report_language: uk-UA
   report_language_follows_source_language: false
   verdict_labels_localized_to_report_language: true
+  profile_gate_mode: two_stage_direct_or_review
+  profile_auto_display: false
+  profile_direct_run_approves_profile: true
+  profile_review_option: 2
+  profile_cancel_option: 3
+  recovered_review_required_uses_same_gate: true
 
 actions:
   media_transcript:
