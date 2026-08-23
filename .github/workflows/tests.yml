@@ -127,3 +127,5 @@ jobs:
 
       - name: Run coverage gate
         run: python -m pytest --cov --cov-report=term-missing --cov-fail-under=70
+
+# self-trigger v2
