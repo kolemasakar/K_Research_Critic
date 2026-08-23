@@ -1,7 +1,7 @@
 # ROADMAP
 План завершеного розвитку K-Research & Critic та межі подальшого maintenance.
 
-Version: 1.13
+Version: 1.14
 Status: MAINTENANCE
 Updated: 2026-08-23
 
@@ -64,7 +64,7 @@ publication state: published
 
 ## 5. Current Public Core Runtime Baseline
 
-Accepted Core behavior:
+Status: ACCEPTED / SYNCHRONIZED
 
 ```text
 two-stage CriticProfile gate                 PASS
@@ -76,15 +76,12 @@ systematic-review double-counting protection PASS
 Critic REVISE -> PASS loop                   PASS
 Ukrainian report/profile/table localization  PASS
 COMPLETED_WITH_LIMITATIONS when required     PASS
-```
-
-Repository target after the current maintenance change:
-
-```text
 Actions                                     DISABLED
 request logging in Builder instructions     DISABLED
-public consent interruption                 REMOVED AFTER MANUAL BUILDER SYNC
+script.google.com consent interruption      ABSENT
 ```
+
+The repository and actual public Builder are synchronized for the no-Action public Core.
 
 ## 6. Maintenance Scope
 
@@ -102,7 +99,7 @@ maintenance releases
 
 ## 6.1 Request Accounting MVP
 
-Status: `DISABLED_DUE_TO_USER_CONSENT_UX`
+Status: `DISABLED_DUE_TO_USER_CONSENT_UX_RUNTIME_ACCEPTED`
 
 Historical implementation:
 
@@ -117,13 +114,16 @@ The implementation and runtime tests passed, including one substantive request -
 
 However, the public GPT presented a platform-controlled external-Action consent screen before sending the generalized topic to `script.google.com`. The owner decided that this is unacceptable UX for a non-essential request counter.
 
-Decision:
+Final accepted decision:
 
 ```text
-remove `logRequest` from active public Builder
-remove request logging from active public Instructions
-retain Apps Script, OpenAPI, Sheet and historical acceptance artifacts
-keep prototype disabled unless separately re-approved
+remove `logRequest` from active public Builder       COMPLETE
+remove request logging from active Instructions      COMPLETE
+save/update public GPT                                COMPLETE
+NEW-chat post-disable smoke test                      PASS
+script.google.com consent screen                      ABSENT
+CriticProfile gate appears directly                  PASS
+retain Apps Script/OpenAPI/Sheet prototype            YES
 ```
 
 Canonical retained prototype resources:
@@ -135,23 +135,23 @@ prompts/GPT_STORE_REQUEST_LOG_ADDENDUM.md
 docs/REQUEST_LOG_MVP.md
 docs/PRIVACY_POLICY_REQUEST_LOG.md
 docs/REQUEST_LOG_MVP_RUNTIME_ACCEPTANCE_2026-08-23.md
+docs/REQUEST_LOG_DISABLEMENT_DECISION_2026-08-23.md
 ```
+
+Do not re-enable the public Action unless the owner explicitly accepts the consent UX or a different telemetry architecture avoids it.
 
 ## 7. Current Activation Boundary
 
-Repository target state is already prepared with Actions disabled and request logging removed from `prompts/GPT_STORE_INSTRUCTIONS.md`.
-
-Manual Builder steps remain required because GitHub does not automatically update the Custom GPT:
+Current accepted Builder state:
 
 ```text
-1. remove the `logRequest` Action from the public Builder;
-2. replace Builder Instructions with current `main/prompts/GPT_STORE_INSTRUCTIONS.md`;
-3. save/update the public GPT;
-4. run one NEW-chat smoke test and verify there is no script.google.com consent screen;
-5. then mark repository/public Builder synchronization complete.
+Actions: disabled
+Apps: disabled
+Web search: enabled
+Code Interpreter & Data Analysis: enabled
+REQUEST LOGGING instruction block: absent
+privacy-policy URL required by active package: no
 ```
-
-Until those steps finish, `repository_matches_current_public_builder=false` is intentional.
 
 ## 8. Modular Agent Platform Transfer
 
@@ -181,6 +181,7 @@ LOGGING.md
 REQUEST_LOG_MVP.md
 PRIVACY_POLICY_REQUEST_LOG.md
 REQUEST_LOG_MVP_RUNTIME_ACCEPTANCE_2026-08-23.md
+REQUEST_LOG_DISABLEMENT_DECISION_2026-08-23.md
 ```
 
 ## 11. Current Implementation State
@@ -189,12 +190,13 @@ REQUEST_LOG_MVP_RUNTIME_ACCEPTANCE_2026-08-23.md
 Phase 0-12                                COMPLETE
 GPT Store publication                    COMPLETE
 2026-08-23 public Core runtime hardening ACCEPTED
-Request-log prototype                   IMPLEMENTED / TESTED
-Request-log public usage                DISABLED_DUE_TO_USER_CONSENT_UX
+Request-log prototype                    IMPLEMENTED / TESTED / RETAINED
+Request-log public usage                 DISABLED_DUE_TO_USER_CONSENT_UX
 Repository Instructions without logging COMPLETE
-Repository target actions=false         COMPLETE
-Public Builder Action removal           PENDING MANUAL STEP
-Public Builder Instructions resync      PENDING MANUAL STEP
-Post-disable NEW-chat smoke test         PENDING
+Repository actions=false                 COMPLETE
+Public Builder Action removal            COMPLETE
+Public Builder Instructions resync       COMPLETE
+Post-disable NEW-chat smoke test         PASS
+Repository / public Builder sync         COMPLETE
 Current repository mode                 MAINTENANCE
 ```
