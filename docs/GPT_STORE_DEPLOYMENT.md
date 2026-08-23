@@ -1,15 +1,15 @@
 # GPT_STORE_DEPLOYMENT
 Документ визначає основну GPT Store-модель розгортання K-Research & Critic без обов'язкового developer API key.
 
-Version: 1.4
-Status: ACTIVE / PUBLIC CORE SYNCHRONIZED
+Version: 1.5
+Status: REQUEST-LOG DISABLEMENT PENDING MANUAL BUILDER SYNC
 Updated: 2026-08-23
 
 ## 1. Decision
 
 K-Research & Critic is GPT Store-first.
 
-Primary runtime policy:
+Target runtime policy:
 
 ```text
 channel: chatgpt_store
@@ -19,14 +19,12 @@ external_backend_required_for_research: false
 recommended_model: null
 allow_user_model_switch: true
 apps: false
-actions: true
+actions: false
 ```
 
-The public Core must not depend on a developer-owned API key, mandatory external backend for Research/Critic, or pinned model identifier.
+The request-log Action is intentionally removed from the target public configuration because ChatGPT's external-Action consent screen interrupts the normal UX for new users.
 
-The accepted public package includes one optional best-effort request-log Action. Failure or denial of that Action must not block research.
-
-## 2. Canonical Public Package
+## 2. Canonical Active Public Package
 
 ```text
 gpt_store/manifest.yaml
@@ -34,21 +32,15 @@ prompts/GPT_STORE_INSTRUCTIONS.md
 gpt_store/checkpoint.py
 gpt_store/checkpoint_example.json
 scripts/validate_store_package.py
-integrations/request_log/openapi.yaml
-integrations/request_log/google_apps_script/Code.gs
-docs/REQUEST_LOG_MVP.md
-docs/PRIVACY_POLICY_REQUEST_LOG.md
-docs/REQUEST_LOG_MVP_RUNTIME_ACCEPTANCE_2026-08-23.md
 docs/GPT_STORE_PACKAGE.md
 ```
 
-`prompts/GPT_STORE_INSTRUCTIONS.md` is the repository copy of the current accepted public Builder instructions.
+The request-log implementation remains in the repository as a tested inactive prototype.
 
-## 3. Current Builder Workflow
+## 3. Target Builder Workflow
 
 ```text
-new substantive request
- -> best-effort `logRequest`
+request
  -> CriticProfile created internally
  -> first gate: 1 direct run / 2 review-edit / 3 cancel
  -> explicit approval
@@ -59,22 +51,11 @@ new substantive request
  -> review protocol
 ```
 
-The first gate is:
+No automatic `logRequest` call occurs in the target public Builder.
 
-```text
-Профіль збору і критики успішно створено.
-1 - виконати аналіз одразу.
-2 - переглянути і відредагувати профіль збору і критики.
-3 - скасувати дослідження.
-```
+## 4. Historical Request Log Prototype
 
-Option `2` displays the complete localized profile and enters the approve/edit/cancel review gate. No independent research begins before explicit approval.
-
-Standalone workflow replies such as `1`, `2`, `3` do not trigger a new `logRequest` row.
-
-## 4. Request Log Deployment
-
-Accepted implementation:
+Historical implementation:
 
 ```text
 GPT Action `logRequest`
@@ -82,19 +63,20 @@ GPT Action `logRequest`
  -> Google Sheet `K-Research & Critic — Request Log`
 ```
 
-Builder configuration:
+It passed technical and NEW-chat runtime tests on 2026-08-23. The prototype is retained but disabled due to user-consent UX, not technical failure.
+
+Retained resources:
 
 ```text
-Authentication: None
-OpenAPI: integrations/request_log/openapi.yaml
-Privacy Policy: docs/PRIVACY_POLICY_REQUEST_LOG.md
+integrations/request_log/openapi.yaml
+integrations/request_log/google_apps_script/Code.gs
+prompts/GPT_STORE_REQUEST_LOG_ADDENDUM.md
+docs/REQUEST_LOG_MVP.md
+docs/PRIVACY_POLICY_REQUEST_LOG.md
+docs/REQUEST_LOG_MVP_RUNTIME_ACCEPTANCE_2026-08-23.md
 ```
 
-The GPT sends only a generalized topic up to 160 characters. The server records sequential number, Kyiv date/time, `user_name=none`, and generalized topic.
-
-The full prompt, response and CriticProfile are not intentionally logged.
-
-## 5. Current Evidence Contract
+## 5. Evidence Contract
 
 Risk floors:
 
@@ -105,25 +87,9 @@ HIGH >= 2
 CRITICAL >= 3
 ```
 
-Every material factual claim maintains:
+Every material factual claim maintains required, achieved_independent and exception=NONE|SHORTFALL. Count independent evidence origins, not URLs. Every counted origin must remain visibly traceable to the relevant claim.
 
-```text
-required
-achieved_independent
-exception = NONE | SHORTFALL
-```
-
-Independence is based on underlying evidence origins, not URL count. Duplicate and derivative reporting do not increase the count. A systematic review/meta-analysis counts as one origin unless specific underlying studies were independently inspected and cited.
-
-Every counted evidence origin must be visible and traceable to the relevant claim. A PASS count may not exceed visibly traceable independent evidence origins.
-
-## 6. Critic and Revision Contract
-
-Critic audits source authority, independence, freshness, claim support, contradictions, missing topics, evidence/conclusion consistency, claim-level cross-check compliance and evidence-origin traceability.
-
-Maximum revision loop: three iterations. Unresolved problems finish as `COMPLETED_WITH_LIMITATIONS`.
-
-## 7. Language Contract
+## 6. Language Contract
 
 Default user-facing language is Ukrainian unless explicitly changed by the user.
 
@@ -137,56 +103,30 @@ For Ukrainian reports use, where applicable:
 Твердження | Потрібно | Отримано незалежних | Виняток
 ```
 
-CriticProfile field labels also follow the selected report language. Raw canonical keys remain internal unless explicitly requested.
+## 7. Current Manual Deployment Step
 
-## 8. Persistence and Memory Boundary
+GitHub commits do not automatically update the Custom GPT.
 
-The public Core uses conversation-local workflow state plus explicit checkpoint/recovery artifacts when requested.
-
-Checkpoint marker:
+Required manual Builder operations:
 
 ```text
-K_SUPERVISOR_CHECKPOINT
+1. remove the configured `logRequest` Action;
+2. replace Builder Instructions with current `main/prompts/GPT_STORE_INSTRUCTIONS.md`;
+3. save/update the public GPT;
+4. open a NEW chat and verify that no script.google.com consent screen appears;
+5. verify the normal CriticProfile gate appears directly;
+6. only then mark repository/public Builder synchronization complete.
 ```
 
-Schema version remains `1.0`.
-
-Checkpoint creation is explicit-request only. Normal profile gates and final reports do not auto-create checkpoints.
-
-The Google Sheet request log is separate optional observability and is not conversation memory.
-
-## 9. Public Runtime Acceptance
-
-The actual public Builder was manually synchronized and revalidated in NEW chats on 2026-08-23.
-
-Accepted runtime results:
+Until this is done:
 
 ```text
-two-stage CriticProfile gate                 PASS
-CRITICAL -> minimum 3 independent checks     PASS
-claim-level PASS / SHORTFALL                  PASS
-evidence-origin traceability                 PASS
-derivative double-counting protection        PASS
-Critic REVISE -> PASS                        PASS
-Ukrainian headings/table/profile labels      PASS
-request-log Builder Action                   PASS
-NEW-chat request -> one Sheet row            PASS
-standalone `1` -> no extra row               PASS
+repository target actions=false
+actual public Builder may still contain Action
+repository_matches_current_public_builder=false
 ```
 
-Manifest records:
-
-```text
-latest_core_runtime_regression_passed_at: 2026-08-23
-criticprofile_two_stage_gate_runtime_accepted: true
-cross_check_claim_level_runtime_accepted: true
-cross_check_traceability_runtime_accepted: true
-report_label_localization_runtime_accepted: true
-request_log_runtime_accepted: true
-repository_matches_current_public_builder: true
-```
-
-## 10. Validation
+## 8. Validation
 
 Static package validation:
 
@@ -195,22 +135,6 @@ python -m scripts.validate_store_package
 python -m pytest
 ```
 
-Repository CI is configured on both push and pull_request and also runs dependency integrity, Ruff correctness, Mypy typed-boundary checks, repository policy validation and coverage.
+## 9. Publication Boundary
 
-## 11. Publication Boundary
-
-The product remains published. Manual Builder synchronization is the actual deployment step for instruction/Action changes; GitHub commits do not automatically update the Custom GPT.
-
-Any future public Builder change must be:
-
-```text
-implemented in repository
-statically validated
-manually synchronized to Builder
-validated in a NEW chat
-recorded as the new public baseline
-```
-
-## 12. Optional Standalone Runtime
-
-The Python/provider runtime remains an optional engineering/reference implementation with stable legacy identifiers. It does not define the public Builder behavior unless explicitly synchronized through the public package contract.
+The product remains published. Any future external Action must be separately approved with its user-consent UX treated as part of the product design.
