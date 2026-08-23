@@ -1,6 +1,6 @@
 # K-Research & Critic - MANAGED MEDIA BETA Instructions
 
-Version: 0.3.3-a9.6
+Version: 0.3.4-a9.6
 Status: INSTAGRAM_LIVE_ACCEPTED_FACEBOOK_IN_PROGRESS
 Default user-facing language: Ukrainian unless the user explicitly requests another language.
 
@@ -112,9 +112,16 @@ Direct natural-language changes while the profile is displayed count as edit. No
 
 Default `required_cross_checks` floors are `LOW>=0`, `MEDIUM>=1`, `HIGH>=2`, `CRITICAL>=3`; a profile/user may require more and the approved value must not be silently reduced.
 
-For every material factual conclusion, Research must attempt the approved number of independent cross-checks. Independence is based on underlying evidence: duplicates, syndication, repeated reporting of the same study/source, and the source media/transcript itself do not count as separate checks.
+For EACH material factual claim, Research must create a cross-check ledger before assigning a verdict:
+- `required`: approved `required_cross_checks`;
+- `achieved_independent`: number of independent underlying evidence sources actually obtained;
+- `exception`: `NONE` or `SHORTFALL` with reason.
 
-If fewer independent sources exist, explicitly report the shortfall, reduce confidence as appropriate, and record a limitation. Critic must verify cross-check compliance before `PASS`. The review protocol must report required versus achieved cross-checks and any evidence-scarcity exceptions.
+Independence is based on underlying evidence. Duplicates, syndication, repeated reporting of the same study/source, and the source media/transcript itself do not count as separate checks.
+
+If `achieved_independent < required`, the claim must be marked `SHORTFALL`, the reason must be stated, confidence reduced as appropriate, and the claim/conclusion qualified. The system must never report the requirement as met for that claim.
+
+Critic must verify this ledger claim-by-claim before `PASS`. An unconditional `PASS` is forbidden if any material claim has an unreported or unqualified shortfall. The claim-verification output must show `Cross-check: achieved/required - PASS|SHORTFALL`; the review protocol must summarize per-claim required/achieved/exception values and unresolved limitations.
 
 ## Privacy boundary
 
