@@ -1,8 +1,9 @@
 # K-Research & Critic
 Базовий опис завершеного production-продукту K-Research & Critic для дослідження та незалежної перевірки.
 
-Version: 1.1
+Version: 1.2
 Status: PRODUCTION / MAINTENANCE
+Updated: 2026-08-23
 
 ## Overview
 
@@ -27,97 +28,92 @@ Checkpoint marker: K_SUPERVISOR_CHECKPOINT
 Standalone database: runtime/k_supervisor.db
 ```
 
-Core rule:
+## Current Public Core Status
+
+The actual public Builder runtime was revalidated on 2026-08-23 and the accepted Core instructions are synchronized to repository `main`.
 
 ```text
-Supervisor proposes.
-User approves or edits.
-Critic executes.
+Two-stage CriticProfile gate                       PASS
+Risk-based cross-check floors                      PASS
+Claim-level required/achieved/exception            PASS
+Visible SHORTFALL                                  PASS
+Evidence-origin traceability                       PASS
+Systematic-review double-counting protection       PASS
+Critic REVISE -> PASS loop                         PASS
+Ukrainian headings/table/profile-field localization PASS
+Repository main / public Builder Core sync         COMPLETE
 ```
 
-## User Guide
-
-Ukrainian quick-start guide for first-time users:
-
-[Open the Ukrainian user guide](docs/K_RESEARCH_CRITIC_USER_GUIDE_UK.pdf)
-
-The guide explains task formulation, CriticProfile approval, the Research-Critic revision workflow, FINAL REPORT interpretation, and REVIEW PROTOCOL evaluation.
-
-## Product Status
+## Public Workflow
 
 ```text
-Phase 0-10                                           COMPLETE
-Post-MVP Hybrid Domain Resolver                     COMPLETE
-Phase 11 - Configuration, Cost, Quality Controls    COMPLETE
-Phase 12 - Test and CI Hardening                    COMPLETE
-GPT Store publication                               COMPLETE
-Free-account live validation                        PASS
-Paid-account runtime/model-switch validation        PASS
-Store discoverability                               PASS
-Production smoke test                               PASS
-Release line                                        v1.0.x
-Repository mode                                     MAINTENANCE
+User request
+   |
+   v
+CriticProfile created internally
+   |
+   v
+1 - run now / 2 - review-edit / 3 - cancel
+   |
+   +-- 2 --> localized CriticProfile --> approve/edit/cancel gate
+   |
+   v
+Explicit approval
+   |
+   v
+Research
+   |
+   v
+Critic
+   |
+   +---- REVISE ----> Research
+   |
+   +---- PASS ------> Final report + Review protocol
 ```
 
-The former planned Phase 13 Modular Agent Platform has been removed from this product roadmap. General modular multi-agent platform development continues in a separate new repository named `K_Supervisor`, with a new roadmap starting from Phase 0.
+The profile is not displayed automatically before the first gate. No independent research starts before explicit approval.
 
-## Release
-
-Canonical first production release:
+Risk floors:
 
 ```text
-K-Research & Critic v1.0.0
-Git tag: v1.0.0
+LOW >= 0
+MEDIUM >= 1
+HIGH >= 2
+CRITICAL >= 3
 ```
 
-The `v1.0.0` tag must point to the finalized maintenance-synchronization commit with fully green CI.
+Each material factual claim is audited independently. Evidence counted in `achieved_independent` must be visibly traceable to that claim; derivative reporting of the same underlying evidence is not double-counted.
 
-## Primary Product Target
+## Language Contract
 
-K-Research & Critic is GPT Store-first.
+Ukrainian is the default user-facing report language unless the user explicitly requests another language.
+
+Required Ukrainian labels include, where applicable:
+
+```text
+ФІНАЛЬНИЙ ЗВІТ
+ПЕРЕВІРКА ТВЕРДЖЕНЬ
+ПРОТОКОЛ ПЕРЕВІРКИ
+ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ
+Твердження | Потрібно | Отримано незалежних | Виняток
+```
+
+CriticProfile field labels are also localized. Canonical internal keys remain internal unless explicitly requested.
+
+## Product Boundary
 
 ```text
 GPT Store Edition
   - public ChatGPT product
-  - free-user compatible
   - no developer-owned API key required
   - no mandatory external backend
-  - model policy follows the user's ChatGPT plan
+  - Apps disabled
+  - Actions disabled
   - no pinned model identifier
-  - user may switch available models/runtimes when exposed by the plan
+  - user-plan model policy
 ```
 
 The Python/SQLite/provider implementation remains available as an optional standalone engineering reference runtime. It is not a dependency of the public Store path.
-
-## Logical Workflow
-
-```text
-User task
-   |
-   v
-Domain resolution
-   |
-   v
-CriticProfile proposal
-   |
-   v
-USER APPROVAL / EDIT / REJECT
-   |
-   v
-ResearchAgent
-   |
-   v
-CriticAgent
-   |
-   +---- REVISE ----> ResearchAgent
-   |
-   +---- PASS ------> ReportGenerator
-                         |
-                         +-- FINAL REPORT
-                         +-- REVIEW PROTOCOL
-```
-
-In the GPT Store Edition, Research and Critic are separated logical passes inside one ChatGPT runtime rather than process-isolated model instances.
 
 ## GPT Store Package
 
@@ -138,11 +134,23 @@ Production package state includes:
 ```text
 publication_state: published
 production_smoke_test_passed: true
+latest_core_runtime_regression_passed_at: 2026-08-23
+repository_matches_current_public_builder: true
 ```
+
+## Checkpoint and Recovery
+
+Cross-chat continuity uses the explicit user-controlled checkpoint marker:
+
+```text
+K_SUPERVISOR_CHECKPOINT
+```
+
+Checkpoint creation is explicit-request only. The normal profile gate and final report do not auto-create checkpoints.
 
 ## Quality Baseline
 
-CI includes:
+CI is configured for push and pull requests and includes:
 
 ```text
 Python 3.13 full pytest suite
@@ -155,7 +163,11 @@ python -m scripts.validate_store_package
 coverage gate
 ```
 
-The release baseline has passed Python 3.13, Python 3.14, repository validation, GPT Store package validation, lint/type gates, and coverage checks.
+## User Guide
+
+Ukrainian quick-start guide for first-time users:
+
+[Open the Ukrainian user guide](docs/K_RESEARCH_CRITIC_USER_GUIDE_UK.pdf)
 
 ## Optional Local / Standalone Setup
 
@@ -169,69 +181,7 @@ pip install -r requirements.txt
 python -m pytest
 ```
 
-For development quality dependencies:
-
-```text
-python -m pip install -r requirements-dev.txt
-```
-
-`.env` is optional and is needed only when an optional standalone integration requires a secret.
-
-## End-to-End Local CLI
-
-The bundled CLI can use the deterministic local corpus provider for offline/reference execution:
-
-```text
-python -m scripts.run_research --task "Explain software architecture behavior" --corpus examples/sample_corpus.json
-```
-
-Explicit non-interactive profile approval:
-
-```text
-python -m scripts.run_research --task "Explain software architecture behavior" --corpus examples/sample_corpus.json --approve-profile
-```
-
-## Persistence and Recovery
-
-Standalone/reference runtime persistence uses:
-
-```text
-runtime/k_supervisor.db
-```
-
-The database name is a stable legacy engineering identifier and is intentionally retained in the v1.0 line.
-
-GPT Store cross-chat continuity uses the explicit user-controlled:
-
-```text
-K_SUPERVISOR_CHECKPOINT
-```
-
-## Repository Structure
-
-```text
-agents/         agent implementations
-supervisor/     orchestration core
-persistence/    persistence and SQLite reference store
-providers/      optional provider adapters
-observability/  logging and redaction
-gpt_store/      GPT Store manifest and checkpoint contract
-models/         domain and transport contracts
-tools/          capability adapters and evidence utilities
-config/         tracked non-secret configuration
-prompts/        Store prompt assets
-tests/          automated tests
-scripts/        local commands and validators
-examples/       deterministic sample and benchmark inputs
-output/         generated standalone artifacts
-runtime/        local SQLite runtime data; ignored by Git
-logs/           standalone operational logs
-docs/           canonical project documentation
-```
-
 ## Maintenance Policy
-
-This repository is no longer the development home of the general modular K_Supervisor platform.
 
 Allowed work here:
 
@@ -243,20 +193,13 @@ OpenAI platform compatibility updates
 regression fixes
 documentation corrections
 narrow UX improvements
+narrow analytics/observability improvements after privacy and architecture approval
 maintenance releases v1.0.1, v1.0.2, ...
 ```
 
-Out of scope here:
+The planned request-accounting improvement is documented in `docs/ROADMAP.md` and is not implemented yet.
 
-```text
-general capability-based agent platform
-automatic agent discovery
-large modular agent catalog
-capability router development
-new platform roadmap phases
-```
-
-Those belong to the separate `K_Supervisor` project.
+General modular multi-agent platform development belongs to the separate `K_Supervisor` project.
 
 ## Canonical Documentation
 
@@ -276,13 +219,3 @@ docs/GPT_STORE_DEPLOYMENT.md
 docs/GPT_STORE_PACKAGE.md
 docs/LOGGING.md
 ```
-
-## Successor Project
-
-The reusable modular multi-agent platform is developed separately as:
-
-```text
-K_Supervisor
-```
-
-That project starts with a clean repository, a new architecture decision set, and a new roadmap beginning at Phase 0. K-Research & Critic remains the completed production reference product and is not rewritten merely to follow future platform experiments.
