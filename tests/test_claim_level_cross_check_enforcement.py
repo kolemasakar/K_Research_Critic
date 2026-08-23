@@ -99,7 +99,7 @@ def test_manifest_declares_claim_level_traceability_and_localization_contract() 
     assert release["cross_check_claim_level_enforcement_hardened"] is True
     assert release["cross_check_claim_level_runtime_accepted"] is True
     assert release["cross_check_traceability_hardened"] is True
-    assert release["cross_check_traceability_runtime_accepted"] is False
+    assert release["cross_check_traceability_runtime_accepted"] is True
     assert release["report_label_localization_hardened"] is True
-    assert release["report_label_localization_runtime_accepted"] is False
-    assert release["gpt_builder_private_update_required"] is True
+    assert release["report_label_localization_runtime_accepted"] is True
+    assert release["gpt_builder_private_update_required"] is False
