@@ -1,7 +1,7 @@
 # GPT_STORE_PACKAGE
 Документ визначає production-пакет K-Research & Critic, перевірки релізу та maintenance-gates для GPT Store.
 
-Version: 1.9
+Version: 2.0
 Status: MAINTENANCE / CURRENT PUBLIC CORE SYNCED
 Updated: 2026-08-23
 
@@ -19,14 +19,16 @@ The public Core follows these invariants:
 
 ```text
 no developer API key
-no mandatory external backend
-no Actions
+no mandatory external backend for Research/Critic
+one optional request-log Action
 no Apps
 no pinned model
 user-plan model policy
 built-in ChatGPT capabilities for the core path
 Ukrainian user-facing language by default
 ```
+
+The request-log Action is optional observability and must remain non-blocking.
 
 ## 2. Package Files
 
@@ -36,6 +38,11 @@ prompts/GPT_STORE_INSTRUCTIONS.md
 gpt_store/checkpoint.py
 gpt_store/checkpoint_example.json
 scripts/validate_store_package.py
+integrations/request_log/openapi.yaml
+integrations/request_log/google_apps_script/Code.gs
+docs/PRIVACY_POLICY_REQUEST_LOG.md
+docs/REQUEST_LOG_MVP.md
+docs/REQUEST_LOG_MVP_RUNTIME_ACCEPTANCE_2026-08-23.md
 docs/GPT_STORE_PACKAGE.md
 ```
 
@@ -66,24 +73,27 @@ Enable:
 ```text
 Web search
 Code Interpreter & Data Analysis
+Actions: request-log `logRequest`
 ```
 
-Disable for the public Core package:
+Disable:
 
 ```text
 Image generation
 Apps
-Actions
 ```
 
-No external backend is required by the current public Core.
+The Action uses Authentication=None and the public privacy-policy URL in `docs/PRIVACY_POLICY_REQUEST_LOG.md`.
+
+No external backend is mandatory for Research/Critic execution. If request logging is unavailable or denied, the normal workflow continues.
 
 ## 4. Current Public Core Workflow
 
 The accepted workflow is:
 
 ```text
-request
+new substantive request
+ -> best-effort generalized-topic logRequest
  -> CriticProfile created internally
  -> first gate: direct run / profile review-edit / cancel
  -> explicit profile approval
@@ -113,7 +123,7 @@ If option `2` is selected, the complete profile is displayed with localized fiel
 3 - скасувати дослідження.
 ```
 
-No independent research starts before explicit approval.
+No independent research starts before explicit approval. Standalone workflow replies such as `1`, `2`, `3` are not new request-log rows.
 
 ## 5. Risk and Claim-Level Cross-Check Contract
 
@@ -167,7 +177,32 @@ Required claim-summary columns:
 
 Canonical English/internal keys stay internal unless explicitly requested.
 
-## 8. Checkpoint and Fresh-Chat Recovery
+## 8. Request Log Contract
+
+For each NEW substantive request, the GPT sends only a generalized topic up to 160 characters to `logRequest` exactly once before the CriticProfile gate.
+
+The server writes:
+
+```text
+request number
+date
+time
+user_name=none
+generalized request topic
+```
+
+The full prompt, answer, CriticProfile and hidden reasoning are not intentionally stored. Logging is best-effort and non-blocking.
+
+Runtime acceptance on 2026-08-23 verified:
+
+```text
+Builder direct Action write: PASS
+Published NEW-chat write: PASS
+request_number 2: PASS
+standalone `1` -> no row 3: PASS
+```
+
+## 9. Checkpoint and Fresh-Chat Recovery
 
 Cross-chat continuation remains explicit-request only and uses the existing checkpoint contract marked:
 
@@ -177,7 +212,7 @@ K_SUPERVISOR_CHECKPOINT
 
 Schema version remains `1.0`. The runtime must never auto-create a checkpoint at a normal profile gate or final report.
 
-## 9. Static Validation
+## 10. Static Validation
 
 Run after public Core package changes:
 
@@ -188,7 +223,7 @@ python -m pytest
 
 CI additionally validates repository policy, typed boundaries, lint correctness, dependency integrity and coverage.
 
-## 10. Historical Launch Validation
+## 11. Historical Launch Validation
 
 Initial publication and launch smoke validation completed on 2026-08-14. Manifest retains:
 
@@ -201,9 +236,9 @@ production_smoke_tested_at: 2026-08-14
 
 These fields preserve the original launch record.
 
-## 11. Current Core Runtime Regression
+## 12. Current Runtime Acceptance
 
-On 2026-08-23 the actual public `K-Research & Critic` Builder was manually synchronized with the hardened Core instructions and validated in NEW chats.
+On 2026-08-23 the actual public `K-Research & Critic` Builder was synchronized and validated in NEW chats.
 
 Accepted behavior includes:
 
@@ -217,6 +252,9 @@ mandatory claim-level summary: PASS
 Ukrainian headings/columns/profile labels: PASS
 REVISE -> PASS Critic cycle: PASS
 COMPLETED_WITH_LIMITATIONS when evidence remains insufficient: PASS
+request-log Action: PASS
+request-log one request -> one row: PASS
+workflow-reply de-duplication: PASS
 ```
 
 Current runtime markers recorded in `gpt_store/manifest.yaml`:
@@ -226,23 +264,12 @@ criticprofile_two_stage_gate_runtime_accepted: true
 cross_check_claim_level_runtime_accepted: true
 cross_check_traceability_runtime_accepted: true
 report_label_localization_runtime_accepted: true
+request_log_runtime_accepted: true
 repository_matches_current_public_builder: true
 ```
 
-## 12. Maintenance Boundary
+## 13. Maintenance Boundary
 
 Any later Builder change is a product update and must be revalidated before being treated as the public baseline.
 
-Allowed maintenance includes:
-
-```text
-bug/security fixes
-OpenAI/ChatGPT compatibility changes
-Store-package compatibility changes
-regression fixes
-small UX improvements
-documentation corrections
-narrow product analytics/observability improvements after privacy and architecture approval
-```
-
-The current public Core must remain independent of mandatory external services unless a separate product decision explicitly changes that invariant.
+The Research/Critic core must remain independent of mandatory external services. The accepted request-log Action is optional observability only.
