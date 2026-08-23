@@ -1,7 +1,7 @@
 # ROADMAP
 План завершеного розвитку K-Research & Critic та межі подальшого maintenance.
 
-Version: 1.12
+Version: 1.13
 Status: MAINTENANCE
 Updated: 2026-08-23
 
@@ -28,7 +28,7 @@ The previously planned Modular Agent Platform is no longer Phase 13 of this prod
 - Contracts, task states, evidence, limitations, and failures remain explicit.
 - Private chain-of-thought is never required for auditability.
 - Cross-chat continuation uses the explicit checkpoint contract when requested.
-- Request accounting is optional observability: it is best-effort and must never block Research/Critic execution.
+- Non-essential telemetry must not degrade the normal public request UX.
 
 ## 3. Completed Core
 
@@ -44,9 +44,9 @@ Phase 7  Autonomous Research-Critic Loop              COMPLETE
 Phase 8  ReportGenerator and Final Artifacts          COMPLETE
 Phase 9  End-to-End MVP                               COMPLETE
 Phase 10 Persistence and Audit                        COMPLETE
+Phase 11 Configuration, Cost and Quality Controls     COMPLETE
+Phase 12 Test and CI Hardening                        COMPLETE
 ```
-
-MVP boundary: Phase 9. The post-MVP Hybrid Domain Resolver enhancement is COMPLETE.
 
 ## 4. GPT Store-first Product Decision
 
@@ -60,27 +60,11 @@ model policy: user_plan
 fixed model dependency: none
 user model switching: allowed when available
 publication state: published
-production smoke test: passed
 ```
 
-## 5. Phase 11 - Configuration, Cost, and Quality Controls
+## 5. Current Public Core Runtime Baseline
 
-Status: COMPLETE
-
-## 6. Phase 12 - Test and CI Hardening
-
-Status: COMPLETE
-
-Delivered:
-- Python 3.13 and Python 3.14 CI matrix;
-- dependency integrity, Ruff, mypy, repository policy, GPT Store package and coverage gates;
-- deterministic reference and workflow regression coverage.
-
-## 7. Current Public Core Runtime Baseline
-
-Status: ACCEPTED / SYNCHRONIZED TO REPOSITORY MAIN
-
-Accepted public behavior:
+Accepted Core behavior:
 
 ```text
 two-stage CriticProfile gate                 PASS
@@ -92,12 +76,17 @@ systematic-review double-counting protection PASS
 Critic REVISE -> PASS loop                   PASS
 Ukrainian report/profile/table localization  PASS
 COMPLETED_WITH_LIMITATIONS when required     PASS
-optional request-log Action                  PASS
 ```
 
-The repository and current public Builder are synchronized for the accepted Public Core plus Request Log MVP.
+Repository target after the current maintenance change:
 
-## 8. Maintenance Scope
+```text
+Actions                                     DISABLED
+request logging in Builder instructions     DISABLED
+public consent interruption                 REMOVED AFTER MANUAL BUILDER SYNC
+```
+
+## 6. Maintenance Scope
 
 Allowed future work:
 
@@ -108,86 +97,71 @@ regression fixes
 documentation corrections
 narrow UX improvements
 narrow analytics/observability improvements
-maintenance releases v1.0.x
+maintenance releases
 ```
 
-## 8.1 Narrow Product Improvement - Request Accounting MVP
+## 6.1 Request Accounting MVP
 
-Status: RUNTIME_ACCEPTED
+Status: `DISABLED_DUE_TO_USER_CONSENT_UX`
 
-Accepted architecture:
+Historical implementation:
 
 ```text
 Public K-Research & Critic
-  -> best-effort GPT Action `logRequest`
+  -> GPT Action `logRequest`
   -> Google Apps Script Web App
   -> Google Sheet
 ```
 
-Google Sheet:
+The implementation and runtime tests passed, including one substantive request -> one row and no extra row for standalone workflow reply `1`.
+
+However, the public GPT presented a platform-controlled external-Action consent screen before sending the generalized topic to `script.google.com`. The owner decided that this is unacceptable UX for a non-essential request counter.
+
+Decision:
 
 ```text
-K-Research & Critic — Request Log
-spreadsheet_id: 1icDvAkPx43s7568iZkANBCriz8UaanB4kMITO-icLaU
-sheet: Звернення
-timezone: Europe/Kyiv
+remove `logRequest` from active public Builder
+remove request logging from active public Instructions
+retain Apps Script, OpenAPI, Sheet and historical acceptance artifacts
+keep prototype disabled unless separately re-approved
 ```
 
-Columns:
-
-```text
-Номер звернення
-Дата
-Час
-Ім'я користувача
-Коротка узагальнена тема запиту
-```
-
-Accepted MVP decisions:
-- authentication: none;
-- `user_name`: `none` until a separately approved reliable identity mechanism exists;
-- full prompts/conversations are not stored;
-- only a generalized topic up to 160 characters is sent;
-- Apps Script generates sequential number, date and time;
-- Google Sheets is both storage and owner review interface;
-- CSV/XLSX export comes from Google Sheets;
-- logging failure or user denial is non-blocking and must not alter Research/Critic results;
-- standalone `1/2/3` workflow replies are not new logged requests.
-
-Canonical package:
+Canonical retained prototype resources:
 
 ```text
 integrations/request_log/google_apps_script/Code.gs
 integrations/request_log/openapi.yaml
 prompts/GPT_STORE_REQUEST_LOG_ADDENDUM.md
-prompts/GPT_STORE_INSTRUCTIONS.md
 docs/REQUEST_LOG_MVP.md
 docs/PRIVACY_POLICY_REQUEST_LOG.md
 docs/REQUEST_LOG_MVP_RUNTIME_ACCEPTANCE_2026-08-23.md
 ```
 
-Runtime acceptance on 2026-08-23:
+## 7. Current Activation Boundary
+
+Repository target state is already prepared with Actions disabled and request logging removed from `prompts/GPT_STORE_INSTRUCTIONS.md`.
+
+Manual Builder steps remain required because GitHub does not automatically update the Custom GPT:
 
 ```text
-Builder OpenAPI validation                  PASS
-Builder direct Action write                 PASS
-NEW-chat substantive request logging        PASS
-request_number=2 physical Sheet write       PASS
-standalone `1` created no row 3             PASS
-1 substantive request -> exactly 1 row      PASS
+1. remove the `logRequest` Action from the public Builder;
+2. replace Builder Instructions with current `main/prompts/GPT_STORE_INSTRUCTIONS.md`;
+3. save/update the public GPT;
+4. run one NEW-chat smoke test and verify there is no script.google.com consent screen;
+5. then mark repository/public Builder synchronization complete.
 ```
 
-Important UX property: because this is an external Action, ChatGPT may require the user to authorize sharing the generalized topic with `script.google.com`. This consent behavior is platform-controlled.
+Until those steps finish, `repository_matches_current_public_builder=false` is intentional.
 
-## 9. Modular Agent Platform Transfer
+## 8. Modular Agent Platform Transfer
 
 General modular platform work remains in separate `K_Supervisor`.
 
-## 10. Legacy Engineering Identifiers
+## 9. Legacy Engineering Identifiers
 
 Stable compatibility identifiers may retain `K_Supervisor`, including `K_SUPERVISOR_CHECKPOINT` and `runtime/k_supervisor.db`.
 
-## 11. Canonical Project Documents
+## 10. Canonical Project Documents
 
 ```text
 PROJECT_FILE_STANDARD.md
@@ -209,22 +183,18 @@ PRIVACY_POLICY_REQUEST_LOG.md
 REQUEST_LOG_MVP_RUNTIME_ACCEPTANCE_2026-08-23.md
 ```
 
-## 12. Current Implementation State
+## 11. Current Implementation State
 
 ```text
 Phase 0-12                                COMPLETE
 GPT Store publication                    COMPLETE
 2026-08-23 public Core runtime hardening ACCEPTED
-GitHub main / public Builder Core sync   COMPLETE
-Request-log Google Sheet                 CREATED
-Request-log repository package           COMPLETE
-Apps Script Web App deployment           COMPLETE
-OpenAPI endpoint configuration           COMPLETE
-Builder Action configuration/test        PASS
-Google Sheet write test                  PASS
-Public Builder Instructions sync         COMPLETE
-Public GPT update                         COMPLETE
-Request-log NEW-chat runtime acceptance  ACCEPTED
-Future Modular Agent Platform            MOVED TO K_Supervisor
-Current repository mode                  MAINTENANCE
+Request-log prototype                   IMPLEMENTED / TESTED
+Request-log public usage                DISABLED_DUE_TO_USER_CONSENT_UX
+Repository Instructions without logging COMPLETE
+Repository target actions=false         COMPLETE
+Public Builder Action removal           PENDING MANUAL STEP
+Public Builder Instructions resync      PENDING MANUAL STEP
+Post-disable NEW-chat smoke test         PENDING
+Current repository mode                 MAINTENANCE
 ```
