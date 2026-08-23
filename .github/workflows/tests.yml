@@ -5,13 +5,56 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  a9-7-i-applied-state-patch:
+    name: A9.7-I applied-state regression patch
+    if: github.event_name == 'push' && github.ref == 'refs/heads/agent/video-url-research' && contains(github.event.head_commit.message, 'A9.7-I run applied-state regression patch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v6
+        with:
+          ref: agent/video-url-research
+          persist-credentials: true
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - name: Install runtime dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+      - name: Patch old applied-state assertions
+        run: python .github/scripts/a9_7_i_applied_state_patch.py
+      - name: Validate package
+        run: |
+          python -m scripts.validate_repository
+          python -m scripts.validate_store_package
+          python -m pytest -q
+      - name: Scope guard and commit
+        run: |
+          set -euo pipefail
+          for f in $(git status --short | awk '{print $2}'); do
+            case "$f" in
+              tests/test_media_beta_managed_package.py|tests/test_claim_level_cross_check_enforcement.py) ;;
+              *) echo "unexpected source path: $f"; exit 1 ;;
+            esac
+          done
+          git add tests/test_media_beta_managed_package.py tests/test_claim_level_cross_check_enforcement.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "A9.7-I align regressions with applied Builder state"
+          git push origin HEAD:agent/video-url-research
+
   pytest:
     name: Tests / Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
