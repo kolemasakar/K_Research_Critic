@@ -56,3 +56,23 @@ def test_profile_gate_does_not_bypass_research_approval() -> None:
     assert "MANDATORY GATE: USER APPROVAL before research" in core
     assert 'status=APPROVED, approved_by="user"' in core
     assert "status=APPROVED, approved_by=user" in media
+
+
+def test_required_cross_checks_are_enforced_and_auditable() -> None:
+    core = (ROOT / "prompts" / "GPT_STORE_INSTRUCTIONS.md").read_text(
+        encoding="utf-8"
+    )
+    media = (
+        ROOT / "prompts" / "GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md"
+    ).read_text(encoding="utf-8")
+
+    assert "LOW>=0, MEDIUM>=1, HIGH>=2, CRITICAL>=3" in core
+    assert "CRITICAL>=3, HIGH>=2, MEDIUM>=1, LOW>=0" in media
+    assert "independent underlying evidence sources" in core
+    assert "Count independent underlying sources" in media
+    assert "state the shortfall" in core
+    assert "state the shortfall" in media
+    assert "cross-check compliance" in core
+    assert "cross-check compliance" in media
+    assert "required versus achieved cross-checks" in core
+    assert "required/achieved cross-checks" in media
