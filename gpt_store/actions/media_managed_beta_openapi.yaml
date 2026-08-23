@@ -349,8 +349,6 @@ components:
           type: boolean
         automatic_ai_fallback:
           type: boolean
-        user_beta_access_code_required:
-          type: boolean
         owner_access_injected_server_side:
           type: boolean
         durable_store:
