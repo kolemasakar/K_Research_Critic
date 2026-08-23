@@ -19,7 +19,7 @@ def test_request_log_manifest_contract() -> None:
     assert request_log["topic_max_length"] == 160
     assert request_log["logging_failure_blocks_core_workflow"] is False
     assert request_log["google_sheet_created"] is True
-    assert request_log["apps_script_deployed"] is False
+    assert request_log["apps_script_deployed"] is True
     assert request_log["builder_action_configured"] is False
     assert request_log["runtime_accepted"] is False
 
@@ -37,15 +37,20 @@ def test_apps_script_uses_server_side_timestamp_and_lock() -> None:
     assert "appendRow" in text
 
 
-def test_action_schema_is_minimal_and_non_consequential() -> None:
+def test_action_schema_is_minimal_non_consequential_and_builder_compatible() -> None:
     schema = yaml.safe_load((ROOT / "integrations" / "request_log" / "openapi.yaml").read_text(encoding="utf-8"))
     operation = schema["paths"]["/exec"]["post"]
     topic = operation["requestBody"]["content"]["application/json"]["schema"]["properties"]["topic"]
+    response_schema = operation["responses"]["200"]["content"]["application/json"]["schema"]
 
     assert operation["operationId"] == "logRequest"
     assert operation["x-openai-isConsequential"] is False
     assert topic["maxLength"] == 160
-    assert schema["components"] == {}
+    assert schema["components"]["schemas"] == {}
+    assert response_schema["type"] == "object"
+    assert "properties" in response_schema
+    assert response_schema["properties"]["ok"]["type"] == "boolean"
+    assert response_schema["properties"]["request_number"]["type"] == "integer"
 
 
 def test_request_log_addendum_is_non_blocking_and_minimal() -> None:
