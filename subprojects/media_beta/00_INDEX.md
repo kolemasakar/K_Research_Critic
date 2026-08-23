@@ -2,7 +2,7 @@
 
 Canonical documentation index for K-Research & Critic media-input work.
 
-Version: 2.8
+Version: 2.9
 Status: ACTIVE
 Updated: 2026-08-23
 
@@ -17,7 +17,7 @@ It covers:
 - private GPT Action integration and owner E2E acceptance;
 - CriticProfile presentation/approval UX and runtime acceptance;
 - claim-level required cross-check enforcement/auditability;
-- clean Core Builder extraction and runtime hardening;
+- clean Core Builder extraction, traceability hardening, and final runtime acceptance;
 - additional public platform adapters and local upload;
 - later sustainable/free media architecture.
 
@@ -40,20 +40,22 @@ The published K-Research & Critic product and repository `main` remain separate 
 13. `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md` - actual private GPT runtime acceptance of the gate.
 14. `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md` - claim-level required/achieved/exception enforcement contract.
 15. `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md` - actual private MEDIA BETA runtime PASS of claim-level enforcement.
-16. `35_CORE_RUNTIME_TRACEABILITY_HARDENING.md` - main Core runtime auditability finding and traceability/protocol-table hardening.
+16. `35_CORE_RUNTIME_TRACEABILITY_HARDENING.md` - main Core auditability finding and traceability/protocol-table hardening.
+17. `36_CORE_TRACEABILITY_RUNTIME_ACCEPTANCE.md` - final NEW-chat runtime PASS of the hardened main Core workflow.
 
 ## Source-of-truth precedence
 
 When documents disagree:
 1. current code, live runtime evidence and CI on active feature branches;
 2. `03_CURRENT_STATE.md`;
-3. `35_CORE_RUNTIME_TRACEABILITY_HARDENING.md` for current Core traceability state;
-4. `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md` for MEDIA BETA claim-level runtime evidence;
-5. `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md` for claim-level cross-check behavior;
-6. `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md` for gate runtime evidence;
-7. `31_CRITICPROFILE_GATE_UX_UPDATE.md` for CriticProfile UX behavior;
-8. `06_DECISION_LOG.md`;
-9. roadmap/handoff/phase records.
+3. `36_CORE_TRACEABILITY_RUNTIME_ACCEPTANCE.md` for final main Core runtime evidence;
+4. `35_CORE_RUNTIME_TRACEABILITY_HARDENING.md` for the Core traceability contract and implementation history;
+5. `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md` for MEDIA BETA claim-level runtime evidence;
+6. `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md` for claim-level cross-check behavior;
+7. `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md` for gate runtime evidence;
+8. `31_CRITICPROFILE_GATE_UX_UPDATE.md` for CriticProfile UX behavior;
+9. `06_DECISION_LOG.md`;
+10. roadmap/handoff/phase records.
 
 Do not mark a phase complete from roadmap text alone.
 
@@ -82,13 +84,22 @@ Do not mark a phase complete from roadmap text alone.
 - unconditional PASS is forbidden for hidden/unqualified material shortfalls;
 - every counted evidence origin must be visibly traceable to the claim;
 - achieved count cannot exceed visibly traceable independent evidence origins;
+- a review/meta-analysis does not become a second independent origin merely by repeating an underlying study;
 - review protocol must contain `Claim | Required | Achieved independent | Exception` for every material factual claim.
 
-## Core candidate track
+## Core runtime status
 
-The main `K-Research & Critic` was manually synchronized with the first clean Core candidate and runtime-tested. Core claim-level enforcement worked, but protocol auditability/traceability required one additional hardening pass.
+The main `K-Research & Critic` has been manually synchronized with the hardened clean Core Builder and passed the final NEW-chat regression.
 
-The branch now contains the hardened `prompts/GPT_STORE_CORE_BUILDER_INSTRUCTIONS.md` and green automated tests. The actual main GPT still requires a new manual Builder synchronization and one final regression run before Core traceability is runtime-accepted.
+Accepted runtime evidence includes:
+- `CRITICAL -> required_cross_checks=3`;
+- traceable `3/3 PASS` claims with three named/cited evidence origins;
+- real `1/3 SHORTFALL` without double-counting derivative review evidence;
+- mandatory claim-level protocol summary;
+- `REVISE -> PASS` Critic cycle;
+- `CORE_TRACEABILITY_HARDENING_RUNTIME = ACCEPTED`.
+
+The minor Markdown header rendering issue is non-blocking because the four logical columns and values were present.
 
 ## Current A9 security/UX boundaries
 
