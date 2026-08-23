@@ -2,7 +2,7 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 5.2
+Version: 5.3
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-23
 
@@ -22,8 +22,6 @@ Not accepted yet:
 - local audio/video attachment.
 
 Repository `main`, external tester rollout, and production VoiceBridge remain outside the current merge gate.
-
-The main `K-Research & Critic` previously passed final evidence-origin traceability runtime acceptance. MEDIA BETA was then aligned to the same traceability contract and rerun in a NEW chat. That MEDIA BETA run passed the traceability logic but exposed a default-language regression: some user-visible table headings/columns and CriticProfile field labels remained English. The branch now contains a localization hardening for BOTH Core and MEDIA BETA Builder instructions. Both actual Custom GPTs require manual Builder resynchronization and fresh visual regression for the new localization contract.
 
 ## Repositories and isolation boundary
 
@@ -47,7 +45,90 @@ Isolated beta runtime:
 
 Do not merge PR #8 or PR #28 and do not target production without a separate explicit owner decision.
 
-## Accepted owner UX
+## Accepted Research/Critic workflow
+
+Two-stage CriticProfile gate is runtime accepted:
+- profile created internally;
+- first gate offers direct run / review-edit / cancel;
+- explicit `1` approves before research;
+- displayed profile edits remain `REVIEW_REQUIRED` until re-approved;
+- approval records ISO-8601 timestamp.
+
+Claim-level cross-check enforcement is runtime accepted:
+- floors: `LOW>=0`, `MEDIUM>=1`, `HIGH>=2`, `CRITICAL>=3`;
+- every material factual claim maintains `required / achieved_independent / exception`;
+- independence is based on underlying evidence, not URL count;
+- derivative reporting and systematic-review repetition are not double-counted;
+- real shortfalls remain visible and qualified;
+- Critic audits each material claim before PASS.
+
+Evidence-origin traceability is runtime accepted in BOTH main Core and MEDIA BETA:
+- each origin counted in `achieved_independent` is visibly attributable to the claim;
+- achieved count cannot exceed visible independent origins;
+- traceable `3/3 PASS` values were demonstrated;
+- a real `1/3 SHORTFALL` remained visible;
+- MEDIA BETA latest text-only regression used 0 managed media credits.
+
+Canonical records:
+- `31_CRITICPROFILE_GATE_UX_UPDATE.md`;
+- `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md`;
+- `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md`;
+- `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md`;
+- `35_CORE_RUNTIME_TRACEABILITY_HARDENING.md`;
+- `36_CORE_TRACEABILITY_RUNTIME_ACCEPTANCE.md`;
+- `37_MEDIA_BETA_TRACEABILITY_ALIGNMENT.md`;
+- `39_REPORT_LANGUAGE_AND_MEDIA_TRACEABILITY_RUNTIME_ACCEPTANCE.md`.
+
+## Report-language invariant
+
+Default user-facing report language is Ukrainian unless the user explicitly requests another language.
+
+The selected report language controls ALL user-visible workflow text including:
+- prompts;
+- CriticProfile presentation;
+- section headings;
+- table titles and columns;
+- CriticProfile field labels;
+- verdict labels;
+- final report;
+- claim verification;
+- review protocol.
+
+Canonical English/internal keys remain internal unless explicitly requested.
+
+For Ukrainian reports use, as applicable:
+- `ФІНАЛЬНИЙ ЗВІТ`;
+- `ПЕРЕВІРКА ТВЕРДЖЕНЬ`;
+- `ПРОТОКОЛ ПЕРЕВІРКИ`;
+- `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ`;
+- columns `Твердження | Потрібно | Отримано незалежних | Виняток`.
+
+Latest NEW-chat regressions in BOTH actual Custom GPTs passed this localization contract. Main Core displayed the Ukrainian claim summary and localized profile summary. MEDIA BETA displayed localized CriticProfile field labels such as `Ідентифікатор профілю`, `Рівень ризику`, `Необхідних незалежних перевірок`, and `Час схвалення`.
+
+Canonical hardening record: `38_REPORT_LANGUAGE_LABEL_LOCALIZATION_HARDENING.md`.
+Canonical runtime record: `39_REPORT_LANGUAGE_AND_MEDIA_TRACEABILITY_RUNTIME_ACCEPTANCE.md`.
+
+## Runtime markers
+
+`CRITICPROFILE_TWO_STAGE_GATE_RUNTIME = ACCEPTED`
+
+`CLAIM_LEVEL_CROSS_CHECK_RUNTIME = ACCEPTED`
+
+`CORE_TRACEABILITY_HARDENING_RUNTIME = ACCEPTED`
+
+`CORE_REPORT_LABEL_LOCALIZATION_RUNTIME = ACCEPTED`
+
+`MEDIA_BETA_TRACEABILITY_LOGIC_RUNTIME = PASS`
+
+`MEDIA_BETA_TRACEABILITY_HARDENING_RUNTIME = ACCEPTED`
+
+`MEDIA_BETA_REPORT_LABEL_LOCALIZATION_RUNTIME = ACCEPTED`
+
+`gpt_builder_private_update_required = false`
+
+A compact Markdown copy may visually concatenate adjacent table-header text; this is non-blocking while the four required labels/columns remain structurally present in the actual ChatGPT output.
+
+## Accepted owner media UX
 
 ```text
 supported public media URL in ChatGPT
@@ -60,211 +141,61 @@ supported public media URL in ChatGPT
  -> explicit user consent
  -> ChatGPT consequential-Action confirmation when shown
  -> native transcript when available
- -> for supported Instagram Reel only: if native unavailable, separate AI preflight + separate explicit consent
- -> CriticProfile created internally
- -> direct analysis OR profile review/edit
- -> requested K-Research & Critic workflow
+ -> Instagram only: if native unavailable, separate AI preflight + separate explicit consent
+ -> CriticProfile gate
+ -> Research -> Critic
  -> result in same conversation
 ```
 
-Remote adapters remain public-only. Do not request platform login/password/cookies/session state/account tokens. Auth/private content must return `UNSUPPORTED_PRIVATE_OR_AUTH_REQUIRED`.
-
-## Language invariant
-
-Default user-facing report language is Ukrainian unless the user explicitly requests another language.
-
-The selected report language controls ALL user-visible workflow text, including prompts, CriticProfile text, section headings, table titles, table columns, CriticProfile field labels, verdict labels, final report, claim verification, and review protocol. Source/transcript language must never switch the report language. Canonical English/internal keys remain internal unless explicitly requested.
-
-For Ukrainian reports use, as applicable:
-- `ФІНАЛЬНИЙ ЗВІТ`;
-- `ПЕРЕВІРКА ТВЕРДЖЕНЬ`;
-- `ПРОТОКОЛ ПЕРЕВІРКИ`;
-- `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ`;
-- claim-level columns `Твердження | Потрібно | Отримано незалежних | Виняток`.
-
-Do not expose `Claim-level summary`, `Claim`, `Required`, `Achieved independent`, `Exception` or raw CriticProfile keys such as `profile_id`, `risk_level`, `required_cross_checks`, `approved_at` as Ukrainian user-visible labels unless the user explicitly requests canonical/internal keys.
-
-Ukrainian verdict labels remain:
-- VERIFIED -> `ПІДТВЕРДЖЕНО`;
-- PARTLY_SUPPORTED -> `ЧАСТКОВО ПІДТВЕРДЖЕНО`;
-- UNSUPPORTED -> `НЕ ПІДТВЕРДЖЕНО`;
-- CONTRADICTED -> `СУПЕРЕЧИТЬ ДЖЕРЕЛАМ`;
-- MISLEADING -> `ВВОДИТЬ В ОМАНУ`;
-- UNVERIFIABLE -> `НЕМОЖЛИВО ПЕРЕВІРИТИ`;
-- OPINION -> `ДУМКА`.
-
-Canonical localization record: `38_REPORT_LANGUAGE_LABEL_LOCALIZATION_HARDENING.md`.
-
-## CriticProfile gate runtime acceptance
-
-Status: PASS / RUNTIME_ACCEPTED_PRIVATE_OWNER_BETA for the established two-stage gate behavior.
-
-Accepted behavior:
-- profile created internally without automatic display;
-- first direct-run/review/cancel gate;
-- option `2` displays complete unapproved profile;
-- edits preserve `REVIEW_REQUIRED` and increment version when appropriate;
-- explicit `1` approves and starts Research -> Critic;
-- `approved_at` recorded as ISO-8601.
-
-Canonical runtime record: `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md`.
-
-The newly required localization of visible CriticProfile field labels is a separate pending visual runtime gate.
-
-## Claim-level cross-check enforcement
-
-Status: PASS / RUNTIME_ACCEPTED_PRIVATE_OWNER_BETA for the earlier claim-level contract.
-
-Each material factual claim maintains:
-
-```text
-required: approved required_cross_checks
-achieved_independent: independent underlying evidence sources actually obtained
-exception: NONE | SHORTFALL
-```
-
-Rules:
-- floors: `LOW>=0`, `MEDIUM>=1`, `HIGH>=2`, `CRITICAL>=3`;
-- count underlying evidence independence, not URL count;
-- duplicates, syndication, repeated reporting of one study/source, and source media/transcript do not count separately;
-- if achieved < required, mark `SHORTFALL`, state reason, adjust confidence and qualify conclusion;
-- Critic verifies claim-by-claim;
-- hidden/unqualified shortfall forbids unconditional PASS.
-
-Canonical contract: `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md`.
-Canonical prior runtime acceptance: `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md`.
-
-## MEDIA BETA traceability alignment and latest runtime
-
-Traceability code: IMPLEMENTED.
-Traceability logic runtime: PASS.
-Final combined runtime acceptance: PENDING localization regression.
-
-Accepted in the latest NEW-chat MEDIA BETA run:
-- `risk_level=CRITICAL`;
-- `required_cross_checks=3`;
-- visible claim-level PASS/SHORTFALL;
-- counted evidence origins visibly attributable to claims;
-- achieved counts matched visible independent origins;
-- derivative systematic-review evidence was not double-counted as an independent origin;
-- mandatory four-column claim-level summary was present;
-- managed media credits were 0 for the text-only test.
-
-Observed language defect:
-- heading `Claim-level summary` appeared in English;
-- columns `Claim`, `Required`, `Achieved independent`, `Exception` appeared in English;
-- raw CriticProfile keys were visible as field labels.
-
-Therefore:
-
-`MEDIA_BETA_TRACEABILITY_LOGIC_RUNTIME = PASS`
-
-`MEDIA_BETA_REPORT_LABEL_LOCALIZATION_CODE = IMPLEMENTED`
-
-`MEDIA_BETA_REPORT_LABEL_LOCALIZATION_RUNTIME = PENDING`
-
-`MEDIA_BETA_TRACEABILITY_HARDENING_RUNTIME = PENDING_FINAL_LANGUAGE_REGRESSION`
-
-Updated branch artifacts:
-- `prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md`;
-- `prompts/GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md` version `0.3.6-a9.6`;
-- `gpt_store/media_beta_manifest.yaml`;
-- claim-level/package regression tests.
-
-Canonical traceability alignment: `37_MEDIA_BETA_TRACEABILITY_ALIGNMENT.md`.
-Canonical localization hardening: `38_REPORT_LANGUAGE_LABEL_LOCALIZATION_HARDENING.md`.
-
-## Main Core track
-
-Evidence-origin traceability status remains accepted from the previous NEW-chat runtime:
-
-`CORE_TRACEABILITY_HARDENING_RUNTIME = ACCEPTED`
-
-The Core Builder now also contains the stricter user-visible label localization contract:
-- Ukrainian headings/table titles/columns by default;
-- localized CriticProfile field labels;
-- canonical raw keys internal unless requested;
-- Ukrainian claim-level protocol columns `Твердження | Потрібно | Отримано незалежних | Виняток`.
-
-This NEW localization behavior is not yet runtime accepted because the actual main Custom GPT still requires manual resynchronization with the updated `prompts/GPT_STORE_CORE_BUILDER_INSTRUCTIONS.md`.
-
-`CORE_REPORT_LABEL_LOCALIZATION_CODE = IMPLEMENTED`
-
-`CORE_REPORT_LABEL_LOCALIZATION_RUNTIME = PENDING`
-
-Canonical Core traceability records:
-- `35_CORE_RUNTIME_TRACEABILITY_HARDENING.md`;
-- `36_CORE_TRACEABILITY_RUNTIME_ACCEPTANCE.md`.
-
-## A8 browser-assisted baseline
-
-Status: PASS / COMPLETE_BASELINE. A8 Helper 0.2.2 / `KRCC_` remains emergency/dev fallback evidence only.
-
-## A9.1 - Server-side STT privacy parity
-
-Status: PASS / COMPLETE. AssemblyAI EU routing remains available for the accepted browser-assisted fallback path.
-
-## A9.2 - Direct Render-to-YouTube
-
-Status: BLOCKED / CLOSED AS PRIMARY STRATEGY.
-Disposition: `DIRECT_RENDER_YOUTUBE = BLOCKED_BY_DATACENTER_ANTIBOT`.
-
-## A9.2R - Managed provider native route
-
-Status: PASS / COMPLETE_FOR_NATIVE_OWNER_BETA.
-Provider: `Supadata`. Mode: `native`.
-Accepted YouTube evidence: source language `ru`; 277 timestamped segments; one approved native credit; no Helper, cookies, login/session state or residential proxy; no automatic AI fallback.
+Remote adapters remain public-only. Do not request platform login/password/cookies/session state/account tokens.
 
 ## Credit consent invariant
 
-A billable managed transcript request must never start merely because a URL was pasted. Native hard cap: `credit_consent.max_credits = 1`. If native transcript is unavailable, previous consent does not authorize managed AI generation. Automatic AI fallback is prohibited.
+A billable managed transcript request must never start merely because a URL was pasted.
+- native Supadata hard cap: 1 approved credit;
+- Instagram AI fallback: separate quote + separate explicit approval;
+- AI rate: 2 credits/minute;
+- conservative maximum: 40 credits / 20 minutes;
+- automatic AI fallback prohibited;
+- `credit_charge_uncertain=true` operation must never be automatically retried or replayed.
 
-## A9.3 - Durable managed jobs
+## Accepted A9 media milestones
 
-Status: PASS / COMPLETE.
-Accepted live code: `7736f2e7acc5abbb3415e3753d0ca022c1b8d7b2`.
-Durable jobs remain restart-safe; duplicate start reuses the completed job; uncertain interrupted provider operations are not auto-replayed.
+### A9.2R - managed native YouTube
 
-## A9.5 - Private GPT Action integration
+PASS. Supadata native zero-client path accepted. Initial owner E2E evidence: source language `ru`, 277 timestamped segments, 1 credit.
 
-Status: PASS / COMPLETE.
-Accepted VoiceBridge owner-auth implementation: `970d7cc5819a623ec1d3cc7a70aceb44bfe311b9`.
-Actual private GPT zero-client YouTube E2E remains accepted with Supadata native, source language `ru`, 277 segments, 1 credit, reliability `0.91`, `PASS / COMPLETED`.
+### A9.3 - durable managed jobs
 
-## A9.6 - Instagram managed adapter
+PASS. Durable jobs restart-safe; duplicate start reuses completed job; uncertain interrupted provider operations are not replayed. Accepted VoiceBridge commit: `7736f2e7acc5abbb3415e3753d0ca022c1b8d7b2`.
 
-Status: PASS / COMPLETE_FOR_MANAGED_OWNER_BETA.
-Accepted live flow: native 1 credit -> `AWAITING_AI_CONSENT` -> separate AI quote/approval -> generated transcript; final detected language `en`, 11 segments, cumulative 3 credits. Automatic AI fallback remains disabled.
+### A9.5 / A9.8 - private GPT integration and owner YouTube E2E
 
-## A9.6 - Facebook adapter
+PASS. Owner auth accepted; private GPT zero-client YouTube path complete. Accepted owner-auth commit: `970d7cc5819a623ec1d3cc7a70aceb44bfe311b9`.
 
-Status: IN_PROGRESS / NOT_ACCEPTED.
-A separately authorized Facebook AI generate request failed with `MANAGED_PROVIDER_TRANSCRIPT_INVALID`, `segments=0`, `credit_charge_uncertain=true`; automatic retry is prohibited. Nested async-result parser remediation is committed as `f6b32c2a03425deaecadd10fc902671d62eaab5d`, but latest recorded isolated deploy attempt failed.
+### A9.6 - Instagram
 
-## Completion markers
+PASS for isolated owner beta. Accepted flow: native 1 credit -> `AWAITING_AI_CONSENT` -> separate AI quote/approval -> generated transcript; source language `en`, 11 segments, cumulative 3 credits.
 
-`OWNER_ONLY_ZERO_CLIENT_YOUTUBE = COMPLETE`
+### A9.6 - Facebook
 
-`OWNER_ONLY_MANAGED_INSTAGRAM_REEL = COMPLETE`
+IN_PROGRESS / NOT_ACCEPTED.
 
-`CRITICPROFILE_TWO_STAGE_GATE_RUNTIME = ACCEPTED`
+A separately authorized Facebook AI generate request failed with:
+- `MANAGED_PROVIDER_TRANSCRIPT_INVALID`;
+- `segments=0`;
+- `credit_charge_uncertain=true`.
 
-`CLAIM_LEVEL_CROSS_CHECK_RUNTIME = ACCEPTED`
-
-`CORE_TRACEABILITY_HARDENING_RUNTIME = ACCEPTED`
-
-`CORE_REPORT_LABEL_LOCALIZATION_CODE = IMPLEMENTED`
-
-`CORE_REPORT_LABEL_LOCALIZATION_RUNTIME = PENDING`
-
-`MEDIA_BETA_TRACEABILITY_LOGIC_RUNTIME = PASS`
-
-`MEDIA_BETA_REPORT_LABEL_LOCALIZATION_CODE = IMPLEMENTED`
-
-`MEDIA_BETA_REPORT_LABEL_LOCALIZATION_RUNTIME = PENDING`
-
-These markers do not authorize repository merge, external testers, production VoiceBridge changes, private/authenticated media, automatic AI fallback, Facebook, Telegram, or local upload.
+Automatic retry/replay is prohibited. Nested async-result parser remediation exists in VoiceBridge commit `f6b32c2a03425deaecadd10fc902671d62eaab5d`, but the latest recorded isolated deploy attempt failed.
 
 ## Next task
 
-`Manually resynchronize BOTH actual Custom GPT Builder instruction sets (main Core and MEDIA BETA) with their latest branch Builder files, then run NEW-chat visual regressions to verify Ukrainian default headings/table columns/CriticProfile field labels. After PASS, resume A9.6 Facebook remediation without replaying any uncertain-charge operation.`
+Resume A9.6 Facebook remediation without replaying the uncertain-charge operation:
+1. deploy parser remediation without a billable provider call;
+2. verify isolated service health/capability;
+3. obtain a fresh credit quote;
+4. require fresh explicit authorization;
+5. execute one fresh acceptance test;
+6. only after backend PASS, run private GPT E2E.
+
+These markers do NOT authorize repository merge, external tester rollout, production VoiceBridge changes, private/authenticated media, automatic AI fallback, Facebook acceptance, Telegram, or local upload.
