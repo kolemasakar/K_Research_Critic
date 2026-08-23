@@ -1,4 +1,4 @@
-schema_version: "0.7-beta"
+schema_version: "0.6-beta"
 
 product:
   name: K-Research & Critic - MEDIA BETA
@@ -28,7 +28,7 @@ knowledge:
 instructions:
   file: prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md
   canonical_reference: prompts/GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md
-  version: "0.7-beta-a9.6"
+  version: "0.6-beta-a9.6"
   builder_character_limit: 8000
   default_report_language: uk-UA
   report_language_follows_source_language: false
