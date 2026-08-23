@@ -1,18 +1,39 @@
 # Public Request Log MVP
 
-Version: 1.1
-Status: RUNTIME_ACCEPTED
+Version: 1.2
+Status: DISABLED_DUE_TO_USER_CONSENT_UX / PROTOTYPE RETAINED
 Updated: 2026-08-23
 
-## Goal
+## Decision
 
-Record a minimal owner-visible register of public K-Research & Critic requests without storing full conversations.
+The Request Log MVP was implemented and runtime-tested successfully, but it is being removed from the public K-Research & Critic UX.
 
-## Accepted implementation
+Reason:
 
 ```text
-Public K-Research & Critic
-  -> GPT Action `logRequest` (best effort, non-blocking)
+ChatGPT external Action consent is shown to users before `script.google.com` receives the generalized topic.
+The builder cannot pre-authorize that consent for every public user.
+The consent interruption is too costly for a non-essential analytics feature.
+```
+
+Target public workflow therefore returns to:
+
+```text
+User request
+  -> CriticProfile gate
+  -> Research
+  -> Critic
+  -> Final report
+```
+
+with no automatic request-log Action.
+
+## Historical prototype
+
+The tested prototype is retained in the repository for reference and possible future reuse outside the public Custom GPT consent path:
+
+```text
+GPT Action `logRequest`
   -> Google Apps Script Web App
   -> Google Sheet: K-Research & Critic — Request Log
 ```
@@ -25,9 +46,9 @@ Google Sheet ID:
 
 Sheet tab: `Звернення`.
 Timezone: `Europe/Kyiv`.
-Authentication: `None`.
+Authentication used by prototype: `None`.
 
-Columns:
+Stored fields were:
 
 ```text
 Номер звернення
@@ -39,72 +60,53 @@ Columns:
 
 ## Privacy/data-minimization contract
 
-- user name is currently always `none`;
-- never infer identity from the prompt;
-- send only a short generalized topic, maximum 160 characters;
-- do not send the full prompt, response, CriticProfile, credentials, hidden reasoning, or unrelated personal details;
-- logging failure or user denial must never block the Research/Critic workflow.
+The prototype intentionally used minimal data:
 
-## Canonical files
+- `user_name=none`;
+- identity was never inferred from the prompt;
+- only a generalized topic up to 160 characters was sent;
+- full prompt, response, CriticProfile, credentials and hidden reasoning were not intentionally stored;
+- logging failure or denial never blocked Research/Critic.
+
+## Canonical prototype files
 
 ```text
 integrations/request_log/google_apps_script/Code.gs
 integrations/request_log/openapi.yaml
 prompts/GPT_STORE_REQUEST_LOG_ADDENDUM.md
-prompts/GPT_STORE_INSTRUCTIONS.md
 docs/PRIVACY_POLICY_REQUEST_LOG.md
+docs/REQUEST_LOG_MVP_RUNTIME_ACCEPTANCE_2026-08-23.md
 ```
 
-## Runtime behavior
+These files are retained as historical/tested implementation artifacts. They are not part of the target active public Builder configuration while request logging is disabled.
 
-For each NEW substantive research request:
+## Historical runtime acceptance — 2026-08-23
 
-1. create a short generalized topic;
-2. call `logRequest` exactly once before the CriticProfile gate;
-3. continue the normal Research/Critic workflow regardless of logging success;
-4. do not log standalone workflow replies such as `1`, `2`, `3`, approve/edit/cancel responses, or ordinary follow-ups continuing the same request.
-
-## Security decision for MVP
-
-Authentication: `None`.
-
-This is intentionally the simplest MVP. Anyone who learns the Apps Script endpoint URL could submit rows. The table therefore must contain no sensitive data. A later revision may add a proxy/API-key layer if abuse becomes material.
-
-## Runtime acceptance — 2026-08-23
-
-Builder direct Action test:
+The prototype itself passed:
 
 ```text
-request_number: 1
-request_topic: API operation invocation request
-result: PASS
+Builder direct Action test                 PASS
+Published NEW-chat request write           PASS
+one substantive request -> one row         PASS
+standalone `1` -> no additional row        PASS
+server-side Kyiv timestamp                 PASS
+user_name=none                             PASS
+generalized topic only                     PASS
+Core workflow continued after logging      PASS
 ```
 
-Published NEW-chat test:
-
-```text
-user request: Досліди, чи справді регулярні прогулянки покращують якість сну.
-logged request_number: 2
-logged topic: Вплив регулярних прогулянок на якість сну
-user_name: none
-result: PASS
-```
-
-After the CriticProfile gate, the user sent standalone `1`. Direct spreadsheet verification showed no third row. Therefore:
-
-```text
-one new substantive request -> one row       PASS
-standalone workflow reply -> no new row      PASS
-server-side Kyiv date/time                   PASS
-user_name=none                               PASS
-generalized topic only                       PASS
-full prompt absent                           PASS
-Core workflow continues after logging        PASS
-owner review through Google Sheets           PASS
-```
-
-Final marker:
+Historical marker:
 
 ```text
 REQUEST_LOG_MVP_RUNTIME = ACCEPTED
 ```
+
+Current product marker:
+
+```text
+REQUEST_LOG_PUBLIC = DISABLED_DUE_TO_USER_CONSENT_UX
+```
+
+## Reactivation rule
+
+Do not re-enable this Action in the public GPT unless the owner explicitly approves the resulting consent UX or a different telemetry architecture avoids that interruption.
