@@ -59,7 +59,7 @@ def validate_store_package(root: Path = ROOT) -> dict:
 
     _require(product.get("name") == "K-Research & Critic", "product.name must be K-Research & Critic")
     description = product.get("description")
-    _require(isinstance(description, str), "product.description must be a string")
+    _require(isinstance(description, str), "Store description must be a string")
     _require(description.startswith("Користувач:"), "Store description must use the approved Ukrainian first line")
     _require(
         "\n(research supervisor for evidence-based planning" in description,
@@ -200,11 +200,11 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(beta.get("browser_assisted_a8_fallback_preserved") is True, "A8 fallback evidence must remain preserved")
     _require(beta.get("managed_job_prefix") == "KRCM_", "managed jobs must use KRCM_ prefix")
     _require(beta.get("public_platforms_live_accepted") == ["youtube", "instagram"], "YouTube and Instagram must be declared live accepted")
-    _require(beta.get("public_platforms_in_progress") == ["facebook"], "Facebook must remain in progress")
+    _require(beta.get("public_platforms_in_progress") == ["facebook"], "Facebook must remain in progress until isolated live acceptance")
     _require(beta.get("public_platforms_not_started") == ["telegram"], "Telegram must remain not started")
     _require(beta.get("local_upload_live_accepted") is False, "local upload must remain unaccepted")
     _require(beta.get("max_video_seconds") == 3600, "media beta max video must remain 60 minutes")
-    _require(beta.get("managed_provider") == "supadata", "managed provider must remain Supadata")
+    _require(beta.get("managed_provider") == "supadata", "managed provider must remain Supadata for native-first paths")
     _require(beta.get("managed_provider_mode") == "native_first", "managed mode must remain native-first")
     _require(beta.get("managed_native_credit_cost") == 1, "native managed cost must remain one credit")
     _require(beta.get("managed_credit_preflight_required") is True, "credit preflight must remain mandatory")
@@ -214,6 +214,16 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(beta.get("managed_instagram_ai_fallback_live_accepted") is True, "Instagram AI fallback must be live accepted")
     _require(beta.get("managed_instagram_ai_rate_credits_per_minute") == 2, "Instagram AI rate must remain 2 credits/min")
     _require(beta.get("managed_instagram_ai_hard_cap_credits") == 40, "Instagram AI consent cap must remain 40 credits")
+
+    _require(beta.get("managed_facebook_retrieval_stt_code_ready") is True, "A9.7-C Facebook retrieval/STT must be code-ready")
+    _require(beta.get("managed_facebook_free_retrieval_provider") == "cobalt", "Facebook free retrieval provider must be Cobalt")
+    _require(beta.get("managed_facebook_paid_retrieval_provider") == "scrapecreators", "Facebook paid retrieval provider must be ScrapeCreators")
+    _require(beta.get("managed_facebook_paid_retrieval_max_credits") == 1, "Facebook paid retrieval hard cap must remain one credit")
+    _require(beta.get("managed_facebook_paid_retrieval_requires_separate_consent") is True, "Facebook paid retrieval must require separate explicit consent")
+    _require(beta.get("managed_facebook_automatic_paid_retrieval") is False, "Facebook paid retrieval must never run automatically")
+    _require(beta.get("managed_facebook_stt_provider") == "assemblyai", "Facebook STT provider must be AssemblyAI")
+    _require(beta.get("managed_facebook_live_accepted") is False, "Facebook must not be marked live accepted before isolated deployment evidence")
+
     _require(beta.get("managed_user_beta_access_code_required") is False, "owner must not be asked for a beta code")
     _require(beta.get("managed_owner_access_injected_server_side") is True, "owner admission must be injected server-side")
     _require(beta.get("managed_durable_store") == "postgres", "managed store must remain Postgres")
@@ -226,7 +236,7 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(legacy.get("stt_endpoint") == MEDIA_BETA_ASSEMBLYAI_EU, "A8 fallback STT endpoint must remain AssemblyAI EU")
     _require(legacy.get("status") == "A8_ACCEPTED_FALLBACK_ONLY", "A8 must be fallback only")
 
-    _require(release.get("rollout_state") == "A9_6_INSTAGRAM_COMPLETE_FACEBOOK_IN_PROGRESS", "rollout state must match A9.6 checkpoint")
+    _require(release.get("rollout_state") == "A9_6_INSTAGRAM_COMPLETE_FACEBOOK_IN_PROGRESS", "live rollout state must remain pre-Facebook-acceptance")
     _require(release.get("production_core_unchanged") is True, "private beta must preserve production core")
     _require(release.get("public_store_gpt_unchanged") is True, "private beta must not modify public GPT")
     _require(release.get("user_api_key_required") is False, "private beta must not request user API keys")
@@ -237,6 +247,8 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(release.get("a9_8_owner_zero_client_acceptance_complete") is True, "YouTube owner zero-client acceptance must remain complete")
     _require(release.get("a9_6_instagram_managed_complete") is True, "Instagram managed path must remain complete")
     _require(release.get("a9_6_facebook_complete") is False, "Facebook must not be pre-declared complete")
+    _require(release.get("a9_7_c_facebook_runtime_code_ready") is True, "A9.7-C Facebook runtime contract must be recorded code-ready")
+    _require(release.get("a9_7_c_facebook_live_acceptance_complete") is False, "A9.7-C must not pre-declare live acceptance")
     _require(release.get("external_tester_rollout_paused") is True, "external tester rollout must remain paused")
     _require(release.get("merge_to_public_product_allowed") is False, "private beta must not auto-promote to public product")
 
@@ -282,24 +294,37 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require_tokens(
         action_text,
         [
-            "version: 0.3.0-a9.6",
+            "version: 0.4.0-a9.7-c",
+            "operationId: getManagedMediaCapability",
             "operationId: preflightManagedMediaCredits",
             "operationId: startManagedMediaNativeTranscription",
+            "operationId: startManagedFacebookFallback",
+            "operationId: preflightManagedFacebookRetrievalCredit",
+            "operationId: continueManagedFacebookPaidRetrieval",
             "operationId: getManagedMediaTranscriptionStatus",
             "operationId: getManagedMediaTranscriptSegments",
             "operationId: preflightManagedMediaAiCredits",
             "operationId: startManagedMediaAiTranscription",
             "x-openai-isConsequential: true",
+            "x-openai-isConsequential: false",
             "const: supadata",
             "const: native",
             "const: generate",
+            "const: scrapecreators",
+            "const: facebook_post",
+            "const: cobalt",
+            "const: assemblyai",
             "maximum: 1",
-            "PROCESSING, COMPLETED, AWAITING_AI_CONSENT, FAILED",
+            "AWAITING_RETRIEVAL_CONSENT",
+            "facebook_retrieval_stt",
+            "provider_balance_lookup_performed",
+            "retrieval_credits_charged",
+            "stt_seconds_charged",
             "credit_charge_uncertain",
             "reused",
             "bearerAuth",
         ],
-        "A9.6 managed Action schema",
+        "A9.7-C managed Action schema",
     )
     _require("beta_access_code" not in action_text, "user-facing Action schema must not expose beta_access_code")
 
