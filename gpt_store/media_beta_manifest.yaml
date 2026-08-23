@@ -146,7 +146,7 @@ beta:
     never_log: true
 
 release:
-  rollout_state: A9_7_C_FACEBOOK_RUNTIME_CODE_READY
+  rollout_state: A9_6_INSTAGRAM_COMPLETE_FACEBOOK_IN_PROGRESS
   production_core_unchanged: true
   public_store_gpt_unchanged: true
   user_api_key_required: false
