@@ -60,9 +60,27 @@ def validate_store_package(root: Path = ROOT) -> dict:
     _require(release.get("external_backend_required") is False, "Store package must not require an external backend")
     _require(release.get("free_user_compatible") is True, "Store package must remain Free-user compatible")
     _require(release.get("production_smoke_test_passed") is True, "production smoke test must be recorded as passed")
+    _require(release.get("production_smoke_tested_at") == "2026-08-14", "launch smoke-test date must remain recorded")
+    _require(release.get("latest_core_runtime_regression_passed_at") == "2026-08-23", "latest Core runtime regression must be recorded")
+    _require(release.get("criticprofile_two_stage_gate_runtime_accepted") is True, "two-stage CriticProfile gate must be accepted")
+    _require(release.get("cross_check_claim_level_runtime_accepted") is True, "claim-level cross-check runtime must be accepted")
+    _require(release.get("cross_check_traceability_runtime_accepted") is True, "traceability runtime must be accepted")
+    _require(release.get("report_label_localization_runtime_accepted") is True, "report-label localization runtime must be accepted")
+    _require(release.get("repository_matches_current_public_builder") is True, "repository must match the accepted public Builder")
+
+    _require(instructions.get("builder_character_limit") == 8000, "Builder character limit must be 8000")
+    _require(instructions.get("default_report_language") == "uk-UA", "default report language must be uk-UA")
+    _require(instructions.get("profile_gate_mode") == "two_stage_direct_or_review", "two-stage profile gate must be declared")
+    _require(instructions.get("profile_auto_display") is False, "profile must not auto-display")
+    _require(instructions.get("cross_check_traceability_required") is True, "traceability must be required")
     _require(
-        release.get("production_smoke_tested_at") == "2026-08-14",
-        "production smoke test date must record the launch verification date",
+        instructions.get("cross_check_achieved_cannot_exceed_visible_origins") is True,
+        "achieved cross-check count cannot exceed visible origins",
+    )
+    _require(
+        instructions.get("cross_check_protocol_table_columns")
+        == ["Твердження", "Потрібно", "Отримано незалежних", "Виняток"],
+        "Ukrainian claim-summary columns must match the accepted runtime",
     )
 
     instruction_path = root / str(instructions.get("file", ""))
@@ -71,33 +89,34 @@ def validate_store_package(root: Path = ROOT) -> dict:
     except OSError as exc:
         raise StorePackageValidationError(f"Cannot load instruction package: {exc}") from exc
 
+    _require(len(instruction_text) <= 8000, "public Builder instructions must fit the 8000-character limit")
     required_instruction_tokens = [
-        "Use Ukrainian by default",
-        "CAPABILITY PREFLIGHT",
-        "web_search=AVAILABLE",
-        "web_search=UNAVAILABLE",
+        "ALWAYS reply in Ukrainian",
+        "Профіль збору і критики успішно створено.",
+        "1 - виконати аналіз одразу.",
+        "2 - переглянути і відредагувати профіль збору і критики.",
+        "Cross-check floors: LOW>=0, MEDIUM>=1, HIGH>=2, CRITICAL>=3",
+        "For EACH material factual claim",
+        "A systematic review/meta-analysis counts as one evidence origin",
+        "TRACEABILITY INVARIANT",
+        "Critic must inspect each material claim ledger",
+        "Cross-check: achieved/required - PASS|SHORTFALL",
+        "ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ",
+        "Твердження | Потрібно | Отримано незалежних | Виняток",
+        "Localize CriticProfile field labels",
         "COMPLETED_WITH_LIMITATIONS",
-        "Supervisor proposes.",
-        "USER APPROVAL",
-        "1=APPROVE, 2=EDIT, 3=REJECT",
-        "Наступна допустима дія: 1 - **APPROVE**, 2 - **EDIT** або 3 - **REJECT**.",
-        "Present the profile itself, NOT a checkpoint",
-        "Never expose internal placeholders such as :contentReference, oaicite",
-        "On PASS produce normal user-facing output, NOT a checkpoint",
-        "Create checkpoint ONLY when user explicitly requests",
-        "Never auto-create it at a normal profile gate/final report",
-        "latest_research object uses EXACTLY",
-        "latest_review object uses EXACTLY",
-        "no extra keys",
-        "K_SUPERVISOR_CHECKPOINT",
-        "task_id matching ^TASK_[A-Za-z0-9_-]+$",
-        "required_cross_checks:int>=0",
-        "approved_by=\"user\"",
-        "Output one complete valid JSON object",
-        "Do not persist/reveal hidden chain-of-thought",
+        "Only when explicitly asked to save/resume across chats",
     ]
     for token in required_instruction_tokens:
         _require(token in instruction_text, f"instruction package is missing required token: {token}")
+
+    forbidden_instruction_tokens = [
+        "CAPABILITY PREFLIGHT",
+        "Наступна допустима дія: 1 - **APPROVE**",
+        "Present the profile itself, NOT a checkpoint",
+    ]
+    for token in forbidden_instruction_tokens:
+        _require(token not in instruction_text, f"obsolete public Builder behavior remains: {token}")
 
     checkpoint_example_path = root / str(checkpoint.get("example", ""))
     try:
