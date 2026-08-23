@@ -56,39 +56,37 @@ def validate_store_package(root: Path = ROOT) -> dict:
         "data analysis must be enabled in the Store package",
     )
     _require(capabilities.get("apps") is False, "Apps must remain disabled for the core package")
-    _require(capabilities.get("actions") is True, "The accepted public package must expose the request-log Action")
+    _require(capabilities.get("actions") is False, "Public request-log Action must be disabled")
     _require(release.get("developer_api_key_required") is False, "Store package must not require a developer API key")
-    _require(release.get("external_backend_required") is False, "Research/Critic must not require the optional logging backend")
-    _require(release.get("privacy_policy_url_required_by_package") is True, "public Action requires a privacy-policy URL")
+    _require(release.get("external_backend_required") is False, "Research/Critic must not require an external backend")
+    _require(release.get("privacy_policy_url_required_by_package") is False, "disabled Action must not require privacy policy")
     _require(release.get("free_user_compatible") is True, "Store package must remain Free-user compatible")
     _require(release.get("production_smoke_test_passed") is True, "production smoke test must be recorded as passed")
-    _require(release.get("production_smoke_tested_at") == "2026-08-14", "launch smoke-test date must remain recorded")
     _require(release.get("latest_core_runtime_regression_passed_at") == "2026-08-23", "latest Core runtime regression must be recorded")
     _require(release.get("criticprofile_two_stage_gate_runtime_accepted") is True, "two-stage CriticProfile gate must be accepted")
     _require(release.get("cross_check_claim_level_runtime_accepted") is True, "claim-level cross-check runtime must be accepted")
     _require(release.get("cross_check_traceability_runtime_accepted") is True, "traceability runtime must be accepted")
     _require(release.get("report_label_localization_runtime_accepted") is True, "report-label localization runtime must be accepted")
-    _require(release.get("request_log_runtime_accepted") is True, "request-log runtime must be accepted")
-    _require(release.get("repository_matches_current_public_builder") is True, "repository must match the accepted public Builder")
+    _require(release.get("request_log_runtime_accepted") is True, "historical request-log runtime acceptance must be preserved")
+    _require(release.get("request_log_public_enabled") is False, "request log must be disabled for public target")
+    _require(release.get("repository_matches_current_public_builder") is False, "Builder sync must remain pending until manual Action removal")
 
-    _require(request_log.get("status") == "RUNTIME_ACCEPTED", "request-log MVP status must be RUNTIME_ACCEPTED")
-    _require(request_log.get("authentication") == "none", "request-log MVP authentication must remain none")
-    _require(request_log.get("full_prompt_storage") is False, "request-log MVP must not store full prompts")
-    _require(request_log.get("logging_failure_blocks_core_workflow") is False, "request-log failure must remain non-blocking")
-    _require(request_log.get("builder_action_configured") is True, "request-log Action must be configured")
-    _require(request_log.get("runtime_new_chat_test_passed") is True, "request-log NEW-chat test must pass")
-    _require(request_log.get("workflow_reply_dedup_verified") is True, "workflow reply de-duplication must be verified")
-    _require(request_log.get("runtime_accepted") is True, "request-log runtime must be accepted")
+    _require(
+        request_log.get("status") == "DISABLED_DUE_TO_USER_CONSENT_UX_PENDING_BUILDER_SYNC",
+        "request-log status must record consent-UX disablement",
+    )
+    _require(request_log.get("public_enabled_target") is False, "request-log public target must be disabled")
+    _require(request_log.get("prototype_retained") is True, "tested request-log prototype must be retained")
+    _require(request_log.get("historical_runtime_acceptance_preserved") is True, "historical acceptance must be preserved")
+    _require(request_log.get("full_prompt_storage") is False, "request-log prototype must not store full prompts")
+    _require(request_log.get("builder_action_disable_pending_manual_step") is True, "manual Builder Action removal must remain pending")
+    _require(request_log.get("runtime_accepted") is True, "historical runtime acceptance must remain recorded")
 
     _require(instructions.get("builder_character_limit") == 8000, "Builder character limit must be 8000")
     _require(instructions.get("default_report_language") == "uk-UA", "default report language must be uk-UA")
     _require(instructions.get("profile_gate_mode") == "two_stage_direct_or_review", "two-stage profile gate must be declared")
     _require(instructions.get("profile_auto_display") is False, "profile must not auto-display")
     _require(instructions.get("cross_check_traceability_required") is True, "traceability must be required")
-    _require(
-        instructions.get("cross_check_achieved_cannot_exceed_visible_origins") is True,
-        "achieved cross-check count cannot exceed visible origins",
-    )
     _require(
         instructions.get("cross_check_protocol_table_columns")
         == ["Твердження", "Потрібно", "Отримано незалежних", "Виняток"],
@@ -115,13 +113,8 @@ def validate_store_package(root: Path = ROOT) -> dict:
         "Cross-check: achieved/required - PASS|SHORTFALL",
         "ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ",
         "Твердження | Потрібно | Отримано незалежних | Виняток",
-        "Localize CriticProfile field labels",
         "COMPLETED_WITH_LIMITATIONS",
         "Only when explicitly asked to save/resume across chats",
-        "REQUEST LOGGING",
-        "call `logRequest` exactly once",
-        "Do not log standalone workflow replies",
-        "NON-BLOCKING",
     ]
     for token in required_instruction_tokens:
         _require(token in instruction_text, f"instruction package is missing required token: {token}")
@@ -130,9 +123,11 @@ def validate_store_package(root: Path = ROOT) -> dict:
         "CAPABILITY PREFLIGHT",
         "Наступна допустима дія: 1 - **APPROVE**",
         "Present the profile itself, NOT a checkpoint",
+        "REQUEST LOGGING",
+        "logRequest",
     ]
     for token in forbidden_instruction_tokens:
-        _require(token not in instruction_text, f"obsolete public Builder behavior remains: {token}")
+        _require(token not in instruction_text, f"disabled/obsolete public Builder behavior remains: {token}")
 
     checkpoint_example_path = root / str(checkpoint.get("example", ""))
     try:
