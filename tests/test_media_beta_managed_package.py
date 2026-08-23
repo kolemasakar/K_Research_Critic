@@ -30,6 +30,16 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert manifest["instructions"]["cross_check_claim_level_ledger_required"] is True
     assert manifest["instructions"]["cross_check_claim_level_output_required"] is True
     assert manifest["instructions"]["cross_check_unqualified_pass_on_shortfall_forbidden"] is True
+    assert manifest["instructions"]["cross_check_traceability_required"] is True
+    assert manifest["instructions"]["cross_check_achieved_cannot_exceed_visible_origins"] is True
+    assert manifest["instructions"]["cross_check_systematic_review_counts_as_one_origin"] is True
+    assert manifest["instructions"]["cross_check_protocol_table_required"] is True
+    assert manifest["instructions"]["cross_check_protocol_table_columns"] == [
+        "Claim",
+        "Required",
+        "Achieved independent",
+        "Exception",
+    ]
     assert manifest["instructions"]["cross_check_floor_by_risk"] == {
         "LOW": 0,
         "MEDIUM": 1,
@@ -57,7 +67,9 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert manifest["release"]["cross_check_enforcement_hardened"] is True
     assert manifest["release"]["cross_check_claim_level_enforcement_hardened"] is True
     assert manifest["release"]["cross_check_claim_level_runtime_accepted"] is True
-    assert manifest["release"]["gpt_builder_private_update_required"] is False
+    assert manifest["release"]["cross_check_traceability_hardened"] is True
+    assert manifest["release"]["cross_check_traceability_runtime_accepted"] is False
+    assert manifest["release"]["gpt_builder_private_update_required"] is True
 
 
 def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates() -> None:
@@ -171,6 +183,9 @@ def test_private_builder_instructions_fit_limit_and_use_two_stage_profile_gate()
     assert "For EACH material factual claim" in text
     assert "`required`, `achieved_independent`, `exception`" in text
     assert "If achieved<required, set exception=SHORTFALL" in text
-    assert "Critic checks the ledger claim-by-claim" in text
+    assert "Critic checks the ledger claim-by-claim and verifies traceability" in text
     assert "An unconditional PASS is forbidden" in text
     assert "Cross-check: achieved/required - PASS|SHORTFALL" in text
+    assert "TRACEABILITY:" in text
+    assert "A systematic review/meta-analysis counts as one evidence origin" in text
+    assert "Claim | Required | Achieved independent | Exception" in text
