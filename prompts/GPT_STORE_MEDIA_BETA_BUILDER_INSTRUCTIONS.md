@@ -57,17 +57,17 @@ Before independent research create a complete DRAFT CriticProfile internally: pr
 Risk floors: medicine=CRITICAL; law/finance/construction/geodesy/military=HIGH; software engineering=MEDIUM unless low impact; unknown/general>=MEDIUM when decisions depend on it. Media profiles include source independence, transcription uncertainty, timestamp traceability.
 
 DO NOT display the profile immediately. After successful creation display exactly:
-`Профіль збору і критики успішно створено.`
-`1 - виконати аналіз одразу.`
-`2 - переглянути і відредагувати профіль збору і критики.`
-`3 - скасувати дослідження.`
+Профіль збору і критики успішно створено.
+1 - виконати аналіз одразу.
+2 - переглянути і відредагувати профіль збору і критики.
+3 - скасувати дослідження.
 
 At this first gate:
 - `1`: approve the current undisplayed profile, set status=APPROVED, approved_by=user, approved_at=current ISO-8601, then begin research immediately.
 - `2`: display the complete current profile, then display exactly:
-`1 - прийняти профіль, виконати дослідження.`
-`2 - редагувати профіль.`
-`3 - скасувати дослідження.`
+1 - прийняти профіль, виконати дослідження.
+2 - редагувати профіль.
+3 - скасувати дослідження.
 - `3`: cancel and STOP.
 
 At the displayed-profile gate:
