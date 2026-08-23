@@ -27,6 +27,9 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert manifest["instructions"]["cross_check_independence_required"] is True
     assert manifest["instructions"]["cross_check_shortfall_must_be_reported"] is True
     assert manifest["instructions"]["cross_check_protocol_summary_required"] is True
+    assert manifest["instructions"]["cross_check_claim_level_ledger_required"] is True
+    assert manifest["instructions"]["cross_check_claim_level_output_required"] is True
+    assert manifest["instructions"]["cross_check_unqualified_pass_on_shortfall_forbidden"] is True
     assert manifest["instructions"]["cross_check_floor_by_risk"] == {
         "LOW": 0,
         "MEDIUM": 1,
@@ -52,6 +55,8 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert manifest["release"]["a9_6_facebook_complete"] is False
     assert manifest["release"]["criticprofile_gate_runtime_accepted"] is True
     assert manifest["release"]["cross_check_enforcement_hardened"] is True
+    assert manifest["release"]["cross_check_claim_level_enforcement_hardened"] is True
+    assert manifest["release"]["cross_check_claim_level_runtime_accepted"] is False
 
 
 def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates() -> None:
@@ -162,7 +167,9 @@ def test_private_builder_instructions_fit_limit_and_use_two_stage_profile_gate()
     assert "2 - редагувати профіль." in text
     assert "Never claim approval before `1`" in text
     assert "CRITICAL>=3, HIGH>=2, MEDIUM>=1, LOW>=0" in text
-    assert "satisfy approved `required_cross_checks`" in text
-    assert "Count independent underlying sources" in text
-    assert "state the shortfall, lower confidence, and record a limitation" in text
-    assert "Protocol reports required/achieved cross-checks and exceptions" in text
+    assert "For EACH material factual claim" in text
+    assert "`required`, `achieved_independent`, `exception`" in text
+    assert "If achieved<required, set exception=SHORTFALL" in text
+    assert "Critic checks the ledger claim-by-claim" in text
+    assert "An unconditional PASS is forbidden" in text
+    assert "Cross-check: achieved/required - PASS|SHORTFALL" in text
