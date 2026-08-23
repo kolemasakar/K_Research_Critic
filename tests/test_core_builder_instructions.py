@@ -48,20 +48,30 @@ def test_core_builder_requires_traceable_pass_counts() -> None:
     text = _text()
     assert "TRACEABILITY INVARIANT" in text
     assert "Every evidence origin counted in `achieved_independent` MUST be traceable" in text
-    assert "Never report `3/3`, `4/3`, or any PASS count greater" in text
-    assert "`achieved_independent` cannot exceed 2" in text
+    assert "PASS count greater than the number of visibly traceable independent origins" in text
     assert "systematic review/meta-analysis counts as one evidence origin" in text
     assert "untraceable PASS count" in text
     assert "equals the number of valid, visibly traceable independent evidence origins" in text
 
 
-def test_core_builder_requires_claim_level_protocol_table() -> None:
+def test_core_builder_requires_localized_claim_protocol_table() -> None:
     text = _text()
-    assert "MANDATORY: include a compact claim-level summary table" in text
-    assert "`Claim | Required | Achieved independent | Exception`" in text
+    assert "`ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ`" in text
+    assert "`Твердження | Потрібно | Отримано незалежних | Виняток`" in text
     assert "Include EVERY material factual claim" in text
-    assert "Values must match the visible claim blocks and traceable evidence origins" in text
-    assert "Use `NONE` or `SHORTFALL` in Exception" in text
+    assert "Values must match visible claim blocks and traceable evidence origins" in text
+    assert "localize equivalents for another selected report language" in text
+
+
+def test_core_builder_localizes_all_user_visible_labels() -> None:
+    text = _text()
+    assert "headings, table titles/columns, field labels" in text
+    assert "Canonical English keys may remain internal only" in text
+    assert "`ФІНАЛЬНИЙ ЗВІТ`" in text
+    assert "`ПЕРЕВІРКА ТВЕРДЖЕНЬ`" in text
+    assert "`ПРОТОКОЛ ПЕРЕВІРКИ`" in text
+    assert "Do not show English labels such as `Claim-level summary`" in text
+    assert "raw keys such as `profile_id`, `risk_level`, `required_cross_checks`, `approved_at` remain internal" in text
 
 
 def test_core_builder_is_clean_of_media_beta_operational_logic() -> None:
