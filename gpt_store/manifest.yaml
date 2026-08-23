@@ -21,7 +21,7 @@ capabilities:
   code_interpreter_data_analysis: true
   image_generation: false
   apps: false
-  actions: true
+  actions: false
 
 knowledge:
   required: false
@@ -29,7 +29,7 @@ knowledge:
 
 instructions:
   file: prompts/GPT_STORE_INSTRUCTIONS.md
-  version: "2.1-request-log-mvp-runtime-accepted"
+  version: "2.2-request-log-disabled-pending-builder-sync"
   builder_character_limit: 8000
   default_report_language: uk-UA
   report_language_follows_source_language: false
@@ -70,7 +70,11 @@ checkpoint:
   example: gpt_store/checkpoint_example.json
 
 request_log_mvp:
-  status: RUNTIME_ACCEPTED
+  status: DISABLED_DUE_TO_USER_CONSENT_UX_PENDING_BUILDER_SYNC
+  public_enabled_target: false
+  disable_reason: "ChatGPT external Action consent interrupts the public UX for new users"
+  prototype_retained: true
+  historical_runtime_acceptance_preserved: true
   selected_storage: google_sheets
   spreadsheet_id: 1icDvAkPx43s7568iZkANBCriz8UaanB4kMITO-icLaU
   sheet_name: Звернення
@@ -89,13 +93,14 @@ request_log_mvp:
   apps_script_deployed: true
   apps_script_deployed_at: "2026-08-23T16:40:00+03:00"
   apps_script_deployment_url: https://script.google.com/macros/s/AKfycbwYLrCEtLTRnB91amNUbpAzah6DvXPhhOoo-jCUOU1LgHCsMnu34BKXEix8dkA5r6IR/exec
-  builder_action_configured: true
+  builder_action_currently_configured: true
+  builder_action_disable_pending_manual_step: true
   builder_action_test_passed: true
   google_sheet_write_test_passed: true
   write_test_request_number: 1
   write_tested_at: "2026-08-23T17:45:37+03:00"
-  public_builder_instructions_synced: true
-  public_gpt_updated: true
+  historical_public_builder_instructions_synced: true
+  historical_public_gpt_updated: true
   runtime_new_chat_test_passed: true
   runtime_request_number: 2
   runtime_request_topic: Вплив регулярних прогулянок на якість сну
@@ -117,7 +122,7 @@ release:
   free_user_compatible: true
   developer_api_key_required: false
   external_backend_required: false
-  privacy_policy_url_required_by_package: true
+  privacy_policy_url_required_by_package: false
   live_free_plan_test_required: true
   live_paid_plan_model_switch_test_required: true
   public_publish_is_manual: true
@@ -129,4 +134,5 @@ release:
   cross_check_traceability_runtime_accepted: true
   report_label_localization_runtime_accepted: true
   request_log_runtime_accepted: true
-  repository_matches_current_public_builder: true
+  request_log_public_enabled: false
+  repository_matches_current_public_builder: false
