@@ -2,7 +2,7 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 4.8
+Version: 4.9
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-23
 
@@ -21,7 +21,7 @@ Not accepted yet:
 - Telegram public video posts;
 - local audio/video attachment.
 
-The public GPT, external tester rollout, merge to `main`, and production VoiceBridge remain outside the current gate.
+Repository `main`, external tester rollout, and production VoiceBridge remain outside the current merge gate. The actual main `K-Research & Critic` Builder has been manually synchronized with a Core candidate, but the latest traceability hardening still requires another manual synchronization and runtime regression.
 
 ## Repositories and isolation boundary
 
@@ -29,7 +29,7 @@ KRC:
 - repo `kolemasakar/K_Research_Critic`;
 - branch `agent/video-url-research`;
 - draft PR #8;
-- public GPT and `main` unchanged.
+- repository `main` unchanged.
 
 VoiceBridge:
 - repo `kolemasakar/VoiceBridge`;
@@ -103,9 +103,7 @@ Canonical record: `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md`.
 
 Status: PASS / RUNTIME_ACCEPTED_PRIVATE_OWNER_BETA.
 
-The first strengthened runtime test correctly produced `CRITICAL` and `required_cross_checks >= 3`, but exposed aggregate-only enforcement: individual material claims could still rely on one study while the protocol returned an unconditional `PASS`.
-
-The Builder contract was hardened and resynchronized. The repeated owner-only runtime test now requires a ledger for EACH material factual claim before verdict:
+The Builder contract requires a ledger for EACH material factual claim before verdict:
 
 ```text
 required: approved required_cross_checks
@@ -121,32 +119,47 @@ Accepted rules:
 - never claim the requirement was met for that claim;
 - Critic verifies the ledger claim-by-claim;
 - unconditional `PASS` is forbidden while a material shortfall is hidden or unqualified;
-- fact-check output shows `Cross-check: achieved/required - PASS|SHORTFALL` for each material claim;
-- protocol summarizes per-claim required/achieved/exception values.
+- fact-check output shows `Cross-check: achieved/required - PASS|SHORTFALL` for each material claim.
 
-Observed acceptance evidence included a real `Cross-check: 1/3 - SHORTFALL` for the 29% sick-leave interpretation, an explicit replication limitation, and final status `COMPLETED_WITH_LIMITATIONS` rather than unconditional `PASS`.
+Observed acceptance evidence included a real `Cross-check: 1/3 - SHORTFALL` and final `COMPLETED_WITH_LIMITATIONS` rather than unconditional `PASS`.
 
 Canonical contract: `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md`.
 Canonical runtime record: `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md`.
 
-`cross_check_claim_level_runtime_accepted=true` and the current MEDIA BETA Builder no longer requires another synchronization for this contract.
+`cross_check_claim_level_runtime_accepted=true` for MEDIA BETA.
 
 ## Core GPT improvement track
 
-The accepted general improvements are now being separated from Media Beta so they can later be synchronized into the main `K-Research & Critic` without provider/credit/media-specific behavior.
+Status: `CORE_CLAIM_LEVEL_ENFORCEMENT_RUNTIME = PASS_WITH_REQUIRED_FIX`.
 
-Core candidate scope:
-- Ukrainian default report language;
-- two-stage CriticProfile gate;
-- risk-based cross-check floors;
-- claim-level `required / achieved_independent / exception` enforcement;
-- no hidden/unqualified PASS on shortfall;
-- per-claim auditability and review protocol;
-- ISO-8601 approval metadata;
-- no Supadata, credit gates, KRCM jobs, Instagram/Facebook fallback, or Media Beta operational logic.
+The main `K-Research & Critic` was manually synchronized with the first clean Core Builder candidate and tested in a new chat using the cold-shower CRITICAL medical query.
 
-Candidate Builder source: `prompts/GPT_STORE_CORE_BUILDER_INSTRUCTIONS.md`.
-This is branch-only preparation; the actual published/main GPT is not changed until a separate manual synchronization/acceptance step.
+Observed successful behavior:
+- two-stage gate worked in the new-version chat;
+- `risk_level=CRITICAL`;
+- `required_cross_checks=3`;
+- claim-level `PASS` and `SHORTFALL` were shown;
+- a real `1/3 - SHORTFALL` was explained;
+- Critic ran `REVISE -> REVISE -> REVISE`;
+- final status was `COMPLETED_WITH_LIMITATIONS` rather than unconditional PASS.
+
+Observed auditability defects:
+- Review Protocol omitted the mandatory per-claim required/achieved/exception summary table;
+- some `3/3` and `4/3` PASS values exceeded the number of independent evidence origins visibly traceable in the report.
+
+The branch Core Builder is now hardened with a strict traceability invariant:
+- every counted evidence origin must be user-visible and traceable by title/citation to that claim;
+- achieved count cannot exceed the number of visibly traceable independent origins;
+- a systematic review/meta-analysis counts as one origin unless underlying studies were separately inspected and cited;
+- Critic verifies traceable evidence-origin count before PASS;
+- untraceable PASS count blocks unconditional PASS;
+- Review Protocol MUST include a compact table with columns exactly `Claim | Required | Achieved independent | Exception` for every material factual claim.
+
+Automated implementation/tests passed CI #687 on commit `d838787f3b3040143842e7674a42477e757d26cd`.
+
+Canonical record: `35_CORE_RUNTIME_TRACEABILITY_HARDENING.md`.
+
+The currently configured main GPT still has the previous Core candidate. Required next Core step: manually resynchronize `prompts/GPT_STORE_CORE_BUILDER_INSTRUCTIONS.md`, start a NEW chat, rerun the regression, and verify traceable PASS counts plus the mandatory protocol table.
 
 ## A8 browser-assisted baseline
 
@@ -204,10 +217,14 @@ A separately authorized Facebook AI generate request failed with `MANAGED_PROVID
 
 `CLAIM_LEVEL_CROSS_CHECK_RUNTIME = ACCEPTED`
 
-These markers do not authorize public rollout, external testers, production merge, private/authenticated media, automatic AI fallback, Facebook, Telegram, or local upload.
+`CORE_TRACEABILITY_HARDENING_CODE = PASS`
+
+`CORE_TRACEABILITY_HARDENING_RUNTIME = PENDING`
+
+These markers do not authorize repository merge, external testers, production VoiceBridge changes, private/authenticated media, automatic AI fallback, Facebook, Telegram, or local upload.
 
 ## Next task
 
-`Prepare and validate the clean core Builder candidate for the main K-Research & Critic, then manually synchronize/test it only after owner confirmation.`
+`Resynchronize the hardened Core Builder into the main K-Research & Critic and run one final NEW-chat regression for evidence-origin traceability and mandatory protocol table.`
 
-After the core candidate track is ready, resume A9.6 Facebook remediation without replaying any uncertain-charge operation.
+After Core traceability runtime PASS, resume A9.6 Facebook remediation without replaying any uncertain-charge operation.
