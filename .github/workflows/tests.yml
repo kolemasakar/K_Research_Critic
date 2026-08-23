@@ -6,7 +6,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -85,65 +84,3 @@ jobs:
 
       - name: Run coverage gate
         run: python -m pytest --cov --cov-report=term-missing --cov-fail-under=70
-
-  a9_7_c_schema_audit:
-    name: A9.7-C media schema audit
-    runs-on: ubuntu-latest
-    timeout-minutes: 8
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
-          cache: pip
-          cache-dependency-path: requirements-dev.txt
-
-      - name: Install development dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements-dev.txt
-
-      - name: Run A9.7-C package gates with diagnostics
-        id: gate
-        shell: bash
-        run: |
-          set +e
-          python -m scripts.validate_repository > repository.log 2>&1
-          repo_rc=$?
-          python -m scripts.validate_store_package > store.log 2>&1
-          store_rc=$?
-          python -m pytest -q > pytest.log 2>&1
-          pytest_rc=$?
-          repo_diag="$(tail -n 1 repository.log | tr '\n' ' ' | cut -c1-220)"
-          store_diag="$(tail -n 1 store.log | tr '\n' ' ' | cut -c1-220)"
-          pytest_diag="$(tail -n 1 pytest.log | tr '\n' ' ' | cut -c1-220)"
-          pytest_failed="$(grep '^FAILED ' pytest.log | tr '\n' ';' | cut -c1-900)"
-          echo "repo_rc=$repo_rc" >> "$GITHUB_OUTPUT"
-          echo "store_rc=$store_rc" >> "$GITHUB_OUTPUT"
-          echo "pytest_rc=$pytest_rc" >> "$GITHUB_OUTPUT"
-          echo "repo_diag=$repo_diag" >> "$GITHUB_OUTPUT"
-          echo "store_diag=$store_diag" >> "$GITHUB_OUTPUT"
-          echo "pytest_diag=$pytest_diag" >> "$GITHUB_OUTPUT"
-          echo "pytest_failed=$pytest_failed" >> "$GITHUB_OUTPUT"
-          cat repository.log
-          cat store.log
-          cat pytest.log
-          exit 0
-
-      - name: Report A9.7-C gate
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPO_RC: ${{ steps.gate.outputs.repo_rc }}
-          STORE_RC: ${{ steps.gate.outputs.store_rc }}
-          PYTEST_RC: ${{ steps.gate.outputs.pytest_rc }}
-          REPO_DIAG: ${{ steps.gate.outputs.repo_diag }}
-          STORE_DIAG: ${{ steps.gate.outputs.store_diag }}
-          PYTEST_DIAG: ${{ steps.gate.outputs.pytest_diag }}
-          PYTEST_FAILED: ${{ steps.gate.outputs.pytest_failed }}
-        run: |
-          if [[ "$REPO_RC" == "0" && "$STORE_RC" == "0" && "$PYTEST_RC" == "0" ]]; then result=PASS; else result=FAIL; fi
-          gh pr comment 8 --repo kolemasakar/K_Research_Critic --body "A9.7-C managed Facebook Action schema audit V3: **${result}**. validate_repository_rc=\`${REPO_RC}\`, validate_store_package_rc=\`${STORE_RC}\`, pytest_rc=\`${PYTEST_RC}\`; repository_diag=\`${REPO_DIAG}\`; store_diag=\`${STORE_DIAG}\`; pytest_diag=\`${PYTEST_DIAG}\`; failed=\`${PYTEST_FAILED}\`. No provider or Render endpoint is called by this CI gate. Production/main are not targeted."
-          [[ "$result" == "PASS" ]]
