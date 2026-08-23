@@ -6,52 +6,12 @@ on:
 
 permissions:
   contents: read
-  issues: write
-  pull-requests: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  a9-7-i-audit:
-    name: A9.7-I Builder package audit
-    if: github.event_name == 'push' && github.ref == 'refs/heads/agent/video-url-research'
-    runs-on: ubuntu-latest
-    timeout-minutes: 12
-    steps:
-      - name: Checkout feature branch
-        uses: actions/checkout@v6
-        with:
-          ref: agent/video-url-research
-          persist-credentials: false
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
-          cache: pip
-          cache-dependency-path: requirements.txt
-      - name: Install runtime dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
-      - name: Run A9.7-I gates
-        id: gates
-        run: |
-          set -euo pipefail
-          python -m scripts.validate_repository
-          python -m scripts.validate_store_package
-          python -m pytest -q | tee /tmp/a97i-pytest.txt
-      - name: Report A9.7-I audit
-        if: always()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          if [[ '${{ steps.gates.outcome }}' == 'success' ]]; then result=PASS; else result=FAIL; fi
-          diag="$(tail -n 2 /tmp/a97i-pytest.txt 2>/dev/null | tr '\n' ' ' || true)"
-          gh pr comment 8 --repo kolemasakar/K_Research_Critic --body "A9.7-I private GPT Builder package audit: **${result}**. validate_repository + validate_store_package + full pytest executed. pytest_diag=\`${diag}\`. No Facebook/Cobalt/AssemblyAI/Supadata/ScrapeCreators/Render/production/main/merge action was executed by this audit."
-
   pytest:
     name: Tests / Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
