@@ -1,8 +1,8 @@
 # Report Language Label Localization Hardening
 
-Version: 1.0
+Version: 1.1
 Date: 2026-08-23
-Status: IMPLEMENTED_IN_BRANCH_PENDING_BUILDER_RESYNC_RUNTIME
+Status: RUNTIME_ACCEPTED_BOTH_BUILDERS
 
 ## Trigger
 
@@ -36,7 +36,7 @@ For Ukrainian reports use, as applicable:
 - `ПРОТОКОЛ ПЕРЕВІРКИ`;
 - `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ`.
 
-The mandatory claim-level protocol table uses exactly:
+The mandatory claim-level protocol table uses:
 
 ```text
 Твердження | Потрібно | Отримано незалежних | Виняток
@@ -57,32 +57,51 @@ MEDIA BETA:
 - `tests/test_claim_level_cross_check_enforcement.py`;
 - `tests/test_media_beta_managed_package.py`.
 
-## Runtime disposition
+## Runtime acceptance
 
-The latest MEDIA BETA regression demonstrated:
-- claim-level traceability logic: PASS;
-- visible independent-origin counting: PASS;
-- systematic-review double-counting protection: PASS;
-- mandatory four-column claim-level summary: present;
-- default-language label localization: FAIL / REQUIRED_FIX.
+Both actual Custom GPTs were manually resynchronized and tested in NEW chats on 2026-08-23.
 
-Therefore do not treat that run as final acceptance of the complete updated MEDIA BETA contract.
+### Main K-Research & Critic
 
-Current markers:
+Observed:
+- `ФІНАЛЬНИЙ ЗВІТ`: PASS;
+- `ПЕРЕВІРКА ТВЕРДЖЕНЬ`: PASS;
+- `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ`: PASS;
+- claim-summary labels `Твердження / Потрібно / Отримано незалежних / Виняток`: PASS;
+- CriticProfile content presented with Ukrainian user-visible labels rather than raw field keys: PASS;
+- previous claim-level traceability remained intact, including traceable `3/3` and a real `1/3 SHORTFALL`.
 
-`MEDIA_BETA_TRACEABILITY_LOGIC_RUNTIME = PASS`
+Disposition:
 
-`MEDIA_BETA_REPORT_LABEL_LOCALIZATION_CODE = IMPLEMENTED`
+`CORE_REPORT_LABEL_LOCALIZATION_RUNTIME = ACCEPTED`
 
-`MEDIA_BETA_REPORT_LABEL_LOCALIZATION_RUNTIME = PENDING`
+### K-Research & Critic - MEDIA BETA
 
-`MEDIA_BETA_TRACEABILITY_HARDENING_RUNTIME = PENDING_FINAL_LANGUAGE_REGRESSION`
+Observed:
+- `ФІНАЛЬНИЙ ЗВІТ`: PASS;
+- `ПЕРЕВІРКА ТВЕРДЖЕНЬ`: PASS;
+- `ПРОТОКОЛ ПЕРЕВІРКИ`: PASS;
+- `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ`: PASS;
+- claim-summary labels `Твердження / Потрібно / Отримано незалежних / Виняток`: PASS;
+- visible CriticProfile field labels localized to Ukrainian: PASS;
+- traceable `3/3 PASS` remained intact;
+- explicit `1/3 SHORTFALL` remained intact;
+- systematic-review derivative evidence was not double-counted;
+- text-only regression charged 0 managed media credits.
 
-For the main Core, previous evidence-origin traceability acceptance remains valid, but the newly hardened label-localization behavior also requires a fresh Builder synchronization and NEW-chat visual regression before its localization runtime marker can be accepted.
+Disposition:
+
+`MEDIA_BETA_REPORT_LABEL_LOCALIZATION_RUNTIME = ACCEPTED`
+
+`MEDIA_BETA_TRACEABILITY_HARDENING_RUNTIME = ACCEPTED`
+
+The compact Markdown rendering may visually compress adjacent table headers in some copied/plain-text representations; the actual required labels and four-column structure are present. This is non-blocking formatting behavior, not a contract failure.
+
+Canonical runtime record: `39_REPORT_LANGUAGE_AND_MEDIA_TRACEABILITY_RUNTIME_ACCEPTANCE.md`.
 
 ## Unchanged boundaries
 
-This hardening does not change:
+This hardening and acceptance do not change:
 - media ingestion;
 - Supadata pricing or credit gates;
 - Action/OpenAPI/authentication;
@@ -92,4 +111,4 @@ This hardening does not change:
 - production VoiceBridge;
 - external tester rollout.
 
-No merge is authorized by this change.
+No merge is authorized by this acceptance.
