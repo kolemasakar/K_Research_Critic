@@ -33,36 +33,76 @@ def test_manifest_preserves_store_first_invariants() -> None:
     assert manifest["capabilities"]["code_interpreter_data_analysis"] is True
     assert manifest["capabilities"]["apps"] is False
     assert manifest["capabilities"]["actions"] is False
-    assert manifest["release"]["developer_api_key_required"] is False
-    assert manifest["release"]["external_backend_required"] is False
-    assert manifest["release"]["production_smoke_test_passed"] is True
-    assert manifest["release"]["production_smoke_tested_at"] == "2026-08-14"
+    release = manifest["release"]
+    assert release["developer_api_key_required"] is False
+    assert release["external_backend_required"] is False
+    assert release["production_smoke_test_passed"] is True
+    assert release["production_smoke_tested_at"] == "2026-08-14"
+    assert release["latest_core_runtime_regression_passed_at"] == "2026-08-23"
+    assert release["criticprofile_two_stage_gate_runtime_accepted"] is True
+    assert release["cross_check_claim_level_runtime_accepted"] is True
+    assert release["cross_check_traceability_runtime_accepted"] is True
+    assert release["report_label_localization_runtime_accepted"] is True
+    assert release["repository_matches_current_public_builder"] is True
 
 
-def test_instruction_package_contains_required_workflow_boundaries() -> None:
+def test_instruction_package_matches_accepted_public_core_runtime() -> None:
     text = (ROOT / "prompts" / "GPT_STORE_INSTRUCTIONS.md").read_text(encoding="utf-8")
 
-    assert "Use Ukrainian by default" in text
-    assert "CAPABILITY PREFLIGHT" in text
-    assert "web_search=AVAILABLE" in text
-    assert "web_search=UNAVAILABLE" in text
-    assert "Supervisor proposes." in text
-    assert "USER APPROVAL" in text
-    assert "1=APPROVE, 2=EDIT, 3=REJECT" in text
-    assert "Наступна допустима дія: 1 - **APPROVE**, 2 - **EDIT** або 3 - **REJECT**." in text
-    assert "Present the profile itself, NOT a checkpoint" in text
-    assert "Never expose internal placeholders such as :contentReference, oaicite" in text
-    assert "On PASS produce normal user-facing output, NOT a checkpoint" in text
-    assert "Create checkpoint ONLY when user explicitly requests" in text
-    assert "Never auto-create it at a normal profile gate/final report" in text
-    assert "latest_research object uses EXACTLY" in text
-    assert "latest_review object uses EXACTLY" in text
-    assert "K_SUPERVISOR_CHECKPOINT" in text
-    assert "task_id matching ^TASK_[A-Za-z0-9_-]+$" in text
-    assert "required_cross_checks:int>=0" in text
-    assert 'approved_by="user"' in text
-    assert "Output one complete valid JSON object" in text
-    assert "Do not persist/reveal hidden chain-of-thought" in text
+    assert len(text) <= 8000
+    assert "ALWAYS reply in Ukrainian" in text
+    assert "Профіль збору і критики успішно створено." in text
+    assert "1 - виконати аналіз одразу." in text
+    assert "2 - переглянути і відредагувати профіль збору і критики." in text
+    assert "1 - прийняти профіль, виконати дослідження." in text
+    assert "Cross-check floors: LOW>=0, MEDIUM>=1, HIGH>=2, CRITICAL>=3" in text
+    assert "For EACH material factual claim" in text
+    assert "A systematic review/meta-analysis counts as one evidence origin" in text
+    assert "TRACEABILITY INVARIANT" in text
+    assert "Critic must inspect each material claim ledger" in text
+    assert "Cross-check: achieved/required - PASS|SHORTFALL" in text
+    assert "`ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ`" in text
+    assert "`Твердження | Потрібно | Отримано незалежних | Виняток`" in text
+    assert "Localize CriticProfile field labels" in text
+    assert "COMPLETED_WITH_LIMITATIONS" in text
+    assert "Only when explicitly asked to save/resume across chats" in text
+    assert "CAPABILITY PREFLIGHT" not in text
+    assert "Наступна допустима дія: 1 - **APPROVE**" not in text
+
+
+def test_manifest_declares_accepted_core_contract() -> None:
+    manifest = yaml.safe_load((ROOT / "gpt_store" / "manifest.yaml").read_text(encoding="utf-8"))
+    instructions = manifest["instructions"]
+
+    assert instructions["version"] == "2.0-core-runtime-accepted"
+    assert instructions["builder_character_limit"] == 8000
+    assert instructions["default_report_language"] == "uk-UA"
+    assert instructions["report_language_follows_source_language"] is False
+    assert instructions["user_visible_labels_localized_to_report_language"] is True
+    assert instructions["criticprofile_field_labels_localized_to_report_language"] is True
+    assert instructions["profile_gate_mode"] == "two_stage_direct_or_review"
+    assert instructions["profile_auto_display"] is False
+    assert instructions["profile_direct_run_approves_profile"] is True
+    assert instructions["profile_review_option"] == 2
+    assert instructions["profile_cancel_option"] == 3
+    assert instructions["cross_check_claim_level_ledger_required"] is True
+    assert instructions["cross_check_claim_level_output_required"] is True
+    assert instructions["cross_check_traceability_required"] is True
+    assert instructions["cross_check_achieved_cannot_exceed_visible_origins"] is True
+    assert instructions["cross_check_systematic_review_counts_as_one_origin"] is True
+    assert instructions["cross_check_protocol_table_required"] is True
+    assert instructions["cross_check_protocol_table_columns"] == [
+        "Твердження",
+        "Потрібно",
+        "Отримано незалежних",
+        "Виняток",
+    ]
+    assert instructions["cross_check_floor_by_risk"] == {
+        "LOW": 0,
+        "MEDIUM": 1,
+        "HIGH": 2,
+        "CRITICAL": 3,
+    }
 
 
 def test_checkpoint_example_validates_and_round_trips() -> None:
