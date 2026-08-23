@@ -5,13 +5,59 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  a9-7-i-parser-patch:
+    name: A9.7-I GPT Action parser compatibility patch
+    if: github.event_name == 'push' && github.ref == 'refs/heads/agent/video-url-research' && contains(github.event.head_commit.message, 'A9.7-I run GPT Action parser compatibility patch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v6
+        with:
+          ref: agent/video-url-research
+          persist-credentials: true
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - name: Install runtime dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+      - name: Apply parser compatibility patch
+        run: python .github/scripts/a9_7_i_gpt_action_parser_patch.py
+      - name: Validate package
+        run: |
+          python -m scripts.validate_repository
+          python -m scripts.validate_store_package
+          python -m pytest -q
+      - name: Scope guard and commit
+        run: |
+          set -euo pipefail
+          allowed='gpt_store/actions/media_managed_beta_openapi.yaml|tests/test_media_beta_managed_package.py|tests/test_media_action_parser_compat.py'
+          changed="$(git status --short | awk '{print $2}' | paste -sd'|' -)"
+          echo "changed=${changed}"
+          for f in $(git status --short | awk '{print $2}'); do
+            case "$f" in
+              gpt_store/actions/media_managed_beta_openapi.yaml|tests/test_media_beta_managed_package.py|tests/test_media_action_parser_compat.py) ;;
+              *) echo "unexpected source path: $f"; exit 1 ;;
+            esac
+          done
+          git add gpt_store/actions/media_managed_beta_openapi.yaml tests/test_media_beta_managed_package.py tests/test_media_action_parser_compat.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "A9.7-I make Action schema GPT Builder parser compatible"
+          git push origin HEAD:agent/video-url-research
+
   pytest:
     name: Tests / Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
