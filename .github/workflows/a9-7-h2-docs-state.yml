@@ -1,5 +1,6 @@
 name: A9.7-H2 Facebook Documentation State
 
+# Registered workflow trigger: H2 documentation-only update.
 on:
   pull_request:
     branches: [main]
