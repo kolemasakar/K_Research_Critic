@@ -1,28 +1,35 @@
 # ROADMAP
 План завершеного розвитку K-Research & Critic та межі подальшого maintenance.
 
-Version: 1.7
+Version: 1.8
 Status: MAINTENANCE
+Updated: 2026-08-23
 
 ## 1. Purpose
 
-This roadmap records the completed implementation path for K-Research & Critic.
+This roadmap records the completed implementation path for K-Research & Critic and narrowly scoped future product improvements.
 
-K-Research & Critic is a finished GPT Store product. Its active product-development roadmap ends with Phase 12. Future work in this repository is limited to maintenance, compatibility, security, regression fixes, and narrowly scoped product improvements.
+K-Research & Critic is a finished GPT Store product. Its active product-development roadmap ends with Phase 12. Future work in this repository is limited to maintenance, compatibility, security, regression fixes, and separately approved narrow product improvements.
 
-The previously planned Modular Agent Platform is no longer Phase 13 of this product. That direction is transferred to a separate new project and repository named `K_Supervisor`, which starts from a new Phase 0 roadmap.
+The previously planned Modular Agent Platform is no longer Phase 13 of this product. That direction is transferred to the separate `K_Supervisor` project.
 
 ## 2. Stable Product Invariants
 
 - Supervisor coordinates but does not replace research or critique.
-- CriticProfile approval is mandatory before autonomous execution.
+- CriticProfile approval is mandatory before autonomous independent research.
+- The current public UX uses the accepted two-stage direct-run / review-edit / cancel gate.
 - Approved profiles remain immutable unless a material amendment is approved.
 - Research-Critic revision cycles are autonomous after approval.
+- Risk floors control minimum independent cross-check requirements.
+- Every material factual claim has its own required/achieved/exception cross-check ledger.
+- Evidence counted as independent must be traceable to visible evidence origins.
+- Derivative reporting of the same underlying evidence is not double-counted.
+- Ukrainian is the default user-facing report language; headings, table columns and CriticProfile labels follow the selected report language.
 - Contracts, task states, evidence, limitations, and failures remain explicit.
 - The public Store workflow does not depend on a fixed model identifier or mandatory external service.
 - Private chain-of-thought is never required for auditability.
 - Cross-chat continuation uses the explicit checkpoint contract when requested.
-- Maintenance changes must preserve the validated production workflow unless a separately approved product revision changes it.
+- Maintenance changes must preserve the validated public workflow unless a separately approved product revision changes it.
 
 ## 3. Completed Core
 
@@ -40,9 +47,7 @@ Phase 9  End-to-End MVP                               COMPLETE
 Phase 10 Persistence and Audit                        COMPLETE
 ```
 
-MVP boundary: Phase 9.
-
-The post-MVP Hybrid Domain Resolver enhancement is COMPLETE.
+MVP boundary: Phase 9. The post-MVP Hybrid Domain Resolver enhancement is COMPLETE.
 
 ## 4. GPT Store-first Product Decision
 
@@ -77,19 +82,6 @@ Status: COMPLETE
 11.7 GPT Store Packaging / Publication Readiness COMPLETE
 ```
 
-Delivered:
-
-- validated frozen configuration;
-- immutable task configuration snapshots and restart-safe reconstruction;
-- role-based provider isolation for optional standalone execution;
-- research and critic limits;
-- tool call budgets, timeouts, retries, runtime ceilings, and output-size limits;
-- GPT Store distribution invariants and user-plan model policy;
-- usage and quality metrics;
-- restart-safe metric reconstruction;
-- structured operational logging and sensitive-data redaction;
-- Store manifest, instructions, checkpoint contract, release validator, and operator documentation.
-
 ## 6. Phase 12 - Test and CI Hardening
 
 Status: COMPLETE
@@ -98,7 +90,6 @@ Delivered:
 
 - orchestration, profile, loop, report, failure, Store-package, and configuration regression coverage;
 - deterministic offline reference benchmark;
-- four reference domains: literary analysis, software engineering, medicine, and geodesy;
 - Python 3.13 and Python 3.14 CI test matrix;
 - dependency integrity gate;
 - Ruff correctness gate;
@@ -106,43 +97,37 @@ Delivered:
 - repository policy validation;
 - GPT Store package regression validation;
 - blocking coverage floor;
-- dependency maintenance automation;
-- synchronized quality documentation.
+- dependency maintenance automation.
 
-Validated release baseline:
+## 7. Current Public Core Runtime Baseline
 
-```text
-Python 3.13 full suite: PASS
-Python 3.14 full suite: PASS
-Quality gates: PASS
-Repository validation: PASS
-GPT Store package validation: PASS
-Production smoke test: PASS
-```
+Status: ACCEPTED / SYNCHRONIZED TO REPOSITORY MAIN
 
-## 7. Production Release Boundary
+The current public Builder runtime was revalidated on 2026-08-23 and the accepted Core contract is now mirrored in `main`.
 
-Canonical first production release:
+Accepted runtime behavior:
 
 ```text
-K-Research & Critic v1.0.0
-Git tag: v1.0.0
+two-stage CriticProfile gate                 PASS
+CRITICAL -> required_cross_checks >= 3       PASS
+claim-level required/achieved/exception      PASS
+visible SHORTFALL                            PASS
+evidence-origin traceability                 PASS
+systematic-review double-counting protection PASS
+Critic REVISE -> PASS loop                   PASS
+Ukrainian report/profile/table localization  PASS
+COMPLETED_WITH_LIMITATIONS when required     PASS
 ```
 
-Release characteristics:
+Canonical repository files:
 
 ```text
-status: PRODUCTION / MAINTENANCE
-GPT Store: published
-Free-account validation: PASS
-Paid-account validation: PASS
-Model/runtime-switch validation: PASS
-Store discoverability: PASS
-Production Research -> Critic workflow: PASS
-Production REVISE -> PASS cycle: PASS
+prompts/GPT_STORE_INSTRUCTIONS.md
+gpt_store/manifest.yaml
+scripts/validate_store_package.py
+tests/test_gpt_store_package.py
+docs/GPT_STORE_PACKAGE.md
 ```
-
-The `v1.0.0` tag must point to the finalized maintenance-synchronization commit whose CI is fully green.
 
 ## 8. Maintenance Scope
 
@@ -156,44 +141,85 @@ OpenAI platform compatibility updates
 regression fixes
 documentation corrections
 narrow UX improvements
+narrow analytics/observability improvements after privacy and architecture approval
 maintenance releases such as v1.0.1 and v1.0.2
 ```
 
 Changes that turn the product into a general modular agent platform are out of scope here.
 
+## 8.1 Planned Narrow Product Improvement - Request Accounting
+
+Status: PLANNED / ARCHITECTURE AND PRIVACY DECISION REQUIRED
+
+Goal: create a persistent owner-visible register of user requests to the public K-Research & Critic product without changing the Research/Critic semantics.
+
+Target table fields:
+
+| Field | Requirement |
+|---|---|
+| `request_number` | sequential request number |
+| `date` | request date |
+| `time` | request time |
+| `user_name` | reliable user name when actually available; otherwise `none` |
+| `request_topic` | short generalized topic of the request |
+
+Data-minimization rules:
+
+- never infer a user's identity from message content;
+- if the platform does not reliably expose an authenticated user name to the product, store `none`;
+- store a short generalized topic, not the full prompt, by default;
+- do not store hidden reasoning, credentials, sensitive tool metadata, or unrelated personal data;
+- define the canonical timestamp/time-zone rule before implementation.
+
+Required design tasks before implementation:
+
+1. Verify what user/account identity metadata, if any, is actually available to the published Custom GPT runtime.
+2. Select the persistence mechanism for the request table.
+3. Select the owner review mechanism for browsing, filtering and exporting requests.
+4. Define owner authentication/access control for the review interface.
+5. Define retention/deletion policy and privacy notice requirements.
+6. Confirm whether implementation requires an Action/external backend; if so, treat that as a separate product architecture decision because the current public Core has `actions=false` and no mandatory backend.
+7. Implement only after the storage/review/privacy design is explicitly approved.
+
+Mechanisms to compare for owner review:
+
+```text
+A. private admin web table/dashboard
+B. protected spreadsheet-style owner view
+C. database admin view with CSV/export capability
+```
+
+Selection criteria:
+
+```text
+privacy and access control
+reliability
+implementation complexity
+operating cost
+mobile/desktop usability
+filter/search capability
+export/backup capability
+impact on current public GPT UX
+```
+
+No review mechanism is selected yet; mechanism selection is an explicit planned task.
+
 ## 9. Modular Agent Platform Transfer
 
-The former planned item:
+The former planned `Phase 13 - Modular Agent Platform` is intentionally removed from the K-Research & Critic product roadmap.
 
-```text
-Phase 13 - Modular Agent Platform
-```
-
-is intentionally removed from the K-Research & Critic product roadmap.
-
-Its goals are transferred to the separate `K_Supervisor` project:
-
-```text
-capability-oriented agent metadata
-automatic agent discovery
-executable agent registration
-capability-based selection and routing
-standard compatibility contracts
-modular FactCheck/DataAnalysis/Technical/Financial/Legal/Planning agents
-```
-
-The new K_Supervisor project starts with its own Phase 0 and is not a continuation of this roadmap numbering.
+Its goals are transferred to the separate `K_Supervisor` project, which starts with its own Phase 0.
 
 ## 10. Legacy Engineering Identifiers
 
-Some stable internal identifiers retain the historical `K_Supervisor` name for compatibility, including the checkpoint marker and existing runtime/database conventions. These identifiers are not repository/product names and must not be renamed solely for cosmetic consistency if doing so would break compatibility.
-
-Examples:
+Some stable internal identifiers retain the historical `K_Supervisor` name for compatibility, including:
 
 ```text
 K_SUPERVISOR_CHECKPOINT
 runtime/k_supervisor.db
 ```
+
+These identifiers are not repository/product names and should not be renamed solely for cosmetic consistency if doing so would break compatibility.
 
 ## 11. Canonical Project Documents
 
@@ -214,7 +240,7 @@ GPT_STORE_PACKAGE.md
 LOGGING.md
 ```
 
-## 12. Final Implementation State
+## 12. Current Implementation State
 
 ```text
 Phase 0-10                               COMPLETE
@@ -223,8 +249,10 @@ GPT Store-first Product Decision        COMPLETE
 Phase 11                                COMPLETE
 Phase 12                                COMPLETE
 GPT Store publication                   COMPLETE
-Production smoke test                   COMPLETE
-K-Research & Critic v1.0.0              RELEASE BASELINE
-Future Modular Agent Platform           MOVED TO NEW K_Supervisor PROJECT
+Original production smoke test          COMPLETE
+2026-08-23 public Core runtime hardening ACCEPTED
+GitHub main / public Builder Core sync   COMPLETE
+Request accounting                      PLANNED
+Future Modular Agent Platform           MOVED TO K_Supervisor
 Current repository mode                 MAINTENANCE
 ```
