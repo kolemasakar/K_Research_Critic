@@ -43,7 +43,7 @@ def test_manifest_preserves_store_first_invariants() -> None:
     assert release["cross_check_claim_level_runtime_accepted"] is True
     assert release["cross_check_traceability_runtime_accepted"] is True
     assert release["report_label_localization_runtime_accepted"] is True
-    assert release["repository_matches_current_public_builder"] is True
+    assert release["repository_matches_current_public_builder"] is False
 
 
 def test_instruction_package_matches_accepted_public_core_runtime() -> None:
@@ -66,6 +66,8 @@ def test_instruction_package_matches_accepted_public_core_runtime() -> None:
     assert "Localize CriticProfile field labels" in text
     assert "COMPLETED_WITH_LIMITATIONS" in text
     assert "Only when explicitly asked to save/resume across chats" in text
+    assert "REQUEST LOGGING" in text
+    assert "call `logRequest` exactly once" in text
     assert "CAPABILITY PREFLIGHT" not in text
     assert "Наступна допустима дія: 1 - **APPROVE**" not in text
 
@@ -74,7 +76,7 @@ def test_manifest_declares_accepted_core_contract() -> None:
     manifest = yaml.safe_load((ROOT / "gpt_store" / "manifest.yaml").read_text(encoding="utf-8"))
     instructions = manifest["instructions"]
 
-    assert instructions["version"] == "2.0-core-runtime-accepted"
+    assert instructions["version"] == "2.1-request-log-mvp-prepublish"
     assert instructions["builder_character_limit"] == 8000
     assert instructions["default_report_language"] == "uk-UA"
     assert instructions["report_language_follows_source_language"] is False
