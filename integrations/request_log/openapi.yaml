@@ -1,0 +1,37 @@
+openapi: 3.1.0
+info:
+  title: K-Research & Critic Request Log
+  version: 1.0.0
+  description: Minimal request logging Action for the public K-Research & Critic GPT.
+servers:
+  - url: https://script.google.com/macros/s/REPLACE_WITH_DEPLOYMENT_ID
+paths:
+  /exec:
+    post:
+      operationId: logRequest
+      summary: Record one generalized research request topic
+      description: Records one request row. Do not send full prompts, answers, credentials, or sensitive details. If unavailable, the main Research/Critic workflow must continue.
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+                - topic
+              properties:
+                topic:
+                  type: string
+                  maxLength: 160
+                  description: Short generalized topic of the user's request, without sensitive details or full prompt text.
+      responses:
+        '200':
+          description: Logging result
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+components: {}
