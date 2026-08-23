@@ -1,0 +1,57 @@
+from pathlib import Path
+
+import yaml
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_request_log_manifest_contract() -> None:
+    manifest = yaml.safe_load((ROOT / "gpt_store" / "manifest.yaml").read_text(encoding="utf-8"))
+    request_log = manifest["request_log_mvp"]
+
+    assert request_log["selected_storage"] == "google_sheets"
+    assert request_log["sheet_name"] == "Звернення"
+    assert request_log["timezone"] == "Europe/Kyiv"
+    assert request_log["authentication"] == "none"
+    assert request_log["full_prompt_storage"] is False
+    assert request_log["user_name_mode"] == "none"
+    assert request_log["topic_max_length"] == 160
+    assert request_log["logging_failure_blocks_core_workflow"] is False
+    assert request_log["google_sheet_created"] is True
+    assert request_log["apps_script_deployed"] is False
+    assert request_log["builder_action_configured"] is False
+    assert request_log["runtime_accepted"] is False
+
+
+def test_apps_script_uses_server_side_timestamp_and_lock() -> None:
+    text = (ROOT / "integrations" / "request_log" / "google_apps_script" / "Code.gs").read_text(
+        encoding="utf-8"
+    )
+
+    assert "LockService.getScriptLock" in text
+    assert "Europe/Kyiv" in text
+    assert "Utilities.formatDate" in text
+    assert "'none'" in text
+    assert ".slice(0, 160)" in text
+    assert "appendRow" in text
+
+
+def test_action_schema_is_minimal_and_non_consequential() -> None:
+    schema = yaml.safe_load((ROOT / "integrations" / "request_log" / "openapi.yaml").read_text(encoding="utf-8"))
+    operation = schema["paths"]["/exec"]["post"]
+    topic = operation["requestBody"]["content"]["application/json"]["schema"]["properties"]["topic"]
+
+    assert operation["operationId"] == "logRequest"
+    assert operation["x-openai-isConsequential"] is False
+    assert topic["maxLength"] == 160
+    assert schema["components"] == {}
+
+
+def test_request_log_addendum_is_non_blocking_and_minimal() -> None:
+    text = (ROOT / "prompts" / "GPT_STORE_REQUEST_LOG_ADDENDUM.md").read_text(encoding="utf-8")
+
+    assert "exactly once" in text
+    assert "Do not send the full prompt" in text
+    assert "NON-BLOCKING" in text
+    assert "Do not log standalone workflow replies" in text
