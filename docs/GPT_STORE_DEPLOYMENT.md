@@ -1,20 +1,15 @@
 # GPT_STORE_DEPLOYMENT
 Документ визначає основну GPT Store-модель розгортання K-Research & Critic без обов'язкового developer API key.
 
-Version: 1.2
-Status: ACTIVE
+Version: 1.3
+Status: ACTIVE / PUBLIC CORE SYNCHRONIZED
+Updated: 2026-08-23
 
 ## 1. Decision
 
 K-Research & Critic is GPT Store-first.
 
-The primary public edition is a Custom GPT distributed through ChatGPT and intended to remain usable by signed-in users whose plan allows access to public GPTs, including the Free plan where the platform makes GPT access available.
-
-The primary edition must not require a developer-owned OpenAI API key, a mandatory external backend, or a pinned API model.
-
-## 2. Primary Runtime: GPT Store Edition
-
-The primary runtime policy is:
+Primary runtime policy:
 
 ```text
 channel: chatgpt_store
@@ -23,15 +18,13 @@ developer_api_key_required: false
 external_backend_required: false
 recommended_model: null
 allow_user_model_switch: true
+apps: false
+actions: false
 ```
 
-`recommended_model: null` is intentional. K-Research & Critic does not pin a model identifier that may later be retired or unavailable to a user. ChatGPT selects an available model according to the user's account and current platform behavior. Users with additional model choices may switch to another available model.
+The public Core must not depend on a developer-owned API key, mandatory external backend, or pinned model identifier.
 
-The Store package maps research to built-in Web search and Code Interpreter & Data Analysis when those capabilities are available to the current user. Capability absence must produce an explicit limitation rather than fabricated tool use.
-
-## 3. Store Package
-
-The publication-ready repository package is defined by:
+## 2. Canonical Public Package
 
 ```text
 gpt_store/manifest.yaml
@@ -42,53 +35,93 @@ scripts/validate_store_package.py
 docs/GPT_STORE_PACKAGE.md
 ```
 
-The package state is:
+`prompts/GPT_STORE_INSTRUCTIONS.md` is the repository copy of the current accepted public Builder instructions.
+
+## 3. Current Builder Workflow
 
 ```text
-ready_for_manual_publication_test
+request
+ -> CriticProfile created internally
+ -> first gate: 1 direct run / 2 review-edit / 3 cancel
+ -> explicit approval
+ -> Research
+ -> Critic
+ -> revision when needed
+ -> final report
+ -> review protocol
 ```
 
-This state means the repository package and static validation are complete. It does not mean the GPT has already been published in the GPT Store.
-
-## 4. Free and Paid User Behavior
-
-K-Research & Critic does not implement plan detection or billing logic.
-
-Expected platform behavior is:
+The first gate is:
 
 ```text
-Free user
-  -> model/capabilities available to that user in ChatGPT
-  -> K-Research & Critic workflow
-
-Paid user
-  -> the same K-Research & Critic workflow
-  -> optional switch to additional models exposed by the user's plan
+Профіль збору і критики успішно створено.
+1 - виконати аналіз одразу.
+2 - переглянути і відредагувати профіль збору і критики.
+3 - скасувати дослідження.
 ```
 
-The workflow and CriticProfile rules must not depend on a specific named ChatGPT model.
+Option `2` displays the complete localized profile and enters the approve/edit/cancel review gate. No independent research begins before explicit approval.
 
-## 5. No Developer Secret in the Store Edition
+## 4. Current Evidence Contract
 
-The GPT Store edition does not require:
+Risk floors:
 
 ```text
-OPENAI_API_KEY
-SEARCH_API_KEY
-DATABASE_URL
+LOW >= 0
+MEDIUM >= 1
+HIGH >= 2
+CRITICAL >= 3
 ```
 
-These environment variables remain supported only by optional standalone/server integrations.
+Every material factual claim maintains:
 
-A Store release must not embed developer secrets in GPT instructions, knowledge files, configuration text, or user-visible artifacts.
+```text
+required
+achieved_independent
+exception = NONE | SHORTFALL
+```
 
-The core Store manifest keeps Apps and Actions disabled, so no third-party API or Action privacy-policy dependency is required by the package.
+Independence is based on underlying evidence origins, not URL count. Duplicate and derivative reporting do not increase the count. A systematic review/meta-analysis counts as one origin unless specific underlying studies were independently inspected and cited.
 
-## 6. Persistence and Memory Boundary
+Every counted evidence origin must be visible and traceable to the relevant claim. A PASS count may not exceed visibly traceable independent evidence origins.
 
-Custom GPT conversations do not use previous GPT conversations, saved memory, or user custom instructions as workflow state.
+## 5. Critic and Revision Contract
 
-The Store edition therefore uses conversation-local state plus explicit checkpoint/recovery artifacts for continuity across chats.
+Critic audits:
+
+```text
+source authority
+independence
+freshness
+claim support
+contradictions
+missing topics
+evidence/conclusion consistency
+claim-level cross-check compliance
+evidence-origin traceability
+```
+
+Maximum revision loop: three iterations. Unresolved problems finish as `COMPLETED_WITH_LIMITATIONS`.
+
+## 6. Language Contract
+
+Default user-facing language is Ukrainian unless explicitly changed by the user.
+
+For Ukrainian reports use, where applicable:
+
+```text
+ФІНАЛЬНИЙ ЗВІТ
+ПЕРЕВІРКА ТВЕРДЖЕНЬ
+ПРОТОКОЛ ПЕРЕВІРКИ
+ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ
+Твердження | Потрібно | Отримано незалежних | Виняток
+```
+
+CriticProfile field labels also follow the selected report language. Raw canonical keys remain internal unless explicitly requested.
+
+## 7. Persistence and Memory Boundary
+
+The public Core uses conversation-local workflow state plus explicit checkpoint/recovery artifacts when requested.
 
 Checkpoint marker:
 
@@ -96,98 +129,40 @@ Checkpoint marker:
 K_SUPERVISOR_CHECKPOINT
 ```
 
-Checkpoint schema version:
+Schema version remains `1.0`.
+
+Checkpoint creation is explicit-request only. Normal profile gates and final reports do not auto-create checkpoints.
+
+The SQLite persistence layer remains part of the optional standalone engineering runtime and is not required by the public GPT Store path.
+
+## 8. Public Core Runtime Acceptance
+
+The actual public Builder was manually synchronized and revalidated in NEW chats on 2026-08-23.
+
+Accepted runtime results:
 
 ```text
-1.0
+two-stage CriticProfile gate                 PASS
+CRITICAL -> minimum 3 independent checks     PASS
+claim-level PASS / SHORTFALL                  PASS
+evidence-origin traceability                 PASS
+derivative double-counting protection        PASS
+Critic REVISE -> PASS                        PASS
+Ukrainian headings/table/profile labels      PASS
 ```
 
-Only safe orchestration boundaries may be checkpointed. Ambiguous mid-agent states are not replayed automatically.
-
-The existing SQLite persistence layer remains part of the optional standalone/API edition and local engineering/test environment.
-
-## 7. Optional Standalone/API Edition
-
-The repository and standalone engineering core retain the stable technical identifier `K_Supervisor`.
-
-The existing Python runtime is retained as an optional deployment profile:
+Manifest records:
 
 ```text
-K_Supervisor Core
-  |
-  +-- GPT Store Edition       PRIMARY
-  |     - public name: K-Research & Critic
-  |     - ChatGPT-managed model
-  |     - no developer API key
-  |     - no mandatory backend
-  |
-  +-- Standalone/API Edition  OPTIONAL
-        - Python runtime
-        - SQLite persistence
-        - provider factory
-        - provider API keys when required
+latest_core_runtime_regression_passed_at: 2026-08-23
+criticprofile_two_stage_gate_runtime_accepted: true
+cross_check_claim_level_runtime_accepted: true
+cross_check_traceability_runtime_accepted: true
+report_label_localization_runtime_accepted: true
+repository_matches_current_public_builder: true
 ```
 
-The OpenAI provider adapter implemented in Phase 11.3 remains an optional adapter for standalone/server execution, development, integration testing, and future external products.
-
-## 8. Architecture Invariants
-
-Both editions preserve:
-
-- Supervisor orchestration semantics;
-- explicit CriticProfile user approval;
-- approved profile immutability;
-- Research-Critic revision loop;
-- evidence and source discipline;
-- PASS/REVISE separation from execution status;
-- explicit failure/limitation states;
-- no hidden chain-of-thought persistence.
-
-The Store Edition implements Research and Critic as separated logical passes inside one ChatGPT runtime. It does not claim process-isolated or model-isolated agent instances.
-
-Deployment-specific infrastructure must not change the workflow contracts.
-
-## 9. Publication Requirements
-
-Before GPT Store publication:
-
-- use the approved manifest and instruction package;
-- enable Web search and Code Interpreter & Data Analysis;
-- keep Apps and Actions disabled for the core package;
-- leave Recommended model unset;
-- do not require an external backend for the free core experience;
-- run the GPT Builder Preview test matrix;
-- verify the workflow on a Free account and at least one paid account;
-- verify that model switching does not break workflow semantics;
-- verify fresh-chat behavior and checkpoint recovery;
-- complete Builder Profile/category/policy requirements when prompted;
-- review current OpenAI GPT Store publication requirements immediately before release.
-
-Actual Store publication and live plan-account validation are manual release operations. Repository CI cannot substitute for those ChatGPT UI/account checks.
-
-## 10. Platform Assumptions
-
-Platform assumptions were re-verified on 2026-08-13 against current OpenAI Help Center documentation:
-
-```text
-https://help.openai.com/en/articles/8554407-gpts-in-chatgpt
-https://help.openai.com/en/articles/8554397-create-a-gpt
-https://help.openai.com/en/articles/8798878
-```
-
-Current relevant facts include:
-
-- signed-in users can use GPTs they have access to;
-- creating/editing GPTs requires an eligible paid plan and is performed on the web;
-- Recommended model is optional and users may switch when additional models are available;
-- public Store publishing can require Builder Profile/category/policy checks;
-- public Actions require a valid Privacy Policy URL;
-- GPT builders cannot view individual user conversations;
-- GPTs start fresh across separate conversations and do not use saved memory, custom instructions, or previous GPT conversations.
-
-OpenAI may change plan availability, model names, model picker behavior, capabilities, or GPT Store rules. These platform facts must be re-verified immediately before public release.
-
-## 11. Validation
+## 9. Validation
 
 Static package validation:
 
@@ -196,12 +171,24 @@ python -m scripts.validate_store_package
 python -m pytest
 ```
 
-Phase 11.7 implementation validation:
+Repository CI is configured on both push and pull_request and also runs dependency integrity, Ruff correctness, Mypy typed-boundary checks, repository policy validation and coverage.
+
+## 10. Publication Boundary
+
+The product remains published. Manual Builder synchronization is the actual deployment step for instruction changes; GitHub commits do not automatically update the Custom GPT.
+
+Any future public Builder change must be:
 
 ```text
-Validated head: fb0d84468dddab88f15f425fda217cbabe1b057f
-GitHub Actions: 31666028204
-156 tests passed
+implemented in repository
+statically validated
+manually synchronized to Builder
+validated in a NEW chat
+recorded as the new public baseline
 ```
 
-Manual publication/Free-plan/paid-model-switch tests remain release gates and are intentionally not represented as completed repository CI checks.
+The public Core currently has no Actions or mandatory external backend. Any future request-accounting feature that requires either is a separate architecture/privacy decision and must not be introduced implicitly.
+
+## 11. Optional Standalone Runtime
+
+The Python/provider runtime remains an optional engineering/reference implementation with stable legacy identifiers. It does not define the public Builder behavior unless explicitly synchronized through the public package contract.
