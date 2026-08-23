@@ -1,7 +1,7 @@
 # ROADMAP
 План завершеного розвитку K-Research & Critic та межі подальшого maintenance.
 
-Version: 1.9
+Version: 1.10
 Status: MAINTENANCE
 Updated: 2026-08-23
 
@@ -110,7 +110,7 @@ maintenance releases v1.0.x
 
 ## 8.1 Narrow Product Improvement - Request Accounting MVP
 
-Status: IMPLEMENTED PACKAGE / GOOGLE SHEET CREATED / APPS SCRIPT DEPLOYMENT AND BUILDER WIRING PENDING
+Status: APPS SCRIPT DEPLOYED / BUILDER WIRING AND RUNTIME ACCEPTANCE PENDING
 
 Approved architecture:
 
@@ -161,16 +161,25 @@ docs/REQUEST_LOG_MVP.md
 docs/PRIVACY_POLICY_REQUEST_LOG.md
 ```
 
-Remaining activation steps:
-1. paste `Code.gs` into the target Sheet's Apps Script project;
-2. deploy as Web App, execute as owner, access `Anyone`;
-3. place the deployment ID into `openapi.yaml`;
-4. configure the Action in the public GPT Builder with Authentication=None;
-5. set the public Privacy Policy URL;
-6. merge the request-log addendum into Builder Instructions;
-7. run a fresh-chat smoke test and confirm exactly one row per new substantive research request.
+Deployment:
 
-The currently published GPT is unchanged until those Builder steps are completed.
+```text
+Apps Script Web App: DEPLOYED
+Authentication: none
+Execute as: owner
+Access: Anyone
+Deployment time: 2026-08-23 16:40 Europe/Kyiv
+OpenAPI deployment endpoint: CONFIGURED
+```
+
+Remaining activation steps:
+1. configure the Action in the public GPT Builder with Authentication=None using `integrations/request_log/openapi.yaml`;
+2. set the public Privacy Policy URL;
+3. merge `prompts/GPT_STORE_REQUEST_LOG_ADDENDUM.md` into Builder Instructions;
+4. run a fresh-chat smoke test and confirm exactly one row per new substantive research request;
+5. after PASS, mark `capabilities.actions=true`, Builder/runtime acceptance true, and revalidate the public package.
+
+The currently published GPT remains unchanged until the Builder steps are completed.
 
 ## 9. Modular Agent Platform Transfer
 
@@ -210,7 +219,8 @@ GPT Store publication                   COMPLETE
 GitHub main / public Builder Core sync   COMPLETE
 Request-log Google Sheet                CREATED
 Request-log repository package          IMPLEMENTED
-Apps Script Web App deployment          PENDING MANUAL GOOGLE STEP
+Apps Script Web App deployment          COMPLETE
+OpenAPI endpoint configuration          COMPLETE
 Public GPT Action wiring                PENDING MANUAL BUILDER STEP
 Request-log runtime acceptance          PENDING
 Future Modular Agent Platform           MOVED TO K_Supervisor
