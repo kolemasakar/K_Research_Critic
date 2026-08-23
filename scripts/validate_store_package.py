@@ -164,7 +164,7 @@ def validate_store_package(root: Path = ROOT) -> dict:
 
 def validate_media_beta_package(root: Path = ROOT) -> dict:
     manifest = _load_yaml(root / "gpt_store" / "media_beta_manifest.yaml", "media beta manifest")
-    _require(manifest.get("schema_version") == "0.5-beta", "media beta schema_version must be 0.5-beta")
+    _require(manifest.get("schema_version") == "0.6-beta", "media beta schema_version must be 0.6-beta")
 
     product = _mapping(manifest, "product")
     capabilities = _mapping(manifest, "capabilities")
@@ -174,8 +174,8 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     release = _mapping(manifest, "release")
 
     _require(product.get("name") == "K-Research & Critic - MEDIA BETA", "media beta product name must remain isolated")
-    _require(product.get("publication_state") == "private_owner_only", "A9.5 media beta must remain private owner-only")
-    _require(product.get("primary_channel") == "chatgpt_private_beta", "A9.5 media beta channel must remain private")
+    _require(product.get("publication_state") == "private_owner_only", "MEDIA BETA must remain private owner-only")
+    _require(product.get("primary_channel") == "chatgpt_private_beta", "MEDIA BETA channel must remain private")
     _require(product.get("default_language") == "uk-UA", "media beta default language must remain Ukrainian")
 
     _require(capabilities.get("web_search") is True, "private media beta requires web search")
@@ -184,27 +184,36 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(capabilities.get("actions") is True, "private media beta requires Actions")
     _require(capabilities.get("apps") is False, "private media beta must not require Apps")
 
-    _require(instructions.get("version") == "0.5-beta-a9.5", "A9.5 instruction version must be 0.5-beta-a9.5")
+    _require(instructions.get("version") == "0.6-beta-a9.6", "A9.6 instruction version must be 0.6-beta-a9.6")
     _require(instructions.get("builder_character_limit") == 8000, "Builder instruction limit must remain 8000")
     _require(instructions.get("canonical_reference") == "prompts/GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md", "managed instruction file must be canonical")
+    _require(instructions.get("default_report_language") == "uk-UA", "default report language must remain uk-UA")
+    _require(instructions.get("report_language_follows_source_language") is False, "source language must not control report language")
+    _require(instructions.get("verdict_labels_localized_to_report_language") is True, "verdicts must be localized to report language")
 
-    _require(beta.get("access_model") == "private_gpt_action_bearer_plus_server_owner_admission", "A9.5 access model must keep owner admission server-side")
-    _require(beta.get("intended_testers") == 1, "A9.5 private beta must target owner only")
-    _require(beta.get("owner_only") is True, "A9.5 must remain owner-only")
-    _require(beta.get("ingress_mode") == "managed_zero_client", "A9.5 must use managed zero-client ingress")
-    _require(beta.get("browser_helper_required") is False, "normal A9.5 flow must not require Helper")
-    _require(beta.get("browser_helper_normal_flow_allowed") is False, "normal A9.5 flow must not use Helper")
+    _require(beta.get("access_model") == "private_gpt_action_bearer_plus_server_owner_admission", "access model must keep owner admission server-side")
+    _require(beta.get("intended_testers") == 1, "private beta must target owner only")
+    _require(beta.get("owner_only") is True, "MEDIA BETA must remain owner-only")
+    _require(beta.get("ingress_mode") == "managed_zero_client", "MEDIA BETA must use managed zero-client ingress")
+    _require(beta.get("browser_helper_required") is False, "normal flow must not require Helper")
+    _require(beta.get("browser_helper_normal_flow_allowed") is False, "normal flow must not use Helper")
     _require(beta.get("browser_assisted_a8_fallback_preserved") is True, "A8 fallback evidence must remain preserved")
     _require(beta.get("managed_job_prefix") == "KRCM_", "managed jobs must use KRCM_ prefix")
-    _require(beta.get("public_platforms_live_accepted") == ["youtube"], "only YouTube may be declared live accepted")
+    _require(beta.get("public_platforms_live_accepted") == ["youtube", "instagram"], "YouTube and Instagram must be declared live accepted")
+    _require(beta.get("public_platforms_in_progress") == ["facebook"], "Facebook must remain in progress")
+    _require(beta.get("public_platforms_not_started") == ["telegram"], "Telegram must remain not started")
+    _require(beta.get("local_upload_live_accepted") is False, "local upload must remain unaccepted")
     _require(beta.get("max_video_seconds") == 3600, "media beta max video must remain 60 minutes")
-    _require(beta.get("managed_provider") == "supadata", "A9.5 managed provider must remain Supadata")
-    _require(beta.get("managed_provider_mode") == "native", "A9.5 managed mode must remain native")
+    _require(beta.get("managed_provider") == "supadata", "managed provider must remain Supadata")
+    _require(beta.get("managed_provider_mode") == "native_first", "managed mode must remain native-first")
     _require(beta.get("managed_native_credit_cost") == 1, "native managed cost must remain one credit")
     _require(beta.get("managed_credit_preflight_required") is True, "credit preflight must remain mandatory")
     _require(beta.get("managed_explicit_user_consent_required") is True, "explicit user credit consent must remain mandatory")
     _require(beta.get("managed_automatic_ai_fallback") is False, "automatic managed AI fallback must remain disabled")
     _require(beta.get("managed_ai_requires_second_consent") is True, "AI fallback must require second consent")
+    _require(beta.get("managed_instagram_ai_fallback_live_accepted") is True, "Instagram AI fallback must be live accepted")
+    _require(beta.get("managed_instagram_ai_rate_credits_per_minute") == 2, "Instagram AI rate must remain 2 credits/min")
+    _require(beta.get("managed_instagram_ai_hard_cap_credits") == 40, "Instagram AI consent cap must remain 40 credits")
     _require(beta.get("managed_user_beta_access_code_required") is False, "owner must not be asked for a beta code")
     _require(beta.get("managed_owner_access_injected_server_side") is True, "owner admission must be injected server-side")
     _require(beta.get("managed_durable_store") == "postgres", "managed store must remain Postgres")
@@ -217,14 +226,17 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(legacy.get("stt_endpoint") == MEDIA_BETA_ASSEMBLYAI_EU, "A8 fallback STT endpoint must remain AssemblyAI EU")
     _require(legacy.get("status") == "A8_ACCEPTED_FALLBACK_ONLY", "A8 must be fallback only")
 
-    _require(release.get("rollout_state") == "A9_5_PACKAGE_READY_FOR_PRIVATE_GPT", "A9.5 package must be ready for private GPT integration")
+    _require(release.get("rollout_state") == "A9_6_INSTAGRAM_COMPLETE_FACEBOOK_IN_PROGRESS", "rollout state must match A9.6 checkpoint")
     _require(release.get("production_core_unchanged") is True, "private beta must preserve production core")
     _require(release.get("public_store_gpt_unchanged") is True, "private beta must not modify public GPT")
     _require(release.get("user_api_key_required") is False, "private beta must not request user API keys")
     _require(release.get("user_beta_access_code_required") is False, "private owner flow must not request beta access code")
     _require(release.get("a9_2r_managed_native_complete") is True, "A9.2R must remain complete")
     _require(release.get("a9_3_durable_managed_complete") is True, "A9.3 must remain complete")
-    _require(release.get("a9_5_private_gpt_integration_complete") is False, "A9.5 live acceptance must not be pre-declared")
+    _require(release.get("a9_5_private_gpt_integration_complete") is True, "A9.5 private GPT integration must remain complete")
+    _require(release.get("a9_8_owner_zero_client_acceptance_complete") is True, "YouTube owner zero-client acceptance must remain complete")
+    _require(release.get("a9_6_instagram_managed_complete") is True, "Instagram managed path must remain complete")
+    _require(release.get("a9_6_facebook_complete") is False, "Facebook must not be pre-declared complete")
     _require(release.get("external_tester_rollout_paused") is True, "external tester rollout must remain paused")
     _require(release.get("merge_to_public_product_allowed") is False, "private beta must not auto-promote to public product")
 
@@ -239,11 +251,15 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
         builder_text,
         [
             "K-Research & Critic - MEDIA BETA",
+            "REPORT LANGUAGE INVARIANT",
+            "Source/transcript language never controls report language",
             "OWNER-ONLY ZERO-CLIENT MEDIA",
             "preflightManagedMediaCredits",
             "startManagedMediaNativeTranscription",
             "getManagedMediaTranscriptionStatus",
             "getManagedMediaTranscriptSegments",
+            "preflightManagedMediaAiCredits",
+            "startManagedMediaAiTranscription",
             "Do NOT ask the user for beta access code",
             "Do not expose `KRCM_...` Job IDs",
             "Do not fall back to Helper in the normal owner flow",
@@ -253,7 +269,7 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
             "credit_charge_uncertain=true",
             "1=APPROVE, 2=EDIT, 3=REJECT",
         ],
-        "A9.5 Builder instructions",
+        "A9.6 Builder instructions",
     )
 
     action_path = root / str(media_action.get("schema", ""))
@@ -266,23 +282,26 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require_tokens(
         action_text,
         [
-            "version: 0.2.2-a9.5",
+            "version: 0.3.0-a9.6",
             "operationId: preflightManagedMediaCredits",
             "operationId: startManagedMediaNativeTranscription",
             "operationId: getManagedMediaTranscriptionStatus",
             "operationId: getManagedMediaTranscriptSegments",
+            "operationId: preflightManagedMediaAiCredits",
+            "operationId: startManagedMediaAiTranscription",
             "x-openai-isConsequential: true",
             "const: supadata",
             "const: native",
+            "const: generate",
             "maximum: 1",
             "PROCESSING, COMPLETED, AWAITING_AI_CONSENT, FAILED",
             "credit_charge_uncertain",
             "reused",
             "bearerAuth",
         ],
-        "A9.5 managed Action schema",
+        "A9.6 managed Action schema",
     )
-    _require("beta_access_code" not in action_text, "A9.5 user-facing Action schema must not expose beta_access_code")
+    _require("beta_access_code" not in action_text, "user-facing Action schema must not expose beta_access_code")
 
     privacy_path = root / str(media_action.get("privacy_policy_document", ""))
     privacy_text = privacy_path.read_text(encoding="utf-8")
