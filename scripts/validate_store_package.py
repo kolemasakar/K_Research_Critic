@@ -68,19 +68,39 @@ def validate_store_package(root: Path = ROOT) -> dict:
     _require(release.get("cross_check_traceability_runtime_accepted") is True, "traceability runtime must be accepted")
     _require(release.get("report_label_localization_runtime_accepted") is True, "report-label localization runtime must be accepted")
     _require(release.get("request_log_runtime_accepted") is True, "historical request-log runtime acceptance must be preserved")
-    _require(release.get("request_log_public_enabled") is False, "request log must be disabled for public target")
-    _require(release.get("repository_matches_current_public_builder") is False, "Builder sync must remain pending until manual Action removal")
+    _require(release.get("request_log_public_enabled") is False, "request log must be disabled for public runtime")
+    _require(
+        release.get("request_log_disablement_runtime_accepted") is True,
+        "request-log disablement runtime must be accepted",
+    )
+    _require(
+        release.get("repository_matches_current_public_builder") is True,
+        "repository must match the current accepted public Builder",
+    )
 
     _require(
-        request_log.get("status") == "DISABLED_DUE_TO_USER_CONSENT_UX_PENDING_BUILDER_SYNC",
-        "request-log status must record consent-UX disablement",
+        request_log.get("status") == "DISABLED_DUE_TO_USER_CONSENT_UX_RUNTIME_ACCEPTED",
+        "request-log status must record accepted consent-UX disablement",
     )
-    _require(request_log.get("public_enabled_target") is False, "request-log public target must be disabled")
+    _require(request_log.get("public_enabled_target") is False, "request-log public runtime must be disabled")
     _require(request_log.get("prototype_retained") is True, "tested request-log prototype must be retained")
     _require(request_log.get("historical_runtime_acceptance_preserved") is True, "historical acceptance must be preserved")
     _require(request_log.get("full_prompt_storage") is False, "request-log prototype must not store full prompts")
-    _require(request_log.get("builder_action_disable_pending_manual_step") is True, "manual Builder Action removal must remain pending")
+    _require(request_log.get("builder_action_currently_configured") is False, "public Builder Action must be absent")
+    _require(
+        request_log.get("builder_action_disable_pending_manual_step") is False,
+        "Builder Action disablement must no longer be pending",
+    )
     _require(request_log.get("runtime_accepted") is True, "historical runtime acceptance must remain recorded")
+    _require(
+        request_log.get("builder_instructions_synced_after_disablement") is True,
+        "Builder instructions must be synchronized after disablement",
+    )
+    _require(request_log.get("public_gpt_updated_after_disablement") is True, "public GPT must be updated after disablement")
+    _require(request_log.get("disablement_new_chat_test_passed") is True, "post-disable NEW-chat test must pass")
+    _require(request_log.get("disablement_consent_screen_absent") is True, "post-disable consent screen must be absent")
+    _require(request_log.get("disablement_criticprofile_gate_direct") is True, "CriticProfile gate must appear directly")
+    _require(request_log.get("disablement_runtime_accepted") is True, "disablement runtime must be accepted")
 
     _require(instructions.get("builder_character_limit") == 8000, "Builder character limit must be 8000")
     _require(instructions.get("default_report_language") == "uk-UA", "default report language must be uk-UA")
