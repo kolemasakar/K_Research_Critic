@@ -8,23 +8,23 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_a9_7_i_builder_package_is_ready_but_not_runtime_applied() -> None:
+def test_a9_7_i_builder_package_is_applied_but_e2e_pending() -> None:
     manifest = yaml.safe_load(
         (ROOT / "gpt_store" / "media_beta_manifest.yaml").read_text(encoding="utf-8")
     )
     instructions = manifest["instructions"]
     release = manifest["release"]
 
-    assert instructions["version"] == "0.6-beta-a9.6"
+    assert instructions["version"] == "0.7-beta-a9.7-i"
     assert instructions["builder_package_version"] == "0.7-beta-a9.7-i"
     assert instructions["builder_target_action_schema_version"] == "0.4.0-a9.7-c"
     assert instructions["builder_package_ready"] is True
-    assert instructions["builder_runtime_applied"] is False
+    assert instructions["builder_runtime_applied"] is True
 
     assert release["a9_7_i_builder_package_ready"] is True
-    assert release["a9_7_i_builder_runtime_applied"] is False
+    assert release["a9_7_i_builder_runtime_applied"] is True
     assert release["a9_7_i_private_gpt_e2e_complete"] is False
-    assert release["gpt_builder_private_update_required"] is True
+    assert release["gpt_builder_private_update_required"] is False
 
 
 def test_a9_7_i_builder_contains_facebook_free_and_paid_gate_contracts() -> None:
