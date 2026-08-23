@@ -21,7 +21,7 @@ capabilities:
   code_interpreter_data_analysis: true
   image_generation: false
   apps: false
-  actions: false
+  actions: true
 
 knowledge:
   required: false
@@ -29,7 +29,7 @@ knowledge:
 
 instructions:
   file: prompts/GPT_STORE_INSTRUCTIONS.md
-  version: "2.1-request-log-mvp-prepublish"
+  version: "2.1-request-log-mvp-runtime-accepted"
   builder_character_limit: 8000
   default_report_language: uk-UA
   report_language_follows_source_language: false
@@ -70,7 +70,7 @@ checkpoint:
   example: gpt_store/checkpoint_example.json
 
 request_log_mvp:
-  status: BUILDER_ACTION_WRITE_TEST_PASSED_PENDING_INSTRUCTIONS_SYNC_AND_PUBLIC_UPDATE
+  status: RUNTIME_ACCEPTED
   selected_storage: google_sheets
   spreadsheet_id: 1icDvAkPx43s7568iZkANBCriz8UaanB4kMITO-icLaU
   sheet_name: Звернення
@@ -94,7 +94,14 @@ request_log_mvp:
   google_sheet_write_test_passed: true
   write_test_request_number: 1
   write_tested_at: "2026-08-23T17:45:37+03:00"
-  runtime_accepted: false
+  public_builder_instructions_synced: true
+  public_gpt_updated: true
+  runtime_new_chat_test_passed: true
+  runtime_request_number: 2
+  runtime_request_topic: Вплив регулярних прогулянок на якість сну
+  workflow_reply_dedup_verified: true
+  runtime_accepted: true
+  runtime_accepted_at: "2026-08-23T17:58:00+03:00"
 
 conversation_starters:
   - "Досліди цю тему та спочатку сформуй CriticProfile для мого погодження."
@@ -110,7 +117,7 @@ release:
   free_user_compatible: true
   developer_api_key_required: false
   external_backend_required: false
-  privacy_policy_url_required_by_package: false
+  privacy_policy_url_required_by_package: true
   live_free_plan_test_required: true
   live_paid_plan_model_switch_test_required: true
   public_publish_is_manual: true
@@ -121,4 +128,5 @@ release:
   cross_check_claim_level_runtime_accepted: true
   cross_check_traceability_runtime_accepted: true
   report_label_localization_runtime_accepted: true
-  repository_matches_current_public_builder: false
+  request_log_runtime_accepted: true
+  repository_matches_current_public_builder: true
