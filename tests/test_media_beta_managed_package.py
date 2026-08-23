@@ -55,21 +55,34 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
         "HIGH": 2,
         "CRITICAL": 3,
     }
-    assert manifest["beta"]["ingress_mode"] == "managed_zero_client"
-    assert manifest["beta"]["browser_helper_required"] is False
-    assert manifest["beta"]["managed_job_prefix"] == "KRCM_"
-    assert manifest["beta"]["managed_credit_preflight_required"] is True
-    assert manifest["beta"]["managed_explicit_user_consent_required"] is True
-    assert manifest["beta"]["managed_automatic_ai_fallback"] is False
-    assert manifest["beta"]["managed_user_beta_access_code_required"] is False
-    assert manifest["beta"]["public_platforms_live_accepted"] == ["youtube", "instagram"]
-    assert manifest["beta"]["managed_instagram_ai_fallback_live_accepted"] is True
+    beta = manifest["beta"]
+    assert beta["ingress_mode"] == "managed_zero_client"
+    assert beta["browser_helper_required"] is False
+    assert beta["managed_job_prefix"] == "KRCM_"
+    assert beta["managed_credit_preflight_required"] is True
+    assert beta["managed_explicit_user_consent_required"] is True
+    assert beta["managed_automatic_ai_fallback"] is False
+    assert beta["managed_user_beta_access_code_required"] is False
+    assert beta["public_platforms_live_accepted"] == ["youtube", "instagram"]
+    assert beta["public_platforms_in_progress"] == ["facebook"]
+    assert beta["managed_instagram_ai_fallback_live_accepted"] is True
+    assert beta["managed_facebook_retrieval_stt_code_ready"] is True
+    assert beta["managed_facebook_free_retrieval_provider"] == "cobalt"
+    assert beta["managed_facebook_paid_retrieval_provider"] == "scrapecreators"
+    assert beta["managed_facebook_paid_retrieval_max_credits"] == 1
+    assert beta["managed_facebook_paid_retrieval_requires_separate_consent"] is True
+    assert beta["managed_facebook_automatic_paid_retrieval"] is False
+    assert beta["managed_facebook_stt_provider"] == "assemblyai"
+    assert beta["managed_facebook_live_accepted"] is False
+
     release = manifest["release"]
     assert release["a9_3_durable_managed_complete"] is True
     assert release["a9_5_private_gpt_integration_complete"] is True
     assert release["a9_8_owner_zero_client_acceptance_complete"] is True
     assert release["a9_6_instagram_managed_complete"] is True
     assert release["a9_6_facebook_complete"] is False
+    assert release["a9_7_c_facebook_runtime_code_ready"] is True
+    assert release["a9_7_c_facebook_live_acceptance_complete"] is False
     assert release["criticprofile_gate_runtime_accepted"] is True
     assert release["cross_check_enforcement_hardened"] is True
     assert release["cross_check_claim_level_enforcement_hardened"] is True
@@ -78,7 +91,7 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert release["cross_check_traceability_runtime_accepted"] is True
     assert release["report_label_localization_hardened"] is True
     assert release["report_label_localization_runtime_accepted"] is True
-    assert release["gpt_builder_private_update_required"] is False
+    assert release["gpt_builder_private_update_required"] is True
 
 
 def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates() -> None:
@@ -90,19 +103,42 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates(
     paths = schema["paths"]
 
     assert set(paths) == {
+        "/api/v1/media/managed",
         "/api/v1/media/managed/preflight",
         "/api/v1/media/managed/transcriptions",
+        "/api/v1/media/managed/facebook-fallback",
         "/api/v1/media/managed/transcriptions/{job_id}",
         "/api/v1/media/managed/transcriptions/{job_id}/segments",
+        "/api/v1/media/managed/transcriptions/{job_id}/facebook-retrieval-preflight",
+        "/api/v1/media/managed/transcriptions/{job_id}/facebook-retrieval",
         "/api/v1/media/managed/transcriptions/{job_id}/ai-preflight",
         "/api/v1/media/managed/transcriptions/{job_id}/ai",
     }
+    assert paths["/api/v1/media/managed"]["get"]["operationId"] == (
+        "getManagedMediaCapability"
+    )
     assert paths["/api/v1/media/managed/preflight"]["post"]["operationId"] == (
         "preflightManagedMediaCredits"
     )
     start = paths["/api/v1/media/managed/transcriptions"]["post"]
     assert start["operationId"] == "startManagedMediaNativeTranscription"
     assert start["x-openai-isConsequential"] is True
+
+    facebook_free = paths["/api/v1/media/managed/facebook-fallback"]["post"]
+    assert facebook_free["operationId"] == "startManagedFacebookFallback"
+    assert facebook_free["x-openai-isConsequential"] is False
+
+    retrieval_preflight = paths[
+        "/api/v1/media/managed/transcriptions/{job_id}/facebook-retrieval-preflight"
+    ]["get"]
+    assert retrieval_preflight["operationId"] == "preflightManagedFacebookRetrievalCredit"
+    assert retrieval_preflight["x-openai-isConsequential"] is False
+
+    retrieval_start = paths[
+        "/api/v1/media/managed/transcriptions/{job_id}/facebook-retrieval"
+    ]["post"]
+    assert retrieval_start["operationId"] == "continueManagedFacebookPaidRetrieval"
+    assert retrieval_start["x-openai-isConsequential"] is True
 
     ai_preflight = paths[
         "/api/v1/media/managed/transcriptions/{job_id}/ai-preflight"
@@ -117,19 +153,22 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates(
     job_operations = [
         paths["/api/v1/media/managed/transcriptions/{job_id}"]["get"],
         paths["/api/v1/media/managed/transcriptions/{job_id}/segments"]["get"],
+        retrieval_preflight,
+        retrieval_start,
         ai_preflight,
         ai_start,
     ]
     for operation in job_operations:
-        parameter = operation["parameters"][0]
-        assert "$ref" not in parameter
-        assert parameter["name"] == "job_id"
-        assert parameter["in"] == "path"
-        assert parameter["required"] is True
+        assert operation["parameters"][0] == {"$ref": "#/components/parameters/JobId"}
 
     preflight = schema["components"]["schemas"]["PreflightRequest"]
     assert preflight["required"] == ["url"]
     assert "beta_access_code" not in preflight["properties"]
+
+    facebook_request = schema["components"]["schemas"]["FacebookFallbackRequest"]
+    assert facebook_request["required"] == ["url"]
+    assert "credit_consent" not in facebook_request["properties"]
+    assert "beta_access_code" not in facebook_request["properties"]
 
     native = schema["components"]["schemas"]["NativeTranscriptRequest"]
     assert native["type"] == "object"
@@ -139,7 +178,26 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates(
     native_consent = native["properties"]["credit_consent"]["properties"]
     assert native_consent["provider"]["const"] == "supadata"
     assert native_consent["mode"]["const"] == "native"
-    assert native_consent["max_credits"]["const"] == 1
+    assert native_consent["max_credits"]["minimum"] == 1
+    assert native_consent["max_credits"]["maximum"] == 1
+
+    retrieval_request = schema["components"]["schemas"]["FacebookRetrievalConsentRequest"]
+    assert retrieval_request["required"] == ["credit_consent"]
+    retrieval_consent = retrieval_request["properties"]["credit_consent"]["properties"]
+    assert retrieval_consent["provider"]["const"] == "scrapecreators"
+    assert retrieval_consent["mode"]["const"] == "facebook_post"
+    assert retrieval_consent["max_credits"]["minimum"] == 1
+    assert retrieval_consent["max_credits"]["maximum"] == 1
+
+    retrieval_quote = schema["components"]["schemas"][
+        "FacebookRetrievalCreditPreflight"
+    ]["properties"]
+    assert retrieval_quote["provider"]["const"] == "scrapecreators"
+    assert retrieval_quote["mode"]["const"] == "facebook_post"
+    assert retrieval_quote["estimated_credits"]["const"] == 1
+    assert retrieval_quote["maximum_credits"]["const"] == 1
+    assert retrieval_quote["provider_balance_lookup_performed"]["const"] is False
+    assert retrieval_quote["consent_required"]["const"] is True
 
     ai_request = schema["components"]["schemas"]["AiTranscriptRequest"]
     assert ai_request["type"] == "object"
@@ -152,14 +210,28 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates(
     assert ai_consent["max_credits"]["const"] == 40
 
     ai_quote = schema["components"]["schemas"]["AiCreditPreflight"]["properties"]
-    assert ai_quote["estimated_credits"]["const"] == 40
-    assert ai_quote["maximum_credits"]["const"] == 40
-    assert ai_quote["credits_per_minute"]["const"] == 2
-    assert ai_quote["maximum_duration_minutes"]["const"] == 20
-    assert ai_quote["conservative_maximum"]["const"] is True
+    assert ai_quote["estimated_credits"]["minimum"] == 1
+    assert ai_quote["maximum_credits"]["minimum"] == 1
+    assert ai_quote["credits_per_minute"]["minimum"] == 0
+    assert ai_quote["maximum_duration_minutes"]["minimum"] == 0
+    assert "const" not in ai_quote["estimated_credits"]
+    assert "const" not in ai_quote["maximum_credits"]
 
     job = schema["components"]["schemas"]["ManagedJob"]["properties"]
-    assert set(job["provider_mode"]["enum"]) == {"native", "generate"}
+    assert set(job["status"]["enum"]) == {
+        "PROCESSING",
+        "COMPLETED",
+        "AWAITING_AI_CONSENT",
+        "AWAITING_RETRIEVAL_CONSENT",
+        "FAILED",
+    }
+    assert set(job["provider_mode"]["enum"]) == {
+        "native",
+        "generate",
+        "facebook_retrieval_stt",
+    }
+    retrieval_provider = job["retrieval_provider"]["anyOf"][0]
+    assert set(retrieval_provider["enum"]) == {"cobalt", "scrapecreators"}
 
 
 def test_private_builder_instructions_fit_limit_and_use_two_stage_profile_gate() -> None:
