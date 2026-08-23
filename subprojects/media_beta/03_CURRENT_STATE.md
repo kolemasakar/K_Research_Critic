@@ -2,7 +2,7 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 4.9
+Version: 5.0
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-23
 
@@ -21,7 +21,9 @@ Not accepted yet:
 - Telegram public video posts;
 - local audio/video attachment.
 
-Repository `main`, external tester rollout, and production VoiceBridge remain outside the current merge gate. The actual main `K-Research & Critic` Builder has been manually synchronized with a Core candidate, but the latest traceability hardening still requires another manual synchronization and runtime regression.
+Repository `main`, external tester rollout, and production VoiceBridge remain outside the current merge gate.
+
+The actual main `K-Research & Critic` Builder has now been manually synchronized with the hardened clean Core candidate and passed the final NEW-chat runtime regression for CriticProfile gating, claim-level cross-check enforcement, evidence-origin traceability, and mandatory protocol summary.
 
 ## Repositories and isolation boundary
 
@@ -99,7 +101,7 @@ Observed PASS sequence:
 
 Canonical record: `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md`.
 
-## Claim-level cross-check enforcement
+## MEDIA BETA claim-level cross-check enforcement
 
 Status: PASS / RUNTIME_ACCEPTED_PRIVATE_OWNER_BETA.
 
@@ -128,38 +130,40 @@ Canonical runtime record: `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md`.
 
 `cross_check_claim_level_runtime_accepted=true` for MEDIA BETA.
 
-## Core GPT improvement track
+## Main Core GPT runtime acceptance
 
-Status: `CORE_CLAIM_LEVEL_ENFORCEMENT_RUNTIME = PASS_WITH_REQUIRED_FIX`.
+Status: PASS / RUNTIME_ACCEPTED_MAIN_CORE.
 
-The main `K-Research & Critic` was manually synchronized with the first clean Core Builder candidate and tested in a new chat using the cold-shower CRITICAL medical query.
+The main `K-Research & Critic` was manually synchronized with the hardened clean Core Builder and retested in a NEW chat using the cold-shower CRITICAL medical query.
 
-Observed successful behavior:
-- two-stage gate worked in the new-version chat;
+Accepted behavior:
+- two-stage CriticProfile gate worked on the current GPT version;
 - `risk_level=CRITICAL`;
 - `required_cross_checks=3`;
-- claim-level `PASS` and `SHORTFALL` were shown;
-- a real `1/3 - SHORTFALL` was explained;
-- Critic ran `REVISE -> REVISE -> REVISE`;
-- final status was `COMPLETED_WITH_LIMITATIONS` rather than unconditional PASS.
+- material claims exposed `PASS` or `SHORTFALL` claim-by-claim;
+- `3/3 PASS` values were backed by three named/cited independent evidence origins visible to the user;
+- the 2016 sick-leave result remained `1/3 - SHORTFALL`;
+- a later systematic review repeating the 2016 result was explicitly not counted as a second independent origin;
+- the mandatory claim-level protocol summary table was present and consistent with visible claim blocks;
+- Critic ran `REVISE -> PASS`;
+- final reliability score was `0.88`;
+- remaining evidence scarcity was stated explicitly.
 
-Observed auditability defects:
-- Review Protocol omitted the mandatory per-claim required/achieved/exception summary table;
-- some `3/3` and `4/3` PASS values exceeded the number of independent evidence origins visibly traceable in the report.
+Traceable PASS examples:
+- claim 1: Buijze 2016 + Collier 2015 + El-Ansary 2024 -> `3/3`;
+- claim 2: El-Ansary 2024 + Janský 1996 + Brenner 1999 -> `3/3`;
+- claim 3: Buijze 2016 only -> `1/3 SHORTFALL`.
 
-The branch Core Builder is now hardened with a strict traceability invariant:
-- every counted evidence origin must be user-visible and traceable by title/citation to that claim;
-- achieved count cannot exceed the number of visibly traceable independent origins;
-- a systematic review/meta-analysis counts as one origin unless underlying studies were separately inspected and cited;
-- Critic verifies traceable evidence-origin count before PASS;
-- untraceable PASS count blocks unconditional PASS;
-- Review Protocol MUST include a compact table with columns exactly `Claim | Required | Achieved independent | Exception` for every material factual claim.
+A minor Markdown rendering defect collapsed the visible table header text, but all four logical columns and values were present. This is non-blocking.
 
-Automated implementation/tests passed CI #687 on commit `d838787f3b3040143842e7674a42477e757d26cd`.
+Canonical hardening record: `35_CORE_RUNTIME_TRACEABILITY_HARDENING.md`.
+Canonical runtime acceptance: `36_CORE_TRACEABILITY_RUNTIME_ACCEPTANCE.md`.
 
-Canonical record: `35_CORE_RUNTIME_TRACEABILITY_HARDENING.md`.
+`CORE_CLAIM_LEVEL_ENFORCEMENT_RUNTIME = ACCEPTED`
 
-The currently configured main GPT still has the previous Core candidate. Required next Core step: manually resynchronize `prompts/GPT_STORE_CORE_BUILDER_INSTRUCTIONS.md`, start a NEW chat, rerun the regression, and verify traceable PASS counts plus the mandatory protocol table.
+`CORE_TRACEABILITY_HARDENING_CODE = PASS`
+
+`CORE_TRACEABILITY_HARDENING_RUNTIME = ACCEPTED`
 
 ## A8 browser-assisted baseline
 
@@ -217,14 +221,10 @@ A separately authorized Facebook AI generate request failed with `MANAGED_PROVID
 
 `CLAIM_LEVEL_CROSS_CHECK_RUNTIME = ACCEPTED`
 
-`CORE_TRACEABILITY_HARDENING_CODE = PASS`
-
-`CORE_TRACEABILITY_HARDENING_RUNTIME = PENDING`
+`CORE_TRACEABILITY_HARDENING_RUNTIME = ACCEPTED`
 
 These markers do not authorize repository merge, external testers, production VoiceBridge changes, private/authenticated media, automatic AI fallback, Facebook, Telegram, or local upload.
 
 ## Next task
 
-`Resynchronize the hardened Core Builder into the main K-Research & Critic and run one final NEW-chat regression for evidence-origin traceability and mandatory protocol table.`
-
-After Core traceability runtime PASS, resume A9.6 Facebook remediation without replaying any uncertain-charge operation.
+`Resume A9.6 Facebook remediation without replaying any uncertain-charge operation.`
