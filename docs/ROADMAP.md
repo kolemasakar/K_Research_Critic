@@ -1,7 +1,7 @@
 # ROADMAP
 План завершеного розвитку K-Research & Critic та межі подальшого maintenance.
 
-Version: 1.10
+Version: 1.11
 Status: MAINTENANCE
 Updated: 2026-08-23
 
@@ -78,9 +78,9 @@ Delivered:
 
 ## 7. Current Public Core Runtime Baseline
 
-Status: ACCEPTED / SYNCHRONIZED TO REPOSITORY MAIN
+Status: ACCEPTED / PRE-REQUEST-LOG BASELINE
 
-Accepted runtime behavior:
+Accepted Core behavior remains:
 
 ```text
 two-stage CriticProfile gate                 PASS
@@ -93,6 +93,8 @@ Critic REVISE -> PASS loop                   PASS
 Ukrainian report/profile/table localization  PASS
 COMPLETED_WITH_LIMITATIONS when required     PASS
 ```
+
+The repository now contains the next prepublish Builder instructions with request logging integrated, so `main` is intentionally ahead of the currently published Builder until the manual Builder update is completed.
 
 ## 8. Maintenance Scope
 
@@ -110,7 +112,7 @@ maintenance releases v1.0.x
 
 ## 8.1 Narrow Product Improvement - Request Accounting MVP
 
-Status: APPS SCRIPT DEPLOYED / BUILDER WIRING AND RUNTIME ACCEPTANCE PENDING
+Status: BUILDER ACTION WRITE TEST PASS / INSTRUCTIONS SYNC + PUBLIC UPDATE + NEW-CHAT RUNTIME ACCEPTANCE PENDING
 
 Approved architecture:
 
@@ -142,44 +144,51 @@ Columns:
 
 MVP decisions:
 - authentication: none;
-- `user_name`: always `none` until a separately approved reliable identity mechanism exists;
+- `user_name`: `none` until a separately approved reliable identity mechanism exists;
 - full prompts/conversations are not stored;
 - only a generalized topic up to 160 characters is sent;
 - Apps Script generates sequential number, date and time;
 - Google Sheets is both storage and owner review interface;
 - CSV/XLSX export comes from Google Sheets;
-- request logging failure is non-blocking and must not alter Research/Critic results;
+- logging failure or user denial is non-blocking and must not alter Research/Critic results;
 - standalone `1/2/3` workflow replies are not new logged requests.
 
-Implemented repository package:
+Implemented package:
 
 ```text
 integrations/request_log/google_apps_script/Code.gs
 integrations/request_log/openapi.yaml
 prompts/GPT_STORE_REQUEST_LOG_ADDENDUM.md
+prompts/GPT_STORE_INSTRUCTIONS.md
 docs/REQUEST_LOG_MVP.md
 docs/PRIVACY_POLICY_REQUEST_LOG.md
 ```
 
-Deployment:
+Technical activation status:
 
 ```text
-Apps Script Web App: DEPLOYED
-Authentication: none
-Execute as: owner
-Access: Anyone
-Deployment time: 2026-08-23 16:40 Europe/Kyiv
-OpenAPI deployment endpoint: CONFIGURED
+Google Sheet                              CREATED
+Apps Script Web App                       DEPLOYED
+Authentication                            NONE
+Execute as                                OWNER
+Access                                    ANYONE
+OpenAPI Builder validation                PASS
+Builder logRequest Action configuration   PASS
+Builder direct Action test                PASS
+Google Sheet physical write test          PASS
+first test request_number                  1
+first test timestamp                       2026-08-23 17:45:37 Europe/Kyiv
 ```
 
 Remaining activation steps:
-1. configure the Action in the public GPT Builder with Authentication=None using `integrations/request_log/openapi.yaml`;
-2. set the public Privacy Policy URL;
-3. merge `prompts/GPT_STORE_REQUEST_LOG_ADDENDUM.md` into Builder Instructions;
-4. run a fresh-chat smoke test and confirm exactly one row per new substantive research request;
-5. after PASS, mark `capabilities.actions=true`, Builder/runtime acceptance true, and revalidate the public package.
+1. replace the public GPT Builder Instructions with current `prompts/GPT_STORE_INSTRUCTIONS.md`;
+2. save/update the public GPT so the configured Action and new Instructions become live;
+3. run a NEW-chat substantive research request;
+4. confirm one request-log consent interaction according to ChatGPT Action UX, then verify exactly one new row is written;
+5. verify standalone `1` does not create another row;
+6. if PASS, mark `capabilities.actions=true`, request-log runtime accepted, and repository/public Builder synchronized.
 
-The currently published GPT remains unchanged until the Builder steps are completed.
+Important UX property: because this is an external Action, ChatGPT may require the user to authorize sharing the generalized topic with `script.google.com`. The test UI offered `Allow once` and `Always allow`; this consent behavior is platform-controlled and cannot be silently disabled by the GPT instructions.
 
 ## 9. Modular Agent Platform Transfer
 
@@ -213,16 +222,19 @@ PRIVACY_POLICY_REQUEST_LOG.md
 ## 12. Current Implementation State
 
 ```text
-Phase 0-12                               COMPLETE
-GPT Store publication                   COMPLETE
+Phase 0-12                                COMPLETE
+GPT Store publication                    COMPLETE
 2026-08-23 public Core runtime hardening ACCEPTED
-GitHub main / public Builder Core sync   COMPLETE
-Request-log Google Sheet                CREATED
-Request-log repository package          IMPLEMENTED
-Apps Script Web App deployment          COMPLETE
-OpenAPI endpoint configuration          COMPLETE
-Public GPT Action wiring                PENDING MANUAL BUILDER STEP
-Request-log runtime acceptance          PENDING
-Future Modular Agent Platform           MOVED TO K_Supervisor
-Current repository mode                 MAINTENANCE
+Request-log Google Sheet                 CREATED
+Request-log repository package           IMPLEMENTED
+Apps Script Web App deployment           COMPLETE
+OpenAPI endpoint configuration           COMPLETE
+Builder Action configuration/test        PASS
+Google Sheet write test                  PASS
+Request logging integrated in repo Core  COMPLETE
+Public Builder Instructions resync       PENDING MANUAL BUILDER STEP
+Public GPT update                         PENDING MANUAL BUILDER STEP
+Request-log NEW-chat runtime acceptance  PENDING
+Future Modular Agent Platform            MOVED TO K_Supervisor
+Current repository mode                  MAINTENANCE
 ```
