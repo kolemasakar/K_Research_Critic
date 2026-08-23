@@ -56,7 +56,8 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert manifest["release"]["criticprofile_gate_runtime_accepted"] is True
     assert manifest["release"]["cross_check_enforcement_hardened"] is True
     assert manifest["release"]["cross_check_claim_level_enforcement_hardened"] is True
-    assert manifest["release"]["cross_check_claim_level_runtime_accepted"] is False
+    assert manifest["release"]["cross_check_claim_level_runtime_accepted"] is True
+    assert manifest["release"]["gpt_builder_private_update_required"] is False
 
 
 def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates() -> None:
