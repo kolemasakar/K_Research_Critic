@@ -29,7 +29,7 @@ knowledge:
 
 instructions:
   file: prompts/GPT_STORE_INSTRUCTIONS.md
-  version: "2.0-core-runtime-accepted"
+  version: "2.1-request-log-mvp-prepublish"
   builder_character_limit: 8000
   default_report_language: uk-UA
   report_language_follows_source_language: false
@@ -70,7 +70,7 @@ checkpoint:
   example: gpt_store/checkpoint_example.json
 
 request_log_mvp:
-  status: APPS_SCRIPT_DEPLOYED_PENDING_BUILDER_WIRING
+  status: BUILDER_ACTION_WRITE_TEST_PASSED_PENDING_INSTRUCTIONS_SYNC_AND_PUBLIC_UPDATE
   selected_storage: google_sheets
   spreadsheet_id: 1icDvAkPx43s7568iZkANBCriz8UaanB4kMITO-icLaU
   sheet_name: Звернення
@@ -84,11 +84,16 @@ request_log_mvp:
   action_schema_file: integrations/request_log/openapi.yaml
   builder_addendum_file: prompts/GPT_STORE_REQUEST_LOG_ADDENDUM.md
   privacy_policy_file: docs/PRIVACY_POLICY_REQUEST_LOG.md
+  privacy_policy_url: https://github.com/kolemasakar/K_Research_Critic/blob/main/docs/PRIVACY_POLICY_REQUEST_LOG.md
   google_sheet_created: true
   apps_script_deployed: true
   apps_script_deployed_at: "2026-08-23T16:40:00+03:00"
   apps_script_deployment_url: https://script.google.com/macros/s/AKfycbwYLrCEtLTRnB91amNUbpAzah6DvXPhhOoo-jCUOU1LgHCsMnu34BKXEix8dkA5r6IR/exec
-  builder_action_configured: false
+  builder_action_configured: true
+  builder_action_test_passed: true
+  google_sheet_write_test_passed: true
+  write_test_request_number: 1
+  write_tested_at: "2026-08-23T17:45:37+03:00"
   runtime_accepted: false
 
 conversation_starters:
@@ -116,4 +121,4 @@ release:
   cross_check_claim_level_runtime_accepted: true
   cross_check_traceability_runtime_accepted: true
   report_label_localization_runtime_accepted: true
-  repository_matches_current_public_builder: true
+  repository_matches_current_public_builder: false
