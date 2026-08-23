@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: Minimal request logging Action for the public K-Research & Critic GPT.
 servers:
-  - url: https://script.google.com/macros/s/REPLACE_WITH_DEPLOYMENT_ID
+  - url: https://script.google.com/macros/s/AKfycbwYLrCEtLTRnB91amNUbpAzah6DvXPhhOoo-jCUOU1LgHCsMnu34BKXEix8dkA5r6IR
 paths:
   /exec:
     post:
