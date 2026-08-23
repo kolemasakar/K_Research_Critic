@@ -20,7 +20,10 @@ def test_request_log_manifest_contract() -> None:
     assert request_log["logging_failure_blocks_core_workflow"] is False
     assert request_log["google_sheet_created"] is True
     assert request_log["apps_script_deployed"] is True
-    assert request_log["builder_action_configured"] is False
+    assert request_log["builder_action_configured"] is True
+    assert request_log["builder_action_test_passed"] is True
+    assert request_log["google_sheet_write_test_passed"] is True
+    assert request_log["write_test_request_number"] == 1
     assert request_log["runtime_accepted"] is False
 
 
