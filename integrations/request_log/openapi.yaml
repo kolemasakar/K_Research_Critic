@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: K-Research & Critic Request Log
-  version: 1.0.0
+  version: 1.0.1
   description: Minimal request logging Action for the public K-Research & Critic GPT.
 servers:
   - url: https://script.google.com/macros/s/AKfycbwYLrCEtLTRnB91amNUbpAzah6DvXPhhOoo-jCUOU1LgHCsMnu34BKXEix8dkA5r6IR
@@ -33,5 +33,23 @@ paths:
             application/json:
               schema:
                 type: object
-                additionalProperties: true
-components: {}
+                additionalProperties: false
+                required:
+                  - ok
+                properties:
+                  ok:
+                    type: boolean
+                  request_number:
+                    type: integer
+                  date:
+                    type: string
+                  time:
+                    type: string
+                  user_name:
+                    type: string
+                  request_topic:
+                    type: string
+                  error:
+                    type: string
+components:
+  schemas: {}
