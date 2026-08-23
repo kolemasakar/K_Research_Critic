@@ -1,4 +1,4 @@
-schema_version: "0.6-beta"
+schema_version: "0.7-beta"
 
 product:
   name: K-Research & Critic - MEDIA BETA
@@ -28,7 +28,7 @@ knowledge:
 instructions:
   file: prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md
   canonical_reference: prompts/GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md
-  version: "0.6-beta-a9.6"
+  version: "0.7-beta-a9.6"
   builder_character_limit: 8000
   default_report_language: uk-UA
   report_language_follows_source_language: false
@@ -39,6 +39,15 @@ instructions:
   profile_review_option: 2
   profile_cancel_option: 3
   recovered_review_required_uses_same_gate: true
+  required_cross_checks_enforced: true
+  cross_check_independence_required: true
+  cross_check_shortfall_must_be_reported: true
+  cross_check_protocol_summary_required: true
+  cross_check_floor_by_risk:
+    LOW: 0
+    MEDIUM: 1
+    HIGH: 2
+    CRITICAL: 3
 
 actions:
   media_transcript:
@@ -124,6 +133,8 @@ release:
   a9_8_owner_zero_client_acceptance_complete: true
   a9_6_instagram_managed_complete: true
   a9_6_facebook_complete: false
+  criticprofile_gate_runtime_accepted: true
+  cross_check_enforcement_hardened: true
   external_tester_rollout_paused: true
   gpt_builder_private_update_required: true
   merge_to_public_product_allowed: false
