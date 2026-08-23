@@ -2,7 +2,7 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 4.5
+Version: 4.6
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-23
 
@@ -59,6 +59,8 @@ supported public media URL in ChatGPT
  -> ChatGPT consequential-Action confirmation when shown
  -> native transcript when available
  -> for supported Instagram Reel only: if native unavailable, separate AI preflight + separate explicit consent
+ -> CriticProfile created internally
+ -> direct analysis OR profile review/edit
  -> requested K-Research & Critic workflow
  -> result in same conversation
 ```
@@ -89,6 +91,36 @@ Canonical English verdict keys may be retained only in internal structured state
 - OPINION -> `ДУМКА`.
 
 This rule was hardened in the Builder source instructions on 2026-08-23 after owner testing exposed report-language leakage from source/transcript language.
+
+## CriticProfile gate runtime acceptance
+
+Status: PASS / RUNTIME_ACCEPTED_PRIVATE_OWNER_BETA.
+
+On 2026-08-23 the actual private `K-Research & Critic - MEDIA BETA` Custom GPT was synchronized with the two-stage CriticProfile gate and tested using a medicine/health research request.
+
+Observed PASS sequence:
+- profile created internally without automatic display;
+- first direct-run/review/cancel gate displayed correctly;
+- option `2` displayed the complete unapproved profile;
+- profile edit preserved `REVIEW_REQUIRED` and produced version 2;
+- second gate repeated after edit;
+- option `1` approved version 2 and immediately started Research -> Critic;
+- final Ukrainian report recorded profile version 2, 2 critic iterations, `PASS`, reliability `0.89`, `COMPLETED_WITH_LIMITATIONS`, and 0 media credits.
+
+Canonical record:
+`32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md`.
+
+The acceptance exposed one auditability weakness: the final report stated a three-source cross-check requirement but did not make three-source compliance visible for every material claim. The gate UX remains accepted; the evidence-control contract was hardened afterward.
+
+Current required-cross-check contract:
+- default floors: `LOW>=0`, `MEDIUM>=1`, `HIGH>=2`, `CRITICAL>=3`;
+- the approved `required_cross_checks` value is mandatory for material factual conclusions and may not be silently reduced;
+- count independent underlying evidence, not duplicate URLs, syndication, repeated reporting of one study/source, or the source media/transcript itself;
+- if fewer independent sources exist, explicitly report the shortfall, reduce confidence as appropriate, and record a limitation;
+- Critic verifies cross-check compliance before `PASS`;
+- the review protocol reports required versus achieved cross-checks and evidence-scarcity exceptions.
+
+Because this hardening changed the Builder source after the runtime test, the actual private GPT requires one more manual Builder Instructions synchronization before the strengthened cross-check contract is considered runtime-synchronized. The already accepted two-stage gate behavior itself is unchanged.
 
 ## A8 browser-assisted baseline
 
@@ -300,15 +332,19 @@ Facebook is not a supported user-facing adapter until isolated deploy plus a fre
 
 `OWNER_ONLY_MANAGED_INSTAGRAM_REEL = COMPLETE`
 
+`CRITICPROFILE_TWO_STAGE_GATE_RUNTIME = ACCEPTED`
+
 These completion markers apply only to the accepted owner-only private MEDIA BETA paths. They do not authorize public rollout, external testers, production merge, private/authenticated media, automatic AI fallback, Facebook, Telegram, or local upload.
 
 ## Next task
 
-`A9.6 - Complete Facebook isolated remediation and acceptance without replaying any uncertain-charge operation.`
+`Synchronize the strengthened cross-check Builder Instructions, then continue A9.6 Facebook isolated remediation and acceptance without replaying any uncertain-charge operation.`
 
 Required sequence:
-1. deploy the committed nested-result parser remediation to the isolated MEDIA BETA runtime and verify health/capability without billable provider calls;
-2. use a fresh Facebook test operation only after a fresh quote and explicit user authorization;
-3. validate native -> metadata-duration -> derived AI ceiling -> separate AI consent -> completed transcript;
-4. after backend PASS, update KRC Action/Builder package if required and run an actual private-GPT Facebook zero-client E2E;
-5. only then move to Telegram; local upload remains a separate transport gate.
+1. synchronize the current Builder Instructions into the actual private GPT and save/update;
+2. run a compact non-billable text-research regression confirming the cross-check protocol contract;
+3. deploy the committed Facebook nested-result parser remediation to the isolated MEDIA BETA runtime and verify health/capability without billable provider calls;
+4. use a fresh Facebook test operation only after a fresh quote and explicit user authorization;
+5. validate native -> metadata-duration -> derived AI ceiling -> separate AI consent -> completed transcript;
+6. after backend PASS, update KRC Action/Builder package if required and run an actual private-GPT Facebook zero-client E2E;
+7. only then move to Telegram; local upload remains a separate transport gate.
