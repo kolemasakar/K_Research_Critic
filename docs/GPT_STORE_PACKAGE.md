@@ -1,8 +1,8 @@
 # GPT_STORE_PACKAGE
 Документ визначає production-пакет K-Research & Critic, перевірки релізу та maintenance-gates для GPT Store.
 
-Version: 2.1
-Status: MAINTENANCE / REQUEST-LOG DISABLEMENT PENDING BUILDER SYNC
+Version: 2.2
+Status: MAINTENANCE / CURRENT PUBLIC CORE SYNCED / ACTIONS DISABLED
 Updated: 2026-08-23
 
 ## 1. Purpose
@@ -15,7 +15,7 @@ Repository:
 kolemasakar/K_Research_Critic
 ```
 
-Target public Core invariants:
+Current public Core invariants:
 
 ```text
 no developer API key
@@ -28,7 +28,7 @@ built-in ChatGPT capabilities for the core path
 Ukrainian user-facing language by default
 ```
 
-The previously accepted request-log Action is intentionally disabled because the platform-controlled external Action consent screen interrupts the normal public UX.
+The previously accepted request-log Action is disabled because the platform-controlled external Action consent screen interrupts the normal public UX.
 
 ## 2. Active Package Files
 
@@ -50,11 +50,12 @@ prompts/GPT_STORE_REQUEST_LOG_ADDENDUM.md
 docs/PRIVACY_POLICY_REQUEST_LOG.md
 docs/REQUEST_LOG_MVP.md
 docs/REQUEST_LOG_MVP_RUNTIME_ACCEPTANCE_2026-08-23.md
+docs/REQUEST_LOG_DISABLEMENT_DECISION_2026-08-23.md
 ```
 
-These retained resources are not part of the active target Builder configuration.
+These retained resources are not part of the active public Builder configuration.
 
-## 3. Target Builder Configuration
+## 3. Current Builder Configuration
 
 ### Name
 
@@ -85,9 +86,9 @@ Apps
 Actions
 ```
 
-No external backend or privacy-policy URL is required by the target active public package.
+No external backend or privacy-policy URL is required by the active public package.
 
-## 4. Target Public Workflow
+## 4. Current Public Workflow
 
 ```text
 new substantive request
@@ -101,7 +102,7 @@ new substantive request
  -> review protocol
 ```
 
-The request-log call is no longer part of the target public workflow.
+The request-log call is not part of the public workflow.
 
 ## 5. Risk and Claim-Level Cross-Check Contract
 
@@ -146,41 +147,49 @@ Ukrainian is the default. Required labels where applicable:
 
 The Request Log MVP was implemented and runtime-accepted on 2026-08-23. The implementation itself worked correctly, including one substantive request -> one row and workflow-reply de-duplication.
 
-It is now disabled for product UX reasons, not because of a technical failure.
+It is disabled for product UX reasons, not because of technical failure.
 
 Current markers:
 
 ```text
 historical request-log runtime acceptance: PRESERVED
-public request-log target: DISABLED
+public request-log: DISABLED
 prototype resources: RETAINED
+request-log disablement runtime: ACCEPTED
 ```
 
-## 9. Static Validation
+## 9. Disablement Runtime Acceptance
+
+On 2026-08-23 the owner removed the public `logRequest` Action, synchronized the no-logging Builder Instructions, saved/updated the GPT, and opened a NEW chat.
+
+Observed:
+
+```text
+script.google.com consent screen            ABSENT
+CriticProfile gate appears directly         PASS
+Actions                                     DISABLED
+repository/public Builder synchronization   COMPLETE
+```
+
+## 10. Static Validation
 
 ```text
 python -m scripts.validate_store_package
 python -m pytest
 ```
 
-## 10. Current Synchronization State
-
-Repository target:
+## 11. Current Synchronization State
 
 ```text
 actions: false
 REQUEST LOGGING removed from Builder instructions
 privacy-policy URL not required by active package
+repository_matches_current_public_builder: true
+request_log_disablement_runtime_accepted: true
 ```
 
-Current public Builder still requires manual synchronization. Until the owner removes the Action and replaces Instructions, the manifest intentionally records:
-
-```text
-repository_matches_current_public_builder: false
-```
-
-After manual Builder sync, run one NEW-chat smoke test confirming that no `script.google.com` consent screen appears before the CriticProfile gate.
-
-## 11. Maintenance Boundary
+## 12. Maintenance Boundary
 
 Any later Builder change is a product update and must be revalidated before being treated as the public baseline.
+
+Do not re-enable the public request-log Action without explicit owner approval of the resulting consent UX or an alternative telemetry architecture.
