@@ -69,8 +69,6 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates(
     assert ai_start["operationId"] == "startManagedMediaAiTranscription"
     assert ai_start["x-openai-isConsequential"] is True
 
-    # GPT Builder currently skips Parameter Object $ref entries in operation-level
-    # parameters. Keep path parameters inline so all four job operations import.
     job_operations = [
         paths["/api/v1/media/managed/transcriptions/{job_id}"]["get"],
         paths["/api/v1/media/managed/transcriptions/{job_id}/segments"]["get"],
@@ -119,7 +117,7 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates(
     assert set(job["provider_mode"]["enum"]) == {"native", "generate"}
 
 
-def test_private_builder_instructions_fit_limit_and_forbid_legacy_normal_flow() -> None:
+def test_private_builder_instructions_fit_limit_and_use_two_stage_profile_gate() -> None:
     text = (
         ROOT / "prompts" / "GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md"
     ).read_text(encoding="utf-8")
@@ -138,3 +136,10 @@ def test_private_builder_instructions_fit_limit_and_forbid_legacy_normal_flow() 
     assert "Do not fall back to Helper in the normal owner flow" in text
     assert "1 - Так" in text
     assert "2 - Ні" in text
+    assert "DO NOT display the profile immediately" in text
+    assert "Профіль збору і критики успішно створено." in text
+    assert "1 - виконати аналіз одразу." in text
+    assert "2 - переглянути і відредагувати профіль збору і критики." in text
+    assert "1 - прийняти профіль, виконати дослідження." in text
+    assert "2 - редагувати профіль." in text
+    assert "Never claim approval before `1`" in text
