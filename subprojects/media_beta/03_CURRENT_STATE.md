@@ -2,7 +2,7 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 4.7
+Version: 4.8
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-23
 
@@ -101,11 +101,11 @@ Canonical record: `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md`.
 
 ## Claim-level cross-check enforcement
 
-Status: IMPLEMENTED_IN_BRANCH / RUNTIME_ACCEPTANCE_PENDING.
+Status: PASS / RUNTIME_ACCEPTED_PRIVATE_OWNER_BETA.
 
-The first strengthened cross-check runtime test correctly produced `CRITICAL` and `required_cross_checks >= 3`, but exposed a remaining defect: three-source compliance was demonstrated only for the overall conclusion. Individual material claims could still rely on one study while the protocol returned an unconditional `PASS`.
+The first strengthened runtime test correctly produced `CRITICAL` and `required_cross_checks >= 3`, but exposed aggregate-only enforcement: individual material claims could still rely on one study while the protocol returned an unconditional `PASS`.
 
-Current contract now requires a ledger for EACH material factual claim before verdict:
+The Builder contract was hardened and resynchronized. The repeated owner-only runtime test now requires a ledger for EACH material factual claim before verdict:
 
 ```text
 required: approved required_cross_checks
@@ -113,7 +113,7 @@ achieved_independent: independent underlying evidence sources actually obtained
 exception: NONE | SHORTFALL
 ```
 
-Rules:
+Accepted rules:
 - default floors: `LOW>=0`, `MEDIUM>=1`, `HIGH>=2`, `CRITICAL>=3`;
 - count underlying evidence independence, not URL count;
 - duplicates, syndication, repeated reporting of one study/source, and source media/transcript do not count separately;
@@ -124,9 +124,29 @@ Rules:
 - fact-check output shows `Cross-check: achieved/required - PASS|SHORTFALL` for each material claim;
 - protocol summarizes per-claim required/achieved/exception values.
 
-Canonical contract: `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md`.
+Observed acceptance evidence included a real `Cross-check: 1/3 - SHORTFALL` for the 29% sick-leave interpretation, an explicit replication limitation, and final status `COMPLETED_WITH_LIMITATIONS` rather than unconditional `PASS`.
 
-The actual private GPT must be synchronized again with the latest Builder source and then rerun against the same non-billable cold-shower query. `cross_check_claim_level_runtime_accepted` remains false until that test passes.
+Canonical contract: `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md`.
+Canonical runtime record: `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md`.
+
+`cross_check_claim_level_runtime_accepted=true` and the current MEDIA BETA Builder no longer requires another synchronization for this contract.
+
+## Core GPT improvement track
+
+The accepted general improvements are now being separated from Media Beta so they can later be synchronized into the main `K-Research & Critic` without provider/credit/media-specific behavior.
+
+Core candidate scope:
+- Ukrainian default report language;
+- two-stage CriticProfile gate;
+- risk-based cross-check floors;
+- claim-level `required / achieved_independent / exception` enforcement;
+- no hidden/unqualified PASS on shortfall;
+- per-claim auditability and review protocol;
+- ISO-8601 approval metadata;
+- no Supadata, credit gates, KRCM jobs, Instagram/Facebook fallback, or Media Beta operational logic.
+
+Candidate Builder source: `prompts/GPT_STORE_CORE_BUILDER_INSTRUCTIONS.md`.
+This is branch-only preparation; the actual published/main GPT is not changed until a separate manual synchronization/acceptance step.
 
 ## A8 browser-assisted baseline
 
@@ -182,12 +202,12 @@ A separately authorized Facebook AI generate request failed with `MANAGED_PROVID
 
 `CRITICPROFILE_TWO_STAGE_GATE_RUNTIME = ACCEPTED`
 
-`CLAIM_LEVEL_CROSS_CHECK_RUNTIME = PENDING`
+`CLAIM_LEVEL_CROSS_CHECK_RUNTIME = ACCEPTED`
 
 These markers do not authorize public rollout, external testers, production merge, private/authenticated media, automatic AI fallback, Facebook, Telegram, or local upload.
 
 ## Next task
 
-`Synchronize latest Builder Instructions and rerun claim-level cross-check runtime acceptance.`
+`Prepare and validate the clean core Builder candidate for the main K-Research & Critic, then manually synchronize/test it only after owner confirmation.`
 
-After claim-level PASS, resume A9.6 Facebook remediation without replaying any uncertain-charge operation.
+After the core candidate track is ready, resume A9.6 Facebook remediation without replaying any uncertain-charge operation.
