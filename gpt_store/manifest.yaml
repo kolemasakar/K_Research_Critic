@@ -29,7 +29,7 @@ knowledge:
 
 instructions:
   file: prompts/GPT_STORE_INSTRUCTIONS.md
-  version: "2.2-request-log-disabled-pending-builder-sync"
+  version: "2.2-request-log-disabled-runtime-accepted"
   builder_character_limit: 8000
   default_report_language: uk-UA
   report_language_follows_source_language: false
@@ -70,7 +70,7 @@ checkpoint:
   example: gpt_store/checkpoint_example.json
 
 request_log_mvp:
-  status: DISABLED_DUE_TO_USER_CONSENT_UX_PENDING_BUILDER_SYNC
+  status: DISABLED_DUE_TO_USER_CONSENT_UX_RUNTIME_ACCEPTED
   public_enabled_target: false
   disable_reason: "ChatGPT external Action consent interrupts the public UX for new users"
   prototype_retained: true
@@ -93,8 +93,8 @@ request_log_mvp:
   apps_script_deployed: true
   apps_script_deployed_at: "2026-08-23T16:40:00+03:00"
   apps_script_deployment_url: https://script.google.com/macros/s/AKfycbwYLrCEtLTRnB91amNUbpAzah6DvXPhhOoo-jCUOU1LgHCsMnu34BKXEix8dkA5r6IR/exec
-  builder_action_currently_configured: true
-  builder_action_disable_pending_manual_step: true
+  builder_action_currently_configured: false
+  builder_action_disable_pending_manual_step: false
   builder_action_test_passed: true
   google_sheet_write_test_passed: true
   write_test_request_number: 1
@@ -107,6 +107,13 @@ request_log_mvp:
   workflow_reply_dedup_verified: true
   runtime_accepted: true
   runtime_accepted_at: "2026-08-23T17:58:00+03:00"
+  builder_instructions_synced_after_disablement: true
+  public_gpt_updated_after_disablement: true
+  disablement_new_chat_test_passed: true
+  disablement_consent_screen_absent: true
+  disablement_criticprofile_gate_direct: true
+  disablement_runtime_accepted: true
+  disablement_runtime_accepted_at: "2026-08-23T18:59:00+03:00"
 
 conversation_starters:
   - "Досліди цю тему та спочатку сформуй CriticProfile для мого погодження."
@@ -135,4 +142,5 @@ release:
   report_label_localization_runtime_accepted: true
   request_log_runtime_accepted: true
   request_log_public_enabled: false
-  repository_matches_current_public_builder: false
+  request_log_disablement_runtime_accepted: true
+  repository_matches_current_public_builder: true
