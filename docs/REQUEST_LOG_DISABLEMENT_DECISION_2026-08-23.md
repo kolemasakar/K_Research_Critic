@@ -1,7 +1,7 @@
 # Request Log Public Disablement Decision
 
 Date: 2026-08-23
-Status: APPROVED / IMPLEMENTED IN REPOSITORY / MANUAL BUILDER SYNC PENDING
+Status: ACCEPTED / RUNTIME VERIFIED
 Scope: public K-Research & Critic
 
 ## Decision
@@ -39,7 +39,7 @@ Apps Script deployment
 
 Historical runtime acceptance remains valid as evidence that the prototype worked.
 
-## Active Builder target
+## Active Builder state
 
 ```text
 Actions: disabled
@@ -47,22 +47,42 @@ REQUEST LOGGING instruction block: absent
 privacy-policy URL required by active package: no
 ```
 
-## Manual completion gate
+## Runtime completion
 
-Repository changes do not update the Custom GPT automatically. Completion requires:
+Completed on 2026-08-23:
 
-1. remove the `logRequest` Action from the public Builder;
-2. replace Builder Instructions with current `main/prompts/GPT_STORE_INSTRUCTIONS.md`;
-3. save/update the GPT;
-4. run a NEW-chat substantive request;
-5. verify that no `script.google.com` consent screen appears and the CriticProfile gate appears directly;
-6. then update manifest/docs to `repository_matches_current_public_builder=true` and mark disablement runtime accepted.
+```text
+remove `logRequest` Action from public Builder       PASS
+synchronize Builder Instructions with repository     PASS
+save/update public GPT                               PASS
+NEW-chat substantive request                         PASS
+script.google.com consent screen absent              PASS
+CriticProfile gate appears directly                  PASS
+repository/public Builder synchronization            PASS
+```
+
+Observed first response in the post-disable NEW chat:
+
+```text
+Профіль збору і критики успішно створено.
+1 - виконати аналіз одразу.
+2 - переглянути і відредагувати профіль збору і критики.
+3 - скасувати дослідження.
+```
+
+No external Action consent screen appeared before this gate.
 
 ## Markers
 
 ```text
-REQUEST_LOG_PROTOTYPE = IMPLEMENTED_TESTED
-REQUEST_LOG_PUBLIC_TARGET = DISABLED
+REQUEST_LOG_PROTOTYPE = IMPLEMENTED_TESTED_RETAINED
+REQUEST_LOG_PUBLIC = DISABLED
 DISABLE_REASON = USER_CONSENT_UX
-BUILDER_SYNC = PENDING
+PUBLIC_ACTIONS = DISABLED
+BUILDER_SYNC = ACCEPTED
+REQUEST_LOG_DISABLEMENT_RUNTIME = ACCEPTED
 ```
+
+## Reactivation rule
+
+Do not re-enable request logging in the public GPT unless the owner explicitly approves the resulting consent UX or a different telemetry architecture avoids that interruption.
