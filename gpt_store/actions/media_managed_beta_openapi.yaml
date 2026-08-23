@@ -91,11 +91,9 @@ paths:
       operationId: startManagedFacebookFallback
       summary: Try free public Facebook media retrieval and AssemblyAI STT
       description: >-
-        Public Facebook media only. This operation attempts configured Cobalt
-        retrieval first. It never invokes the paid ScrapeCreators fallback. If
-        free retrieval is unavailable, the returned durable job stops at
-        AWAITING_RETRIEVAL_CONSENT. If retrieval succeeds, AssemblyAI STT completes
-        the durable KRCM transcript and segments subject to the closed-beta STT quota.
+        Try configured Cobalt for a public Facebook URL. Never call ScrapeCreators
+        here. If free retrieval fails, stop at AWAITING_RETRIEVAL_CONSENT. If it
+        succeeds, run AssemblyAI STT and persist durable KRCM transcript segments.
       x-openai-isConsequential: false
       requestBody:
         required: true
@@ -126,7 +124,12 @@ paths:
       summary: Read managed media job status and actual cumulative charge
       x-openai-isConsequential: false
       parameters:
-        - $ref: "#/components/parameters/JobId"
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCM_[A-Za-z0-9-]+$
       responses:
         "200":
           description: Current managed media job state.
@@ -142,7 +145,12 @@ paths:
       summary: Read timestamped managed transcript segments
       x-openai-isConsequential: false
       parameters:
-        - $ref: "#/components/parameters/JobId"
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCM_[A-Za-z0-9-]+$
         - name: cursor
           in: query
           required: false
@@ -177,7 +185,12 @@ paths:
         balance lookup. It does not authorize paid retrieval.
       x-openai-isConsequential: false
       parameters:
-        - $ref: "#/components/parameters/JobId"
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCM_[A-Za-z0-9-]+$
       responses:
         "200":
           description: Local exact one-credit paid-retrieval consent contract.
@@ -204,7 +217,12 @@ paths:
         records credit_charge_uncertain=true and must never be replayed automatically.
       x-openai-isConsequential: true
       parameters:
-        - $ref: "#/components/parameters/JobId"
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCM_[A-Za-z0-9-]+$
       requestBody:
         required: true
         content:
@@ -239,7 +257,12 @@ paths:
         maximum when separately available in backend state.
       x-openai-isConsequential: false
       parameters:
-        - $ref: "#/components/parameters/JobId"
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCM_[A-Za-z0-9-]+$
       responses:
         "200":
           description: Separate AI credit quote. This does not authorize AI processing.
@@ -268,7 +291,12 @@ paths:
         Instagram Reel hard maximum of 40 credits.
       x-openai-isConsequential: true
       parameters:
-        - $ref: "#/components/parameters/JobId"
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCM_[A-Za-z0-9-]+$
       requestBody:
         required: true
         content:
@@ -299,14 +327,6 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
-  parameters:
-    JobId:
-      name: job_id
-      in: path
-      required: true
-      schema:
-        type: string
-        pattern: ^KRCM_[A-Za-z0-9-]+$
   schemas:
     ManagedCapability:
       type: object

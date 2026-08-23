@@ -163,7 +163,13 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates(
         ai_start,
     ]
     for operation in job_operations:
-        assert operation["parameters"][0] == {"$ref": "#/components/parameters/JobId"}
+        job_id = operation["parameters"][0]
+        assert job_id["name"] == "job_id"
+        assert job_id["in"] == "path"
+        assert job_id["required"] is True
+        assert job_id["schema"]["type"] == "string"
+        assert job_id["schema"]["pattern"] == "^KRCM_[A-Za-z0-9-]+$"
+        assert "$ref" not in job_id
 
     preflight = schema["components"]["schemas"]["PreflightRequest"]
     assert preflight["required"] == ["url"]
