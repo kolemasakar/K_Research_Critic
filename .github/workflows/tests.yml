@@ -106,20 +106,41 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.txt
 
-      - name: Run A9.7-C package gates
+      - name: Run A9.7-C package gates with diagnostics
         id: gate
-        continue-on-error: true
+        shell: bash
         run: |
-          python -m scripts.validate_repository
-          python -m scripts.validate_store_package
-          python -m pytest -q
+          set +e
+          python -m scripts.validate_repository > repository.log 2>&1
+          repo_rc=$?
+          python -m scripts.validate_store_package > store.log 2>&1
+          store_rc=$?
+          python -m pytest -q > pytest.log 2>&1
+          pytest_rc=$?
+          repo_diag="$(tail -n 1 repository.log | tr '\n' ' ' | cut -c1-220)"
+          store_diag="$(tail -n 1 store.log | tr '\n' ' ' | cut -c1-220)"
+          pytest_diag="$(tail -n 1 pytest.log | tr '\n' ' ' | cut -c1-220)"
+          echo "repo_rc=$repo_rc" >> "$GITHUB_OUTPUT"
+          echo "store_rc=$store_rc" >> "$GITHUB_OUTPUT"
+          echo "pytest_rc=$pytest_rc" >> "$GITHUB_OUTPUT"
+          echo "repo_diag=$repo_diag" >> "$GITHUB_OUTPUT"
+          echo "store_diag=$store_diag" >> "$GITHUB_OUTPUT"
+          echo "pytest_diag=$pytest_diag" >> "$GITHUB_OUTPUT"
+          cat repository.log
+          cat store.log
+          cat pytest.log
+          exit 0
 
       - name: Report A9.7-C gate
-        if: always()
         env:
           GH_TOKEN: ${{ github.token }}
-          OUTCOME: ${{ steps.gate.outcome }}
+          REPO_RC: ${{ steps.gate.outputs.repo_rc }}
+          STORE_RC: ${{ steps.gate.outputs.store_rc }}
+          PYTEST_RC: ${{ steps.gate.outputs.pytest_rc }}
+          REPO_DIAG: ${{ steps.gate.outputs.repo_diag }}
+          STORE_DIAG: ${{ steps.gate.outputs.store_diag }}
+          PYTEST_DIAG: ${{ steps.gate.outputs.pytest_diag }}
         run: |
-          if [[ "$OUTCOME" == "success" ]]; then result=PASS; else result=FAIL; fi
-          gh pr comment 8 --repo kolemasakar/K_Research_Critic --body "A9.7-C managed Facebook Action schema audit: **${result}**. validate_repository=executed; validate_store_package=executed; pytest=executed. Schema exposes free Facebook fallback, local one-credit retrieval preflight, and exact consented ScrapeCreators continuation while Facebook remains not live-accepted. No provider or Render endpoint is called by this CI gate. Production/main are not targeted."
-          [[ "$OUTCOME" == "success" ]]
+          if [[ "$REPO_RC" == "0" && "$STORE_RC" == "0" && "$PYTEST_RC" == "0" ]]; then result=PASS; else result=FAIL; fi
+          gh pr comment 8 --repo kolemasakar/K_Research_Critic --body "A9.7-C managed Facebook Action schema audit V2: **${result}**. validate_repository_rc=\`${REPO_RC}\`, validate_store_package_rc=\`${STORE_RC}\`, pytest_rc=\`${PYTEST_RC}\`; repository_diag=\`${REPO_DIAG}\`; store_diag=\`${STORE_DIAG}\`; pytest_diag=\`${PYTEST_DIAG}\`. No provider or Render endpoint is called by this CI gate. Production/main are not targeted."
+          [[ "$result" == "PASS" ]]
