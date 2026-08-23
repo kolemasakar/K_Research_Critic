@@ -1,9 +1,9 @@
-schema_version: "0.5-beta"
+schema_version: "0.6-beta"
 
 product:
   name: K-Research & Critic - MEDIA BETA
   description: |-
-    Приватне owner-only тестування аналізу публічних YouTube-відео без Helper і ручного Job ID.
+    Приватне owner-only тестування zero-client аналізу публічних YouTube-відео та Instagram Reel.
     (owner-only zero-client media-input beta for K-Research & Critic.)
   default_language: uk-UA
   primary_channel: chatgpt_private_beta
@@ -28,8 +28,11 @@ knowledge:
 instructions:
   file: prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md
   canonical_reference: prompts/GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md
-  version: "0.5-beta-a9.5"
+  version: "0.6-beta-a9.6"
   builder_character_limit: 8000
+  default_report_language: uk-UA
+  report_language_follows_source_language: false
+  verdict_labels_localized_to_report_language: true
 
 actions:
   media_transcript:
@@ -56,14 +59,23 @@ beta:
   managed_job_prefix: KRCM_
   public_platforms_live_accepted:
     - youtube
+    - instagram
+  public_platforms_in_progress:
+    - facebook
+  public_platforms_not_started:
+    - telegram
+  local_upload_live_accepted: false
   max_video_seconds: 3600
   managed_provider: supadata
-  managed_provider_mode: native
+  managed_provider_mode: native_first
   managed_native_credit_cost: 1
   managed_credit_preflight_required: true
   managed_explicit_user_consent_required: true
   managed_automatic_ai_fallback: false
   managed_ai_requires_second_consent: true
+  managed_instagram_ai_fallback_live_accepted: true
+  managed_instagram_ai_rate_credits_per_minute: 2
+  managed_instagram_ai_hard_cap_credits: 40
   managed_user_beta_access_code_required: false
   managed_owner_access_injected_server_side: true
   managed_durable_store: postgres
@@ -87,7 +99,7 @@ beta:
     never_log: true
 
 release:
-  rollout_state: A9_5_PACKAGE_READY_FOR_PRIVATE_GPT
+  rollout_state: A9_6_INSTAGRAM_COMPLETE_FACEBOOK_IN_PROGRESS
   production_core_unchanged: true
   public_store_gpt_unchanged: true
   user_api_key_required: false
@@ -102,8 +114,10 @@ release:
   a9_2_direct_youtube_blocked: true
   a9_2r_managed_native_complete: true
   a9_3_durable_managed_complete: true
-  a9_5_private_gpt_integration_complete: false
-  a9_8_owner_zero_client_acceptance_complete: false
+  a9_5_private_gpt_integration_complete: true
+  a9_8_owner_zero_client_acceptance_complete: true
+  a9_6_instagram_managed_complete: true
+  a9_6_facebook_complete: false
   external_tester_rollout_paused: true
   gpt_builder_private_update_required: true
   merge_to_public_product_allowed: false
