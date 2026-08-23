@@ -2,19 +2,24 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 4.4
+Version: 4.5
 Status: ACTIVE_CHECKPOINT
-Checkpoint date: 2026-08-21
+Checkpoint date: 2026-08-23
 
 ## Executive state
 
 Current phase state:
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_COMPLETE / A9_8_OWNER_ZERO_CLIENT_YOUTUBE_COMPLETE / A9_6_MULTI_PLATFORM_NEXT`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_COMPLETE / A9_8_OWNER_ZERO_CLIENT_YOUTUBE_COMPLETE / A9_6_INSTAGRAM_MANAGED_COMPLETE / A9_6_FACEBOOK_IN_PROGRESS`
 
-Current product target achieved for the first source adapter:
+Current accepted owner-only zero-client adapters:
+- public prerecorded YouTube;
+- public Instagram Reel through managed native first, with separately authorized AI fallback only when native transcript is unavailable.
 
-`PRIVATE OWNER-ONLY ZERO-CLIENT YOUTUBE MEDIA ANALYSIS = COMPLETE`
+Not accepted yet:
+- Facebook public Video/Reels;
+- Telegram public video posts;
+- local audio/video attachment.
 
 The public GPT, external tester rollout, merge to `main`, and production VoiceBridge remain outside the current gate.
 
@@ -43,30 +48,47 @@ Do not merge PR #8 or PR #28 and do not target production without a separate exp
 ## Accepted owner UX
 
 ```text
-public YouTube URL in ChatGPT
+supported public media URL in ChatGPT
  -> analysis mode if missing
  -> no separate media opening
  -> no Helper
  -> no beta-code prompt
  -> no manual Job ID
- -> managed credit preflight
+ -> native managed credit preflight
  -> explicit user consent
- -> ChatGPT consequential-Action confirmation
- -> native transcript
+ -> ChatGPT consequential-Action confirmation when shown
+ -> native transcript when available
+ -> for supported Instagram Reel only: if native unavailable, separate AI preflight + separate explicit consent
  -> requested K-Research & Critic workflow
  -> result in same conversation
 ```
 
-Current live-accepted zero-client source adapter:
-`YouTube public prerecorded video`.
-
-Planned but not accepted:
-- Instagram public Reels/video posts;
-- Facebook public Video/Reels;
-- Telegram public video posts;
-- local audio/video attachment.
-
 Remote adapters remain public-only. Do not request platform login/password/cookies/session state/account tokens. Auth/private content must return `UNSUPPORTED_PRIVATE_OR_AUTH_REQUIRED`.
+
+## Language invariant
+
+Default user-facing report language is Ukrainian unless the user explicitly requests another language.
+
+The selected report language controls all user-visible workflow text:
+- prompts;
+- CriticProfile;
+- section headings;
+- verdict labels;
+- final report;
+- claim verification;
+- review protocol.
+
+The media/transcript/source language must never switch the report language.
+Canonical English verdict keys may be retained only in internal structured state. User-visible verdicts must be localized to the selected report language. For Ukrainian reports use:
+- VERIFIED -> `ПІДТВЕРДЖЕНО`;
+- PARTLY_SUPPORTED -> `ЧАСТКОВО ПІДТВЕРДЖЕНО`;
+- UNSUPPORTED -> `НЕ ПІДТВЕРДЖЕНО`;
+- CONTRADICTED -> `СУПЕРЕЧИТЬ ДЖЕРЕЛАМ`;
+- MISLEADING -> `ВВОДИТЬ В ОМАНУ`;
+- UNVERIFIABLE -> `НЕМОЖЛИВО ПЕРЕВІРИТИ`;
+- OPINION -> `ДУМКА`.
+
+This rule was hardened in the Builder source instructions on 2026-08-23 after owner testing exposed report-language leakage from source/transcript language.
 
 ## A8 browser-assisted baseline
 
@@ -114,18 +136,20 @@ Canonical record:
 
 A billable managed transcript request must never start merely because a URL was pasted.
 
-Required preflight:
+Required native preflight:
 - current available credits;
 - estimated operation cost;
 - estimated remaining balance;
 - explicit `1 - Так / 2 - Ні`.
 
-Only explicit `1` authorizes the quoted operation.
+Only explicit `1` authorizes the quoted native operation.
 
-Current Supadata native hard cap:
+Current native hard cap:
 `credit_consent.max_credits = 1`.
 
-If native transcript is unavailable, stop at `AWAITING_AI_CONSENT`. Previous consent does not authorize managed AI generation. Any future AI fallback requires a separate preflight and second explicit consent.
+If native transcript is unavailable, previous consent does not authorize managed AI generation. Any supported AI fallback requires its own preflight and a new explicit consent.
+
+Automatic AI fallback is prohibited.
 
 ## A9.3 - Durable managed jobs and credit-safe idempotency
 
@@ -181,7 +205,7 @@ credits_after_estimate: 97
 
 No transcript credit was spent by preflight.
 
-### Actual private GPT zero-client E2E
+### Actual private GPT zero-client YouTube E2E
 
 Test source:
 `https://www.youtube.com/watch?v=IzYyKRx7Qwg`.
@@ -218,20 +242,73 @@ The ChatGPT platform displayed its own `Allow` confirmation for the consequentia
 Canonical E2E record:
 `30_A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_ACCEPTANCE.md`.
 
-## First zero-client source completion marker
+## A9.6 - Instagram managed adapter
+
+Status: PASS / COMPLETE_FOR_MANAGED_OWNER_BETA.
+
+Backend capability/preflight accepted on isolated MEDIA BETA for public Instagram Reel URLs.
+
+Accepted live flow:
+1. Native preflight succeeded with available `97`, estimated native cost `1`, after estimate `96`.
+2. Native request was explicitly authorized with hard maximum `1` credit.
+3. Native result returned `AWAITING_AI_CONSENT`, no transcript segments, and charged `1` native credit.
+4. Automatic AI fallback did not run.
+5. Separate AI preflight returned rate `2 credits/min`, hard beta maximum `40` credits, conservative Reel ceiling `20 min`, and worst-case remaining balance `56` from the then-current balance `96`.
+6. A new explicit user approval authorized one AI generate request.
+7. Final managed result: `COMPLETED`, provider mode `generate`, detected language `en`, `11` segments, cumulative charge `3` credits (`1 native + 2 AI`).
+
+Accepted safety invariants:
+- native approval never authorizes AI;
+- AI requires a separate quote and separate explicit consent;
+- AI hard maximum is not exceeded;
+- no automatic fallback;
+- no Helper, beta code, cookies, login/session state, Job ID, or provider key in normal UX.
+
+KRC Builder source instructions currently advertise YouTube and Instagram as the supported public adapters.
+
+## A9.6 - Facebook adapter
+
+Status: IN_PROGRESS / NOT_ACCEPTED.
+
+Accepted partial evidence on isolated MEDIA BETA:
+- Facebook capability/native preflight implemented;
+- native request explicitly authorized with hard maximum `1` credit;
+- native result reached `AWAITING_AI_CONSENT` with no segments;
+- separate metadata-duration path implemented because Facebook AI ceiling must be duration-derived;
+- managed read-only lookup added to recover durable jobs safely;
+- metadata-duration acceptance eventually succeeded with `duration_seconds=22`, metadata charge `1`, cumulative job charge `2`, and derived AI hard ceiling `2` credits;
+- separate AI preflight succeeded.
+
+Blocking result:
+- one separately authorized Facebook AI generate request failed;
+- final job status `FAILED`;
+- error code `MANAGED_PROVIDER_TRANSCRIPT_INVALID`;
+- `segments=0`;
+- `credit_charge_uncertain=true`;
+- automatic retry is therefore prohibited for that failed operation.
+
+Remediation state:
+- Supadata nested async-result parser remediation committed as `f6b32c2a03425deaecadd10fc902671d62eaab5d`;
+- latest recorded isolated deploy attempt of that parser remediation failed;
+- no new provider retry was authorized by that failed deploy workflow.
+
+Facebook is not a supported user-facing adapter until isolated deploy plus a fresh, separately authorized acceptance run succeeds.
+
+## Completion markers
 
 `OWNER_ONLY_ZERO_CLIENT_YOUTUBE = COMPLETE`
 
-This completion applies only to the accepted public prerecorded YouTube adapter and owner-only private GPT.
+`OWNER_ONLY_MANAGED_INSTAGRAM_REEL = COMPLETE`
 
-It does not authorize public rollout, external testers, production merge, automatic managed AI fallback, private/authenticated media, or other source adapters.
+These completion markers apply only to the accepted owner-only private MEDIA BETA paths. They do not authorize public rollout, external testers, production merge, private/authenticated media, automatic AI fallback, Facebook, Telegram, or local upload.
 
 ## Next task
 
-`A9.6 - Validate additional public source adapters independently, preserving YouTube as the regression baseline.`
+`A9.6 - Complete Facebook isolated remediation and acceptance without replaying any uncertain-charge operation.`
 
-Recommended order:
-1. Instagram public Reels/video posts;
-2. Facebook public Video/Reels;
-3. Telegram public video posts;
-4. local upload as a separate A9.7 transport gate.
+Required sequence:
+1. deploy the committed nested-result parser remediation to the isolated MEDIA BETA runtime and verify health/capability without billable provider calls;
+2. use a fresh Facebook test operation only after a fresh quote and explicit user authorization;
+3. validate native -> metadata-duration -> derived AI ceiling -> separate AI consent -> completed transcript;
+4. after backend PASS, update KRC Action/Builder package if required and run an actual private-GPT Facebook zero-client E2E;
+5. only then move to Telegram; local upload remains a separate transport gate.
