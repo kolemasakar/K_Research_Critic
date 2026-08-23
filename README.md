@@ -1,13 +1,13 @@
 # K-Research & Critic
 Базовий опис завершеного production-продукту K-Research & Critic для дослідження та незалежної перевірки.
 
-Version: 1.2
+Version: 1.3
 Status: PRODUCTION / MAINTENANCE
 Updated: 2026-08-23
 
 ## Overview
 
-K-Research & Critic is a published GPT Store product for structured research, independent critique, autonomous revision, and sourced final reporting.
+K-Research & Critic is a published GPT Store product for structured research, independent critique, autonomous revision, sourced final reporting, and minimal owner-visible request accounting.
 
 Repository:
 
@@ -33,21 +33,27 @@ Standalone database: runtime/k_supervisor.db
 The actual public Builder runtime was revalidated on 2026-08-23 and the accepted Core instructions are synchronized to repository `main`.
 
 ```text
-Two-stage CriticProfile gate                       PASS
-Risk-based cross-check floors                      PASS
-Claim-level required/achieved/exception            PASS
-Visible SHORTFALL                                  PASS
-Evidence-origin traceability                       PASS
-Systematic-review double-counting protection       PASS
-Critic REVISE -> PASS loop                         PASS
+Two-stage CriticProfile gate                        PASS
+Risk-based cross-check floors                       PASS
+Claim-level required/achieved/exception             PASS
+Visible SHORTFALL                                   PASS
+Evidence-origin traceability                        PASS
+Systematic-review double-counting protection        PASS
+Critic REVISE -> PASS loop                          PASS
 Ukrainian headings/table/profile-field localization PASS
-Repository main / public Builder Core sync         COMPLETE
+Optional request-log Action                         PASS
+One substantive request -> one Sheet row            PASS
+Standalone workflow reply -> no extra row           PASS
+Repository main / public Builder Core sync          COMPLETE
 ```
 
 ## Public Workflow
 
 ```text
 User request
+   |
+   v
+Best-effort generalized-topic logRequest
    |
    v
 CriticProfile created internally
@@ -71,7 +77,7 @@ Critic
    +---- PASS ------> Final report + Review protocol
 ```
 
-The profile is not displayed automatically before the first gate. No independent research starts before explicit approval.
+The request-log Action is optional and non-blocking. The profile is not displayed automatically before the first gate. No independent research starts before explicit approval.
 
 Risk floors:
 
@@ -106,14 +112,39 @@ CriticProfile field labels are also localized. Canonical internal keys remain in
 GPT Store Edition
   - public ChatGPT product
   - no developer-owned API key required
-  - no mandatory external backend
+  - no mandatory external backend for Research/Critic
   - Apps disabled
-  - Actions disabled
+  - one optional request-log Action enabled
   - no pinned model identifier
   - user-plan model policy
 ```
 
-The Python/SQLite/provider implementation remains available as an optional standalone engineering reference runtime. It is not a dependency of the public Store path.
+The Python/SQLite/provider implementation remains available as an optional standalone engineering reference runtime. It is not a dependency of the public Store research path.
+
+## Request Log MVP
+
+Accepted implementation:
+
+```text
+Public GPT
+ -> logRequest Action
+ -> Google Apps Script
+ -> Google Sheet `K-Research & Critic — Request Log`
+```
+
+Stored fields:
+
+```text
+request number
+date
+time
+user_name = none
+short generalized request topic
+```
+
+The full prompt, response, CriticProfile and hidden reasoning are not intentionally stored. Action denial/failure must not block the main workflow.
+
+Runtime acceptance on 2026-08-23 verified a NEW-chat request as row №2 and confirmed that the following standalone `1` created no row №3.
 
 ## GPT Store Package
 
@@ -125,6 +156,11 @@ prompts/GPT_STORE_INSTRUCTIONS.md
 gpt_store/checkpoint.py
 gpt_store/checkpoint_example.json
 scripts/validate_store_package.py
+integrations/request_log/openapi.yaml
+integrations/request_log/google_apps_script/Code.gs
+docs/REQUEST_LOG_MVP.md
+docs/PRIVACY_POLICY_REQUEST_LOG.md
+docs/REQUEST_LOG_MVP_RUNTIME_ACCEPTANCE_2026-08-23.md
 docs/GPT_STORE_DEPLOYMENT.md
 docs/GPT_STORE_PACKAGE.md
 ```
@@ -135,6 +171,7 @@ Production package state includes:
 publication_state: published
 production_smoke_test_passed: true
 latest_core_runtime_regression_passed_at: 2026-08-23
+request_log_runtime_accepted: true
 repository_matches_current_public_builder: true
 ```
 
@@ -193,11 +230,9 @@ OpenAI platform compatibility updates
 regression fixes
 documentation corrections
 narrow UX improvements
-narrow analytics/observability improvements after privacy and architecture approval
+narrow analytics/observability improvements
 maintenance releases v1.0.1, v1.0.2, ...
 ```
-
-The planned request-accounting improvement is documented in `docs/ROADMAP.md` and is not implemented yet.
 
 General modular multi-agent platform development belongs to the separate `K_Supervisor` project.
 
@@ -218,4 +253,7 @@ docs/PERSISTENCE.md
 docs/GPT_STORE_DEPLOYMENT.md
 docs/GPT_STORE_PACKAGE.md
 docs/LOGGING.md
+docs/REQUEST_LOG_MVP.md
+docs/PRIVACY_POLICY_REQUEST_LOG.md
+docs/REQUEST_LOG_MVP_RUNTIME_ACCEPTANCE_2026-08-23.md
 ```
