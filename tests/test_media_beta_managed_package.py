@@ -23,6 +23,16 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert manifest["instructions"]["profile_review_option"] == 2
     assert manifest["instructions"]["profile_cancel_option"] == 3
     assert manifest["instructions"]["recovered_review_required_uses_same_gate"] is True
+    assert manifest["instructions"]["required_cross_checks_enforced"] is True
+    assert manifest["instructions"]["cross_check_independence_required"] is True
+    assert manifest["instructions"]["cross_check_shortfall_must_be_reported"] is True
+    assert manifest["instructions"]["cross_check_protocol_summary_required"] is True
+    assert manifest["instructions"]["cross_check_floor_by_risk"] == {
+        "LOW": 0,
+        "MEDIUM": 1,
+        "HIGH": 2,
+        "CRITICAL": 3,
+    }
     assert manifest["beta"]["ingress_mode"] == "managed_zero_client"
     assert manifest["beta"]["browser_helper_required"] is False
     assert manifest["beta"]["managed_job_prefix"] == "KRCM_"
@@ -40,6 +50,8 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert manifest["release"]["a9_8_owner_zero_client_acceptance_complete"] is True
     assert manifest["release"]["a9_6_instagram_managed_complete"] is True
     assert manifest["release"]["a9_6_facebook_complete"] is False
+    assert manifest["release"]["criticprofile_gate_runtime_accepted"] is True
+    assert manifest["release"]["cross_check_enforcement_hardened"] is True
 
 
 def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates() -> None:
@@ -149,3 +161,8 @@ def test_private_builder_instructions_fit_limit_and_use_two_stage_profile_gate()
     assert "1 - прийняти профіль, виконати дослідження." in text
     assert "2 - редагувати профіль." in text
     assert "Never claim approval before `1`" in text
+    assert "CRITICAL>=3, HIGH>=2, MEDIUM>=1, LOW>=0" in text
+    assert "satisfy approved `required_cross_checks`" in text
+    assert "Count independent underlying sources" in text
+    assert "state the shortfall, lower confidence, and record a limitation" in text
+    assert "Protocol reports required/achieved cross-checks and exceptions" in text
