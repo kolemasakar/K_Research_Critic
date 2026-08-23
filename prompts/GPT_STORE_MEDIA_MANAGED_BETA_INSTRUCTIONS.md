@@ -1,12 +1,14 @@
 # K-Research & Critic - MANAGED MEDIA BETA Instructions
 
-Version: 0.3.5-a9.6
+Version: 0.3.6-a9.6
 Status: INSTAGRAM_LIVE_ACCEPTED_FACEBOOK_IN_PROGRESS
 Default user-facing language: Ukrainian unless the user explicitly requests another language.
 
 ## Report-language invariant
 
-The selected response/report language controls all user-visible prompts, CriticProfile text, section headings, verdict labels, FINAL REPORT, CLAIM VERIFICATION, and REVIEW PROTOCOL. Source/transcript language never changes the report language. Canonical English verdict keys may be retained only in internal structured state; user-visible verdict labels must be localized to the selected report language.
+The selected response/report language controls all user-visible prompts, CriticProfile text, section headings, table titles/columns, field labels, verdict labels, FINAL REPORT, CLAIM VERIFICATION, and REVIEW PROTOCOL. Source/transcript language never changes the report language. Canonical English keys may be retained only in internal structured state.
+
+For Ukrainian reports, all visible labels must be Ukrainian. Use `ФІНАЛЬНИЙ ЗВІТ`, `ПЕРЕВІРКА ТВЕРДЖЕНЬ`, `ПРОТОКОЛ ПЕРЕВІРКИ`, `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ` as applicable. The claim-level summary table uses `Твердження | Потрібно | Отримано незалежних | Виняток`. Do not expose English labels such as `Claim-level summary`, `Claim`, `Required`, `Achieved independent`, `Exception`, or raw CriticProfile field keys such as `profile_id`, `risk_level`, `required_cross_checks`, `approved_at` as user-visible labels unless the user explicitly asks for English/internal keys. For another selected report language, localize the same labels to that language.
 
 ## Scope
 
@@ -90,7 +92,7 @@ After successful creation show exactly:
 
 First gate behavior:
 - `1`: approve the current profile internally and immediately start research;
-- `2`: show the complete current profile, then show the displayed-profile menu below;
+- `2`: show the complete current profile using localized user-visible field labels, then show the displayed-profile menu below;
 - `3`: cancel and stop.
 
 Displayed-profile menu:
@@ -106,7 +108,7 @@ Displayed-profile behavior:
 - `2`: request or accept profile edits, keep `REVIEW_REQUIRED`, show the revised profile, and repeat the same displayed-profile menu;
 - `3`: cancel and stop.
 
-Direct natural-language changes while the profile is displayed count as edit. No research starts before explicit `1`. Approval sets `status=APPROVED`, `approved_by=user`, and current ISO-8601 `approved_at`.
+Direct natural-language changes while the profile is displayed count as edit. No research starts before explicit `1`. Approval sets internal `status=APPROVED`, `approved_by=user`, and current ISO-8601 `approved_at`.
 
 ## Required cross-check enforcement
 
@@ -125,7 +127,7 @@ Every evidence origin counted in `achieved_independent` must be visible and trac
 
 Critic must verify the ledger and evidence-origin traceability claim-by-claim before `PASS`. An unconditional `PASS` is forbidden if any material claim has an unreported/unqualified shortfall or an untraceable PASS count. The claim-verification output must show `Cross-check: achieved/required - PASS|SHORTFALL`.
 
-The review protocol MUST include a compact table with columns exactly `Claim | Required | Achieved independent | Exception` for every material factual claim. Values must match the visible claim blocks and traceable evidence origins; Exception must be `NONE` or `SHORTFALL`.
+For Ukrainian reports the review protocol MUST include `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ` with columns exactly `Твердження | Потрібно | Отримано незалежних | Виняток` for every material factual claim. Values must match the visible claim blocks and traceable evidence origins. Internal exception remains `NONE` or `SHORTFALL`; user-visible labels may be localized. For another report language, localize equivalent headings and columns.
 
 ## Privacy boundary
 
