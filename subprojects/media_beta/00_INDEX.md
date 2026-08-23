@@ -2,7 +2,7 @@
 
 Canonical documentation index for K-Research & Critic media-input work.
 
-Version: 2.9
+Version: 3.0
 Status: ACTIVE
 Updated: 2026-08-23
 
@@ -18,6 +18,7 @@ It covers:
 - CriticProfile presentation/approval UX and runtime acceptance;
 - claim-level required cross-check enforcement/auditability;
 - clean Core Builder extraction, traceability hardening, and final runtime acceptance;
+- MEDIA BETA alignment to the accepted Core traceability contract;
 - additional public platform adapters and local upload;
 - later sustainable/free media architecture.
 
@@ -42,20 +43,22 @@ The published K-Research & Critic product and repository `main` remain separate 
 15. `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md` - actual private MEDIA BETA runtime PASS of claim-level enforcement.
 16. `35_CORE_RUNTIME_TRACEABILITY_HARDENING.md` - main Core auditability finding and traceability/protocol-table hardening.
 17. `36_CORE_TRACEABILITY_RUNTIME_ACCEPTANCE.md` - final NEW-chat runtime PASS of the hardened main Core workflow.
+18. `37_MEDIA_BETA_TRACEABILITY_ALIGNMENT.md` - MEDIA BETA alignment to the accepted Core evidence-origin traceability and mandatory protocol-table contract.
 
 ## Source-of-truth precedence
 
 When documents disagree:
 1. current code, live runtime evidence and CI on active feature branches;
 2. `03_CURRENT_STATE.md`;
-3. `36_CORE_TRACEABILITY_RUNTIME_ACCEPTANCE.md` for final main Core runtime evidence;
-4. `35_CORE_RUNTIME_TRACEABILITY_HARDENING.md` for the Core traceability contract and implementation history;
-5. `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md` for MEDIA BETA claim-level runtime evidence;
-6. `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md` for claim-level cross-check behavior;
-7. `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md` for gate runtime evidence;
-8. `31_CRITICPROFILE_GATE_UX_UPDATE.md` for CriticProfile UX behavior;
-9. `06_DECISION_LOG.md`;
-10. roadmap/handoff/phase records.
+3. `37_MEDIA_BETA_TRACEABILITY_ALIGNMENT.md` for the current MEDIA BETA traceability contract and pending runtime gate;
+4. `36_CORE_TRACEABILITY_RUNTIME_ACCEPTANCE.md` for final main Core runtime evidence;
+5. `35_CORE_RUNTIME_TRACEABILITY_HARDENING.md` for the Core traceability contract and implementation history;
+6. `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md` for MEDIA BETA claim-level runtime evidence before traceability alignment;
+7. `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md` for claim-level cross-check behavior;
+8. `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md` for gate runtime evidence;
+9. `31_CRITICPROFILE_GATE_UX_UPDATE.md` for CriticProfile UX behavior;
+10. `06_DECISION_LOG.md`;
+11. roadmap/handoff/phase records.
 
 Do not mark a phase complete from roadmap text alone.
 
@@ -74,7 +77,7 @@ Do not mark a phase complete from roadmap text alone.
 - recovered `PROFILE_REVIEW_REQUIRED` checkpoints use the same gate;
 - actual private-GPT gate runtime acceptance passed on 2026-08-23.
 
-## Required cross-check contract
+## Required cross-check / traceability contract
 
 - floors: `LOW>=0`, `MEDIUM>=1`, `HIGH>=2`, `CRITICAL>=3`;
 - each material factual claim has its own `required / achieved_independent / exception` ledger;
@@ -84,7 +87,7 @@ Do not mark a phase complete from roadmap text alone.
 - unconditional PASS is forbidden for hidden/unqualified material shortfalls;
 - every counted evidence origin must be visibly traceable to the claim;
 - achieved count cannot exceed visibly traceable independent evidence origins;
-- a review/meta-analysis does not become a second independent origin merely by repeating an underlying study;
+- a systematic review/meta-analysis counts as one origin unless specific underlying studies were independently inspected and cited;
 - review protocol must contain `Claim | Required | Achieved independent | Exception` for every material factual claim.
 
 ## Core runtime status
@@ -99,7 +102,15 @@ Accepted runtime evidence includes:
 - `REVISE -> PASS` Critic cycle;
 - `CORE_TRACEABILITY_HARDENING_RUNTIME = ACCEPTED`.
 
-The minor Markdown header rendering issue is non-blocking because the four logical columns and values were present.
+## MEDIA BETA traceability status
+
+The same traceability contract is now implemented in the MEDIA BETA branch Builder/canonical instructions, manifest and tests.
+
+Current markers:
+- `MEDIA_BETA_CLAIM_LEVEL_RUNTIME = ACCEPTED` for the earlier claim-level contract;
+- `MEDIA_BETA_TRACEABILITY_HARDENING_CODE = IMPLEMENTED`;
+- `MEDIA_BETA_TRACEABILITY_HARDENING_RUNTIME = PENDING`;
+- private MEDIA BETA Builder resynchronization required before the runtime gate.
 
 ## Current A9 security/UX boundaries
 
