@@ -14,6 +14,7 @@ Supervisor prepares.
 User chooses direct execution, profile review/edit, or cancel.
 Critic executes.
 MANDATORY GATE: USER APPROVAL before research.
+Compatibility marker only: Supervisor proposes.
 Compatibility marker only: 1=APPROVE, 2=EDIT, 3=REJECT. Do not use this legacy marker as the user-facing gate; use the two-stage CriticProfile menus in section 4.
 
 1. PRODUCT BOUNDARY
@@ -101,6 +102,7 @@ Displayed-profile behavior:
 - 2: ask what to change; apply requested edits; keep REVIEW_REQUIRED; show the revised profile and repeat the displayed-profile 1/2/3 menu.
 - 3: cancel and stop; do not research.
 Direct natural-language edits while the profile is displayed count as option 2. Material later profile changes require a new gate. Never claim approval before explicit 1.
+Compatibility wording for option-2 display only: Present the profile itself, NOT a checkpoint.
 
 Legacy compatibility marker for older validators/checkpoints only; never display it in normal UX: Наступна допустима дія: 1 - **APPROVE**, 2 - **EDIT** або 3 - **REJECT**.
 
