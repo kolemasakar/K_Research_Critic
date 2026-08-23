@@ -2,7 +2,7 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 5.4
+Version: 5.5
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-23
 
@@ -10,14 +10,15 @@ Checkpoint date: 2026-08-23
 
 Current phase state:
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_COMPLETE / A9_8_OWNER_ZERO_CLIENT_YOUTUBE_COMPLETE / A9_6_INSTAGRAM_MANAGED_COMPLETE / A9_6_FACEBOOK_DEFERRED_NOT_ACCEPTED`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_COMPLETE / A9_8_OWNER_ZERO_CLIENT_YOUTUBE_COMPLETE / A9_6_INSTAGRAM_MANAGED_COMPLETE / A9_6_FACEBOOK_SUPADATA_NOT_ACCEPTED / A9_7_FACEBOOK_COBALT_LIVE_ACCEPTED`
 
 Accepted owner-only zero-client adapters:
 - public prerecorded YouTube;
-- public Instagram Reel through managed native first, with separately authorized AI fallback only when native transcript is unavailable.
+- public Instagram Reel through managed native first, with separately authorized AI fallback only when native transcript is unavailable;
+- public Facebook Video/Reels through the free Cobalt retrieval path followed by AssemblyAI STT and durable KRCM persistence.
 
 Deferred / not accepted:
-- Facebook public Video/Reels — remediation explicitly deferred by owner on 2026-08-23;
+- ScrapeCreators paid Facebook fallback (unconfigured and not live accepted);
 - Telegram public video posts;
 - local audio/video attachment.
 
@@ -115,7 +116,7 @@ Canonical runtime record: `39_REPORT_LANGUAGE_AND_MEDIA_TRACEABILITY_RUNTIME_ACC
 
 `MEDIA_BETA_REPORT_LABEL_LOCALIZATION_RUNTIME = ACCEPTED`
 
-`gpt_builder_private_update_required = false`
+`gpt_builder_private_update_required = true`
 
 A compact Markdown copy may visually concatenate adjacent table-header text; this is non-blocking while the four required labels/columns remain structurally present in the actual ChatGPT output.
 
@@ -133,6 +134,7 @@ supported public media URL in ChatGPT
  -> ChatGPT consequential-Action confirmation when shown
  -> native transcript when available
  -> Instagram only: if native unavailable, separate AI preflight + separate explicit consent
+ -> Facebook: free Cobalt retrieval first; AssemblyAI only after media retrieval; paid ScrapeCreators continuation never automatic
  -> CriticProfile gate
  -> Research -> Critic
  -> result in same conversation
@@ -168,9 +170,9 @@ PASS. Owner auth accepted; private GPT zero-client YouTube path complete. Accept
 
 PASS for isolated owner beta. Accepted flow: native 1 credit -> `AWAITING_AI_CONSENT` -> separate AI quote/approval -> generated transcript; source language `en`, 11 segments, cumulative 3 credits.
 
-### A9.6 - Facebook
+### A9.6 - Facebook Supadata route
 
-DEFERRED BY OWNER / NOT_ACCEPTED.
+HISTORICAL / NOT_ACCEPTED.
 
 Owner decision on 2026-08-23: skip Facebook remediation for now. No deployment, fresh quote, billable acceptance call, or private GPT Facebook E2E is authorized by this checkpoint.
 
@@ -186,8 +188,14 @@ When/if the owner resumes Facebook work, continue from the preserved remediation
 
 Canonical deferral record: `40_FACEBOOK_REMEDIATION_DEFERRED.md`.
 
+### A9.7 - Facebook Cobalt free path
+
+LIVE ACCEPTED for the isolated owner beta. H1 evidence: job `KRCM_0d2a512d-c90d-4b41-87b7-3d3f47d258bd` completed through `retrieval_provider=cobalt` and `provider=assemblyai`, with 0 retrieval credits, 23 STT seconds, 1 durable segment, 101 transcript characters, and a successful durable reread/segments read. ScrapeCreators and Supadata were not called.
+
+Canonical acceptance record: `41_A9_7_FACEBOOK_COBALT_LIVE_ACCEPTANCE.md`.
+
 ## Next task
 
-Facebook remediation is intentionally skipped for now. No replacement engineering task is implied by this checkpoint; select the next project direction explicitly.
+Backend Facebook free-path acceptance is complete. The next media gate is to apply the A9.7-C Action schema/instructions to the actual private Custom GPT Builder and run one owner new-chat Facebook zero-client E2E. ScrapeCreators remains outside live acceptance and still requires a fresh explicit one-credit approval before any real call.
 
-These markers do NOT authorize repository merge, external tester rollout, production VoiceBridge changes, private/authenticated media, automatic AI fallback, Facebook acceptance, Telegram, or local upload.
+These markers do NOT authorize repository merge, external tester rollout, production VoiceBridge changes, private/authenticated media, automatic AI fallback, ScrapeCreators paid-fallback acceptance, Telegram, or local upload.

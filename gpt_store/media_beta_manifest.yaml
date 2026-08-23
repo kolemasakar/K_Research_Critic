@@ -99,8 +99,8 @@ beta:
   public_platforms_live_accepted:
     - youtube
     - instagram
-  public_platforms_in_progress:
     - facebook
+  public_platforms_in_progress: []
   public_platforms_not_started:
     - telegram
   local_upload_live_accepted: false
@@ -117,12 +117,15 @@ beta:
   managed_instagram_ai_hard_cap_credits: 40
   managed_facebook_retrieval_stt_code_ready: true
   managed_facebook_free_retrieval_provider: cobalt
+  managed_facebook_free_path_live_accepted: true
   managed_facebook_paid_retrieval_provider: scrapecreators
+  managed_facebook_paid_retrieval_configured: false
+  managed_facebook_paid_fallback_live_accepted: false
   managed_facebook_paid_retrieval_max_credits: 1
   managed_facebook_paid_retrieval_requires_separate_consent: true
   managed_facebook_automatic_paid_retrieval: false
   managed_facebook_stt_provider: assemblyai
-  managed_facebook_live_accepted: false
+  managed_facebook_live_accepted: true
   managed_user_beta_access_code_required: false
   managed_owner_access_injected_server_side: true
   managed_durable_store: postgres
@@ -146,7 +149,7 @@ beta:
     never_log: true
 
 release:
-  rollout_state: A9_6_INSTAGRAM_COMPLETE_FACEBOOK_IN_PROGRESS
+  rollout_state: A9_7_FACEBOOK_COBALT_LIVE_ACCEPTED
   production_core_unchanged: true
   public_store_gpt_unchanged: true
   user_api_key_required: false
@@ -166,7 +169,8 @@ release:
   a9_6_instagram_managed_complete: true
   a9_6_facebook_complete: false
   a9_7_c_facebook_runtime_code_ready: true
-  a9_7_c_facebook_live_acceptance_complete: false
+  a9_7_c_facebook_live_acceptance_complete: true
+  a9_7_h1_facebook_cobalt_live_acceptance_complete: true
   criticprofile_gate_runtime_accepted: true
   cross_check_enforcement_hardened: true
   cross_check_claim_level_enforcement_hardened: true

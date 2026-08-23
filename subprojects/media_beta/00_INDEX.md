@@ -2,7 +2,7 @@
 
 Canonical documentation index for K-Research & Critic media-input work.
 
-Version: 3.3
+Version: 3.4
 Status: ACTIVE
 Updated: 2026-08-23
 
@@ -45,14 +45,15 @@ The published K-Research & Critic product and repository `main` remain separate 
 18. `37_MEDIA_BETA_TRACEABILITY_ALIGNMENT.md` - MEDIA BETA alignment to the accepted Core traceability contract.
 19. `38_REPORT_LANGUAGE_LABEL_LOCALIZATION_HARDENING.md` - Ukrainian-default visible heading/table/field-label hardening for both Core and MEDIA BETA.
 20. `39_REPORT_LANGUAGE_AND_MEDIA_TRACEABILITY_RUNTIME_ACCEPTANCE.md` - final dual-GPT localization PASS and MEDIA BETA traceability runtime acceptance.
-21. `40_FACEBOOK_REMEDIATION_DEFERRED.md` - owner decision to defer A9.6 Facebook remediation while preserving the non-replay safety boundary.
+21. `40_FACEBOOK_REMEDIATION_DEFERRED.md` - historical owner decision to defer the failed A9.6 Supadata route.
+22. `41_A9_7_FACEBOOK_COBALT_LIVE_ACCEPTANCE.md` - live acceptance of the free Facebook Cobalt -> AssemblyAI -> durable KRCM path.
 
 ## Source-of-truth precedence
 
 When documents disagree:
 1. current code, live runtime evidence and CI on active feature branches;
 2. `03_CURRENT_STATE.md`;
-3. `40_FACEBOOK_REMEDIATION_DEFERRED.md` for the current Facebook work disposition;
+3. `41_A9_7_FACEBOOK_COBALT_LIVE_ACCEPTANCE.md` for the current Facebook live-acceptance boundary;
 4. `39_REPORT_LANGUAGE_AND_MEDIA_TRACEABILITY_RUNTIME_ACCEPTANCE.md` for latest dual-GPT runtime acceptance;
 5. `38_REPORT_LANGUAGE_LABEL_LOCALIZATION_HARDENING.md` for the visible-language contract;
 6. `37_MEDIA_BETA_TRACEABILITY_ALIGNMENT.md` for the MEDIA BETA traceability contract;
@@ -69,7 +70,7 @@ Do not mark a phase complete from roadmap text alone.
 
 ## Current phase checkpoint
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_COMPLETE / A9_8_OWNER_ZERO_CLIENT_YOUTUBE_COMPLETE / A9_6_INSTAGRAM_MANAGED_COMPLETE / A9_6_FACEBOOK_DEFERRED_NOT_ACCEPTED`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_COMPLETE / A9_8_OWNER_ZERO_CLIENT_YOUTUBE_COMPLETE / A9_6_INSTAGRAM_MANAGED_COMPLETE / A9_6_FACEBOOK_SUPADATA_NOT_ACCEPTED / A9_7_FACEBOOK_COBALT_LIVE_ACCEPTED`
 
 ## Accepted Research/Critic contract
 
@@ -103,12 +104,12 @@ Both actual Custom GPTs passed NEW-chat visual localization regression.
 - `MEDIA_BETA_TRACEABILITY_LOGIC_RUNTIME = PASS`;
 - `MEDIA_BETA_TRACEABILITY_HARDENING_RUNTIME = ACCEPTED`;
 - `MEDIA_BETA_REPORT_LABEL_LOCALIZATION_RUNTIME = ACCEPTED`;
-- `gpt_builder_private_update_required = false`.
+- `gpt_builder_private_update_required = true`.
 
 ## Current A9 security/UX boundaries
 
-- live-accepted zero-client adapters: YouTube and Instagram Reel;
-- Facebook is deferred by owner and remains not accepted;
+- live-accepted zero-client adapters: YouTube, Instagram Reel, and Facebook through the free Cobalt -> AssemblyAI path;
+- ScrapeCreators remains an unconfigured, not-live-accepted paid fallback requiring a separate one-credit consent;
 - public URL sources only;
 - no platform login/password/cookies/session/account tokens;
 - no user-facing beta code in owner flow;
@@ -126,7 +127,7 @@ VoiceBridge: `kolemasakar/VoiceBridge`, branch `agent/krc-media-transcript`, dra
 
 ## Next task
 
-Facebook remediation is intentionally skipped for now. No substitute task is implied; choose the next project direction explicitly.
+Backend Facebook free-path acceptance is complete. The next media gate is the private GPT Builder update and owner new-chat Facebook E2E; this documentation update does not perform that Builder change.
 
 ## Non-negotiable boundary
 

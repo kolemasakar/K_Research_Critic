@@ -63,17 +63,20 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert beta["managed_explicit_user_consent_required"] is True
     assert beta["managed_automatic_ai_fallback"] is False
     assert beta["managed_user_beta_access_code_required"] is False
-    assert beta["public_platforms_live_accepted"] == ["youtube", "instagram"]
-    assert beta["public_platforms_in_progress"] == ["facebook"]
+    assert beta["public_platforms_live_accepted"] == ["youtube", "instagram", "facebook"]
+    assert beta["public_platforms_in_progress"] == []
     assert beta["managed_instagram_ai_fallback_live_accepted"] is True
     assert beta["managed_facebook_retrieval_stt_code_ready"] is True
     assert beta["managed_facebook_free_retrieval_provider"] == "cobalt"
+    assert beta["managed_facebook_free_path_live_accepted"] is True
     assert beta["managed_facebook_paid_retrieval_provider"] == "scrapecreators"
+    assert beta["managed_facebook_paid_retrieval_configured"] is False
+    assert beta["managed_facebook_paid_fallback_live_accepted"] is False
     assert beta["managed_facebook_paid_retrieval_max_credits"] == 1
     assert beta["managed_facebook_paid_retrieval_requires_separate_consent"] is True
     assert beta["managed_facebook_automatic_paid_retrieval"] is False
     assert beta["managed_facebook_stt_provider"] == "assemblyai"
-    assert beta["managed_facebook_live_accepted"] is False
+    assert beta["managed_facebook_live_accepted"] is True
 
     release = manifest["release"]
     assert release["a9_3_durable_managed_complete"] is True
@@ -82,7 +85,8 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert release["a9_6_instagram_managed_complete"] is True
     assert release["a9_6_facebook_complete"] is False
     assert release["a9_7_c_facebook_runtime_code_ready"] is True
-    assert release["a9_7_c_facebook_live_acceptance_complete"] is False
+    assert release["a9_7_c_facebook_live_acceptance_complete"] is True
+    assert release["a9_7_h1_facebook_cobalt_live_acceptance_complete"] is True
     assert release["criticprofile_gate_runtime_accepted"] is True
     assert release["cross_check_enforcement_hardened"] is True
     assert release["cross_check_claim_level_enforcement_hardened"] is True
