@@ -42,7 +42,26 @@ def test_core_builder_enforces_claim_level_cross_checks() -> None:
     assert "`exception`: NONE | SHORTFALL" in text
     assert "An unconditional PASS is forbidden" in text
     assert "Cross-check: achieved/required - PASS|SHORTFALL" in text
-    assert "per-claim required/achieved_independent/exception summary" in text
+
+
+def test_core_builder_requires_traceable_pass_counts() -> None:
+    text = _text()
+    assert "TRACEABILITY INVARIANT" in text
+    assert "Every evidence origin counted in `achieved_independent` MUST be traceable" in text
+    assert "Never report `3/3`, `4/3`, or any PASS count greater" in text
+    assert "`achieved_independent` cannot exceed 2" in text
+    assert "systematic review/meta-analysis counts as one evidence origin" in text
+    assert "untraceable PASS count" in text
+    assert "equals the number of valid, visibly traceable independent evidence origins" in text
+
+
+def test_core_builder_requires_claim_level_protocol_table() -> None:
+    text = _text()
+    assert "MANDATORY: include a compact claim-level summary table" in text
+    assert "`Claim | Required | Achieved independent | Exception`" in text
+    assert "Include EVERY material factual claim" in text
+    assert "Values must match the visible claim blocks and traceable evidence origins" in text
+    assert "Use `NONE` or `SHORTFALL` in Exception" in text
 
 
 def test_core_builder_is_clean_of_media_beta_operational_logic() -> None:
