@@ -120,12 +120,14 @@ jobs:
           repo_diag="$(tail -n 1 repository.log | tr '\n' ' ' | cut -c1-220)"
           store_diag="$(tail -n 1 store.log | tr '\n' ' ' | cut -c1-220)"
           pytest_diag="$(tail -n 1 pytest.log | tr '\n' ' ' | cut -c1-220)"
+          pytest_failed="$(grep '^FAILED ' pytest.log | tr '\n' ';' | cut -c1-900)"
           echo "repo_rc=$repo_rc" >> "$GITHUB_OUTPUT"
           echo "store_rc=$store_rc" >> "$GITHUB_OUTPUT"
           echo "pytest_rc=$pytest_rc" >> "$GITHUB_OUTPUT"
           echo "repo_diag=$repo_diag" >> "$GITHUB_OUTPUT"
           echo "store_diag=$store_diag" >> "$GITHUB_OUTPUT"
           echo "pytest_diag=$pytest_diag" >> "$GITHUB_OUTPUT"
+          echo "pytest_failed=$pytest_failed" >> "$GITHUB_OUTPUT"
           cat repository.log
           cat store.log
           cat pytest.log
@@ -140,7 +142,8 @@ jobs:
           REPO_DIAG: ${{ steps.gate.outputs.repo_diag }}
           STORE_DIAG: ${{ steps.gate.outputs.store_diag }}
           PYTEST_DIAG: ${{ steps.gate.outputs.pytest_diag }}
+          PYTEST_FAILED: ${{ steps.gate.outputs.pytest_failed }}
         run: |
           if [[ "$REPO_RC" == "0" && "$STORE_RC" == "0" && "$PYTEST_RC" == "0" ]]; then result=PASS; else result=FAIL; fi
-          gh pr comment 8 --repo kolemasakar/K_Research_Critic --body "A9.7-C managed Facebook Action schema audit V2: **${result}**. validate_repository_rc=\`${REPO_RC}\`, validate_store_package_rc=\`${STORE_RC}\`, pytest_rc=\`${PYTEST_RC}\`; repository_diag=\`${REPO_DIAG}\`; store_diag=\`${STORE_DIAG}\`; pytest_diag=\`${PYTEST_DIAG}\`. No provider or Render endpoint is called by this CI gate. Production/main are not targeted."
+          gh pr comment 8 --repo kolemasakar/K_Research_Critic --body "A9.7-C managed Facebook Action schema audit V3: **${result}**. validate_repository_rc=\`${REPO_RC}\`, validate_store_package_rc=\`${STORE_RC}\`, pytest_rc=\`${PYTEST_RC}\`; repository_diag=\`${REPO_DIAG}\`; store_diag=\`${STORE_DIAG}\`; pytest_diag=\`${PYTEST_DIAG}\`; failed=\`${PYTEST_FAILED}\`. No provider or Render endpoint is called by this CI gate. Production/main are not targeted."
           [[ "$result" == "PASS" ]]
