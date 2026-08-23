@@ -14,7 +14,7 @@ concurrency:
 jobs:
   h2-doc-state:
     name: A9.7-H2 documentation state
-    if: github.event_name == 'pull_request' && github.head_ref == 'agent/video-url-research'
+    if: (github.event_name == 'pull_request' && github.head_ref == 'agent/video-url-research') || (github.event_name == 'push' && github.ref == 'refs/heads/agent/video-url-research')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout feature branch
