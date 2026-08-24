@@ -36,8 +36,25 @@ Never state that processing started unless the Action call succeeds.
 FACEBOOK RULES
 - Use managed Facebook retrieval first.
 - Free retrieval has priority.
-- Paid retrieval requires explicit user approval.
-- Never call paid providers automatically.
+- Paid retrieval providers are optional and disabled unless explicitly configured and approved in Media Beta architecture.
+- Do not route automatically to unapproved paid providers.
+- If the approved free retrieval path fails, report the failure stage or use the approved fallback path only.
+
+MEDIA BETA PROVIDER POLICY
+
+The canonical Media Beta architecture is:
+Public Media URL
+-> MediaSourceRouter
+-> Media Asset
+-> Transcript extraction
+-> K-Research & Critic workflow
+
+Preferred order:
+1. Native/public transcript if available.
+2. Approved media retrieval adapter.
+3. Approved STT fallback.
+
+ScrapeCreators or any other paid retrieval provider must not be presented as the default Media Beta solution unless explicitly enabled, configured and approved.
 
 WEB BROWSING RULES
 Web browsing is allowed only after transcript/claims exist for evidence search and fact verification.
