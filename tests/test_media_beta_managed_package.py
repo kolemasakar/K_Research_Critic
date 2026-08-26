@@ -126,6 +126,7 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates(
         "/api/v1/media/managed/transcriptions",
         "/api/v1/media/managed/facebook-fallback",
         "/api/v1/media/managed/telegram",
+        "/api/v1/media/managed/attachment-probe",
         "/api/v1/media/managed/transcriptions/{job_id}",
         "/api/v1/media/managed/transcriptions/{job_id}/segments",
         "/api/v1/media/managed/transcriptions/{job_id}/facebook-retrieval-preflight",
@@ -148,6 +149,19 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates(
     telegram = paths["/api/v1/media/managed/telegram"]["post"]
     assert telegram["operationId"] == "startManagedTelegramPublicTranscription"
     assert telegram["x-openai-isConsequential"] is False
+    attachment_probe = paths["/api/v1/media/managed/attachment-probe"]["post"]
+    assert attachment_probe["operationId"] == "probeManagedAttachmentTransport"
+    assert attachment_probe["x-openai-isConsequential"] is False
+
+    attachment_request = schema["components"]["schemas"]["AttachmentProbeRequest"]
+    assert attachment_request["required"] == ["openaiFileIdRefs"]
+    refs = attachment_request["properties"]["openaiFileIdRefs"]
+    assert refs["minItems"] == 1
+    assert refs["maxItems"] == 1
+    attachment_result = schema["components"]["schemas"]["AttachmentProbeResult"]["properties"]
+    assert attachment_result["retrieval_credits_charged"]["const"] == 0
+    assert attachment_result["stt_seconds_charged"]["const"] == 0
+    assert attachment_result["probe_byte_limit"]["const"] == 65536
 
     retrieval_preflight = paths[
         "/api/v1/media/managed/transcriptions/{job_id}/facebook-retrieval-preflight"
