@@ -97,7 +97,7 @@ replace_once(
     ).read_text(encoding="utf-8")
     assert "ScrapeCreators is reserved compatibility" in action_text
     assert "treat Facebook retrieval as terminal unavailable" in action_text
-    assert "Active MEDIA BETA Builder must not call this operation after Cobalt failure" in action_text
+    assert "Builder must not call this operation after Cobalt failure" in action_text
     assert "separate local preflight and a new explicit" not in action_text
     assert "stop at AWAITING_RETRIEVAL_CONSENT" not in action_text
 
