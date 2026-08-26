@@ -8,7 +8,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_a9_7_i_builder_package_is_applied_but_e2e_pending() -> None:
+def test_a9_7_i_corrected_builder_package_requires_runtime_reapply() -> None:
     manifest = yaml.safe_load(
         (ROOT / "gpt_store" / "media_beta_manifest.yaml").read_text(encoding="utf-8")
     )
@@ -19,12 +19,13 @@ def test_a9_7_i_builder_package_is_applied_but_e2e_pending() -> None:
     assert instructions["builder_package_version"] == "0.7-beta-a9.7-i"
     assert instructions["builder_target_action_schema_version"] == "0.4.0-a9.7-c"
     assert instructions["builder_package_ready"] is True
-    assert instructions["builder_runtime_applied"] is True
+    assert instructions["builder_runtime_applied"] is False
 
+    assert release["rollout_state"] == "A9_7_I_POLICY_FIX_BUILDER_UPDATE_REQUIRED"
     assert release["a9_7_i_builder_package_ready"] is True
-    assert release["a9_7_i_builder_runtime_applied"] is True
+    assert release["a9_7_i_builder_runtime_applied"] is False
     assert release["a9_7_i_private_gpt_e2e_complete"] is False
-    assert release["gpt_builder_private_update_required"] is False
+    assert release["gpt_builder_private_update_required"] is True
 
 
 def test_a9_7_i_builder_enforces_cobalt_fail_unavailable_without_paid_offer() -> None:
@@ -45,6 +46,19 @@ def test_a9_7_i_builder_enforces_cobalt_fail_unavailable_without_paid_offer() ->
     assert "Do not route Facebook through Supadata generate fallback." in text
     assert "provider=scrapecreators, mode=facebook_post, max_credits=1" not in text
     assert "Only a NEW explicit `1` authorizes `continueManagedFacebookPaidRetrieval`" not in text
+
+
+def test_a9_7_i_manifest_records_facebook_paid_path_inactive() -> None:
+    manifest = yaml.safe_load(
+        (ROOT / "gpt_store" / "media_beta_manifest.yaml").read_text(encoding="utf-8")
+    )
+    beta = manifest["beta"]
+    assert beta["managed_facebook_free_failure_behavior"] == "unavailable"
+    assert beta["managed_facebook_paid_retrieval_configured"] is False
+    assert beta["managed_facebook_paid_fallback_live_accepted"] is False
+    assert beta["managed_facebook_paid_retrieval_active"] is False
+    assert beta["managed_facebook_paid_offer_allowed"] is False
+    assert beta["managed_facebook_automatic_paid_retrieval"] is False
 
 
 def test_a9_7_i_target_action_schema_keeps_reserved_paid_operations_compatible() -> None:
