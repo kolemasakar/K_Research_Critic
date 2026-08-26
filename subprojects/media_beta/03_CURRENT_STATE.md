@@ -2,7 +2,7 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 6.0
+Version: 6.1
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-26
 
@@ -10,7 +10,9 @@ Checkpoint date: 2026-08-26
 
 Current phase state:
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_OWNER_ZERO_CLIENT_MEDIA_INPUT_ACCEPTED / YOUTUBE_ACCEPTED / INSTAGRAM_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_ACCEPTED / LOCAL_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_OWNER_ZERO_CLIENT_MEDIA_INPUT_ACCEPTED / YOUTUBE_ACCEPTED / INSTAGRAM_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_ACCEPTED / LOCAL_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED / A10_STABILIZATION_PACKAGE_READY_RUNTIME_PENDING`
+
+A9.10 remains accepted. A10 does not reopen the accepted transport/transcription workflow; it hardens final-report Markdown presentation and aligns the canonical managed instruction reference.
 
 Accepted owner-only zero-client ingress:
 - prerecorded YouTube;
@@ -64,7 +66,7 @@ Claim-level cross-check enforcement is runtime accepted:
 
 Report language defaults to Ukrainian unless explicitly changed by the user. User-visible workflow text, CriticProfile labels, verdicts and final report labels follow the selected report language.
 
-## Runtime markers
+## A9 runtime markers retained
 
 `CRITICPROFILE_TWO_STAGE_GATE_RUNTIME = ACCEPTED`
 
@@ -88,11 +90,41 @@ Report language defaults to Ukrainian unless explicitly changed by the user. Use
 
 `managed_attachment_private_gpt_e2e_complete = true`
 
-`builder_runtime_applied = true`
-
-`gpt_builder_private_update_required = false`
-
 `rollout_state = A9_10_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED`
+
+## A10 stabilization state
+
+Repository package:
+- Builder instructions: `0.9.1-beta-a10`;
+- Action schema target: `0.6.0-a9.10` unchanged;
+- canonical managed reference: `0.5.0-a10-stabilization`;
+- claim-summary strict Markdown hardening: package-ready;
+- actual private-GPT Builder application of `0.9.1-beta-a10`: pending;
+- runtime acceptance of the table fix: pending.
+
+Authoritative A10 markers:
+- `builder_runtime_applied = false` for the new A10 package;
+- `gpt_builder_private_update_required = true`;
+- `claim_summary_table_hardening_package_ready = true`;
+- `claim_summary_table_hardening_runtime_applied = false`;
+- `a10_claim_summary_table_runtime_accepted = false`;
+- `stabilization_state = A10_CLAIM_TABLE_HARDENING_PACKAGE_READY_RUNTIME_PENDING`.
+
+The previous A9.10 Builder/runtime acceptance remains historical evidence for the accepted media flow; the `false` A10 Builder marker means only that the new formatting package has not yet been applied to the actual private GPT.
+
+### A10 table contract
+
+For Ukrainian `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ`, the staged Builder package requires exactly:
+
+```text
+| Твердження | Потрібно | Отримано незалежних | Виняток |
+| --- | ---: | ---: | --- |
+```
+
+Every material claim follows as one four-cell row. Header labels must not be merged/concatenated. The values must remain consistent with the visible claim blocks and traceable evidence origins.
+
+Canonical A10 record:
+`51_A10_STABILIZATION_AND_RELEASE_BOUNDARY.md`.
 
 ## Accepted owner media UX
 
@@ -140,48 +172,6 @@ Local attachment
 
 ## A9.10 local attachment accepted state
 
-### Transport
-
-PASS.
-
-Actual private GPT runtime injected a usable `openaiFileIdRefs` object. The sanitized probe observed the current OpenAI CDN family, and the hardened backend accepted HTTPS `*.oaiusercontent.com` while retaining anti-lookalike, redirect, port, credential and bounded-read protections.
-
-Real probe result:
-- `transport_available=true`;
-- file class video;
-- MIME `video/mp4` consistent;
-- 65,536 probe bytes;
-- HTTP Range supported;
-- retrieval credits `0`;
-- STT seconds `0`.
-
-Canonical record: `49_A9_10_ATTACHMENT_TRANSPORT_RUNTIME_ACCEPTANCE.md`.
-
-### Full ingestion/backend
-
-PASS.
-
-Action operation:
-
-`POST /api/v1/media/managed/attachment`
-
-`operationId: startManagedAttachmentTranscription`
-
-Boundary:
-- exactly one current-conversation audio/video attachment;
-- maximum bytes `33554432` (32 MiB);
-- trusted OpenAI attachment delivery only;
-- duration constrained by MEDIA BETA maximum;
-- temporary media cleanup;
-- AssemblyAI STT;
-- durable KRCM transcript/segments;
-- duplicate/replay protections preserved;
-- file ID, signed URL and provider secrets not exposed.
-
-### Actual private GPT E2E
-
-PASS / ACCEPTED.
-
 Actual owner test:
 - local `videoplayback (1).mp4`, approximately 5 MB;
 - request: `Перевірити факти/твердження у прикріпленому відео.`;
@@ -198,38 +188,9 @@ Actual owner test:
 - final status `COMPLETED_WITH_LIMITATIONS`;
 - no KRCM Job ID, OpenAI file ID, signed URL or provider credential exposed.
 
-Canonical record: `50_A9_10_PRIVATE_GPT_LOCAL_ATTACHMENT_E2E_ACCEPTANCE.md`.
-
-Non-blocking presentation backlog:
-- copied Markdown of `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ` may collapse the header cells into the first column;
-- data rows/counts remain readable and internally consistent;
-- this does not invalidate A9.10 transport, transcription or workflow acceptance.
-
-## Action / Builder state
-
-Current private MEDIA BETA Action schema:
-
-`0.6.0-a9.10`
-
-Current Builder instructions:
-
-`0.9-beta-a9.10`
-
-Actual private GPT has both applied.
-
-Key attachment operations:
-- `startManagedAttachmentTranscription` -> `POST /api/v1/media/managed/attachment`;
-- `probeManagedAttachmentTransport` -> `POST /api/v1/media/managed/attachment-probe`.
-
-Current authoritative markers:
-- `builder_package_ready = true`;
-- `builder_runtime_applied = true`;
-- `managed_attachment_action_schema_ready = true`;
-- `managed_attachment_builder_runtime_applied = true`;
-- `managed_attachment_ingestion_live_accepted = true`;
-- `managed_attachment_private_gpt_e2e_complete = true`;
-- `gpt_builder_private_update_required = false`;
-- `rollout_state = A9_10_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED`.
+Canonical records:
+- `49_A9_10_ATTACHMENT_TRANSPORT_RUNTIME_ACCEPTANCE.md`;
+- `50_A9_10_PRIVATE_GPT_LOCAL_ATTACHMENT_E2E_ACCEPTANCE.md`.
 
 ## Credit and replay invariants
 
@@ -244,10 +205,11 @@ Current authoritative markers:
 
 ## Current next boundary
 
-A9 owner zero-client ingress target is functionally complete/accepted.
+Repository-level A10 package validation must be green, then:
+1. apply `prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md` version `0.9.1-beta-a10` to the actual private MEDIA BETA GPT;
+2. keep the existing Action schema `0.6.0-a9.10`;
+3. run a fresh final-report regression;
+4. confirm that `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ` renders/copies as four distinct Markdown columns and keeps the same cross-check accounting;
+5. only after that mark A10 runtime accepted and clean the runtime-pending markers.
 
-Next work is stabilization and release-boundary review, not another required ingress adapter:
-1. preserve accepted routes and security invariants;
-2. optionally harden the non-blocking copied-table header defect;
-3. clean temporary acceptance automation after CI evidence is preserved;
-4. keep external tester/public sharing, repository `main` merge and production VoiceBridge promotion paused until a separate explicit owner decision.
+External tester/public sharing, repository `main` merge and production VoiceBridge promotion remain paused until a separate explicit owner decision.
