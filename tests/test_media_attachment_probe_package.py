@@ -52,6 +52,6 @@ def test_attachment_probe_audit_keeps_runtime_acceptance_pending() -> None:
 
     assert "FEASIBILITY_CONFIRMED_IN_CONTRACT / LIVE_RUNTIME_PROBE_REQUIRED" in text
     assert "probeManagedAttachmentTransport" in text
-    assert "0 credits and zero STT seconds" in text
+    assert "zero credits and zero STT seconds" in text
     assert "Only after this live probe passes" in text
     assert "not yet runtime accepted" in text
