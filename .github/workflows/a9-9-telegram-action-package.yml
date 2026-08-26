@@ -34,7 +34,7 @@ jobs:
           python -m pip install -r requirements-dev.txt
 
       - name: Apply A9.9 Telegram package patch
-        # v6: preserve compatibility marker after Builder <=8000 compaction
+        # v7: preserve CriticProfile research gate and compatibility marker
         run: python scripts/a9_9_telegram_action_package_patch_v3.py
 
       - name: Validate package and repository policy
