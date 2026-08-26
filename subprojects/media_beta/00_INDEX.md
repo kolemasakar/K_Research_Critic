@@ -2,7 +2,7 @@
 
 Canonical documentation index for K-Research & Critic media-input work.
 
-Version: 3.5
+Version: 3.6
 Status: ACTIVE
 Updated: 2026-08-26
 
@@ -20,7 +20,7 @@ It covers:
 - Core and MEDIA BETA evidence-origin traceability;
 - report-label localization;
 - Facebook Cobalt free retrieval acceptance;
-- A9.7-I Facebook failure-policy hardening;
+- A9.7-I Facebook failure-policy hardening and private-GPT E2E acceptance;
 - later sustainable/free media architecture.
 
 The published K-Research & Critic product and repository `main` remain separate production baselines and must not be changed implicitly by this subproject.
@@ -50,26 +50,28 @@ The published K-Research & Critic product and repository `main` remain separate 
 21. `40_FACEBOOK_REMEDIATION_DEFERRED.md` - historical owner decision to defer the failed A9.6 Supadata route.
 22. `41_A9_7_FACEBOOK_COBALT_LIVE_ACCEPTANCE.md` - live acceptance of the free Facebook Cobalt -> AssemblyAI -> durable KRCM path.
 23. `42_A9_7_PRIVATE_GPT_BUILDER_UPDATE_PACKAGE.md` - historical Builder application record before the final A9.7-I failure-policy correction.
-24. `43_A9_7_I_FACEBOOK_POLICY_FIX_BACKEND_HARDENING.md` - current A9.7-I policy-fix authority for Cobalt failure and paid-fallback suppression.
+24. `43_A9_7_I_FACEBOOK_POLICY_FIX_BACKEND_HARDENING.md` - backend policy-fix authority for Cobalt failure and paid-fallback suppression.
+25. `44_A9_7_I_PRIVATE_GPT_FACEBOOK_POLICY_E2E_ACCEPTANCE.md` - actual owner NEW-chat acceptance of the corrected private-GPT failure policy.
 
 ## Source-of-truth precedence
 
 When documents disagree:
 1. current code, current CI evidence and verified runtime evidence on active feature branches;
 2. `03_CURRENT_STATE.md`;
-3. `43_A9_7_I_FACEBOOK_POLICY_FIX_BACKEND_HARDENING.md` for the active Facebook Cobalt-failure policy;
-4. `41_A9_7_FACEBOOK_COBALT_LIVE_ACCEPTANCE.md` for the accepted positive Cobalt path;
-5. `39_REPORT_LANGUAGE_AND_MEDIA_TRACEABILITY_RUNTIME_ACCEPTANCE.md` for latest dual-GPT runtime acceptance;
-6. `38_REPORT_LANGUAGE_LABEL_LOCALIZATION_HARDENING.md` for the visible-language contract;
-7. `37_MEDIA_BETA_TRACEABILITY_ALIGNMENT.md` for the MEDIA BETA traceability contract;
-8. `36_CORE_TRACEABILITY_RUNTIME_ACCEPTANCE.md` for accepted main Core traceability evidence;
-9. `35_CORE_RUNTIME_TRACEABILITY_HARDENING.md`;
-10. `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md`;
-11. `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md`;
-12. `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md`;
-13. `31_CRITICPROFILE_GATE_UX_UPDATE.md`;
-14. `06_DECISION_LOG.md`;
-15. roadmap/handoff/older phase records.
+3. `44_A9_7_I_PRIVATE_GPT_FACEBOOK_POLICY_E2E_ACCEPTANCE.md` for the actual private-GPT A9.7-I runtime acceptance;
+4. `43_A9_7_I_FACEBOOK_POLICY_FIX_BACKEND_HARDENING.md` for the backend Cobalt-failure policy;
+5. `41_A9_7_FACEBOOK_COBALT_LIVE_ACCEPTANCE.md` for the accepted positive Cobalt path;
+6. `39_REPORT_LANGUAGE_AND_MEDIA_TRACEABILITY_RUNTIME_ACCEPTANCE.md` for latest dual-GPT runtime acceptance;
+7. `38_REPORT_LANGUAGE_LABEL_LOCALIZATION_HARDENING.md` for the visible-language contract;
+8. `37_MEDIA_BETA_TRACEABILITY_ALIGNMENT.md` for the MEDIA BETA traceability contract;
+9. `36_CORE_TRACEABILITY_RUNTIME_ACCEPTANCE.md` for accepted main Core traceability evidence;
+10. `35_CORE_RUNTIME_TRACEABILITY_HARDENING.md`;
+11. `34_CLAIM_LEVEL_CROSS_CHECK_RUNTIME_ACCEPTANCE.md`;
+12. `33_CLAIM_LEVEL_CROSS_CHECK_ENFORCEMENT.md`;
+13. `32_CRITICPROFILE_GATE_RUNTIME_ACCEPTANCE.md`;
+14. `31_CRITICPROFILE_GATE_UX_UPDATE.md`;
+15. `06_DECISION_LOG.md`;
+16. roadmap/handoff/older phase records.
 
 `42_A9_7_PRIVATE_GPT_BUILDER_UPDATE_PACKAGE.md` is a historical application record. Its prior paid-continuation description does not override the later A9.7-I policy correction.
 
@@ -77,7 +79,7 @@ Do not mark a phase complete from roadmap text alone.
 
 ## Current phase checkpoint
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_COMPLETE / A9_8_OWNER_ZERO_CLIENT_YOUTUBE_COMPLETE / A9_6_INSTAGRAM_MANAGED_COMPLETE / A9_6_FACEBOOK_SUPADATA_NOT_ACCEPTED / A9_7_FACEBOOK_COBALT_LIVE_ACCEPTED / A9_7_I_FACEBOOK_POLICY_BACKEND_HARDENED / A9_7_I_BUILDER_POLICY_REAPPLY_PENDING`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_COMPLETE / A9_8_OWNER_ZERO_CLIENT_YOUTUBE_COMPLETE / A9_6_INSTAGRAM_MANAGED_COMPLETE / A9_6_FACEBOOK_SUPADATA_NOT_ACCEPTED / A9_7_FACEBOOK_COBALT_LIVE_ACCEPTED / A9_7_I_FACEBOOK_POLICY_BACKEND_HARDENED / A9_7_I_BUILDER_POLICY_APPLIED / A9_7_I_PRIVATE_GPT_E2E_ACCEPTED`
 
 ## Accepted Research/Critic contract
 
@@ -105,8 +107,9 @@ Runtime acceptance details remain in records `38` and `39`.
 - `MEDIA_BETA_TRACEABILITY_HARDENING_RUNTIME = ACCEPTED`;
 - `MEDIA_BETA_REPORT_LABEL_LOCALIZATION_RUNTIME = ACCEPTED`;
 - `gpt_builder_private_update_required = false` is retained as a legacy compatibility marker;
-- `builder_policy_fix_runtime_applied = false` is authoritative for the current A9.7-I reapply step;
-- `a9_7_i_private_gpt_e2e_complete = false`.
+- `builder_policy_fix_runtime_applied = true`;
+- `a9_7_i_private_gpt_e2e_complete = true`;
+- `rollout_state = A9_7_I_PRIVATE_GPT_E2E_ACCEPTED`.
 
 ## Current A9 security/UX boundaries
 
@@ -132,11 +135,11 @@ Runtime acceptance details remain in records `38` and `39`.
 KRC: `kolemasakar/K_Research_Critic`, branch `agent/video-url-research`, draft PR #8.
 VoiceBridge: `kolemasakar/VoiceBridge`, branch `agent/krc-media-transcript`, draft PR #28.
 
-Latest VoiceBridge policy-hardening commit: `1b46f15588840eda5b8f14f5206fd966b69c4887`.
+Latest VoiceBridge Facebook policy-hardening commit: `1b46f15588840eda5b8f14f5206fd966b69c4887`.
 
 ## Next task
 
-Reapply the corrected A9.7-I Builder instructions to the actual private owner GPT, then run one NEW-chat Facebook zero-client E2E. If Cobalt cannot retrieve the public media, the expected result is retrieval unavailable with no paid fallback offer or call.
+Facebook A9.7-I is closed. Continue A9 zero-client expansion by auditing current KRC/VoiceBridge support for Telegram public video posts, then define the smallest isolated adapter implementation and acceptance matrix. Local upload remains not accepted and follows after a separate feasibility decision.
 
 ## Non-negotiable boundary
 
