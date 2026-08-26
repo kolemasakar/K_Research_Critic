@@ -37,6 +37,7 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert instructions["cross_check_protocol_table_required"] is True
     assert instructions["cross_check_protocol_markdown_table_strict"] is True
     assert instructions["cross_check_protocol_header_merge_forbidden"] is True
+    assert instructions["cross_check_copy_safe_table_required"] is True
     assert instructions["cross_check_protocol_table_header_row_uk"] == "| Твердження | Потрібно | Отримано незалежних | Виняток |"
     assert instructions["cross_check_protocol_table_separator_row"] == "| --- | ---: | ---: | --- |"
     assert instructions["user_visible_labels_localized_to_report_language"] is True
@@ -95,6 +96,7 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert beta["managed_telegram_action_schema_ready"] is True
     assert beta["managed_telegram_builder_runtime_applied"] is True
     assert beta["managed_telegram_private_gpt_e2e_complete"] is True
+    assert beta["claim_summary_table_hardening_runtime_applied"] is True
 
     release = manifest["release"]
     assert release["a9_3_durable_managed_complete"] is True
@@ -113,7 +115,10 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert release["cross_check_traceability_runtime_accepted"] is True
     assert release["report_label_localization_hardened"] is True
     assert release["report_label_localization_runtime_accepted"] is True
-    assert release["gpt_builder_private_update_required"] is True
+    assert release["stabilization_state"] == "A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED"
+    assert release["a10_claim_summary_table_runtime_accepted"] is True
+    assert release["a10_copy_safe_claim_table_runtime_accepted"] is True
+    assert release["gpt_builder_private_update_required"] is False
 
 
 def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates() -> None:
@@ -337,3 +342,5 @@ def test_private_builder_instructions_fit_limit_and_use_two_stage_profile_gate()
     assert "Cross-check: achieved/required - PASS|SHORTFALL" in text
     assert "TRACEABILITY:" in text
     assert "A systematic review/meta-analysis counts as one evidence origin" in text
+    assert "КОПІЯ ДЛЯ НАДІЙНОГО КОПІЮВАННЯ" in text
+    assert "fenced `text` code block" in text
