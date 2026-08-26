@@ -1,6 +1,6 @@
 # A10 Stabilization and Release Boundary
 
-Status: IN_PROGRESS / PACKAGE_READY_RUNTIME_PENDING
+Status: IN_PROGRESS / COPY_SAFE_RUNTIME_RETEST_PENDING
 Date: 2026-08-26
 Scope: isolated `K-Research & Critic - MEDIA BETA` feature branch only.
 
@@ -37,15 +37,43 @@ The compact Builder package had already gained Telegram and local-attachment rou
 - keep all A9 accepted transport, credit, replay, privacy and fallback boundaries unchanged;
 - stage Builder package `0.9.1-beta-a10` for private owner runtime application.
 
+## Runtime attempt 1
+
+The owner applied the A10 Builder instructions and ran a fresh Telegram fact-check against `https://t.me/techcrimes/12107`.
+
+Observed:
+- CriticProfile gate appeared correctly;
+- final report rendered `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ` visually as four distinct columns;
+- cross-check values remained coherent in the rendered table;
+- however, copying the whole response still serialized the header as a collapsed first cell:
+  `| ТвердженняПотрібноОтримано незалежнихВиняток |   |   |      |`.
+
+Conclusion:
+- visual table-rendering gate: PASS;
+- whole-response copied-Markdown gate: FAIL;
+- A10 is not yet runtime accepted.
+
+The evidence indicates a ChatGPT UI copy/serialization issue rather than a model table-rendering failure: a malformed source Markdown table would not have rendered as the correct four-column table shown in the owner screenshot.
+
+## Copy-safe refinement
+
+To make the report robust to the UI serializer, the same A10 Builder package is refined so every Ukrainian fact-check report must output both:
+1. the normal rendered four-column Markdown table; and
+2. immediately after it, `КОПІЯ ДЛЯ НАДІЙНОГО КОПІЮВАННЯ` containing the same complete table inside one fenced `text` code block.
+
+The fenced block must preserve literal `|` delimiters and exactly match the rendered table values. This does not change claim accounting, media routing, credits, backend behavior or Action schema.
+
 ## Runtime gate
 
 Repository/CI success is necessary but not sufficient to close A10.
 
-The actual private GPT must receive the new Builder instructions and a fresh owner test must confirm that `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ` renders/copies as four distinct Markdown columns while preserving the same cross-check values.
+The actual private GPT must receive the refined Builder instructions and a fresh owner test must confirm:
+- the visual `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ` still renders as four distinct columns;
+- the immediately following copy-safe fenced block contains four explicit pipe-delimited columns and survives whole-response copy;
+- the two representations contain identical claim rows and cross-check values.
 
-Until that manual Builder update/runtime test:
-
-- `builder_runtime_applied = false` for package `0.9.1-beta-a10`;
+Until that runtime retest:
+- `builder_runtime_applied = false` for the current A10 package state;
 - `gpt_builder_private_update_required = true`;
 - `a10_claim_summary_table_runtime_accepted = false`.
 
@@ -67,7 +95,8 @@ Facebook remains Cobalt-only in the active path after failure, ScrapeCreators re
 
 A10 can be marked COMPLETE only when:
 1. repository validators/tests are green on the final stabilization commit;
-2. Builder package `0.9.1-beta-a10` is applied to the actual private GPT;
-3. a fresh report demonstrates a valid four-column claim-summary table;
-4. no accepted A9 routing/security/credit invariant regresses;
-5. public/production boundaries remain unchanged unless separately approved.
+2. the refined Builder instructions are applied to the actual private GPT;
+3. a fresh report demonstrates a valid four-column rendered claim-summary table;
+4. the copy-safe fenced table preserves the same four columns and values when the whole response is copied;
+5. no accepted A9 routing/security/credit invariant regresses;
+6. public/production boundaries remain unchanged unless separately approved.
