@@ -1,0 +1,58 @@
+name: A9.9 Telegram Private GPT Package
+
+on:
+  push:
+    branches:
+      - agent/video-url-research
+    paths:
+      - .github/workflows/a9-9-telegram-action-package.yml
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout MEDIA branch
+        uses: actions/checkout@v6
+        with:
+          ref: agent/video-url-research
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install validation dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+
+      - name: Apply A9.9 Telegram package patch
+        run: python scripts/a9_9_telegram_action_package_patch.py
+
+      - name: Validate package and repository policy
+        run: |
+          python -m scripts.validate_repository
+          python -m scripts.validate_store_package
+          python -m pytest -q
+
+      - name: Commit package
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            gpt_store/actions/media_managed_beta_openapi.yaml \
+            prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md \
+            gpt_store/media_beta_manifest.yaml \
+            scripts/validate_store_package.py
+          git commit -m "A9.9: prepare Telegram private GPT Action package"
+          git push origin HEAD:agent/video-url-research
