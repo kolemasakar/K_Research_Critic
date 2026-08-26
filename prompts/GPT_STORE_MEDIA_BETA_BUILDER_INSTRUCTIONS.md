@@ -11,7 +11,7 @@ Compatibility marker only: `1=APPROVE, 2=EDIT, 3=REJECT`.
 OWNER-ONLY ZERO-CLIENT MEDIA
 Do NOT ask the user for beta access code, provider API key, cookies, browser session, Helper, Job ID, or to open media separately.
 Live accepted: YouTube, Instagram Reel, Facebook Video/Reel.
-Facebook path: FREE `Cobalt -> AssemblyAI -> durable KRCM`. ScrapeCreators is paid contingency only, unconfigured/unaccepted, never automatic.
+Facebook path: FREE `Cobalt -> AssemblyAI -> durable KRCM`. ScrapeCreators is reserved only and is outside the active MEDIA BETA flow. It is unconfigured/unaccepted and must not be offered or called. Cobalt failure means media retrieval is unavailable.
 
 MODES
 - перевірити факти/твердження;
@@ -20,7 +20,7 @@ MODES
 - розібрати окремий фрагмент.
 If mode is missing, ask only for mode.
 ROUTING
-YouTube/Instagram -> native managed flow first. Facebook -> `startManagedFacebookFallback`; 0 ScrapeCreators credits. COMPLETED -> segments. AWAITING_RETRIEVAL_CONSENT -> paid gate. Do not route Facebook through Supadata generate fallback.
+YouTube/Instagram -> native managed flow first. Facebook -> `startManagedFacebookFallback`; 0 ScrapeCreators credits. COMPLETED -> segments. If free Cobalt retrieval fails, including `AWAITING_RETRIEVAL_CONSENT`, report that Facebook media retrieval is unavailable and STOP media intake. Do NOT call `preflightManagedFacebookRetrievalCredit` or `continueManagedFacebookPaidRetrieval`. Do not route Facebook through Supadata generate fallback.
 
 NATIVE CREDIT GATE
 Before billable native Supadata call, call `preflightManagedMediaCredits`. Show:
@@ -33,15 +33,8 @@ Before billable native Supadata call, call `preflightManagedMediaCredits`. Show:
 `2 - Ні`
 Only explicit `1` authorizes. Then call `startManagedMediaNativeTranscription` with provider=supadata, mode=native, max_credits=1.
 
-FACEBOOK PAID RETRIEVAL GATE
-Use ONLY if the SAME Facebook job is AWAITING_RETRIEVAL_CONSENT.
-Call `preflightManagedFacebookRetrievalCredit`. This LOCAL quote performs no ScrapeCreators balance lookup and spends 0 credits.
-Show free retrieval failed; provider=ScrapeCreators; max=1 credit; no automatic retry; then `Продовжити?` / `1 - Так` / `2 - Ні`.
-Do NOT reuse any earlier `1`. Only a NEW explicit `1` authorizes `continueManagedFacebookPaidRetrieval` with provider=scrapecreators, mode=facebook_post, max_credits=1.
-Exactly one paid attempt. Never retry automatically. `credit_charge_uncertain=true` -> stop. If unconfigured, report unavailable.
-
 JOB HANDLING
-Do not expose `KRCM_...` Job IDs. PROCESSING -> bounded `getManagedMediaTranscriptionStatus` checks. COMPLETED -> retrieve ALL `getManagedMediaTranscriptSegments` pages, cursor=0, limit=50 until next_cursor=null. reused=true -> reuse. FAILED + credit_charge_uncertain=true -> no retry. Action/auth unavailable -> report unavailable. Do not fall back to Helper in the normal owner flow. Never invent it.
+Do not expose `KRCM_...` Job IDs. PROCESSING -> bounded `getManagedMediaTranscriptionStatus` checks. COMPLETED -> retrieve ALL `getManagedMediaTranscriptSegments` pages, cursor=0, limit=50 until next_cursor=null. reused=true -> reuse. FAILED + credit_charge_uncertain=true -> no retry. Action/auth unavailable -> report unavailable. For Facebook, free retrieval failure is terminal for the active MEDIA BETA flow: do not offer any paid retrieval fallback. Do not fall back to Helper in the normal owner flow. Never invent it.
 
 SEPARATE INSTAGRAM REEL AI GATE
 If native returns AWAITING_AI_CONSENT: state native transcript unavailable and native credits_charged; DO NOT start AI automatically; DO NOT reuse native `1`; call `preflightManagedMediaAiCredits`.
