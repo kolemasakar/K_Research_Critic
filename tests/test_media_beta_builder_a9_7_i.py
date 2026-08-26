@@ -8,7 +8,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_a9_7_i_corrected_builder_policy_fix_requires_runtime_reapply() -> None:
+def test_a9_7_i_corrected_builder_policy_fix_is_runtime_applied() -> None:
     manifest = yaml.safe_load(
         (ROOT / "gpt_store" / "media_beta_manifest.yaml").read_text(encoding="utf-8")
     )
@@ -20,15 +20,15 @@ def test_a9_7_i_corrected_builder_policy_fix_requires_runtime_reapply() -> None:
     assert instructions["builder_target_action_schema_version"] == "0.4.0-a9.7-c"
     assert instructions["builder_package_ready"] is True
     assert instructions["builder_runtime_applied"] is True
-    assert instructions["builder_policy_fix_runtime_applied"] is False
+    assert instructions["builder_policy_fix_runtime_applied"] is True
 
     assert release["rollout_state"] == "A9_7_I_BUILDER_APPLIED_E2E_PENDING"
     assert release["a9_7_i_builder_package_ready"] is True
     assert release["a9_7_i_builder_runtime_applied"] is True
-    assert release["a9_7_i_builder_policy_fix_runtime_applied"] is False
+    assert release["a9_7_i_builder_policy_fix_runtime_applied"] is True
     assert release["a9_7_i_private_gpt_e2e_complete"] is False
     # Legacy marker remains false for compatibility; the dedicated policy-fix
-    # marker above is authoritative for this reapply step.
+    # marker above is authoritative for the corrected Builder runtime state.
     assert release["gpt_builder_private_update_required"] is False
 
 
