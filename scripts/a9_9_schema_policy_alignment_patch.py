@@ -14,17 +14,19 @@ def replace_once(path: Path, old: str, new: str) -> None:
 
 replace_once(
     SCHEMA,
-    '''    Facebook retrieval/STT uses a free Cobalt attempt first; if that
+    '''    consent-gated AI paths remain
+    available. Facebook retrieval/STT uses a free Cobalt attempt first; if that
     cannot retrieve the public media, a separate local preflight and a new explicit
     one-credit ScrapeCreators approval are required before any paid retrieval.
     AssemblyAI STT runs only after media retrieval. Action bearer and owner
     admission credentials remain server-side.
 ''',
-    '''    Facebook retrieval/STT uses the free Cobalt path. If Cobalt cannot retrieve
-    the public media, Facebook retrieval is unavailable and media intake stops.
-    ScrapeCreators is reserved compatibility surface only and is not active or
-    offerable. AssemblyAI STT runs only after successful media retrieval. Action
-    bearer and owner admission credentials remain server-side.
+    '''    consent-gated AI paths remain available. Facebook retrieval/STT uses the free
+    Cobalt path. If Cobalt cannot retrieve the public media, Facebook retrieval is
+    unavailable and media intake stops. ScrapeCreators is reserved compatibility
+    surface only and is not active or offerable. AssemblyAI STT runs only after
+    successful media retrieval. Action bearer and owner admission credentials remain
+    server-side.
 ''',
 )
 
@@ -93,7 +95,7 @@ replace_once(
     '''    action_text = (
         ROOT / "gpt_store" / "actions" / "media_managed_beta_openapi.yaml"
     ).read_text(encoding="utf-8")
-    assert "ScrapeCreators is reserved compatibility surface only" in action_text
+    assert "ScrapeCreators is reserved compatibility" in action_text
     assert "treat Facebook retrieval as terminal unavailable" in action_text
     assert "Active MEDIA BETA Builder must not call this operation after Cobalt failure" in action_text
     assert "separate local preflight and a new explicit" not in action_text
