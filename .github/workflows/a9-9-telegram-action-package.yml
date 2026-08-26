@@ -34,7 +34,7 @@ jobs:
           python -m pip install -r requirements-dev.txt
 
       - name: Apply A9.9 Telegram package patch
-        # v3: corrected validator token and label anchors
+        # v4: package plus A9.9 regression alignment
         run: python scripts/a9_9_telegram_action_package_patch_v2.py
 
       - name: Validate package and repository policy
@@ -54,6 +54,9 @@ jobs:
             gpt_store/actions/media_managed_beta_openapi.yaml \
             prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md \
             gpt_store/media_beta_manifest.yaml \
-            scripts/validate_store_package.py
+            scripts/validate_store_package.py \
+            tests/test_claim_level_cross_check_enforcement.py \
+            tests/test_media_beta_builder_a9_7_i.py \
+            tests/test_media_beta_managed_package.py
           git commit -m "A9.9: prepare Telegram private GPT Action package"
           git push origin HEAD:agent/video-url-research
