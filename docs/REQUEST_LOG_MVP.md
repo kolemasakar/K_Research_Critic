@@ -1,8 +1,9 @@
 # Public Request Log MVP
+Опис історичного прототипу журналу запитів і чинного стану його вимкнення.
 
-Version: 1.3
+Version: 1.4
 Status: DISABLED_DUE_TO_USER_CONSENT_UX / RUNTIME ACCEPTED / PROTOTYPE RETAINED
-Updated: 2026-08-23
+Updated: 2026-08-26
 
 ## Decision
 
@@ -11,8 +12,8 @@ The Request Log MVP was implemented and runtime-tested successfully, but it is d
 Reason:
 
 ```text
-ChatGPT external Action consent is shown to users before `script.google.com` receives the generalized topic.
-The builder cannot pre-authorize that consent for every public user.
+ChatGPT external Action consent is shown to users before script.google.com receives the generalized topic.
+The Builder cannot pre-authorize that consent for every public user.
 The consent interruption is too costly for a non-essential analytics feature.
 ```
 
@@ -26,7 +27,7 @@ User request
   -> Final report
 ```
 
-with no automatic request-log Action.
+No automatic request-log Action is active.
 
 ## Historical prototype
 
@@ -35,28 +36,13 @@ The tested prototype is retained in the repository for reference and possible fu
 ```text
 GPT Action `logRequest`
   -> Google Apps Script Web App
-  -> Google Sheet: K-Research & Critic — Request Log
+  -> Google Sheet controlled by the product owner
 ```
 
-Google Sheet ID:
-
-```text
-1icDvAkPx43s7568iZkANBCriz8UaanB4kMITO-icLaU
-```
-
-Sheet tab: `Звернення`.
-Timezone: `Europe/Kyiv`.
+Prototype timezone: `Europe/Kyiv`.
 Authentication used by prototype: `None`.
 
-Stored fields were:
-
-```text
-Номер звернення
-Дата
-Час
-Ім'я користувача
-Коротка узагальнена тема запиту
-```
+The stored fields were request number, date, time, user name and a short generalized request topic.
 
 ## Privacy/data-minimization contract
 
@@ -77,11 +63,12 @@ prompts/GPT_STORE_REQUEST_LOG_ADDENDUM.md
 docs/PRIVACY_POLICY_REQUEST_LOG.md
 docs/REQUEST_LOG_MVP_RUNTIME_ACCEPTANCE_2026-08-23.md
 docs/REQUEST_LOG_DISABLEMENT_DECISION_2026-08-23.md
+docs/REQUEST_LOG_DISABLEMENT_RUNTIME_ACCEPTANCE_2026-08-23.md
 ```
 
 These files are retained as historical/tested implementation artifacts. They are not part of the active public Builder configuration while request logging is disabled.
 
-## Historical runtime acceptance — 2026-08-23
+## Historical runtime acceptance - 2026-08-23
 
 The prototype itself passed:
 
@@ -102,7 +89,7 @@ Historical marker:
 REQUEST_LOG_MVP_RUNTIME = ACCEPTED
 ```
 
-## Public disablement runtime acceptance — 2026-08-23
+## Public disablement runtime acceptance - 2026-08-23
 
 After the owner removed the Action and synchronized the no-logging Builder Instructions, a NEW-chat request produced the standard CriticProfile gate directly.
 
