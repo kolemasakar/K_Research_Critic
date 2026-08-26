@@ -63,8 +63,13 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert beta["managed_explicit_user_consent_required"] is True
     assert beta["managed_automatic_ai_fallback"] is False
     assert beta["managed_user_beta_access_code_required"] is False
-    assert beta["public_platforms_live_accepted"] == ["youtube", "instagram", "facebook"]
-    assert beta["public_platforms_in_progress"] == ["telegram"]
+    assert beta["public_platforms_live_accepted"] == [
+        "youtube",
+        "instagram",
+        "facebook",
+        "telegram",
+    ]
+    assert beta["public_platforms_in_progress"] == []
     assert beta["public_platforms_not_started"] == []
     assert beta["managed_instagram_ai_fallback_live_accepted"] is True
     assert beta["managed_facebook_retrieval_stt_code_ready"] is True
@@ -84,8 +89,8 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert beta["managed_telegram_retrieval_credits"] == 0
     assert beta["managed_telegram_stt_provider"] == "assemblyai"
     assert beta["managed_telegram_action_schema_ready"] is True
-    assert beta["managed_telegram_builder_runtime_applied"] is False
-    assert beta["managed_telegram_private_gpt_e2e_complete"] is False
+    assert beta["managed_telegram_builder_runtime_applied"] is True
+    assert beta["managed_telegram_private_gpt_e2e_complete"] is True
 
     release = manifest["release"]
     assert release["a9_3_durable_managed_complete"] is True
@@ -104,7 +109,7 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert release["cross_check_traceability_runtime_accepted"] is True
     assert release["report_label_localization_hardened"] is True
     assert release["report_label_localization_runtime_accepted"] is True
-    assert release["gpt_builder_private_update_required"] is True
+    assert release["gpt_builder_private_update_required"] is False
 
 
 def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates() -> None:
