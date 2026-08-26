@@ -2,15 +2,15 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 5.5
+Version: 5.6
 Status: ACTIVE_CHECKPOINT
-Checkpoint date: 2026-08-23
+Checkpoint date: 2026-08-26
 
 ## Executive state
 
 Current phase state:
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_COMPLETE / A9_8_OWNER_ZERO_CLIENT_YOUTUBE_COMPLETE / A9_6_INSTAGRAM_MANAGED_COMPLETE / A9_6_FACEBOOK_SUPADATA_NOT_ACCEPTED / A9_7_FACEBOOK_COBALT_LIVE_ACCEPTED`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_COMPLETE / A9_8_OWNER_ZERO_CLIENT_YOUTUBE_COMPLETE / A9_6_INSTAGRAM_MANAGED_COMPLETE / A9_6_FACEBOOK_SUPADATA_NOT_ACCEPTED / A9_7_FACEBOOK_COBALT_LIVE_ACCEPTED / A9_7_I_FACEBOOK_POLICY_BACKEND_HARDENED / A9_7_I_BUILDER_POLICY_REAPPLY_PENDING`
 
 Accepted owner-only zero-client adapters:
 - public prerecorded YouTube;
@@ -18,9 +18,15 @@ Accepted owner-only zero-client adapters:
 - public Facebook Video/Reels through the free Cobalt retrieval path followed by AssemblyAI STT and durable KRCM persistence.
 
 Deferred / not accepted:
-- ScrapeCreators paid Facebook fallback (unconfigured and not live accepted);
+- ScrapeCreators paid Facebook fallback: reserve-only, unconfigured, not live accepted and inactive in current MEDIA BETA routing;
 - Telegram public video posts;
 - local audio/video attachment.
+
+The active Facebook failure policy is now explicit and backend-enforced:
+
+`Cobalt/free retrieval failure -> FACEBOOK_RETRIEVAL_UNAVAILABLE -> terminal FAILED -> STOP`
+
+No paid Facebook retrieval offer, preflight or continuation belongs to the active MEDIA BETA flow after Cobalt failure.
 
 Repository `main`, external tester rollout, and production VoiceBridge remain outside the current merge gate.
 
@@ -36,15 +42,9 @@ VoiceBridge:
 - repo `kolemasakar/VoiceBridge`;
 - branch `agent/krc-media-transcript`;
 - draft PR #28;
-- production service and `main` unchanged.
+- repository `main` unchanged.
 
-Isolated beta runtime:
-- service `voicebridge-krc-media-beta-kolemasakar`;
-- service ID `srv-da1kic5bedkc73d6fk60`;
-- endpoint `https://voicebridge-krc-media-beta-kolemasakar.onrender.com`;
-- auto-deploy false.
-
-Do not merge PR #8 or PR #28 and do not target production without a separate explicit owner decision.
+Isolated beta runtime remains separate from production. No production deployment or merge is authorized by this checkpoint.
 
 ## Accepted Research/Critic workflow
 
@@ -66,9 +66,7 @@ Claim-level cross-check enforcement is runtime accepted:
 Evidence-origin traceability is runtime accepted in BOTH main Core and MEDIA BETA:
 - each origin counted in `achieved_independent` is visibly attributable to the claim;
 - achieved count cannot exceed visible independent origins;
-- traceable `3/3 PASS` values were demonstrated;
-- a real `1/3 SHORTFALL` remained visible;
-- MEDIA BETA latest text-only regression used 0 managed media credits.
+- real shortfalls remain visible.
 
 Canonical records:
 - `31_CRITICPROFILE_GATE_UX_UPDATE.md`;
@@ -78,27 +76,16 @@ Canonical records:
 - `35_CORE_RUNTIME_TRACEABILITY_HARDENING.md`;
 - `36_CORE_TRACEABILITY_RUNTIME_ACCEPTANCE.md`;
 - `37_MEDIA_BETA_TRACEABILITY_ALIGNMENT.md`;
+- `38_REPORT_LANGUAGE_LABEL_LOCALIZATION_HARDENING.md`;
 - `39_REPORT_LANGUAGE_AND_MEDIA_TRACEABILITY_RUNTIME_ACCEPTANCE.md`.
 
 ## Report-language invariant
 
 Default user-facing report language is Ukrainian unless the user explicitly requests another language.
 
-The selected report language controls ALL user-visible workflow text including prompts, CriticProfile presentation, section headings, table titles and columns, CriticProfile field labels, verdict labels, final report, claim verification, and review protocol.
+The selected report language controls all user-visible workflow text, prompts, CriticProfile presentation, section/table labels, verdict labels, final report, claim verification and review protocol. Canonical English/internal keys remain internal unless explicitly requested.
 
-Canonical English/internal keys remain internal unless explicitly requested.
-
-For Ukrainian reports use, as applicable:
-- `ФІНАЛЬНИЙ ЗВІТ`;
-- `ПЕРЕВІРКА ТВЕРДЖЕНЬ`;
-- `ПРОТОКОЛ ПЕРЕВІРКИ`;
-- `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ`;
-- columns `Твердження | Потрібно | Отримано незалежних | Виняток`.
-
-Latest NEW-chat regressions in BOTH actual Custom GPTs passed this localization contract. Main Core displayed the Ukrainian claim summary and localized profile summary. MEDIA BETA displayed localized CriticProfile field labels such as `Ідентифікатор профілю`, `Рівень ризику`, `Необхідних незалежних перевірок`, and `Час схвалення`.
-
-Canonical hardening record: `38_REPORT_LANGUAGE_LABEL_LOCALIZATION_HARDENING.md`.
-Canonical runtime record: `39_REPORT_LANGUAGE_AND_MEDIA_TRACEABILITY_RUNTIME_ACCEPTANCE.md`.
+Latest NEW-chat regressions in both actual Custom GPTs passed the localization contract recorded in `39_REPORT_LANGUAGE_AND_MEDIA_TRACEABILITY_RUNTIME_ACCEPTANCE.md`.
 
 ## Runtime markers
 
@@ -116,9 +103,11 @@ Canonical runtime record: `39_REPORT_LANGUAGE_AND_MEDIA_TRACEABILITY_RUNTIME_ACC
 
 `MEDIA_BETA_REPORT_LABEL_LOCALIZATION_RUNTIME = ACCEPTED`
 
-`gpt_builder_private_update_required = true`
+`gpt_builder_private_update_required = false` is retained as a legacy compatibility marker.
 
-A compact Markdown copy may visually concatenate adjacent table-header text; this is non-blocking while the four required labels/columns remain structurally present in the actual ChatGPT output.
+`builder_policy_fix_runtime_applied = false` is authoritative for the corrected A9.7-I Builder-policy reapply.
+
+`a9_7_i_private_gpt_e2e_complete = false`.
 
 ## Accepted owner media UX
 
@@ -129,12 +118,12 @@ supported public media URL in ChatGPT
  -> no Helper
  -> no beta-code prompt
  -> no manual Job ID
- -> native managed credit preflight
- -> explicit user consent
- -> ChatGPT consequential-Action confirmation when shown
- -> native transcript when available
- -> Instagram only: if native unavailable, separate AI preflight + separate explicit consent
- -> Facebook: free Cobalt retrieval first; AssemblyAI only after media retrieval; paid ScrapeCreators continuation never automatic
+ -> YouTube/Instagram: native managed credit preflight where applicable
+ -> explicit user consent for billable native/Instagram AI operations
+ -> Facebook: startManagedFacebookFallback directly
+ -> Facebook Cobalt success: AssemblyAI -> durable KRCM transcript
+ -> Facebook Cobalt failure: retrieval unavailable -> STOP
+ -> no paid Facebook offer/preflight/continuation in active MEDIA BETA
  -> CriticProfile gate
  -> Research -> Critic
  -> result in same conversation
@@ -151,6 +140,8 @@ A billable managed transcript request must never start merely because a URL was 
 - conservative maximum: 40 credits / 20 minutes;
 - automatic AI fallback prohibited;
 - `credit_charge_uncertain=true` operation must never be automatically retried or replayed.
+
+For current Facebook routing there is no active paid retrieval consent gate because paid retrieval is outside active MEDIA BETA. Historical ScrapeCreators consent/preflight code does not authorize current use.
 
 ## Accepted A9 media milestones
 
@@ -174,28 +165,63 @@ PASS for isolated owner beta. Accepted flow: native 1 credit -> `AWAITING_AI_CON
 
 HISTORICAL / NOT_ACCEPTED.
 
-Owner decision on 2026-08-23: skip Facebook remediation for now. No deployment, fresh quote, billable acceptance call, or private GPT Facebook E2E is authorized by this checkpoint.
-
-Preserved technical state for future resumption:
-- prior separately authorized Facebook AI generate request failed with `MANAGED_PROVIDER_TRANSCRIPT_INVALID`;
-- `segments=0`;
-- `credit_charge_uncertain=true`;
-- automatic retry/replay remains prohibited;
-- nested async-result parser remediation remains available in VoiceBridge commit `f6b32c2a03425deaecadd10fc902671d62eaab5d`;
-- latest recorded isolated deploy attempt of that remediation failed.
-
-When/if the owner resumes Facebook work, continue from the preserved remediation sequence; do not replay the uncertain-charge operation.
-
-Canonical deferral record: `40_FACEBOOK_REMEDIATION_DEFERRED.md`.
+The failed/uncertain Supadata Facebook route remains historical and must not be replayed automatically. Canonical deferral record: `40_FACEBOOK_REMEDIATION_DEFERRED.md`.
 
 ### A9.7 - Facebook Cobalt free path
 
-LIVE ACCEPTED for the isolated owner beta. H1 evidence: job `KRCM_0d2a512d-c90d-4b41-87b7-3d3f47d258bd` completed through `retrieval_provider=cobalt` and `provider=assemblyai`, with 0 retrieval credits, 23 STT seconds, 1 durable segment, 101 transcript characters, and a successful durable reread/segments read. ScrapeCreators and Supadata were not called.
+LIVE ACCEPTED for the isolated owner beta. H1 evidence: job `KRCM_0d2a512d-c90d-4b41-87b7-3d3f47d258bd` completed through `retrieval_provider=cobalt` and `provider=assemblyai`, with 0 retrieval credits, 23 STT seconds, 1 durable segment, 101 transcript characters, and successful durable reread/segments read. ScrapeCreators and Supadata were not called.
 
-Canonical acceptance record: `41_A9_7_FACEBOOK_COBALT_LIVE_ACCEPTANCE.md`.
+Canonical positive-path acceptance record: `41_A9_7_FACEBOOK_COBALT_LIVE_ACCEPTANCE.md`.
+
+### A9.7-I - Facebook failure-policy hardening
+
+CODE + CI ACCEPTED on VoiceBridge branch `agent/krc-media-transcript`.
+
+Authoritative VoiceBridge commit:
+
+`1b46f15588840eda5b8f14f5206fd966b69c4887` - `A9: make Cobalt failure terminal unavailable`
+
+Enforced behavior:
+- Cobalt/free retrieval failure becomes `FACEBOOK_RETRIEVAL_UNAVAILABLE`;
+- active managed job becomes terminal `FAILED`;
+- active retrieval chain does not call the paid retriever;
+- supplying a valid historical ScrapeCreators consent object still does not trigger paid fallback;
+- paid preflight is not applicable to the terminal failed job;
+- duplicate starts reuse terminal durable state rather than replay retrieval.
+
+Regression coverage explicitly asserts no paid fallback and `paidCalls == 0`.
+
+CI for the commit:
+- `A9.7-F Cobalt Package Validate`: PASS;
+- `Validate`: PASS.
+
+Canonical hardening record: `43_A9_7_I_FACEBOOK_POLICY_FIX_BACKEND_HARDENING.md`.
+
+## Action-schema compatibility boundary
+
+The current repository Action schema remains compatibility version `0.4.0-a9.7-c` and still exposes historical paid-preflight/continuation operation definitions. They are reserved compatibility surface only.
+
+The active Builder instructions explicitly forbid calling or offering those operations after Cobalt failure. The backend now also makes new Cobalt-failed jobs terminal, preventing the active route from entering the historical retrieval-consent state.
+
+Historical durable jobs may still contain `AWAITING_RETRIEVAL_CONSENT`; this compatibility state does not define new-job routing policy.
+
+## Private GPT state
+
+The actual private GPT previously received the A9.7-I Builder package, but the final corrected policy has not yet been re-applied in the Builder runtime.
+
+Current authoritative markers:
+- `builder_package_ready = true`;
+- `builder_runtime_applied = true` records the earlier package application;
+- `builder_policy_fix_runtime_applied = false` records the pending corrected-policy reapply;
+- `a9_7_i_private_gpt_e2e_complete = false`.
 
 ## Next task
 
-Backend Facebook free-path acceptance is complete. The next media gate is to apply the A9.7-C Action schema/instructions to the actual private Custom GPT Builder and run one owner new-chat Facebook zero-client E2E. ScrapeCreators remains outside live acceptance and still requires a fresh explicit one-credit approval before any real call.
+Reapply the corrected repository Builder instructions to the actual private owner GPT and run one fresh NEW-chat Facebook zero-client E2E.
 
-These markers do NOT authorize repository merge, external tester rollout, production VoiceBridge changes, private/authenticated media, automatic AI fallback, ScrapeCreators paid-fallback acceptance, Telegram, or local upload.
+Acceptance behavior:
+- Cobalt success -> AssemblyAI -> durable transcript -> continue Research/Critic workflow;
+- Cobalt failure -> report media retrieval unavailable -> STOP;
+- no paid Facebook retrieval offer, preflight or continuation;
+- no Helper, beta code, Job ID, cookies or separate media opening;
+- no merge, production change or external rollout.
