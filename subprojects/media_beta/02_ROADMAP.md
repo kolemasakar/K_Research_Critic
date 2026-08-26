@@ -2,9 +2,9 @@
 
 Roadmap for the private MEDIA BETA and later optional public/sustainable media work.
 
-Version: 3.0
+Version: 3.1
 Status: ACTIVE
-Updated: 2026-08-20
+Updated: 2026-08-26
 
 ## Phase A - Private MEDIA BETA
 
@@ -27,14 +27,13 @@ Status: COMPLETE_IN_CODE_AND_PRIMARY_LIVE_GUARDS
 Accepted controls include:
 - max source/capture duration 60 min;
 - concurrency 1;
-- AssemblyAI fallback budget 7200 sec per UTC day;
+- AssemblyAI fallback budget 7200 sec per UTC day for the accepted legacy path;
 - captions path STT charge 0;
 - helper audio upload guard 32 MiB;
 - mono 16 kHz speech normalization at about 32 kbps;
 - provider delete request on normal AssemblyAI completion;
-- access-code guard;
-- durable Postgres job state and STT quota ledger for the accepted KRCC path;
-- negative-path guards for invalid code, wrong source, duration, concurrency, and quota exhaustion.
+- durable managed job state;
+- negative-path guards for invalid access, wrong source, duration, concurrency, quota exhaustion, and uncertain-charge replay.
 
 ### A3. Dedicated Render beta deployment
 
@@ -42,25 +41,13 @@ Status: COMPLETE
 
 Dedicated service:
 - `voicebridge-krc-media-beta-kolemasakar`;
-- ID `srv-da1kic5bedkc73d6fk60`;
 - isolated from production VoiceBridge.
 
 ### A4. Live transcript validation
 
 Status: COMPLETE
 
-Accepted browser-assisted intake:
-- captions-first UK/RU/EN/AUTO cases;
-- captions STT charge 0;
-- AssemblyAI Universal-2 Audio fallback;
-- AssemblyAI EU endpoint acceptance;
-- exact duration/quota accounting;
-- provider cleanup on normal completion;
-- status/segment readback;
-- durable restart/resume and quota-ledger restoration;
-- forced active-audio process loss -> retry-safe deterministic failure;
-- no duplicate STT charge after process replacement;
-- U+FFFD anomaly dispositioned as non-reproducible/non-blocking.
+Accepted browser-assisted intake includes captions-first UK/RU/EN/AUTO cases, AssemblyAI EU audio fallback, duration/quota accounting, provider cleanup, status/segment readback, restart/resume, and retry-safe failure handling.
 
 Canonical records: `10_...` through `17_...` plus `20_A7_EU_AUDIO_PRIVACY_GATE_ACCEPTANCE.md`.
 
@@ -75,8 +62,6 @@ Accepted:
 - API Key/Bearer Action auth;
 - isolated beta Action server;
 - privacy policy configured;
-- three GPT-facing operations manually tested;
-- transcript pagination confirmed;
 - CriticProfile approval gate enforced;
 - Ukrainian default response language;
 - localized report headings and verdict labels;
@@ -113,19 +98,17 @@ private GPT
  -> localized final report
 ```
 
-Canonical acceptance:
-`23_A8_OWNER_ONLY_BROWSER_ASSISTED_ACCEPTANCE.md`.
+Canonical acceptance: `23_A8_OWNER_ONLY_BROWSER_ASSISTED_ACCEPTANCE.md`.
 
-A8 proves the current product works end-to-end, but Helper is not part of the final desired normal UX.
+A8 remains fallback evidence only. Helper is not part of the normal zero-client UX.
 
 ### A9. Zero-client MediaSourceRouter
 
-Status: PLANNED / IMPLEMENTATION_NOT_STARTED
+Status: IN_PROGRESS / THREE_PUBLIC_ADAPTERS_ACCEPTED
 
-Canonical plan:
-`24_A9_ZERO_CLIENT_INGESTION_PLAN.md`.
+Canonical plan: `24_A9_ZERO_CLIENT_INGESTION_PLAN.md`.
 
-Final target:
+Target:
 
 ```text
 media input in ChatGPT
@@ -135,53 +118,126 @@ media input in ChatGPT
  -> result in the same conversation
 ```
 
-Approved ingress directions:
-- public media URL adapters;
-- `local_upload` for local video/audio.
-
-Initial public URL adapters:
-1. YouTube public videos;
-2. Instagram public Reels/posts containing video;
-3. Facebook public Video/Reels;
-4. Telegram public posts containing video.
-
 Access boundary:
 - public sources only;
 - no user logins, passwords, cookies, authenticated browser sessions, account tokens, or imported session state;
-- auth/private content returns `UNSUPPORTED_PRIVATE_OR_AUTH_REQUIRED`.
+- auth/private content returns an unsupported/unavailable boundary rather than requesting credentials.
 
-Approved local-upload direction:
+#### A9.0 Architecture audit
+
+Status: COMPLETE
+
+VoiceBridge legacy server-side media extraction was audited and used as input to the managed zero-client design.
+
+#### A9.1 Server-side STT EU alignment
+
+Status: COMPLETE
+
+Managed server-side STT uses the accepted AssemblyAI EU boundary where applicable.
+
+#### A9.2R Managed native YouTube
+
+Status: COMPLETE / OWNER E2E ACCEPTED
+
+Accepted:
+- zero-client YouTube managed route;
+- one-credit native Supadata preflight/consent boundary;
+- durable KRCM transcript jobs;
+- owner private-GPT E2E.
+
+#### A9.3 Durable managed jobs
+
+Status: COMPLETE
+
+Accepted:
+- Postgres durable managed jobs;
+- restart-safe readback;
+- duplicate-start reuse;
+- uncertain-charge no-replay invariant.
+
+#### A9.5 Private GPT managed Action integration
+
+Status: COMPLETE
+
+Accepted Action auth, Builder integration, managed operations, and owner admission without a user-facing beta code.
+
+#### A9.6 Instagram Reel
+
+Status: COMPLETE / OWNER BETA ACCEPTED
+
+Accepted route:
+- native managed attempt first;
+- when native transcript is unavailable, separate AI preflight and NEW explicit consent;
+- AI generation cap 40 credits;
+- no automatic AI fallback.
+
+#### A9.6 Facebook Supadata route
+
+Status: HISTORICAL / NOT_ACCEPTED
+
+The Supadata Facebook route remains historical and must not be replayed automatically.
+
+#### A9.7 Facebook Cobalt free path
+
+Status: LIVE_ACCEPTED
+
+Accepted backend positive path:
+
+`Facebook public Video/Reel -> Cobalt -> AssemblyAI -> durable KRCM`
+
+Canonical positive-path record: `41_A9_7_FACEBOOK_COBALT_LIVE_ACCEPTANCE.md`.
+
+#### A9.7-I Facebook failure-policy hardening
+
+Status: COMPLETE / PRIVATE_GPT E2E ACCEPTED
+
+Active policy:
+
+`Cobalt failure -> media retrieval unavailable -> STOP`
+
+Accepted boundaries:
+- no automatic paid fallback;
+- no paid Facebook offer after Cobalt failure;
+- ScrapeCreators reserve-only and inactive;
+- backend terminal failure enforcement;
+- private Builder policy re-applied;
+- fresh owner NEW-chat Facebook failure-path E2E accepted with reported credits `0`.
+
+Canonical records:
+- `43_A9_7_I_FACEBOOK_POLICY_FIX_BACKEND_HARDENING.md`;
+- `44_A9_7_I_PRIVATE_GPT_FACEBOOK_POLICY_E2E_ACCEPTANCE.md`.
+
+#### A9.8 Owner zero-client acceptance
+
+Status: COMPLETE for accepted YouTube/Instagram/Facebook boundaries
+
+The private GPT now has accepted owner zero-client behavior for the three currently live public platform adapters.
+
+#### A9.9 Telegram public video adapter
+
+Status: NOT_STARTED / NEXT_ENGINEERING_TASK
+
+Required before implementation:
+- audit current KRC and VoiceBridge support for Telegram public post URLs;
+- define public-only URL patterns and private/auth-required rejection behavior;
+- identify free/direct extraction options before any paid-provider path;
+- preserve zero-client, no-cookie, no-session boundary;
+- define transcript/STT and durable-job integration;
+- add adapter-specific unit/regression tests;
+- run isolated live positive and negative acceptance before marking complete.
+
+#### A9.10 Local upload
+
+Status: FEASIBILITY_PENDING / NOT_ACCEPTED
+
+Target direction:
 - local video/audio attachment;
 - inspect embedded subtitles/text first where available;
 - otherwise extract/normalize audio and use the accepted EU STT path;
 - temporary source media deleted after processing;
 - attachment-to-Action/backend transport still requires technical feasibility validation.
 
-#### A9.0 Architecture audit
-
-Status: COMPLETE
-
-VoiceBridge already contains a legacy server-side `KRCB_` path using yt-dlp, captions-first logic, audio fallback, ffmpeg, and paginated transcript readback.
-
-Known blockers before final zero-client acceptance:
-- server-side legacy AssemblyAI path must use the accepted configurable EU endpoint;
-- `KRCB_` job/quota state is in-memory and must converge on durable persistence;
-- current GPT Action exposes the client-assisted KRCC path;
-- each public platform adapter requires its own live positive and auth/private negative acceptance.
-
-#### A9.2a Server-side YouTube reachability probe
-
-Status: PARTIAL_PASS / REACHABILITY_CONFIRMED
-
-Probe job:
-`KRCB_252bb38a-aba7-4e2e-8148-b31d55974161`
-
-The isolated Render service reached the YouTube extractor and returned a source-specific yt-dlp error:
-`This live stream recording is not available.`
-
-No bot/login, HTTP 403, HTTP 429, or PO-token failure was returned. STT charge remained zero.
-
-This confirms server-side YouTube extractor reachability for that probe, but does not yet accept prerecorded metadata, captions-first extraction, audio fallback, durability, or GPT integration.
+Local upload must not be represented as implemented until the ChatGPT-to-backend transport boundary is proven.
 
 ## Phase B - Sustainable Free Media
 
@@ -189,10 +245,9 @@ Status: DEFERRED
 
 Potential future work:
 - caption-path hardening;
-- Cloudflare Whisper proof of concept;
 - provider-neutral transcript router;
 - owner-controlled local media processing where practical;
-- remove permanent dependence on exhaustible paid STT credits from any future public free path.
+- reduce dependence on exhaustible paid STT credits from any future public free path.
 
 ## Phase C - Public media release
 
@@ -202,8 +257,8 @@ Would require a new explicit owner decision plus sharing/publication resolution,
 
 ## Current transition marker
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_ZERO_CLIENT_MEDIA_ROUTER_PLANNED / A9_IMPLEMENTATION_NOT_STARTED`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_IN_PROGRESS / YOUTUBE_ZERO_CLIENT_ACCEPTED / INSTAGRAM_ZERO_CLIENT_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_NOT_STARTED / LOCAL_UPLOAD_FEASIBILITY_PENDING`
 
 ## Roadmap rule
 
-A roadmap item marked COMPLETE means implementation/acceptance evidence exists. READY/IN_PROGRESS/PAUSED/BLOCKED/PLANNED must never be described as already validated.
+A roadmap item marked COMPLETE means implementation/acceptance evidence exists. READY/IN_PROGRESS/PAUSED/BLOCKED/PLANNED/NOT_STARTED must never be described as already validated.
