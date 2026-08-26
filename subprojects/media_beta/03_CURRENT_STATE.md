@@ -2,7 +2,7 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 6.2
+Version: 6.3
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-26
 
@@ -10,9 +10,9 @@ Checkpoint date: 2026-08-26
 
 Current phase state:
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_OWNER_ZERO_CLIENT_MEDIA_INPUT_ACCEPTED / YOUTUBE_ACCEPTED / INSTAGRAM_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_ACCEPTED / LOCAL_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED / A10_COPY_SAFE_RUNTIME_RETEST_PENDING`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_OWNER_ZERO_CLIENT_MEDIA_INPUT_ACCEPTED / YOUTUBE_ACCEPTED / INSTAGRAM_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_ACCEPTED / LOCAL_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED / A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED`
 
-A9.10 remains accepted. A10 does not reopen media transport/transcription. It is presentation stabilization for the claim-summary table plus canonical instruction alignment.
+A9 owner-zero-client media ingress and A10 presentation stabilization are accepted for the private owner runtime. No public/production promotion follows automatically.
 
 Accepted owner-only zero-client ingress:
 - prerecorded YouTube;
@@ -66,7 +66,7 @@ Claim-level cross-check enforcement is runtime accepted:
 
 Report language defaults to Ukrainian unless explicitly changed by the user.
 
-## A9 runtime markers retained
+## A9 accepted runtime markers retained
 
 `CRITICPROFILE_TWO_STAGE_GATE_RUNTIME = ACCEPTED`
 
@@ -92,59 +92,43 @@ Report language defaults to Ukrainian unless explicitly changed by the user.
 
 `rollout_state = A9_10_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED`
 
-## A10 stabilization state
+## A10 stabilization - accepted
 
-Repository package:
-- Builder package identity remains `0.9.1-beta-a10`;
+Builder package:
+- `0.9.1-beta-a10`;
 - Action schema `0.6.0-a9.10` unchanged;
-- canonical managed reference `0.5.0-a10-stabilization`;
-- strict four-column Markdown table contract present;
-- copy-safe fenced-table fallback added;
+- strict four-column Markdown claim-summary contract;
+- mandatory fenced copy-safe duplicate;
 - backend/VoiceBridge unchanged.
 
-### Runtime attempt 1
+### Runtime evidence
 
-Owner applied the initial A10 Builder package and reran Telegram fact-check on `https://t.me/techcrimes/12107`.
+Fresh private-GPT regression against `https://t.me/techcrimes/12107`:
 
-Observed:
-- CriticProfile gate: PASS;
+- normal CriticProfile gate: PASS;
+- owner selected `1`;
 - visible `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ`: PASS as four distinct columns;
-- whole-response Copy: FAIL because the rendered table header serialized as `ТвердженняПотрібноОтримано незалежнихВиняток` while row values stayed intact.
+- visible claim values: `3/1 NONE`, `2/1 NONE`, `2/1 NONE`, `0/1 SHORTFALL`;
+- real SHORTFALL preserved and final status `ЗАВЕРШЕНО З ОБМЕЖЕННЯМИ`;
+- media/STT `53 s / 53 s`, credits `0`;
+- ordinary whole-response Copy still collapses the rendered table header because of ChatGPT UI serialization;
+- `КОПІЯ ДЛЯ НАДІЙНОГО КОПІЮВАННЯ` survives whole-response Copy with literal `|` delimiters;
+- copied fenced-table rows and values exactly match the visible table.
 
-This is treated as a ChatGPT UI copy/serialization defect rather than a malformed rendered-table source because the owner screenshot shows four correct visual columns.
+The remaining rendered-table Copy defect is treated as an external UI limitation. The fenced duplicate is the accepted mitigation.
 
-### Copy-safe refinement
-
-The Builder now requires both:
-
-```text
-| Твердження | Потрібно | Отримано незалежних | Виняток |
-| --- | ---: | ---: | --- |
-```
-
-and immediately afterward:
-- heading `КОПІЯ ДЛЯ НАДІЙНОГО КОПІЮВАННЯ`;
-- one fenced `text` code block;
-- the same complete table with literal `|` delimiters;
-- identical values in rendered and copy-safe representations.
-
-Regression coverage: `tests/test_a10_copy_safe_claim_table.py`.
-
-Final refined package head:
-`dc8120d43219cc39c02fa10f6ec0136664af067b`
-
-Final refined-package Tests run:
-`33005278994` -> SUCCESS, including Python 3.13, Python 3.14, Ruff, mypy, repository policy, GPT Store package validation and coverage.
-
-Authoritative A10 markers intentionally remain pending until the refined package is applied to the actual private GPT and retested:
-- `builder_runtime_applied = false`;
-- `gpt_builder_private_update_required = true`;
+Authoritative A10 markers:
+- `builder_runtime_applied = true`;
 - `claim_summary_table_hardening_package_ready = true`;
-- `claim_summary_table_hardening_runtime_applied = false`;
-- `a10_claim_summary_table_runtime_accepted = false`.
+- `claim_summary_table_hardening_runtime_applied = true`;
+- `a10_claim_summary_table_runtime_accepted = true`;
+- `a10_copy_safe_claim_table_runtime_accepted = true`;
+- `gpt_builder_private_update_required = false`;
+- `stabilization_state = A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED`.
 
-Canonical A10 record:
-`51_A10_STABILIZATION_AND_RELEASE_BOUNDARY.md`.
+Canonical records:
+- `51_A10_STABILIZATION_AND_RELEASE_BOUNDARY.md`;
+- `52_A10_SAFE_TABLE_RUNTIME_ACCEPTANCE.md`.
 
 ## Accepted owner media UX
 
@@ -224,11 +208,12 @@ Canonical records:
 
 ## Current next boundary
 
-1. Re-apply the refined `prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md` to the actual private MEDIA BETA GPT.
-2. Do not change/reimport Action schema `0.6.0-a9.10`.
-3. Run a fresh Telegram final-report regression.
-4. Confirm the visual table is four columns.
-5. Confirm the following copy-safe fenced `text` table preserves literal `|` separators when the whole response is copied and matches the visual values exactly.
-6. Only after that mark A10 runtime accepted and clear runtime-pending markers.
+No additional A10 Builder/runtime repair is pending.
 
-External tester/public sharing, repository `main` merge and production VoiceBridge promotion remain paused until a separate explicit owner decision.
+The next boundary is a separate owner release decision covering any of:
+1. merge KRC feature branch to `main`;
+2. production VoiceBridge promotion;
+3. external tester onboarding;
+4. public sharing/Store rollout.
+
+Until separately authorized, all four remain paused.
