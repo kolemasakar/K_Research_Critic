@@ -11,7 +11,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-# A9.9 package checkpoint: validate committed Telegram private-GPT package.
+# A9.10 package checkpoint: validate committed local-attachment private-GPT package.
 
 jobs:
   pytest:
