@@ -3,7 +3,7 @@ schema_version: "0.6-beta"
 product:
   name: K-Research & Critic - MEDIA BETA
   description: |-
-    Приватне owner-only тестування zero-client аналізу публічних YouTube-відео, Instagram Reel та Facebook media.
+    Приватне owner-only тестування zero-client аналізу публічних YouTube-відео, Instagram Reel, Facebook та Telegram media.
     (owner-only zero-client media-input beta for K-Research & Critic.)
   default_language: uk-UA
   primary_channel: chatgpt_private_beta
@@ -32,7 +32,7 @@ instructions:
   builder_package_version: "0.8-beta-a9.9"
   builder_target_action_schema_version: "0.5.0-a9.9"
   builder_package_ready: true
-  builder_runtime_applied: false
+  builder_runtime_applied: true
   builder_policy_fix_runtime_applied: true
   builder_character_limit: 8000
   default_report_language: uk-UA
@@ -105,8 +105,8 @@ beta:
     - youtube
     - instagram
     - facebook
-  public_platforms_in_progress:
     - telegram
+  public_platforms_in_progress: []
   public_platforms_not_started: []
   local_upload_live_accepted: false
   max_video_seconds: 3600
@@ -140,8 +140,8 @@ beta:
   managed_telegram_retrieval_credits: 0
   managed_telegram_stt_provider: assemblyai
   managed_telegram_action_schema_ready: true
-  managed_telegram_builder_runtime_applied: false
-  managed_telegram_private_gpt_e2e_complete: false
+  managed_telegram_builder_runtime_applied: true
+  managed_telegram_private_gpt_e2e_complete: true
   managed_user_beta_access_code_required: false
   managed_owner_access_injected_server_side: true
   managed_durable_store: postgres
@@ -165,7 +165,7 @@ beta:
     never_log: true
 
 release:
-  rollout_state: A9_9_TELEGRAM_PACKAGE_READY_BUILDER_PENDING
+  rollout_state: A9_9_TELEGRAM_PRIVATE_GPT_E2E_ACCEPTED
   production_core_unchanged: true
   public_store_gpt_unchanged: true
   user_api_key_required: false
@@ -193,8 +193,8 @@ release:
   a9_7_i_private_gpt_e2e_complete: true
   a9_9_telegram_backend_complete: true
   a9_9_telegram_action_package_complete: true
-  a9_9_telegram_builder_runtime_applied: false
-  a9_9_telegram_private_gpt_e2e_complete: false
+  a9_9_telegram_builder_runtime_applied: true
+  a9_9_telegram_private_gpt_e2e_complete: true
   criticprofile_gate_runtime_accepted: true
   cross_check_enforcement_hardened: true
   cross_check_claim_level_enforcement_hardened: true
@@ -204,5 +204,5 @@ release:
   report_label_localization_hardened: true
   report_label_localization_runtime_accepted: true
   external_tester_rollout_paused: true
-  gpt_builder_private_update_required: true
+  gpt_builder_private_update_required: false
   merge_to_public_product_allowed: false
