@@ -8,7 +8,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_a9_7_i_corrected_builder_policy_fix_is_runtime_applied() -> None:
+def test_a9_7_i_corrected_builder_policy_fix_is_runtime_accepted() -> None:
     manifest = yaml.safe_load(
         (ROOT / "gpt_store" / "media_beta_manifest.yaml").read_text(encoding="utf-8")
     )
@@ -22,13 +22,13 @@ def test_a9_7_i_corrected_builder_policy_fix_is_runtime_applied() -> None:
     assert instructions["builder_runtime_applied"] is True
     assert instructions["builder_policy_fix_runtime_applied"] is True
 
-    assert release["rollout_state"] == "A9_7_I_BUILDER_APPLIED_E2E_PENDING"
+    assert release["rollout_state"] == "A9_7_I_PRIVATE_GPT_E2E_ACCEPTED"
     assert release["a9_7_i_builder_package_ready"] is True
     assert release["a9_7_i_builder_runtime_applied"] is True
     assert release["a9_7_i_builder_policy_fix_runtime_applied"] is True
-    assert release["a9_7_i_private_gpt_e2e_complete"] is False
+    assert release["a9_7_i_private_gpt_e2e_complete"] is True
     # Legacy marker remains false for compatibility; the dedicated policy-fix
-    # marker above is authoritative for the corrected Builder runtime state.
+    # and E2E markers above are authoritative for the accepted Builder runtime.
     assert release["gpt_builder_private_update_required"] is False
 
 
