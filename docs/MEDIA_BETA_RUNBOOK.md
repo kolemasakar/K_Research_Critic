@@ -1,39 +1,20 @@
 # MEDIA_BETA_RUNBOOK
-Інструкція оператора для безпечного запуску окремої закритої MEDIA BETA без зміни production-сервісів.
+Інструкція оператора для поточної owner-only zero-client MEDIA BETA без зміни public Core або production VoiceBridge.
 
-Version: 0.1
-Status: CLOSED_BETA
-Date: 2026-08-17
+Version: 0.9-a9.9
+Status: CLOSED_BETA_OWNER_ONLY
+Date: 2026-08-26
 
-## 1. Safety Boundary
+## 1. Authority and isolation
 
-Do not deploy the media beta over the existing VoiceBridge production service.
-
-Existing production endpoint:
+K-Research & Critic public Core remains on:
 
 ```text
-https://voicebridge-cloud-us.onrender.com
+repository: kolemasakar/K_Research_Critic
+branch: main
 ```
 
-Dedicated beta endpoint:
-
-```text
-https://voicebridge-krc-media-beta-kolemasakar.onrender.com
-```
-
-The public K-Research & Critic GPT must remain unchanged during closed beta.
-
-## 2. Source Branches
-
-VoiceBridge backend:
-
-```text
-repository: kolemasakar/VoiceBridge
-branch: agent/krc-media-transcript
-PR: 28
-```
-
-K-Research & Critic beta package:
+Closed MEDIA BETA package remains on:
 
 ```text
 repository: kolemasakar/K_Research_Critic
@@ -41,138 +22,141 @@ branch: agent/video-url-research
 PR: 8
 ```
 
-Both PRs remain draft during the closed beta.
-
-## 3. Render Deployment
-
-Use the dedicated Render Blueprint stored in VoiceBridge:
+VoiceBridge MEDIA backend remains on:
 
 ```text
-render.media-beta.yaml
-```
-
-Render Dashboard procedure:
-
-```text
-New
--> Blueprint
--> connect kolemasakar/VoiceBridge
--> branch agent/krc-media-transcript
--> Blueprint path render.media-beta.yaml
--> create/sync
-```
-
-The Blueprint creates one Free Docker web service:
-
-```text
-name: voicebridge-krc-media-beta-kolemasakar
-region: frankfurt
-plan: free
-runtime: docker
+repository: kolemasakar/VoiceBridge
 branch: agent/krc-media-transcript
-auto deploy: checksPass
-Dockerfile: src/cloud/Dockerfile
-Docker context: src/cloud
-health check: /api/v1/health
 ```
 
-Render supports `runtime: docker`, explicit `dockerfilePath`, `dockerContext`, `plan: free`, and `autoDeployTrigger: checksPass` in Blueprints.
-
-## 4. Render Secrets
-
-During the first Blueprint creation Render prompts for variables declared with `sync: false`.
-
-Set:
+Dedicated MEDIA BETA endpoint:
 
 ```text
-KRC_MEDIA_ACTION_TOKEN=<long random secret, 32+ characters>
-KRC_MEDIA_BETA_CODES=<four comma-separated tester codes, each 16+ random characters>
-ASSEMBLYAI_API_KEY=<AssemblyAI project API key>
+https://voicebridge-krc-media-beta-kolemasakar.onrender.com
 ```
 
-Do not commit these values to GitHub.
+Do not deploy MEDIA BETA over the existing production VoiceBridge service. Do not merge the private MEDIA package into public Core merely because CI or isolated backend acceptance is green.
 
-`TEST_ACCESS_TOKEN` is generated automatically by Render for the isolated beta service.
+## 2. Current owner-only model
 
-Recommended beta code ownership:
+The normal MEDIA flow is zero-client:
 
 ```text
-code 1: owner
-code 2: tester A
-code 3: tester B
-code 4: tester C
+public media URL
+-> private GPT Action
+-> dedicated MEDIA BETA backend
+-> durable KRCM job
+-> transcript segments
+-> K-Research & Critic workflow
 ```
 
-Each tester should receive only one code.
-
-## 5. Fixed Beta Limits
-
-The Blueprint sets:
+The owner must not be asked for:
 
 ```text
-MEDIA_MAX_DURATION_SECONDS=3600
-MEDIA_MAX_CONCURRENT_JOBS=1
-MEDIA_DAILY_STT_SECONDS=7200
-MEDIA_JOB_TTL_SECONDS=3600
-RATE_LIMIT_REQUESTS_PER_MINUTE=120
-MAX_REQUEST_BODY_BYTES=32768
-CORS_ALLOWED_ORIGIN=*
+beta access code
+provider API key
+Telegram login or cookies
+browser session
+Helper
+KRCM job id
 ```
 
-Resource behavior:
+Action bearer authentication, owner admission, and provider credentials remain server-side.
+
+External tester rollout is paused. The current intended tester count is one owner.
+
+## 3. Current platform state
+
+Live accepted in the current private GPT runtime:
 
 ```text
-YouTube captions available
--> captions path
--> no AssemblyAI STT budget used
-
-captions unavailable
--> 32 kbps mono / 16 kHz STT audio
--> AssemblyAI fallback
--> source-duration seconds reserved from daily quota
+YouTube
+Instagram Reel
+Facebook Video/Reel free path
 ```
 
-The daily STT counter is intentionally in memory for the trusted closed beta. A Render restart resets it. This is not sufficient for future public anti-abuse protection.
-
-## 6. Health Check
-
-After the Render deploy finishes, open:
+Telegram state at A9.9:
 
 ```text
-https://voicebridge-krc-media-beta-kolemasakar.onrender.com/api/v1/health
+backend implementation: PASS
+isolated live backend E2E: PASS
+retrieval provider: telegram_public_web
+retrieval credits: 0
+STT provider: AssemblyAI
+Action package: READY
+Builder runtime application: PENDING
+private GPT Telegram NEW-chat E2E: PENDING
 ```
 
-Expected media capability characteristics:
+Telegram remains `in_progress` until the Builder package is applied and owner NEW-chat E2E is accepted.
+
+## 4. Facebook safety contract
+
+Active Facebook path:
 
 ```text
-mode: closed_beta
-subtitle_first: true
-max_duration_seconds: 3600
-max_concurrent_jobs: 1
-daily_stt_seconds: 7200
-providers:
-  youtube_captions
-  assemblyai_stt
-configured: true
+Facebook public media
+-> Cobalt free retrieval
+-> AssemblyAI STT
+-> durable KRCM
 ```
 
-Do not continue to GPT Builder if `configured` is false.
+Required behavior:
 
-## 7. GPT Builder - Separate Beta GPT
+```text
+Cobalt success -> continue
+Cobalt fail -> unavailable
+automatic paid fallback -> forbidden
+paid offer after Cobalt fail -> forbidden
+ScrapeCreators -> reserved/unconfigured/unaccepted
+```
 
-Create a separate GPT. Do not edit the published production GPT.
+Do not call the reserved paid Facebook continuation operations in the active MEDIA BETA flow.
 
-Use:
+## 5. Telegram safety contract
+
+Supported path:
+
+```text
+public Telegram post URL
+-> public Telegram embed surface
+-> trusted Telegram CDN media
+-> AssemblyAI EU STT
+-> durable KRCM
+```
+
+Required behavior:
+
+```text
+retrieval credits: 0
+Telegram login: forbidden
+cookies/session: forbidden
+bot token: not required
+paid Telegram fallback: none
+automatic retry after terminal unavailable: forbidden
+```
+
+Only trusted Telegram media-host families accepted by the backend may be followed. Arbitrary external media hosts remain forbidden.
+
+## 6. Private GPT Builder package
+
+Use a separate private GPT:
 
 ```text
 Name:
 K-Research & Critic - MEDIA BETA
 
-Instructions:
-prompts/GPT_STORE_MEDIA_BETA_INSTRUCTIONS.md
+Builder instructions:
+prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md
+
+Canonical reference:
+prompts/GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md
 
 Action schema:
-gpt_store/actions/media_beta_openapi.yaml
+gpt_store/actions/media_managed_beta_openapi.yaml
+
+Action schema version:
+0.5.0-a9.9
 ```
 
 Enable:
@@ -183,116 +167,124 @@ Code Interpreter & Data Analysis
 Actions
 ```
 
-Keep Apps and Image generation disabled unless a later approved change requires them.
+Keep disabled:
+
+```text
+Apps
+Image generation
+```
 
 Action authentication:
 
 ```text
 type: API key / bearer
-value: exactly the KRC_MEDIA_ACTION_TOKEN configured on the beta Render service
+value: KRC_MEDIA_ACTION_TOKEN configured on the dedicated MEDIA BETA service
 ```
 
-The action bearer secret is a developer secret. Testers never receive it.
+Do not expose the bearer secret in chat, repository content, screenshots, checkpoints, or acceptance evidence.
 
-## 8. Beta User Access
+## 7. Builder instruction invariants
 
-Distribution:
+The active Builder package must remain within 8000 characters and preserve:
 
 ```text
-Anyone with link / unlisted beta link
+report-language invariant
+CriticProfile approval gate
+claim-level cross-check ledger
+traceable independent evidence counting
+no hidden Job IDs
+native Supadata credit consent gate
+separate Instagram AI consent gate
+Facebook Cobalt fail -> unavailable
+no automatic or offered paid Facebook fallback
+Telegram public-video routing
+no Telegram login/cookies/session
+no paid Telegram fallback
 ```
 
-Actual media access is restricted server-side by the separate tester code.
+## 8. A9.9 package state
 
-Expected first media interaction:
+Repository package state:
 
 ```text
-user sends YouTube URL + media-analysis request
--> GPT asks for beta tester code if not already supplied
--> tester supplies code
--> code is sent only to startMediaBetaTranscription
--> code is never repeated in visible output
+instructions version: 0.8-beta-a9.9
+Builder package version: 0.8-beta-a9.9
+Action schema version: 0.5.0-a9.9
+rollout state: A9_9_TELEGRAM_PACKAGE_READY_BUILDER_PENDING
+Builder package ready: true
+Builder runtime applied: false
+Telegram backend complete: true
+Telegram Action package complete: true
+Telegram private GPT E2E complete: false
 ```
 
-Do not store tester codes in checkpoints or reusable prompts.
+The committed Builder instruction package is below the 8000-character limit and repository/package validation is green.
 
-## 9. Mandatory Live Tests
+## 9. Mandatory next acceptance gate
 
-Run in this order.
+Apply the A9.9 Builder package to the existing private owner-only MEDIA GPT, then open a NEW chat and run a public Telegram video request.
+
+Acceptance requires:
 
 ```text
-B01 health endpoint reports configured=true
-B02 invalid action bearer -> 401
-B03 invalid tester code -> 403
-B04 valid tester code + short YouTube with captions -> COMPLETED
-B05 B04 transcript_source=youtube_captions
-B06 B04 stt_seconds_charged=0
-B07 valid tester code + no usable captions -> AssemblyAI fallback
-B08 B07 transcript_source=assemblyai_stt
-B09 B07 stt_seconds_charged > 0
-B10 provider_data_deleted=true after successful AssemblyAI job
-B11 video > 60 minutes -> MEDIA_DURATION_LIMIT
-B12 two simultaneous jobs -> second job rejected/busy
-B13 uk source transcription
-B14 ru source transcription
-B15 en source transcription
-B16 automatic language mode
-B17 timestamp/segment claim traceability
-B18 CriticProfile approval blocks independent research before APPROVE
-B19 Research -> Critic -> REVISE/PASS loop
-B20 final report contains claim verification and no tester code
-B21 checkpoint contains no full transcript and no tester code
-B22 existing public K-Research & Critic still works unchanged
-B23 existing VoiceBridge production endpoint still works unchanged
+private GPT selects startManagedTelegramPublicTranscription
+no credit preflight is shown for Telegram retrieval
+no Telegram login/cookies/session request appears
+backend returns COMPLETED for a supported public Telegram video
+all transcript pages are retrieved
+KRCM job id remains hidden from the user
+retrieval provider is telegram_public_web
+retrieval credits charged is 0
+paid fallback is not offered or called
+fact-check/research workflow still obeys CriticProfile approval gate
+final report follows report-language and cross-check traceability rules
 ```
 
-## 10. Quota Test
+If Telegram media is unavailable, the private GPT must report unavailable and stop media intake for that URL. It must not improvise a paid fallback.
 
-Do not intentionally burn two hours of AssemblyAI merely to test the quota.
+## 10. Post-acceptance state update
 
-For a dedicated engineering test, temporarily deploy the beta branch with a small `MEDIA_DAILY_STT_SECONDS` value, verify rejection after the limit, then restore:
+Only after successful owner NEW-chat Telegram E2E may the repository state move to Telegram accepted. The acceptance update must set the authoritative state consistently across manifest, validator, tests, and acceptance evidence.
+
+Expected target state after actual acceptance:
 
 ```text
-MEDIA_DAILY_STT_SECONDS=7200
+public_platforms_live_accepted includes telegram
+public_platforms_in_progress is empty
+managed_telegram_builder_runtime_applied: true
+managed_telegram_private_gpt_e2e_complete: true
+a9_9_telegram_builder_runtime_applied: true
+a9_9_telegram_private_gpt_e2e_complete: true
+gpt_builder_private_update_required: false
 ```
 
-Never alter the production VoiceBridge service for this test.
+Do not set these markers before the real private GPT UI acceptance occurs.
 
-## 11. AssemblyAI Release Gate
+## 11. Regression requirements
 
-Before expanding beta access, verify the AssemblyAI project settings/terms used by this service for provider model-training opt-out or equivalent no-training protection.
-
-If this is not verified, keep the media feature in CLOSED_BETA / PREVIEW state.
-
-## 12. Stop / Rollback
-
-To stop the beta without affecting production:
+Before and after Builder acceptance keep these green:
 
 ```text
-Render -> voicebridge-krc-media-beta-kolemasakar -> suspend/delete beta service
-GPT Builder -> make MEDIA BETA private or delete it
+Python 3.13 tests
+Python 3.14 tests
+repository policy validation
+GPT Store package validation
+ruff correctness checks
+mypy boundary checks
+coverage gate
 ```
 
-No rollback is required for:
+Public `main`, public Store GPT, and production VoiceBridge must remain unchanged by A9.9 acceptance work.
+
+## 12. Stop / rollback
+
+If the private MEDIA GPT package behaves incorrectly:
 
 ```text
-voicebridge-cloud-us
-published K-Research & Critic
+private GPT -> restore the last accepted A9.7-I Builder instructions and Action schema
+MEDIA branch -> retain A9.9 package for diagnosis
+public Core -> no rollback required
+production VoiceBridge -> no rollback required
 ```
 
-because closed beta is isolated from both production surfaces.
-
-## 13. Promotion Rule
-
-Do not merge or publish the beta as the public media mode solely because CI is green.
-
-Promotion requires:
-
-```text
-all relevant B01-B23 live tests PASS
-privacy gate PASS
-resource-use observation
-Free-plan tester validation
-no production regression
-explicit user approval
-```
+Do not use a production deployment as a rollback mechanism for an isolated private-GPT package problem.
