@@ -187,6 +187,7 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(instructions.get("version") == "0.7-beta-a9.7-i", "A9.7-I instruction version must be 0.7-beta-a9.7-i")
     _require(instructions.get("builder_package_version") == "0.7-beta-a9.7-i", "A9.7-I Builder package version must be 0.7-beta-a9.7-i")
     _require(instructions.get("builder_runtime_applied") is True, "A9.7-I Builder package must record runtime application")
+    _require(instructions.get("builder_policy_fix_runtime_applied") is True, "A9.7-I corrected Builder policy must record runtime application")
     _require(instructions.get("builder_character_limit") == 8000, "Builder instruction limit must remain 8000")
     _require(instructions.get("canonical_reference") == "prompts/GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md", "managed instruction file must be canonical")
     _require(instructions.get("default_report_language") == "uk-UA", "default report language must remain uk-UA")
@@ -216,7 +217,6 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(beta.get("managed_instagram_ai_fallback_live_accepted") is True, "Instagram AI fallback must be live accepted")
     _require(beta.get("managed_instagram_ai_rate_credits_per_minute") == 2, "Instagram AI rate must remain 2 credits/min")
     _require(beta.get("managed_instagram_ai_hard_cap_credits") == 40, "Instagram AI consent cap must remain 40 credits")
-
     _require(beta.get("managed_facebook_retrieval_stt_code_ready") is True, "A9.7-C Facebook retrieval/STT must be code-ready")
     _require(beta.get("managed_facebook_free_retrieval_provider") == "cobalt", "Facebook free retrieval provider must be Cobalt")
     _require(beta.get("managed_facebook_free_path_live_accepted") is True, "Facebook Cobalt free path must be live accepted")
@@ -241,7 +241,7 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(legacy.get("stt_endpoint") == MEDIA_BETA_ASSEMBLYAI_EU, "A8 fallback STT endpoint must remain AssemblyAI EU")
     _require(legacy.get("status") == "A8_ACCEPTED_FALLBACK_ONLY", "A8 must be fallback only")
 
-    _require(release.get("rollout_state") == "A9_7_I_BUILDER_APPLIED_E2E_PENDING", "rollout state must record A9.7-I Builder applied with owner E2E pending")
+    _require(release.get("rollout_state") == "A9_7_I_PRIVATE_GPT_E2E_ACCEPTED", "rollout state must record accepted A9.7-I owner private-GPT E2E")
     _require(release.get("production_core_unchanged") is True, "private beta must preserve production core")
     _require(release.get("public_store_gpt_unchanged") is True, "private beta must not modify public GPT")
     _require(release.get("user_api_key_required") is False, "private beta must not request user API keys")
@@ -257,7 +257,8 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(release.get("a9_7_h1_facebook_cobalt_live_acceptance_complete") is True, "A9.7-H1 Cobalt acceptance evidence must be recorded")
     _require(release.get("a9_7_i_builder_package_ready") is True, "A9.7-I Builder package must be ready")
     _require(release.get("a9_7_i_builder_runtime_applied") is True, "A9.7-I Builder runtime update must be recorded applied")
-    _require(release.get("a9_7_i_private_gpt_e2e_complete") is False, "A9.7-I owner private-GPT E2E must remain pending until separately accepted")
+    _require(release.get("a9_7_i_builder_policy_fix_runtime_applied") is True, "A9.7-I corrected Builder policy must be applied")
+    _require(release.get("a9_7_i_private_gpt_e2e_complete") is True, "A9.7-I owner private-GPT E2E must be accepted")
     _require(release.get("external_tester_rollout_paused") is True, "external tester rollout must remain paused")
     _require(release.get("merge_to_public_product_allowed") is False, "private beta must not auto-promote to public product")
 
