@@ -1,12 +1,16 @@
-# K-Research & Critic — Request Log Privacy Policy
+# K-Research & Critic - Request Log Privacy Policy
+Політика конфіденційності для збереженого прототипу журналу запитів K-Research & Critic.
 
 Effective: 2026-08-23
+Status: RETAINED PROTOTYPE / PUBLIC ACTION DISABLED
 
-K-Research & Critic uses a minimal external request-log Action to record aggregate usage topics for product maintenance.
+The Request Log MVP is retained as an inactive prototype. The public K-Research & Critic Builder does not currently use this Action.
+
+When enabled in a separately approved deployment, the prototype records aggregate usage topics for product maintenance.
 
 ## Data recorded
 
-For each logged research request, the service records only:
+For each logged research request, the prototype records only:
 - sequential request number;
 - date;
 - time;
@@ -29,11 +33,11 @@ The data is used only for basic product-usage review, maintenance planning, and 
 
 ## Storage and access
 
-The log is stored in a Google Sheet controlled by the product owner. The initial MVP uses minimal access controls and is not intended to store sensitive information.
+The retained prototype uses a Google Sheet controlled by the product owner. It is not intended to store sensitive information.
 
 ## Data minimization
 
-The GPT should generalize the topic before sending it to the logging service and should omit sensitive details when they are not necessary to identify the broad request category.
+If the prototype is re-enabled in a separately approved deployment, the GPT should generalize the topic before sending it to the logging service and omit sensitive details when they are not necessary to identify the broad request category.
 
 ## Changes
 
@@ -41,4 +45,4 @@ Any future collection of user identity, full prompts, detailed analytics, or add
 
 ## Contact
 
-For questions about this request log, use the contact information associated with the K-Research & Critic publisher profile.
+For questions about this retained prototype, use the contact information associated with the K-Research & Critic publisher profile.
