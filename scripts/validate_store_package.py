@@ -186,7 +186,7 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
 
     _require(instructions.get("version") == "0.9.1-beta-a10", "A10 stabilization instruction version must be 0.9.1-beta-a10")
     _require(instructions.get("builder_package_version") == "0.9.1-beta-a10", "A10 stabilization Builder package version must be 0.9.1-beta-a10")
-    _require(instructions.get("builder_runtime_applied") is False, "A10 stabilization Builder package must remain pending until owner runtime application")
+    _require(instructions.get("builder_runtime_applied") is True, "A10 stabilization Builder package must record owner runtime application")
     _require(instructions.get("builder_policy_fix_runtime_applied") is True, "A9.7-I corrected Builder policy must record runtime application")
     _require(instructions.get("builder_character_limit") == 8000, "Builder instruction limit must remain 8000")
     _require(instructions.get("canonical_reference") == "prompts/GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md", "managed instruction file must be canonical")
@@ -195,6 +195,7 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(instructions.get("verdict_labels_localized_to_report_language") is True, "verdicts must be localized to report language")
     _require(instructions.get("cross_check_protocol_markdown_table_strict") is True, "claim summary must require strict Markdown table rendering")
     _require(instructions.get("cross_check_protocol_header_merge_forbidden") is True, "claim summary header merging must be forbidden")
+    _require(instructions.get("cross_check_copy_safe_table_required") is True, "A10 copy-safe fenced table must remain required")
     _require(instructions.get("cross_check_protocol_table_header_row_uk") == "| Твердження | Потрібно | Отримано незалежних | Виняток |", "Ukrainian claim-summary header row must remain exact")
     _require(instructions.get("cross_check_protocol_table_separator_row") == "| --- | ---: | ---: | --- |", "claim-summary separator row must remain exact")
 
@@ -222,7 +223,7 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(beta.get("managed_attachment_private_gpt_e2e_complete") is True, "A9.10 attachment private-GPT E2E must be accepted")
     _require(beta.get("stabilization_phase") == "A10", "stabilization phase must be A10")
     _require(beta.get("claim_summary_table_hardening_package_ready") is True, "A10 claim-summary hardening package must be ready")
-    _require(beta.get("claim_summary_table_hardening_runtime_applied") is False, "A10 claim-summary runtime hardening must remain pending before owner Builder update")
+    _require(beta.get("claim_summary_table_hardening_runtime_applied") is True, "A10 claim-summary runtime hardening must record owner application")
     _require(beta.get("max_video_seconds") == 3600, "media beta max video must remain 60 minutes")
     _require(beta.get("managed_provider") == "supadata", "managed provider must remain Supadata for native-first paths")
     _require(beta.get("managed_provider_mode") == "native_first", "managed mode must remain native-first")
@@ -266,8 +267,8 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(legacy.get("stt_endpoint") == MEDIA_BETA_ASSEMBLYAI_EU, "A8 fallback STT endpoint must remain AssemblyAI EU")
     _require(legacy.get("status") == "A8_ACCEPTED_FALLBACK_ONLY", "A8 must be fallback only")
 
-    _require(release.get("rollout_state") == "A9_10_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED", "rollout state must record accepted A9.10 local attachment private-GPT E2E")
-    _require(release.get("stabilization_state") == "A10_CLAIM_TABLE_HARDENING_PACKAGE_READY_RUNTIME_PENDING", "A10 stabilization state must remain runtime-pending")
+    _require(release.get("rollout_state") == "A9_10_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED", "rollout state must retain accepted A9.10 local attachment private-GPT E2E")
+    _require(release.get("stabilization_state") == "A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED", "A10 stabilization state must record copy-safe runtime acceptance")
     _require(release.get("production_core_unchanged") is True, "private beta must preserve production core")
     _require(release.get("public_store_gpt_unchanged") is True, "private beta must not modify public GPT")
     _require(release.get("user_api_key_required") is False, "private beta must not request user API keys")
@@ -297,8 +298,9 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(release.get("a9_10_attachment_ingestion_live_accepted") is True, "A9.10 full attachment ingestion must be accepted")
     _require(release.get("a9_10_attachment_private_gpt_e2e_complete") is True, "A9.10 attachment private-GPT E2E must be accepted")
     _require(release.get("a10_claim_summary_table_hardening_ready") is True, "A10 claim-summary hardening must be package-ready")
-    _require(release.get("a10_claim_summary_table_runtime_accepted") is False, "A10 claim-summary runtime acceptance must remain pending")
-    _require(release.get("gpt_builder_private_update_required") is True, "A10 stabilization package must require a private Builder update")
+    _require(release.get("a10_claim_summary_table_runtime_accepted") is True, "A10 claim-summary runtime acceptance must be recorded")
+    _require(release.get("a10_copy_safe_claim_table_runtime_accepted") is True, "A10 copy-safe table runtime acceptance must be recorded")
+    _require(release.get("gpt_builder_private_update_required") is False, "A10 accepted Builder package must not require another private update")
     _require(release.get("external_tester_rollout_paused") is True, "external tester rollout must remain paused")
     _require(release.get("merge_to_public_product_allowed") is False, "private beta must not auto-promote to public product")
 
@@ -327,6 +329,8 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
             "| Твердження | Потрібно | Отримано незалежних | Виняток |",
             "| --- | ---: | ---: | --- |",
             "Never merge/concatenate header labels",
+            "КОПІЯ ДЛЯ НАДІЙНОГО КОПІЮВАННЯ",
+            "fenced `text` code block",
             "Do NOT ask the user for beta access code",
             "Do not expose `KRCM_...` Job IDs",
             "Do not fall back to Helper in the normal owner flow",
@@ -336,7 +340,7 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
             "credit_charge_uncertain=true",
             "1=APPROVE, 2=EDIT, 3=REJECT",
         ],
-        "A9.9 Builder instructions",
+        "A10 Builder instructions",
     )
 
     action_path = root / str(media_action.get("schema", ""))
