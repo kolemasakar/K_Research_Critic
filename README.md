@@ -85,15 +85,7 @@ Each material factual claim is audited independently. Evidence counted in `achie
 
 Ukrainian is the default user-facing report language unless the user explicitly requests another language.
 
-Required Ukrainian labels include, where applicable:
-
-```text
-ФІНАЛЬНИЙ ЗВІТ
-ПЕРЕВІРКА ТВЕРДЖЕНЬ
-ПРОТОКОЛ ПЕРЕВІРКИ
-ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ
-Твердження | Потрібно | Отримано незалежних | Виняток
-```
+Canonical localized labels are defined in the active Store instructions and regression tests. Exact user-facing labels are kept there rather than duplicated in this ASCII-constrained repository document.
 
 ## Product Boundary
 
@@ -118,7 +110,7 @@ Historical implementation:
 Public GPT
  -> logRequest Action
  -> Google Apps Script
- -> Google Sheet `K-Research & Critic — Request Log`
+ -> Google Sheet `K-Research & Critic - Request Log`
 ```
 
 Current classification:
