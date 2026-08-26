@@ -120,6 +120,8 @@ For Ukrainian, the protocol must include `ПІДСУМОК ЗА ТВЕРДЖЕН
 
 Never merge or concatenate the four header labels into one cell. Each following claim must be one four-cell row. Values must match the visible claim blocks and traceable evidence origins.
 
+Because the ChatGPT UI can render the table correctly but serialize its header incorrectly when copying the whole response, immediately follow the rendered table with `КОПІЯ ДЛЯ НАДІЙНОГО КОПІЮВАННЯ` and a fenced `text` code block containing the exact same header row, separator row and every four-cell claim row. The copy-safe block must preserve literal `|` delimiters and must match the rendered table values exactly.
+
 Protocol also records transcript method/language/uncertainty and actual managed credits/STT seconds reported by backend.
 
 ## Privacy and safety boundary
