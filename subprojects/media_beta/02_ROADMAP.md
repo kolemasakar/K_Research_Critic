@@ -2,59 +2,17 @@
 
 Roadmap for the private MEDIA BETA and later optional rollout/sustainable media work.
 
-Version: 3.3
+Version: 3.4
 Status: ACTIVE
 Updated: 2026-08-26
 
 ## Phase A - Private MEDIA BETA
 
-### A1. Architecture and isolation
+### A1-A8 foundation
 
-Status: COMPLETE
+Status: COMPLETE for accepted owner baseline and private-beta infrastructure.
 
-Delivered separate MEDIA BETA GPT identity, Action contract, VoiceBridge feature branch/runtime path and dedicated Render beta service. Production VoiceBridge and published K-Research & Critic remain unchanged.
-
-### A2. Resource protection
-
-Status: COMPLETE_IN_CODE_AND_PRIMARY_LIVE_GUARDS
-
-Accepted controls include duration/size limits, concurrency/quota accounting, provider cleanup, durable managed jobs, invalid-input guards and uncertain-charge no-replay behavior.
-
-### A3. Dedicated Render beta deployment
-
-Status: COMPLETE
-
-Dedicated service: `voicebridge-krc-media-beta-kolemasakar`.
-
-### A4. Live transcript validation
-
-Status: COMPLETE
-
-Browser-assisted baseline and server-side transcript/STT paths were validated with quota, cleanup, status/segment readback and failure protections.
-
-### A5. Separate GPT Builder beta
-
-Status: COMPLETE
-
-Accepted separate private GPT, Builder instructions, Action auth/schema, isolated beta server, privacy policy, CriticProfile gate, Ukrainian default/report localization and exactly one verdict per material claim.
-
-### A6. Owner/operator end-to-end acceptance
-
-Status: COMPLETE
-
-Owner completed full transcript -> CriticProfile -> Research/Critic workflows.
-
-### A7. Controlled external tester rollout
-
-Status: PAUSED_BY_OWNER
-
-External tester onboarding, sharing/publication and production promotion remain paused and require a separate owner decision.
-
-### A8. Owner-only browser-assisted baseline
-
-Status: COMPLETE / BASELINE ACCEPTED
-
-Preserved as fallback evidence only. Helper is not part of normal zero-client UX.
+Delivered isolated MEDIA BETA GPT/Action/backend boundaries, resource protection, dedicated Render beta service, transcript validation, Builder integration, CriticProfile approval flow, owner E2E and preserved A8 browser-assisted fallback evidence. External tester rollout remains paused by owner decision.
 
 ### A9. Zero-client MediaSourceRouter
 
@@ -71,17 +29,11 @@ media input in ChatGPT
  -> localized result in same conversation
 ```
 
-Accepted owner ingress now covers four public platform adapters plus local audio/video attachments.
-
-#### A9.1 Server-side STT EU alignment
-
-Status: COMPLETE
+Accepted owner ingress covers four public platform adapters plus one local audio/video attachment.
 
 #### A9.2R Managed native YouTube
 
 Status: COMPLETE / OWNER E2E ACCEPTED
-
-Zero-client YouTube managed route, explicit native credit boundary and durable KRCM jobs accepted.
 
 #### A9.3 Durable managed jobs
 
@@ -122,12 +74,6 @@ Active policy:
 `Cobalt failure -> media retrieval unavailable -> STOP`
 
 Paid Facebook continuation is not part of active MEDIA BETA. ScrapeCreators remains reserve-only and unconfigured.
-
-#### A9.8 Owner zero-client acceptance
-
-Status: COMPLETE
-
-Owner zero-client behavior is accepted for YouTube, Instagram, Facebook, Telegram and local attachment ingress.
 
 #### A9.9 Telegram public video adapter
 
@@ -203,19 +149,57 @@ Canonical records:
 - `49_A9_10_ATTACHMENT_TRANSPORT_RUNTIME_ACCEPTANCE.md`;
 - `50_A9_10_PRIVATE_GPT_LOCAL_ATTACHMENT_E2E_ACCEPTANCE.md`.
 
-Non-blocking backlog:
-- copied Markdown claim-summary table can render a malformed header row even though rows/counts remain readable; treat as UX formatting hardening, not an A9.10 reopening condition.
+## Phase B - A10 Stabilization / release-boundary review
 
-## Phase B - Stabilization / sustainable media
+Status: IN_PROGRESS / PACKAGE READY / PRIVATE GPT RUNTIME PENDING
 
-Status: NEXT / DEFERRED UNTIL OWNER PRIORITIZATION
+Canonical record:
+`51_A10_STABILIZATION_AND_RELEASE_BOUNDARY.md`.
 
-Potential work:
-- harden claim-summary table rendering without changing accepted semantics;
-- reduce exhaustible-provider dependence where practical;
-- provider-neutral transcript routing;
-- additional operational cleanup/observability;
-- decide whether old compatibility surfaces should be retired in a later controlled change.
+### A10.1 Claim-summary Markdown hardening
+
+Status: PACKAGE READY / RUNTIME PENDING
+
+Observed owner-runtime defect:
+
+```text
+ТвердженняПотрібноОтримано незалежнихВиняток
+```
+
+could appear as a collapsed copied Markdown table header although data rows remained readable.
+
+Builder package `0.9.1-beta-a10` now requires exact header rows:
+
+```text
+| Твердження | Потрібно | Отримано незалежних | Виняток |
+| --- | ---: | ---: | --- |
+```
+
+and explicitly forbids merged/concatenated header labels.
+
+Exit gate: actual private GPT Builder update plus a fresh final report showing four distinct Markdown columns with unchanged `required / achieved_independent / exception` semantics.
+
+### A10.2 Canonical managed-instruction alignment
+
+Status: COMPLETE IN PACKAGE
+
+`GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md` is aligned with accepted YouTube, Instagram, Facebook Cobalt, Telegram public and local-attachment ingress. This removes stale A9.7-I-only canonical framing without changing active backend behavior.
+
+### A10.3 Action/backend stability boundary
+
+Status: NO CHANGE REQUIRED
+
+Action schema remains `0.6.0-a9.10`. No VoiceBridge code/deployment change is required for the A10 table-formatting regression gate.
+
+### A10.4 Release boundary
+
+Status: PAUSED / REQUIRES SEPARATE OWNER DECISION
+
+A10 does not authorize:
+- merge to KRC `main`;
+- production VoiceBridge deployment;
+- external tester onboarding;
+- public sharing/store publication.
 
 ## Phase C - Public/external release
 
@@ -225,8 +209,8 @@ Requires a new explicit owner decision plus sharing/publication resolution, priv
 
 ## Current transition marker
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BASELINE_ACCEPTED / A9_OWNER_ZERO_CLIENT_MEDIA_INPUT_ACCEPTED / YOUTUBE_ACCEPTED / INSTAGRAM_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_ACCEPTED / LOCAL_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BASELINE_ACCEPTED / A9_OWNER_ZERO_CLIENT_MEDIA_INPUT_ACCEPTED / YOUTUBE_ACCEPTED / INSTAGRAM_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_ACCEPTED / LOCAL_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED / A10_CLAIM_TABLE_HARDENING_PACKAGE_READY_RUNTIME_PENDING`
 
 ## Roadmap rule
 
-COMPLETE means implementation plus acceptance evidence exists. PAUSED/DEFERRED/PLANNED items must not be represented as already validated.
+COMPLETE means implementation plus acceptance evidence exists. PACKAGE READY does not mean runtime accepted. PAUSED/DEFERRED/PLANNED items must not be represented as validated or released.
