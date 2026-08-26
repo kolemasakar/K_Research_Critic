@@ -39,6 +39,8 @@ def test_media_builder_requires_traceable_evidence_origins_and_localized_protoco
     assert "`| --- | ---: | ---: | --- |`" in text
     assert "Never merge/concatenate header labels" in text
     assert "Values must match visible claim blocks and traceable evidence origins" in text
+    assert "КОПІЯ ДЛЯ НАДІЙНОГО КОПІЮВАННЯ" in text
+    assert "fenced `text` code block" in text
 
 
 def test_media_builder_localizes_user_visible_labels() -> None:
@@ -88,6 +90,7 @@ def test_manifest_declares_claim_level_traceability_and_localization_contract() 
     assert instructions["cross_check_protocol_table_required"] is True
     assert instructions["cross_check_protocol_markdown_table_strict"] is True
     assert instructions["cross_check_protocol_header_merge_forbidden"] is True
+    assert instructions["cross_check_copy_safe_table_required"] is True
     assert instructions["cross_check_protocol_table_header_row_uk"] == "| Твердження | Потрібно | Отримано незалежних | Виняток |"
     assert instructions["cross_check_protocol_table_separator_row"] == "| --- | ---: | ---: | --- |"
     assert instructions["user_visible_labels_localized_to_report_language"] is True
@@ -110,4 +113,6 @@ def test_manifest_declares_claim_level_traceability_and_localization_contract() 
     assert release["cross_check_traceability_runtime_accepted"] is True
     assert release["report_label_localization_hardened"] is True
     assert release["report_label_localization_runtime_accepted"] is True
-    assert release["gpt_builder_private_update_required"] is True
+    assert release["a10_claim_summary_table_runtime_accepted"] is True
+    assert release["a10_copy_safe_claim_table_runtime_accepted"] is True
+    assert release["gpt_builder_private_update_required"] is False
