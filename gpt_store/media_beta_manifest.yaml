@@ -33,7 +33,7 @@ instructions:
   builder_target_action_schema_version: "0.4.0-a9.7-c"
   builder_package_ready: true
   builder_runtime_applied: true
-  builder_policy_fix_runtime_applied: false
+  builder_policy_fix_runtime_applied: true
   builder_character_limit: 8000
   default_report_language: uk-UA
   report_language_follows_source_language: false
@@ -181,7 +181,7 @@ release:
   a9_7_h1_facebook_cobalt_live_acceptance_complete: true
   a9_7_i_builder_package_ready: true
   a9_7_i_builder_runtime_applied: true
-  a9_7_i_builder_policy_fix_runtime_applied: false
+  a9_7_i_builder_policy_fix_runtime_applied: true
   a9_7_i_private_gpt_e2e_complete: false
   criticprofile_gate_runtime_accepted: true
   cross_check_enforcement_hardened: true
