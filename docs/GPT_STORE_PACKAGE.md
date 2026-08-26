@@ -1,9 +1,9 @@
 # GPT_STORE_PACKAGE
 Документ визначає production-пакет K-Research & Critic, перевірки релізу та maintenance-gates для GPT Store.
 
-Version: 2.2
+Version: 2.3
 Status: MAINTENANCE / CURRENT PUBLIC CORE SYNCED / ACTIONS DISABLED
-Updated: 2026-08-23
+Updated: 2026-08-26
 
 ## 1. Purpose
 
@@ -133,15 +133,9 @@ Critic checks claim-level ledgers, source authority, independence, freshness, su
 
 ## 7. User-Visible Language Contract
 
-Ukrainian is the default. Required labels where applicable:
+Ukrainian is the default user-facing language unless the user explicitly requests another language.
 
-```text
-ФІНАЛЬНИЙ ЗВІТ
-ПЕРЕВІРКА ТВЕРДЖЕНЬ
-ПРОТОКОЛ ПЕРЕВІРКИ
-ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ
-Твердження | Потрібно | Отримано незалежних | Виняток
-```
+Canonical localized headings, table columns and CriticProfile labels are defined in the active Store instructions and regression tests. Exact non-ASCII user-facing labels are intentionally not duplicated in this ASCII-constrained repository document.
 
 ## 8. Historical Request Log Result
 
