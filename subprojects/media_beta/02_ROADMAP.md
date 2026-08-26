@@ -2,7 +2,7 @@
 
 Roadmap for the private MEDIA BETA and later optional rollout/sustainable media work.
 
-Version: 3.4
+Version: 3.5
 Status: ACTIVE
 Updated: 2026-08-26
 
@@ -129,21 +129,6 @@ Accepted security/resource boundary:
 - signed URL/file identifiers are not exposed;
 - provider credentials remain server-side.
 
-Runtime acceptance evidence from the real owner private GPT:
-- actual MP4 approximately 5 MB;
-- media duration `70.668 s`;
-- AssemblyAI accounting `71 s`;
-- two durable transcript segments;
-- detected Russian language confidence `0.9984`;
-- retrieval/provider credits reported `0`;
-- canonical CriticProfile gate reached before research;
-- owner selected `1`;
-- Research/Critic completed in Ukrainian;
-- seven material claims checked;
-- real `0/1 - SHORTFALL` preserved for the unsupported numeric timing claim;
-- reliability `88/100`;
-- final status `COMPLETED_WITH_LIMITATIONS`.
-
 Canonical records:
 - `47_A9_10_LOCAL_UPLOAD_TRANSPORT_AUDIT.md`;
 - `49_A9_10_ATTACHMENT_TRANSPORT_RUNTIME_ACCEPTANCE.md`;
@@ -151,51 +136,46 @@ Canonical records:
 
 ## Phase B - A10 Stabilization / release-boundary review
 
-Status: IN_PROGRESS / PACKAGE READY / PRIVATE GPT RUNTIME PENDING
+Status: COMPLETE / PRIVATE GPT RUNTIME ACCEPTED
 
-Canonical record:
-`51_A10_STABILIZATION_AND_RELEASE_BOUNDARY.md`.
+Canonical records:
+- `51_A10_STABILIZATION_AND_RELEASE_BOUNDARY.md`;
+- `52_A10_SAFE_TABLE_RUNTIME_ACCEPTANCE.md`.
 
-### A10.1 Claim-summary Markdown hardening
+### A10.1 Claim-summary and copy-safe hardening
 
-Status: PACKAGE READY / RUNTIME PENDING
+Status: COMPLETE / RUNTIME ACCEPTED
 
-Observed owner-runtime defect:
+Observed UI behavior:
+- the normal Markdown claim-summary table renders correctly as four distinct columns;
+- ChatGPT whole-response Copy can still collapse the rendered table header into `ТвердженняПотрібноОтримано незалежнихВиняток`.
 
-```text
-ТвердженняПотрібноОтримано незалежнихВиняток
-```
+Accepted mitigation:
+- keep the normal rendered table;
+- immediately output `КОПІЯ ДЛЯ НАДІЙНОГО КОПІЮВАННЯ`;
+- repeat the same table in a fenced `text` block with literal `|` delimiters.
 
-could appear as a collapsed copied Markdown table header although data rows remained readable.
+Fresh owner runtime proved that the fenced representation survives whole-response Copy with all four columns and values intact. The copied rows exactly matched the visible rendered table and preserved a real `0/1 SHORTFALL`.
 
-Builder package `0.9.1-beta-a10` now requires exact header rows:
-
-```text
-| Твердження | Потрібно | Отримано незалежних | Виняток |
-| --- | ---: | ---: | --- |
-```
-
-and explicitly forbids merged/concatenated header labels.
-
-Exit gate: actual private GPT Builder update plus a fresh final report showing four distinct Markdown columns with unchanged `required / achieved_independent / exception` semantics.
+Builder package: `0.9.1-beta-a10`.
 
 ### A10.2 Canonical managed-instruction alignment
 
-Status: COMPLETE IN PACKAGE
+Status: COMPLETE
 
-`GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md` is aligned with accepted YouTube, Instagram, Facebook Cobalt, Telegram public and local-attachment ingress. This removes stale A9.7-I-only canonical framing without changing active backend behavior.
+`GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md` is aligned with accepted YouTube, Instagram, Facebook Cobalt, Telegram public and local-attachment ingress.
 
 ### A10.3 Action/backend stability boundary
 
-Status: NO CHANGE REQUIRED
+Status: COMPLETE / NO CHANGE REQUIRED
 
-Action schema remains `0.6.0-a9.10`. No VoiceBridge code/deployment change is required for the A10 table-formatting regression gate.
+Action schema remains `0.6.0-a9.10`. No VoiceBridge code/deployment change was required for A10.
 
 ### A10.4 Release boundary
 
 Status: PAUSED / REQUIRES SEPARATE OWNER DECISION
 
-A10 does not authorize:
+A10 acceptance does not authorize:
 - merge to KRC `main`;
 - production VoiceBridge deployment;
 - external tester onboarding;
@@ -209,8 +189,8 @@ Requires a new explicit owner decision plus sharing/publication resolution, priv
 
 ## Current transition marker
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BASELINE_ACCEPTED / A9_OWNER_ZERO_CLIENT_MEDIA_INPUT_ACCEPTED / YOUTUBE_ACCEPTED / INSTAGRAM_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_ACCEPTED / LOCAL_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED / A10_CLAIM_TABLE_HARDENING_PACKAGE_READY_RUNTIME_PENDING`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BASELINE_ACCEPTED / A9_OWNER_ZERO_CLIENT_MEDIA_INPUT_ACCEPTED / YOUTUBE_ACCEPTED / INSTAGRAM_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_ACCEPTED / LOCAL_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED / A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED`
 
 ## Roadmap rule
 
-COMPLETE means implementation plus acceptance evidence exists. PACKAGE READY does not mean runtime accepted. PAUSED/DEFERRED/PLANNED items must not be represented as validated or released.
+COMPLETE means implementation plus acceptance evidence exists. PAUSED/DEFERRED/PLANNED items must not be represented as validated or released.
