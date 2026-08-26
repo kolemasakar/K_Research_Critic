@@ -2,7 +2,7 @@
 
 Roadmap for the private MEDIA BETA and later optional public/sustainable media work.
 
-Version: 3.1
+Version: 3.2
 Status: ACTIVE
 Updated: 2026-08-26
 
@@ -27,7 +27,7 @@ Status: COMPLETE_IN_CODE_AND_PRIMARY_LIVE_GUARDS
 Accepted controls include:
 - max source/capture duration 60 min;
 - concurrency 1;
-- AssemblyAI fallback budget 7200 sec per UTC day for the accepted legacy path;
+- AssemblyAI fallback budget 7200 sec per UTC day for accepted legacy/managed STT paths;
 - captions path STT charge 0;
 - helper audio upload guard 32 MiB;
 - mono 16 kHz speech normalization at about 32 kbps;
@@ -48,8 +48,6 @@ Dedicated service:
 Status: COMPLETE
 
 Accepted browser-assisted intake includes captions-first UK/RU/EN/AUTO cases, AssemblyAI EU audio fallback, duration/quota accounting, provider cleanup, status/segment readback, restart/resume, and retry-safe failure handling.
-
-Canonical records: `10_...` through `17_...` plus `20_A7_EU_AUDIO_PRIVACY_GATE_ACCEPTANCE.md`.
 
 ### A5. Separate GPT Builder beta
 
@@ -83,28 +81,11 @@ Previously accepted readiness evidence remains valid, but external Tester 1/2/3 
 
 Status: COMPLETE / BASELINE ACCEPTED
 
-Accepted private owner path:
-
-```text
-private GPT
- -> public YouTube URL
- -> owner-designated credential
- -> KRCC job
- -> Helper 0.2.2
- -> captions-first transcript
- -> DRAFT CriticProfile
- -> owner APPROVE
- -> Research/Critic
- -> localized final report
-```
-
-Canonical acceptance: `23_A8_OWNER_ONLY_BROWSER_ASSISTED_ACCEPTANCE.md`.
-
-A8 remains fallback evidence only. Helper is not part of the normal zero-client UX.
+Accepted private owner path remains fallback evidence only. Helper is not part of normal zero-client UX.
 
 ### A9. Zero-client MediaSourceRouter
 
-Status: IN_PROGRESS / THREE_PUBLIC_ADAPTERS_ACCEPTED
+Status: IN_PROGRESS / FOUR PUBLIC ADAPTERS ACCEPTED
 
 Canonical plan: `24_A9_ZERO_CLIENT_INGESTION_PLAN.md`.
 
@@ -121,39 +102,27 @@ media input in ChatGPT
 Access boundary:
 - public sources only;
 - no user logins, passwords, cookies, authenticated browser sessions, account tokens, or imported session state;
-- auth/private content returns an unsupported/unavailable boundary rather than requesting credentials.
+- auth/private content returns unsupported/unavailable rather than requesting credentials.
 
 #### A9.0 Architecture audit
 
 Status: COMPLETE
 
-VoiceBridge legacy server-side media extraction was audited and used as input to the managed zero-client design.
-
 #### A9.1 Server-side STT EU alignment
 
 Status: COMPLETE
-
-Managed server-side STT uses the accepted AssemblyAI EU boundary where applicable.
 
 #### A9.2R Managed native YouTube
 
 Status: COMPLETE / OWNER E2E ACCEPTED
 
-Accepted:
-- zero-client YouTube managed route;
-- one-credit native Supadata preflight/consent boundary;
-- durable KRCM transcript jobs;
-- owner private-GPT E2E.
+Accepted zero-client YouTube managed route, explicit native credit consent, durable KRCM transcript jobs and owner private-GPT E2E.
 
 #### A9.3 Durable managed jobs
 
 Status: COMPLETE
 
-Accepted:
-- Postgres durable managed jobs;
-- restart-safe readback;
-- duplicate-start reuse;
-- uncertain-charge no-replay invariant.
+Accepted Postgres persistence, restart-safe readback, duplicate reuse and uncertain-charge no-replay invariant.
 
 #### A9.5 Private GPT managed Action integration
 
@@ -165,11 +134,7 @@ Accepted Action auth, Builder integration, managed operations, and owner admissi
 
 Status: COMPLETE / OWNER BETA ACCEPTED
 
-Accepted route:
-- native managed attempt first;
-- when native transcript is unavailable, separate AI preflight and NEW explicit consent;
-- AI generation cap 40 credits;
-- no automatic AI fallback.
+Accepted native-first route with separately authorized AI fallback only when native transcript is unavailable.
 
 #### A9.6 Facebook Supadata route
 
@@ -181,11 +146,9 @@ The Supadata Facebook route remains historical and must not be replayed automati
 
 Status: LIVE_ACCEPTED
 
-Accepted backend positive path:
+Accepted positive path:
 
 `Facebook public Video/Reel -> Cobalt -> AssemblyAI -> durable KRCM`
-
-Canonical positive-path record: `41_A9_7_FACEBOOK_COBALT_LIVE_ACCEPTANCE.md`.
 
 #### A9.7-I Facebook failure-policy hardening
 
@@ -195,13 +158,7 @@ Active policy:
 
 `Cobalt failure -> media retrieval unavailable -> STOP`
 
-Accepted boundaries:
-- no automatic paid fallback;
-- no paid Facebook offer after Cobalt failure;
-- ScrapeCreators reserve-only and inactive;
-- backend terminal failure enforcement;
-- private Builder policy re-applied;
-- fresh owner NEW-chat Facebook failure-path E2E accepted with reported credits `0`.
+No automatic or offered paid Facebook fallback belongs to active MEDIA BETA.
 
 Canonical records:
 - `43_A9_7_I_FACEBOOK_POLICY_FIX_BACKEND_HARDENING.md`;
@@ -209,35 +166,59 @@ Canonical records:
 
 #### A9.8 Owner zero-client acceptance
 
-Status: COMPLETE for accepted YouTube/Instagram/Facebook boundaries
+Status: COMPLETE for accepted YouTube/Instagram/Facebook/Telegram public boundaries
 
-The private GPT now has accepted owner zero-client behavior for the three currently live public platform adapters.
+The private GPT now has accepted owner zero-client behavior for four public platform adapters.
 
 #### A9.9 Telegram public video adapter
 
-Status: NOT_STARTED / NEXT_ENGINEERING_TASK
+Status: COMPLETE / BACKEND LIVE + PRIVATE GPT E2E ACCEPTED
 
-Required before implementation:
-- audit current KRC and VoiceBridge support for Telegram public post URLs;
-- define public-only URL patterns and private/auth-required rejection behavior;
-- identify free/direct extraction options before any paid-provider path;
-- preserve zero-client, no-cookie, no-session boundary;
-- define transcript/STT and durable-job integration;
-- add adapter-specific unit/regression tests;
-- run isolated live positive and negative acceptance before marking complete.
+Accepted route:
+
+```text
+public t.me post
+ -> Telegram public web/embed retrieval
+ -> trusted Telegram CDN media
+ -> AssemblyAI EU
+ -> durable KRCM transcript
+ -> CriticProfile gate
+ -> owner approval
+ -> Research/Critic
+ -> localized final report
+```
+
+Positive backend/private-GPT target:
+
+`https://t.me/techcrimes/12107`
+
+Accepted facts:
+- `retrieval_provider=telegram_public_web`;
+- retrieval credits `0`;
+- STT provider AssemblyAI;
+- `53` STT seconds;
+- one durable segment;
+- duplicate request reuse accepted;
+- no Telegram login/cookies/session/bot token;
+- no paid Telegram fallback;
+- actual private GPT reached CriticProfile, accepted owner `1`, ran Research/Critic and produced the final Ukrainian fact-check.
+
+Companion negative/no-speech target `https://t.me/techcrimes/12101` stopped safely with `0` credits.
+
+Canonical records:
+- `45_A9_9_TELEGRAM_PUBLIC_ADAPTER_AUDIT.md`;
+- `46_A9_9_PRIVATE_GPT_TELEGRAM_E2E_ACCEPTANCE.md`.
 
 #### A9.10 Local upload
 
-Status: FEASIBILITY_PENDING / NOT_ACCEPTED
+Status: FEASIBILITY_PENDING / NOT_ACCEPTED / NEXT ENGINEERING BOUNDARY
 
 Target direction:
 - local video/audio attachment;
 - inspect embedded subtitles/text first where available;
 - otherwise extract/normalize audio and use the accepted EU STT path;
 - temporary source media deleted after processing;
-- attachment-to-Action/backend transport still requires technical feasibility validation.
-
-Local upload must not be represented as implemented until the ChatGPT-to-backend transport boundary is proven.
+- attachment-to-Action/backend transport must be proven before implementation is represented as available.
 
 ## Phase B - Sustainable Free Media
 
@@ -257,7 +238,7 @@ Would require a new explicit owner decision plus sharing/publication resolution,
 
 ## Current transition marker
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_IN_PROGRESS / YOUTUBE_ZERO_CLIENT_ACCEPTED / INSTAGRAM_ZERO_CLIENT_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_NOT_STARTED / LOCAL_UPLOAD_FEASIBILITY_PENDING`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_IN_PROGRESS / YOUTUBE_ZERO_CLIENT_ACCEPTED / INSTAGRAM_ZERO_CLIENT_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_ZERO_CLIENT_ACCEPTED / LOCAL_UPLOAD_FEASIBILITY_PENDING`
 
 ## Roadmap rule
 
