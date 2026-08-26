@@ -2,7 +2,7 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 5.6
+Version: 5.7
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-26
 
@@ -10,7 +10,7 @@ Checkpoint date: 2026-08-26
 
 Current phase state:
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_COMPLETE / A9_8_OWNER_ZERO_CLIENT_YOUTUBE_COMPLETE / A9_6_INSTAGRAM_MANAGED_COMPLETE / A9_6_FACEBOOK_SUPADATA_NOT_ACCEPTED / A9_7_FACEBOOK_COBALT_LIVE_ACCEPTED / A9_7_I_FACEBOOK_POLICY_BACKEND_HARDENED / A9_7_I_BUILDER_POLICY_REAPPLY_PENDING`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_COMPLETE / A9_8_OWNER_ZERO_CLIENT_YOUTUBE_COMPLETE / A9_6_INSTAGRAM_MANAGED_COMPLETE / A9_6_FACEBOOK_SUPADATA_NOT_ACCEPTED / A9_7_FACEBOOK_COBALT_LIVE_ACCEPTED / A9_7_I_FACEBOOK_POLICY_BACKEND_HARDENED / A9_7_I_BUILDER_POLICY_APPLIED / A9_7_I_PRIVATE_GPT_E2E_PENDING`
 
 Accepted owner-only zero-client adapters:
 - public prerecorded YouTube;
@@ -22,7 +22,7 @@ Deferred / not accepted:
 - Telegram public video posts;
 - local audio/video attachment.
 
-The active Facebook failure policy is now explicit and backend-enforced:
+The active Facebook failure policy is explicit and backend-enforced:
 
 `Cobalt/free retrieval failure -> FACEBOOK_RETRIEVAL_UNAVAILABLE -> terminal FAILED -> STOP`
 
@@ -105,9 +105,9 @@ Latest NEW-chat regressions in both actual Custom GPTs passed the localization c
 
 `gpt_builder_private_update_required = false` is retained as a legacy compatibility marker.
 
-`builder_policy_fix_runtime_applied = false` is authoritative for the corrected A9.7-I Builder-policy reapply.
+`builder_policy_fix_runtime_applied = true` records the owner-confirmed corrected A9.7-I Builder-policy reapply on 2026-08-26.
 
-`a9_7_i_private_gpt_e2e_complete = false`.
+`a9_7_i_private_gpt_e2e_complete = false` until a fresh NEW-chat Facebook runtime test passes.
 
 ## Accepted owner media UX
 
@@ -201,23 +201,25 @@ Canonical hardening record: `43_A9_7_I_FACEBOOK_POLICY_FIX_BACKEND_HARDENING.md`
 
 The current repository Action schema remains compatibility version `0.4.0-a9.7-c` and still exposes historical paid-preflight/continuation operation definitions. They are reserved compatibility surface only.
 
-The active Builder instructions explicitly forbid calling or offering those operations after Cobalt failure. The backend now also makes new Cobalt-failed jobs terminal, preventing the active route from entering the historical retrieval-consent state.
+The active Builder instructions explicitly forbid calling or offering those operations after Cobalt failure. The backend also makes new Cobalt-failed jobs terminal, preventing the active route from entering the historical retrieval-consent state.
 
 Historical durable jobs may still contain `AWAITING_RETRIEVAL_CONSENT`; this compatibility state does not define new-job routing policy.
 
 ## Private GPT state
 
-The actual private GPT previously received the A9.7-I Builder package, but the final corrected policy has not yet been re-applied in the Builder runtime.
+The owner confirmed on 2026-08-26 that the corrected repository Builder instructions were re-applied to the actual private `K-Research & Critic - MEDIA BETA` GPT and the Builder update was completed.
 
 Current authoritative markers:
 - `builder_package_ready = true`;
-- `builder_runtime_applied = true` records the earlier package application;
-- `builder_policy_fix_runtime_applied = false` records the pending corrected-policy reapply;
+- `builder_runtime_applied = true`;
+- `builder_policy_fix_runtime_applied = true`;
 - `a9_7_i_private_gpt_e2e_complete = false`.
+
+This records manual Builder application only. Runtime behavior is not accepted until the fresh NEW-chat Facebook E2E is observed.
 
 ## Next task
 
-Reapply the corrected repository Builder instructions to the actual private owner GPT and run one fresh NEW-chat Facebook zero-client E2E.
+Run one fresh NEW-chat Facebook zero-client E2E in the actual private owner GPT.
 
 Acceptance behavior:
 - Cobalt success -> AssemblyAI -> durable transcript -> continue Research/Critic workflow;
