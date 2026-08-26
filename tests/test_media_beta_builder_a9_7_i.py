@@ -82,6 +82,15 @@ def test_a9_7_i_target_action_schema_keeps_reserved_paid_operations_compatible()
     assert schema["info"]["version"] == manifest["instructions"][
         "builder_target_action_schema_version"
     ]
+    action_text = (
+        ROOT / "gpt_store" / "actions" / "media_managed_beta_openapi.yaml"
+    ).read_text(encoding="utf-8")
+    assert "ScrapeCreators is reserved compatibility" in action_text
+    assert "treat Facebook retrieval as terminal unavailable" in action_text
+    assert "Builder must not call this operation after Cobalt failure" in action_text
+    assert "separate local preflight and a new explicit" not in action_text
+    assert "stop at AWAITING_RETRIEVAL_CONSENT" not in action_text
+
     paths = schema["paths"]
     assert paths["/api/v1/media/managed/facebook-fallback"]["post"]["operationId"] == (
         "startManagedFacebookFallback"

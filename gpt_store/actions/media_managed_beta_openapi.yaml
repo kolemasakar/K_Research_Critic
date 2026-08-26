@@ -5,12 +5,12 @@ info:
   description: >-
     Owner-only zero-client managed transcript beta for public YouTube, Instagram,
     Facebook and supported public Telegram video posts. Existing Supadata native and
-    consent-gated AI paths remain
-    available. Facebook retrieval/STT uses a free Cobalt attempt first; if that
-    cannot retrieve the public media, a separate local preflight and a new explicit
-    one-credit ScrapeCreators approval are required before any paid retrieval.
-    AssemblyAI STT runs only after media retrieval. Action bearer and owner
-    admission credentials remain server-side.
+    consent-gated AI paths remain available. Facebook retrieval/STT uses the free
+    Cobalt path. If Cobalt cannot retrieve the public media, Facebook retrieval is
+    unavailable and media intake stops. ScrapeCreators is reserved compatibility
+    surface only and is not active or offerable. AssemblyAI STT runs only after
+    successful media retrieval. Action bearer and owner admission credentials remain
+    server-side.
 x-krc-compatibility:
   previous_schema_marker: "version: 0.3.0-a9.6"
   previous_native_cap_marker: "maximum: 1"
@@ -93,8 +93,9 @@ paths:
       summary: Try free public Facebook media retrieval and AssemblyAI STT
       description: >-
         Try configured Cobalt for a public Facebook URL. Never call ScrapeCreators
-        here. If free retrieval fails, stop at AWAITING_RETRIEVAL_CONSENT. If it
-        succeeds, run AssemblyAI STT and persist durable KRCM transcript segments.
+        here. If free retrieval fails, treat Facebook retrieval as terminal unavailable
+        and stop media intake. If it succeeds, run AssemblyAI STT and persist durable
+        KRCM transcript segments.
       x-openai-isConsequential: false
       requestBody:
         required: true
@@ -104,7 +105,7 @@ paths:
               $ref: "#/components/schemas/FacebookFallbackRequest"
       responses:
         "200":
-          description: Facebook fallback completed or stopped before paid retrieval.
+          description: Facebook Cobalt path completed or stopped terminally unavailable.
           content:
             application/json:
               schema:
@@ -212,11 +213,11 @@ paths:
   /api/v1/media/managed/transcriptions/{job_id}/facebook-retrieval-preflight:
     get:
       operationId: preflightManagedFacebookRetrievalCredit
-      summary: Read the local one-credit ceiling before paid Facebook retrieval
+      summary: "Reserved compatibility: inspect legacy Facebook paid-retrieval ceiling"
       description: >-
-        Call only after the same job returns AWAITING_RETRIEVAL_CONSENT. This is a
-        local policy quote: it does not call ScrapeCreators and performs no provider
-        balance lookup. It does not authorize paid retrieval.
+        Reserved compatibility only for historical durable jobs. Active MEDIA BETA
+        Builder must not call or offer this operation after Cobalt failure. This local
+        quote does not call ScrapeCreators and does not authorize paid retrieval.
       x-openai-isConsequential: false
       parameters:
         - name: job_id
@@ -243,12 +244,12 @@ paths:
   /api/v1/media/managed/transcriptions/{job_id}/facebook-retrieval:
     post:
       operationId: continueManagedFacebookPaidRetrieval
-      summary: Run exactly one explicitly approved ScrapeCreators retrieval attempt
+      summary: "Reserved compatibility: legacy explicitly approved Facebook retrieval"
       description: >-
-        Call only after the local Facebook retrieval preflight and a NEW explicit
-        user approval. The hard maximum is exactly one ScrapeCreators credit.
-        Automatic retries are forbidden. If charge outcome is uncertain, the job
-        records credit_charge_uncertain=true and must never be replayed automatically.
+        Reserved compatibility only for historical durable jobs. Active MEDIA BETA
+        Builder must not call this operation after Cobalt failure. If legacy use is ever
+        separately authorized, the hard maximum remains one ScrapeCreators credit and
+        uncertain-charge operations must never be replayed automatically.
       x-openai-isConsequential: true
       parameters:
         - name: job_id
