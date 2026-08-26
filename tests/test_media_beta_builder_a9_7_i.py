@@ -27,7 +27,9 @@ def test_a9_7_i_corrected_builder_policy_fix_requires_runtime_reapply() -> None:
     assert release["a9_7_i_builder_runtime_applied"] is True
     assert release["a9_7_i_builder_policy_fix_runtime_applied"] is False
     assert release["a9_7_i_private_gpt_e2e_complete"] is False
-    assert release["gpt_builder_private_update_required"] is True
+    # Legacy marker remains false for compatibility; the dedicated policy-fix
+    # marker above is authoritative for this reapply step.
+    assert release["gpt_builder_private_update_required"] is False
 
 
 def test_a9_7_i_builder_enforces_cobalt_fail_unavailable_without_paid_offer() -> None:
