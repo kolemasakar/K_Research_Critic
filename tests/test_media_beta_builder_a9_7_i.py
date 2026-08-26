@@ -20,10 +20,11 @@ def test_a9_9_package_preserves_a9_7_i_acceptance_and_records_private_gpt_e2e() 
     assert instructions["builder_package_version"] == "0.9.1-beta-a10"
     assert instructions["builder_target_action_schema_version"] == "0.6.0-a9.10"
     assert instructions["builder_package_ready"] is True
-    assert instructions["builder_runtime_applied"] is False
+    assert instructions["builder_runtime_applied"] is True
     assert instructions["builder_policy_fix_runtime_applied"] is True
     assert instructions["cross_check_protocol_markdown_table_strict"] is True
     assert instructions["cross_check_protocol_header_merge_forbidden"] is True
+    assert instructions["cross_check_copy_safe_table_required"] is True
 
     assert beta["public_platforms_live_accepted"] == [
         "youtube",
@@ -34,8 +35,10 @@ def test_a9_9_package_preserves_a9_7_i_acceptance_and_records_private_gpt_e2e() 
     assert beta["public_platforms_in_progress"] == []
     assert beta["managed_telegram_builder_runtime_applied"] is True
     assert beta["managed_telegram_private_gpt_e2e_complete"] is True
+    assert beta["claim_summary_table_hardening_runtime_applied"] is True
 
     assert release["rollout_state"] == "A9_10_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED"
+    assert release["stabilization_state"] == "A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED"
     assert release["a9_7_i_builder_package_ready"] is True
     assert release["a9_7_i_builder_runtime_applied"] is True
     assert release["a9_7_i_builder_policy_fix_runtime_applied"] is True
@@ -44,7 +47,9 @@ def test_a9_9_package_preserves_a9_7_i_acceptance_and_records_private_gpt_e2e() 
     assert release["a9_9_telegram_action_package_complete"] is True
     assert release["a9_9_telegram_builder_runtime_applied"] is True
     assert release["a9_9_telegram_private_gpt_e2e_complete"] is True
-    assert release["gpt_builder_private_update_required"] is True
+    assert release["a10_claim_summary_table_runtime_accepted"] is True
+    assert release["a10_copy_safe_claim_table_runtime_accepted"] is True
+    assert release["gpt_builder_private_update_required"] is False
 
 
 def test_a9_7_i_builder_enforces_cobalt_fail_unavailable_without_paid_offer() -> None:
