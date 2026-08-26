@@ -34,8 +34,8 @@ jobs:
           python -m pip install -r requirements-dev.txt
 
       - name: Apply A9.9 Telegram package patch
-        # v4: package plus A9.9 regression alignment
-        run: python scripts/a9_9_telegram_action_package_patch_v2.py
+        # v5: package + regression alignment + Builder <=8000 compaction
+        run: python scripts/a9_9_telegram_action_package_patch_v3.py
 
       - name: Validate package and repository policy
         run: |
