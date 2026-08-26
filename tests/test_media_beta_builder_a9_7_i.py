@@ -8,32 +8,41 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_a9_9_package_preserves_a9_7_i_acceptance_and_marks_builder_pending() -> None:
+def test_a9_9_package_preserves_a9_7_i_acceptance_and_records_private_gpt_e2e() -> None:
     manifest = yaml.safe_load(
         (ROOT / "gpt_store" / "media_beta_manifest.yaml").read_text(encoding="utf-8")
     )
     instructions = manifest["instructions"]
+    beta = manifest["beta"]
     release = manifest["release"]
 
     assert instructions["version"] == "0.8-beta-a9.9"
     assert instructions["builder_package_version"] == "0.8-beta-a9.9"
     assert instructions["builder_target_action_schema_version"] == "0.5.0-a9.9"
     assert instructions["builder_package_ready"] is True
-    assert instructions["builder_runtime_applied"] is False
+    assert instructions["builder_runtime_applied"] is True
     assert instructions["builder_policy_fix_runtime_applied"] is True
 
-    assert release["rollout_state"] == "A9_9_TELEGRAM_PACKAGE_READY_BUILDER_PENDING"
+    assert beta["public_platforms_live_accepted"] == [
+        "youtube",
+        "instagram",
+        "facebook",
+        "telegram",
+    ]
+    assert beta["public_platforms_in_progress"] == []
+    assert beta["managed_telegram_builder_runtime_applied"] is True
+    assert beta["managed_telegram_private_gpt_e2e_complete"] is True
+
+    assert release["rollout_state"] == "A9_9_TELEGRAM_PRIVATE_GPT_E2E_ACCEPTED"
     assert release["a9_7_i_builder_package_ready"] is True
     assert release["a9_7_i_builder_runtime_applied"] is True
     assert release["a9_7_i_builder_policy_fix_runtime_applied"] is True
     assert release["a9_7_i_private_gpt_e2e_complete"] is True
     assert release["a9_9_telegram_backend_complete"] is True
     assert release["a9_9_telegram_action_package_complete"] is True
-    assert release["a9_9_telegram_builder_runtime_applied"] is False
-    assert release["a9_9_telegram_private_gpt_e2e_complete"] is False
-    # Legacy marker remains false for compatibility; the dedicated policy-fix
-    # and E2E markers above are authoritative for the accepted Builder runtime.
-    assert release["gpt_builder_private_update_required"] is True
+    assert release["a9_9_telegram_builder_runtime_applied"] is True
+    assert release["a9_9_telegram_private_gpt_e2e_complete"] is True
+    assert release["gpt_builder_private_update_required"] is False
 
 
 def test_a9_7_i_builder_enforces_cobalt_fail_unavailable_without_paid_offer() -> None:
