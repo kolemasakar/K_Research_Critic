@@ -2,7 +2,7 @@
 
 Canonical documentation index for K-Research & Critic media-input work.
 
-Version: 3.8
+Version: 3.9
 Status: ACTIVE
 Updated: 2026-08-26
 
@@ -19,7 +19,8 @@ It covers:
 - claim-level cross-check and evidence-origin traceability;
 - report-label localization;
 - accepted YouTube, Instagram, Facebook, Telegram and local audio/video attachment ingress;
-- later rollout/sustainability boundaries.
+- A10 stabilization and release-boundary hardening;
+- later optional external/public rollout boundaries.
 
 Repository `main`, production VoiceBridge and public sharing remain separate and are not implicitly authorized by this subproject.
 
@@ -55,26 +56,30 @@ Repository `main`, production VoiceBridge and public sharing remain separate and
 28. `47_A9_10_LOCAL_UPLOAD_TRANSPORT_AUDIT.md` - OpenAI attachment transport contract and security design.
 29. `49_A9_10_ATTACHMENT_TRANSPORT_RUNTIME_ACCEPTANCE.md` - actual `openaiFileIdRefs` transport probe acceptance.
 30. `50_A9_10_PRIVATE_GPT_LOCAL_ATTACHMENT_E2E_ACCEPTANCE.md` - actual owner local-attachment ingestion, CriticProfile and Research/Critic E2E acceptance.
+31. `51_A10_STABILIZATION_AND_RELEASE_BOUNDARY.md` - current A10 stabilization package and runtime/release gate.
 
 ## Source-of-truth precedence
 
 When documents disagree:
 1. current code, current CI evidence and verified runtime evidence on active feature branches;
 2. `03_CURRENT_STATE.md`;
-3. `50_A9_10_PRIVATE_GPT_LOCAL_ATTACHMENT_E2E_ACCEPTANCE.md` for local attachment E2E;
-4. `49_A9_10_ATTACHMENT_TRANSPORT_RUNTIME_ACCEPTANCE.md` for attachment transport;
-5. `46_A9_9_PRIVATE_GPT_TELEGRAM_E2E_ACCEPTANCE.md` for Telegram E2E;
-6. `44_A9_7_I_PRIVATE_GPT_FACEBOOK_POLICY_E2E_ACCEPTANCE.md` for Facebook failure policy;
-7. `43_A9_7_I_FACEBOOK_POLICY_FIX_BACKEND_HARDENING.md`;
-8. `41_A9_7_FACEBOOK_COBALT_LIVE_ACCEPTANCE.md`;
-9. `39_REPORT_LANGUAGE_AND_MEDIA_TRACEABILITY_RUNTIME_ACCEPTANCE.md`;
-10. `06_DECISION_LOG.md` and older phase records.
+3. `51_A10_STABILIZATION_AND_RELEASE_BOUNDARY.md` for current stabilization/runtime gate;
+4. `50_A9_10_PRIVATE_GPT_LOCAL_ATTACHMENT_E2E_ACCEPTANCE.md` for accepted local attachment E2E;
+5. `49_A9_10_ATTACHMENT_TRANSPORT_RUNTIME_ACCEPTANCE.md` for attachment transport;
+6. `46_A9_9_PRIVATE_GPT_TELEGRAM_E2E_ACCEPTANCE.md` for Telegram E2E;
+7. `44_A9_7_I_PRIVATE_GPT_FACEBOOK_POLICY_E2E_ACCEPTANCE.md` for Facebook failure policy;
+8. `43_A9_7_I_FACEBOOK_POLICY_FIX_BACKEND_HARDENING.md`;
+9. `41_A9_7_FACEBOOK_COBALT_LIVE_ACCEPTANCE.md`;
+10. `39_REPORT_LANGUAGE_AND_MEDIA_TRACEABILITY_RUNTIME_ACCEPTANCE.md`;
+11. `06_DECISION_LOG.md` and older phase records.
 
 Historical documents do not override later acceptance records. Do not mark a phase complete from roadmap text alone.
 
 ## Current phase checkpoint
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_OWNER_ZERO_CLIENT_MEDIA_INPUT_ACCEPTED / YOUTUBE_ACCEPTED / INSTAGRAM_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_ACCEPTED / LOCAL_ATTACHMENT_ACCEPTED`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_OWNER_ZERO_CLIENT_MEDIA_INPUT_ACCEPTED / YOUTUBE_ACCEPTED / INSTAGRAM_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_ACCEPTED / LOCAL_ATTACHMENT_ACCEPTED / A10_STABILIZATION_PACKAGE_READY_RUNTIME_PENDING`
+
+A9.10 remains accepted. A10 is a presentation/canonical-reference stabilization layer and does not reopen accepted media transport or ingestion.
 
 ## Accepted Research/Critic contract
 
@@ -87,20 +92,26 @@ Historical documents do not override later acceptance records. Do not mark a pha
 - achieved cannot exceed visible independent origins;
 - Critic checks each material claim before PASS.
 
-## Runtime status
+## A10 stabilization package
 
-- `CORE_TRACEABILITY_HARDENING_RUNTIME = ACCEPTED`;
-- `CORE_REPORT_LABEL_LOCALIZATION_RUNTIME = ACCEPTED`;
-- `MEDIA_BETA_TRACEABILITY_HARDENING_RUNTIME = ACCEPTED`;
-- `MEDIA_BETA_REPORT_LABEL_LOCALIZATION_RUNTIME = ACCEPTED`;
-- `a9_7_i_private_gpt_e2e_complete = true`;
-- `managed_telegram_private_gpt_e2e_complete = true`;
-- `managed_attachment_transport_live_accepted = true`;
-- `managed_attachment_ingestion_live_accepted = true`;
-- `managed_attachment_private_gpt_e2e_complete = true`;
-- `builder_runtime_applied = true`;
-- `gpt_builder_private_update_required = false`;
-- `rollout_state = A9_10_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED`.
+Builder package: `0.9.1-beta-a10`.
+
+Action schema remains unchanged: `0.6.0-a9.10`.
+
+The package hardens `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ` to require the exact four-column Markdown header:
+
+`| Твердження | Потрібно | Отримано незалежних | Виняток |`
+
+and separator:
+
+`| --- | ---: | ---: | --- |`
+
+It also aligns the canonical managed instructions with the already accepted Telegram and local-attachment routes.
+
+Repository package validation is distinct from actual private-GPT runtime acceptance. Until the owner applies this new Builder package and confirms a fresh report:
+- `builder_runtime_applied = false` for `0.9.1-beta-a10`;
+- `gpt_builder_private_update_required = true`;
+- `a10_claim_summary_table_runtime_accepted = false`.
 
 ## Accepted owner media ingress
 
@@ -139,7 +150,7 @@ VoiceBridge: `kolemasakar/VoiceBridge`, branch `agent/krc-media-transcript`, dra
 
 ## Next task
 
-A9 owner zero-client target ingress is functionally accepted. Next work is stabilization and release-boundary review: preserve current accepted behavior, harden non-blocking UX defects such as the copied claim-summary table header, and decide separately whether any external tester/public/production promotion should occur.
+Apply Builder package `0.9.1-beta-a10` to the actual private MEDIA BETA GPT and run a fresh runtime regression proving that the claim-summary table keeps four distinct Markdown columns and preserves the accepted cross-check semantics. No Action/backend update is required for this gate.
 
 ## Non-negotiable boundary
 
