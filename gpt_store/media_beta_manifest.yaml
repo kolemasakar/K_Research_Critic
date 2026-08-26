@@ -122,9 +122,12 @@ beta:
   managed_facebook_retrieval_stt_code_ready: true
   managed_facebook_free_retrieval_provider: cobalt
   managed_facebook_free_path_live_accepted: true
+  managed_facebook_free_failure_behavior: unavailable
   managed_facebook_paid_retrieval_provider: scrapecreators
   managed_facebook_paid_retrieval_configured: false
   managed_facebook_paid_fallback_live_accepted: false
+  managed_facebook_paid_retrieval_active: false
+  managed_facebook_paid_offer_allowed: false
   managed_facebook_paid_retrieval_max_credits: 1
   managed_facebook_paid_retrieval_requires_separate_consent: true
   managed_facebook_automatic_paid_retrieval: false
