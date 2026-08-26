@@ -54,11 +54,11 @@ jobs:
           python scripts/validate_repository.py > /tmp/a9-10-package-validate.log 2>&1
           code=$?
           if [[ $code -eq 0 ]]; then
-            python scripts/validate_store_package.py >> /tmp/a9-10-package-validate.log 2>&1
+            PYTHONPATH=. python scripts/validate_store_package.py >> /tmp/a9-10-package-validate.log 2>&1
             code=$?
           fi
           if [[ $code -eq 0 ]]; then
-            pytest -q >> /tmp/a9-10-package-validate.log 2>&1
+            PYTHONPATH=. pytest -q >> /tmp/a9-10-package-validate.log 2>&1
             code=$?
           fi
           cat /tmp/a9-10-package-validate.log
