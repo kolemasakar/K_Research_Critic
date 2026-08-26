@@ -1,8 +1,8 @@
 # MEDIA BETA Roadmap
 
-Roadmap for the private MEDIA BETA and later optional public/sustainable media work.
+Roadmap for the private MEDIA BETA and later optional rollout/sustainable media work.
 
-Version: 3.2
+Version: 3.3
 Status: ACTIVE
 Updated: 2026-08-26
 
@@ -12,101 +12,66 @@ Updated: 2026-08-26
 
 Status: COMPLETE
 
-Delivered:
-- separate MEDIA BETA GPT identity;
-- separate GPT Action contract;
-- separate VoiceBridge media backend path;
-- dedicated Render beta target;
-- production VoiceBridge unchanged;
-- published K-Research & Critic unchanged.
+Delivered separate MEDIA BETA GPT identity, Action contract, VoiceBridge feature branch/runtime path and dedicated Render beta service. Production VoiceBridge and published K-Research & Critic remain unchanged.
 
 ### A2. Resource protection
 
 Status: COMPLETE_IN_CODE_AND_PRIMARY_LIVE_GUARDS
 
-Accepted controls include:
-- max source/capture duration 60 min;
-- concurrency 1;
-- AssemblyAI fallback budget 7200 sec per UTC day for accepted legacy/managed STT paths;
-- captions path STT charge 0;
-- helper audio upload guard 32 MiB;
-- mono 16 kHz speech normalization at about 32 kbps;
-- provider delete request on normal AssemblyAI completion;
-- durable managed job state;
-- negative-path guards for invalid access, wrong source, duration, concurrency, quota exhaustion, and uncertain-charge replay.
+Accepted controls include duration/size limits, concurrency/quota accounting, provider cleanup, durable managed jobs, invalid-input guards and uncertain-charge no-replay behavior.
 
 ### A3. Dedicated Render beta deployment
 
 Status: COMPLETE
 
-Dedicated service:
-- `voicebridge-krc-media-beta-kolemasakar`;
-- isolated from production VoiceBridge.
+Dedicated service: `voicebridge-krc-media-beta-kolemasakar`.
 
 ### A4. Live transcript validation
 
 Status: COMPLETE
 
-Accepted browser-assisted intake includes captions-first UK/RU/EN/AUTO cases, AssemblyAI EU audio fallback, duration/quota accounting, provider cleanup, status/segment readback, restart/resume, and retry-safe failure handling.
+Browser-assisted baseline and server-side transcript/STT paths were validated with quota, cleanup, status/segment readback and failure protections.
 
 ### A5. Separate GPT Builder beta
 
 Status: COMPLETE
 
-Accepted:
-- separate `K-Research & Critic - MEDIA BETA` GPT;
-- Builder-safe instructions below the 8000-character limit;
-- web search enabled;
-- API Key/Bearer Action auth;
-- isolated beta Action server;
-- privacy policy configured;
-- CriticProfile approval gate enforced;
-- Ukrainian default response language;
-- localized report headings and verdict labels;
-- exactly one verdict per material claim.
+Accepted separate private GPT, Builder instructions, Action auth/schema, isolated beta server, privacy policy, CriticProfile gate, Ukrainian default/report localization and exactly one verdict per material claim.
 
 ### A6. Owner/operator end-to-end acceptance
 
 Status: COMPLETE
 
-The owner completed the full Research/Critic flow after transcript intake and explicit CriticProfile approval.
+Owner completed full transcript -> CriticProfile -> Research/Critic workflows.
 
 ### A7. Controlled external tester rollout
 
 Status: PAUSED_BY_OWNER
 
-Previously accepted readiness evidence remains valid, but external Tester 1/2/3 onboarding, GPT sharing/publication investigation, and appeal work are paused by owner decision.
+External tester onboarding, sharing/publication and production promotion remain paused and require a separate owner decision.
 
 ### A8. Owner-only browser-assisted baseline
 
 Status: COMPLETE / BASELINE ACCEPTED
 
-Accepted private owner path remains fallback evidence only. Helper is not part of normal zero-client UX.
+Preserved as fallback evidence only. Helper is not part of normal zero-client UX.
 
 ### A9. Zero-client MediaSourceRouter
 
-Status: IN_PROGRESS / FOUR PUBLIC ADAPTERS ACCEPTED
+Status: COMPLETE / OWNER TARGET INGRESS ACCEPTED
 
-Canonical plan: `24_A9_ZERO_CLIENT_INGESTION_PLAN.md`.
-
-Target:
+Canonical target:
 
 ```text
 media input in ChatGPT
- -> MediaSourceRouter
+ -> MediaSourceRouter / managed Action
  -> zero-client transcript acquisition
- -> requested analysis workflow
- -> result in the same conversation
+ -> CriticProfile gate
+ -> Research/Critic
+ -> localized result in same conversation
 ```
 
-Access boundary:
-- public sources only;
-- no user logins, passwords, cookies, authenticated browser sessions, account tokens, or imported session state;
-- auth/private content returns unsupported/unavailable rather than requesting credentials.
-
-#### A9.0 Architecture audit
-
-Status: COMPLETE
+Accepted owner ingress now covers four public platform adapters plus local audio/video attachments.
 
 #### A9.1 Server-side STT EU alignment
 
@@ -116,37 +81,35 @@ Status: COMPLETE
 
 Status: COMPLETE / OWNER E2E ACCEPTED
 
-Accepted zero-client YouTube managed route, explicit native credit consent, durable KRCM transcript jobs and owner private-GPT E2E.
+Zero-client YouTube managed route, explicit native credit boundary and durable KRCM jobs accepted.
 
 #### A9.3 Durable managed jobs
 
 Status: COMPLETE
 
-Accepted Postgres persistence, restart-safe readback, duplicate reuse and uncertain-charge no-replay invariant.
+Postgres persistence, restart-safe readback, duplicate reuse and uncertain-charge no-replay accepted.
 
 #### A9.5 Private GPT managed Action integration
 
 Status: COMPLETE
 
-Accepted Action auth, Builder integration, managed operations, and owner admission without a user-facing beta code.
+Action auth, Builder integration and server-side owner admission accepted without a user-facing beta code.
 
 #### A9.6 Instagram Reel
 
 Status: COMPLETE / OWNER BETA ACCEPTED
 
-Accepted native-first route with separately authorized AI fallback only when native transcript is unavailable.
+Native-first route accepted with separately authorized AI fallback only when required.
 
 #### A9.6 Facebook Supadata route
 
 Status: HISTORICAL / NOT_ACCEPTED
 
-The Supadata Facebook route remains historical and must not be replayed automatically.
+Historical only; must not be replayed automatically.
 
 #### A9.7 Facebook Cobalt free path
 
-Status: LIVE_ACCEPTED
-
-Accepted positive path:
+Status: COMPLETE / LIVE_ACCEPTED
 
 `Facebook public Video/Reel -> Cobalt -> AssemblyAI -> durable KRCM`
 
@@ -158,17 +121,13 @@ Active policy:
 
 `Cobalt failure -> media retrieval unavailable -> STOP`
 
-No automatic or offered paid Facebook fallback belongs to active MEDIA BETA.
-
-Canonical records:
-- `43_A9_7_I_FACEBOOK_POLICY_FIX_BACKEND_HARDENING.md`;
-- `44_A9_7_I_PRIVATE_GPT_FACEBOOK_POLICY_E2E_ACCEPTANCE.md`.
+Paid Facebook continuation is not part of active MEDIA BETA. ScrapeCreators remains reserve-only and unconfigured.
 
 #### A9.8 Owner zero-client acceptance
 
-Status: COMPLETE for accepted YouTube/Instagram/Facebook/Telegram public boundaries
+Status: COMPLETE
 
-The private GPT now has accepted owner zero-client behavior for four public platform adapters.
+Owner zero-client behavior is accepted for YouTube, Instagram, Facebook, Telegram and local attachment ingress.
 
 #### A9.9 Telegram public video adapter
 
@@ -178,68 +137,96 @@ Accepted route:
 
 ```text
 public t.me post
- -> Telegram public web/embed retrieval
- -> trusted Telegram CDN media
+ -> Telegram public web/embed
+ -> trusted Telegram CDN
  -> AssemblyAI EU
- -> durable KRCM transcript
- -> CriticProfile gate
- -> owner approval
+ -> durable KRCM
+ -> CriticProfile
  -> Research/Critic
- -> localized final report
 ```
 
-Positive backend/private-GPT target:
+Canonical positive target: `https://t.me/techcrimes/12107`.
 
-`https://t.me/techcrimes/12107`
-
-Accepted facts:
-- `retrieval_provider=telegram_public_web`;
-- retrieval credits `0`;
-- STT provider AssemblyAI;
-- `53` STT seconds;
-- one durable segment;
-- duplicate request reuse accepted;
-- no Telegram login/cookies/session/bot token;
-- no paid Telegram fallback;
-- actual private GPT reached CriticProfile, accepted owner `1`, ran Research/Critic and produced the final Ukrainian fact-check.
-
-Companion negative/no-speech target `https://t.me/techcrimes/12101` stopped safely with `0` credits.
+Accepted facts include zero retrieval credits, 53 STT seconds, durable reread/duplicate reuse, no Telegram auth state and no paid fallback.
 
 Canonical records:
 - `45_A9_9_TELEGRAM_PUBLIC_ADAPTER_AUDIT.md`;
 - `46_A9_9_PRIVATE_GPT_TELEGRAM_E2E_ACCEPTANCE.md`.
 
-#### A9.10 Local upload
+#### A9.10 Local audio/video attachment
 
-Status: FEASIBILITY_PENDING / NOT_ACCEPTED / NEXT ENGINEERING BOUNDARY
+Status: COMPLETE / TRANSPORT + BACKEND + PRIVATE GPT E2E ACCEPTED
 
-Target direction:
-- local video/audio attachment;
-- inspect embedded subtitles/text first where available;
-- otherwise extract/normalize audio and use the accepted EU STT path;
-- temporary source media deleted after processing;
-- attachment-to-Action/backend transport must be proven before implementation is represented as available.
+Accepted route:
 
-## Phase B - Sustainable Free Media
+```text
+one current-conversation local audio/video attachment
+ -> openaiFileIdRefs
+ -> trusted *.oaiusercontent.com temporary delivery
+ -> bounded VoiceBridge ingestion
+ -> ffmpeg/audio normalization as needed
+ -> AssemblyAI
+ -> durable KRCM segments
+ -> CriticProfile gate
+ -> explicit owner approval
+ -> Research/Critic
+ -> localized final report
+```
 
-Status: DEFERRED
+Accepted security/resource boundary:
+- exactly one attachment;
+- no Helper/client extension;
+- no user beta code;
+- retrieval provider `openai_attachment`;
+- retrieval credits `0`;
+- maximum attachment size `32 MiB`;
+- signed URL/file identifiers are not exposed;
+- provider credentials remain server-side.
 
-Potential future work:
-- caption-path hardening;
-- provider-neutral transcript router;
-- owner-controlled local media processing where practical;
-- reduce dependence on exhaustible paid STT credits from any future public free path.
+Runtime acceptance evidence from the real owner private GPT:
+- actual MP4 approximately 5 MB;
+- media duration `70.668 s`;
+- AssemblyAI accounting `71 s`;
+- two durable transcript segments;
+- detected Russian language confidence `0.9984`;
+- retrieval/provider credits reported `0`;
+- canonical CriticProfile gate reached before research;
+- owner selected `1`;
+- Research/Critic completed in Ukrainian;
+- seven material claims checked;
+- real `0/1 - SHORTFALL` preserved for the unsupported numeric timing claim;
+- reliability `88/100`;
+- final status `COMPLETED_WITH_LIMITATIONS`.
 
-## Phase C - Public media release
+Canonical records:
+- `47_A9_10_LOCAL_UPLOAD_TRANSPORT_AUDIT.md`;
+- `49_A9_10_ATTACHMENT_TRANSPORT_RUNTIME_ACCEPTANCE.md`;
+- `50_A9_10_PRIVATE_GPT_LOCAL_ATTACHMENT_E2E_ACCEPTANCE.md`.
+
+Non-blocking backlog:
+- copied Markdown claim-summary table can render a malformed header row even though rows/counts remain readable; treat as UX formatting hardening, not an A9.10 reopening condition.
+
+## Phase B - Stabilization / sustainable media
+
+Status: NEXT / DEFERRED UNTIL OWNER PRIORITIZATION
+
+Potential work:
+- harden claim-summary table rendering without changing accepted semantics;
+- reduce exhaustible-provider dependence where practical;
+- provider-neutral transcript routing;
+- additional operational cleanup/observability;
+- decide whether old compatibility surfaces should be retired in a later controlled change.
+
+## Phase C - Public/external release
 
 Status: PAUSED / FUTURE
 
-Would require a new explicit owner decision plus sharing/publication resolution, sustainable resource architecture, privacy re-validation, runtime-plan compatibility, stable public privacy-policy delivery, production smoke tests, and explicit promotion approval.
+Requires a new explicit owner decision plus sharing/publication resolution, privacy re-validation, sustainable resource architecture, production smoke tests and explicit promotion approval.
 
 ## Current transition marker
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_IN_PROGRESS / YOUTUBE_ZERO_CLIENT_ACCEPTED / INSTAGRAM_ZERO_CLIENT_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_ZERO_CLIENT_ACCEPTED / LOCAL_UPLOAD_FEASIBILITY_PENDING`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BASELINE_ACCEPTED / A9_OWNER_ZERO_CLIENT_MEDIA_INPUT_ACCEPTED / YOUTUBE_ACCEPTED / INSTAGRAM_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_ACCEPTED / LOCAL_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED`
 
 ## Roadmap rule
 
-A roadmap item marked COMPLETE means implementation/acceptance evidence exists. READY/IN_PROGRESS/PAUSED/BLOCKED/PLANNED/NOT_STARTED must never be described as already validated.
+COMPLETE means implementation plus acceptance evidence exists. PAUSED/DEFERRED/PLANNED items must not be represented as already validated.
