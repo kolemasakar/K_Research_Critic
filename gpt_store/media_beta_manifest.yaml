@@ -28,11 +28,11 @@ knowledge:
 instructions:
   file: prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md
   canonical_reference: prompts/GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md
-  version: "0.9-beta-a9.10"
-  builder_package_version: "0.9-beta-a9.10"
+  version: "0.9.1-beta-a10"
+  builder_package_version: "0.9.1-beta-a10"
   builder_target_action_schema_version: "0.6.0-a9.10"
   builder_package_ready: true
-  builder_runtime_applied: true
+  builder_runtime_applied: false
   builder_policy_fix_runtime_applied: true
   builder_character_limit: 8000
   default_report_language: uk-UA
@@ -62,7 +62,11 @@ instructions:
   cross_check_achieved_cannot_exceed_visible_origins: true
   cross_check_systematic_review_counts_as_one_origin: true
   cross_check_protocol_table_required: true
+  cross_check_protocol_markdown_table_strict: true
+  cross_check_protocol_header_merge_forbidden: true
   cross_check_protocol_table_heading_uk: ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ
+  cross_check_protocol_table_header_row_uk: "| Твердження | Потрібно | Отримано незалежних | Виняток |"
+  cross_check_protocol_table_separator_row: "| --- | ---: | ---: | --- |"
   cross_check_protocol_table_columns:
     - Твердження
     - Потрібно
@@ -160,6 +164,9 @@ beta:
   managed_restart_resilient_jobs: true
   managed_duplicate_start_reuses_job: true
   provider_balance_after_a9_3_acceptance: 98
+  stabilization_phase: A10
+  claim_summary_table_hardening_package_ready: true
+  claim_summary_table_hardening_runtime_applied: false
   legacy_browser_assisted:
     job_prefix: KRCC_
     helper_version: "0.2.2"
@@ -178,6 +185,7 @@ beta:
 
 release:
   rollout_state: A9_10_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED
+  stabilization_state: A10_CLAIM_TABLE_HARDENING_PACKAGE_READY_RUNTIME_PENDING
   production_core_unchanged: true
   public_store_gpt_unchanged: true
   user_api_key_required: false
@@ -214,6 +222,8 @@ release:
   a9_10_attachment_builder_runtime_applied: true
   a9_10_attachment_ingestion_live_accepted: true
   a9_10_attachment_private_gpt_e2e_complete: true
+  a10_claim_summary_table_hardening_ready: true
+  a10_claim_summary_table_runtime_accepted: false
   criticprofile_gate_runtime_accepted: true
   cross_check_enforcement_hardened: true
   cross_check_claim_level_enforcement_hardened: true
@@ -223,5 +233,5 @@ release:
   report_label_localization_hardened: true
   report_label_localization_runtime_accepted: true
   external_tester_rollout_paused: true
-  gpt_builder_private_update_required: false
+  gpt_builder_private_update_required: true
   merge_to_public_product_allowed: false
