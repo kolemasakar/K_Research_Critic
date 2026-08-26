@@ -1,0 +1,52 @@
+name: A9.9 Private GPT Telegram E2E Acceptance
+
+on:
+  push:
+    branches:
+      - agent/video-url-research
+    paths:
+      - scripts/a9_9_accept_private_gpt_e2e.py
+      - .github/workflows/a9-9-private-gpt-e2e-acceptance.yml
+
+permissions:
+  contents: write
+
+jobs:
+  accept:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout MEDIA branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/video-url-research
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Apply accepted runtime state
+        run: python scripts/a9_9_accept_private_gpt_e2e.py
+
+      - name: Validate targeted regressions
+        run: |
+          python -m pytest -q tests/test_media_beta_builder_a9_7_i.py
+          python scripts/validate_store_package.py
+
+      - name: Commit accepted state
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo "No state changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add gpt_store/media_beta_manifest.yaml scripts/validate_store_package.py tests/test_media_beta_builder_a9_7_i.py
+          git commit -m "A9.9 accept private GPT Telegram E2E"
+          git push origin HEAD:agent/video-url-research
