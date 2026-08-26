@@ -3,7 +3,7 @@ schema_version: "0.6-beta"
 product:
   name: K-Research & Critic - MEDIA BETA
   description: |-
-    Приватне owner-only тестування zero-client аналізу публічних YouTube-відео, Instagram Reel, Facebook та Telegram media.
+    Приватне owner-only тестування zero-client аналізу публічних YouTube-відео, Instagram Reel, Facebook, Telegram media та локальних audio/video вкладень.
     (owner-only zero-client media-input beta for K-Research & Critic.)
   default_language: uk-UA
   primary_channel: chatgpt_private_beta
@@ -32,7 +32,7 @@ instructions:
   builder_package_version: "0.9-beta-a9.10"
   builder_target_action_schema_version: "0.6.0-a9.10"
   builder_package_ready: true
-  builder_runtime_applied: false
+  builder_runtime_applied: true
   builder_policy_fix_runtime_applied: true
   builder_character_limit: 8000
   default_report_language: uk-UA
@@ -108,7 +108,7 @@ beta:
     - telegram
   public_platforms_in_progress: []
   public_platforms_not_started: []
-  local_upload_live_accepted: false
+  local_upload_live_accepted: true
   managed_attachment_transport_live_accepted: true
   managed_attachment_transport_provider: openai_file_refs
   managed_attachment_backend_code_ready: true
@@ -118,9 +118,9 @@ beta:
   managed_attachment_stt_provider: assemblyai
   managed_attachment_max_bytes: 33554432
   managed_attachment_action_schema_ready: true
-  managed_attachment_builder_runtime_applied: false
-  managed_attachment_ingestion_live_accepted: false
-  managed_attachment_private_gpt_e2e_complete: false
+  managed_attachment_builder_runtime_applied: true
+  managed_attachment_ingestion_live_accepted: true
+  managed_attachment_private_gpt_e2e_complete: true
   max_video_seconds: 3600
   managed_provider: supadata
   managed_provider_mode: native_first
@@ -177,7 +177,7 @@ beta:
     never_log: true
 
 release:
-  rollout_state: A9_10_ATTACHMENT_PACKAGE_READY_BUILDER_PENDING
+  rollout_state: A9_10_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED
   production_core_unchanged: true
   public_store_gpt_unchanged: true
   user_api_key_required: false
@@ -211,9 +211,9 @@ release:
   a9_10_attachment_backend_code_ready: true
   a9_10_attachment_backend_live_deployed: true
   a9_10_attachment_action_package_complete: true
-  a9_10_attachment_builder_runtime_applied: false
-  a9_10_attachment_ingestion_live_accepted: false
-  a9_10_attachment_private_gpt_e2e_complete: false
+  a9_10_attachment_builder_runtime_applied: true
+  a9_10_attachment_ingestion_live_accepted: true
+  a9_10_attachment_private_gpt_e2e_complete: true
   criticprofile_gate_runtime_accepted: true
   cross_check_enforcement_hardened: true
   cross_check_claim_level_enforcement_hardened: true
@@ -223,5 +223,5 @@ release:
   report_label_localization_hardened: true
   report_label_localization_runtime_accepted: true
   external_tester_rollout_paused: true
-  gpt_builder_private_update_required: true
+  gpt_builder_private_update_required: false
   merge_to_public_product_allowed: false
