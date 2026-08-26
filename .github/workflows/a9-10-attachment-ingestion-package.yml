@@ -6,6 +6,7 @@ on:
       - agent/video-url-research
     paths:
       - scripts/a9_10_attachment_ingestion_package_patch.py
+      - scripts/a9_10_attachment_ingestion_package_patch_v2.py
       - .github/workflows/a9-10-attachment-ingestion-package.yml
 
 permissions:
@@ -39,7 +40,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          python scripts/a9_10_attachment_ingestion_package_patch.py > /tmp/a9-10-package-patch.log 2>&1
+          python scripts/a9_10_attachment_ingestion_package_patch_v2.py > /tmp/a9-10-package-patch.log 2>&1
           code=$?
           cat /tmp/a9-10-package-patch.log
           exit $code
@@ -77,6 +78,7 @@ jobs:
             prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md \
             gpt_store/media_beta_manifest.yaml \
             scripts/validate_store_package.py \
+            tests/test_claim_level_cross_check_enforcement.py \
             tests/test_media_attachment_probe_package.py \
             tests/test_media_attachment_ingestion_package.py \
             tests/test_media_beta_builder_a9_7_i.py \
