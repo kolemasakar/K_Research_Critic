@@ -35,6 +35,10 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert instructions["cross_check_achieved_cannot_exceed_visible_origins"] is True
     assert instructions["cross_check_systematic_review_counts_as_one_origin"] is True
     assert instructions["cross_check_protocol_table_required"] is True
+    assert instructions["cross_check_protocol_markdown_table_strict"] is True
+    assert instructions["cross_check_protocol_header_merge_forbidden"] is True
+    assert instructions["cross_check_protocol_table_header_row_uk"] == "| Твердження | Потрібно | Отримано незалежних | Виняток |"
+    assert instructions["cross_check_protocol_table_separator_row"] == "| --- | ---: | ---: | --- |"
     assert instructions["user_visible_labels_localized_to_report_language"] is True
     assert instructions["criticprofile_field_labels_localized_to_report_language"] is True
     assert instructions["ukrainian_required_headings"] == [
@@ -109,7 +113,7 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert release["cross_check_traceability_runtime_accepted"] is True
     assert release["report_label_localization_hardened"] is True
     assert release["report_label_localization_runtime_accepted"] is True
-    assert release["gpt_builder_private_update_required"] is False
+    assert release["gpt_builder_private_update_required"] is True
 
 
 def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates() -> None:

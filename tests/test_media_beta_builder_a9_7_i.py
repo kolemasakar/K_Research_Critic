@@ -16,12 +16,14 @@ def test_a9_9_package_preserves_a9_7_i_acceptance_and_records_private_gpt_e2e() 
     beta = manifest["beta"]
     release = manifest["release"]
 
-    assert instructions["version"] == "0.9-beta-a9.10"
-    assert instructions["builder_package_version"] == "0.9-beta-a9.10"
+    assert instructions["version"] == "0.9.1-beta-a10"
+    assert instructions["builder_package_version"] == "0.9.1-beta-a10"
     assert instructions["builder_target_action_schema_version"] == "0.6.0-a9.10"
     assert instructions["builder_package_ready"] is True
-    assert instructions["builder_runtime_applied"] is True
+    assert instructions["builder_runtime_applied"] is False
     assert instructions["builder_policy_fix_runtime_applied"] is True
+    assert instructions["cross_check_protocol_markdown_table_strict"] is True
+    assert instructions["cross_check_protocol_header_merge_forbidden"] is True
 
     assert beta["public_platforms_live_accepted"] == [
         "youtube",
@@ -42,7 +44,7 @@ def test_a9_9_package_preserves_a9_7_i_acceptance_and_records_private_gpt_e2e() 
     assert release["a9_9_telegram_action_package_complete"] is True
     assert release["a9_9_telegram_builder_runtime_applied"] is True
     assert release["a9_9_telegram_private_gpt_e2e_complete"] is True
-    assert release["gpt_builder_private_update_required"] is False
+    assert release["gpt_builder_private_update_required"] is True
 
 
 def test_a9_7_i_builder_enforces_cobalt_fail_unavailable_without_paid_offer() -> None:

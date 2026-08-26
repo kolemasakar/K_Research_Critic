@@ -13,10 +13,10 @@ def test_a9_10_attachment_private_gpt_e2e_is_accepted() -> None:
     release = manifest["release"]
     instructions = manifest["instructions"]
 
-    assert instructions["version"] == "0.9-beta-a9.10"
+    assert instructions["version"] == "0.9.1-beta-a10"
     assert instructions["builder_target_action_schema_version"] == "0.6.0-a9.10"
     assert instructions["builder_package_ready"] is True
-    assert instructions["builder_runtime_applied"] is True
+    assert instructions["builder_runtime_applied"] is False
     assert beta["managed_attachment_transport_live_accepted"] is True
     assert beta["managed_attachment_backend_code_ready"] is True
     assert beta["managed_attachment_backend_live_deployed"] is True
@@ -28,7 +28,7 @@ def test_a9_10_attachment_private_gpt_e2e_is_accepted() -> None:
     assert beta["managed_attachment_ingestion_live_accepted"] is True
     assert beta["managed_attachment_private_gpt_e2e_complete"] is True
     assert release["rollout_state"] == "A9_10_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED"
-    assert release["gpt_builder_private_update_required"] is False
+    assert release["gpt_builder_private_update_required"] is True
 
 
 def test_a9_10_attachment_schema_is_zero_retrieval_credit_and_file_ref_only() -> None:
