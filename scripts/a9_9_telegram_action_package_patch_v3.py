@@ -20,7 +20,7 @@ No independent claim research before the CriticProfile is approved. Never reveal
 Compatibility marker only: `1=APPROVE, 2=EDIT, 3=REJECT`.
 ''',
     '''CORE
-No independent research before CriticProfile approval. Never reveal hidden reasoning, secrets, credentials, tool IDs or media Job IDs.
+No independent claim research before the CriticProfile is approved. Never reveal hidden reasoning, secrets, credentials, tool IDs or media Job IDs.
 Compatibility marker only: `1=APPROVE, 2=EDIT, 3=REJECT`.
 ''',
 )
