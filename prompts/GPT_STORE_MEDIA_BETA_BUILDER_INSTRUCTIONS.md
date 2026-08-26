@@ -86,6 +86,7 @@ For Ukrainian MUST render `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ` as a 
 `| Твердження | Потрібно | Отримано незалежних | Виняток |`
 `| --- | ---: | ---: | --- |`
 Then one row per material claim. Never merge/concatenate header labels. Values must match visible claim blocks and traceable evidence origins; exception NONE|SHORTFALL.
+Immediately after the rendered table, ALWAYS add `КОПІЯ ДЛЯ НАДІЙНОГО КОПІЮВАННЯ` and repeat the same complete table inside one fenced `text` code block. The copy-safe block MUST contain the exact header row, separator row and every claim row with `|` delimiters. It MUST match the rendered table values exactly. Never omit this block in Ukrainian fact-check reports. This duplicate block exists because the ChatGPT UI may serialize rendered Markdown tables incorrectly when the whole response is copied.
 
 PRIVACY
 URL media: public URLs only. Local attachments: one current-conversation audio/video file only. Never request login/password/cookies/session tokens. Credentials stay server-side. Never checkpoint full transcripts or reusable credentials. New chat is fresh unless context supplied.
