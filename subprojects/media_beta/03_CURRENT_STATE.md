@@ -2,7 +2,7 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 6.1
+Version: 6.2
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-26
 
@@ -10,9 +10,9 @@ Checkpoint date: 2026-08-26
 
 Current phase state:
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_OWNER_ZERO_CLIENT_MEDIA_INPUT_ACCEPTED / YOUTUBE_ACCEPTED / INSTAGRAM_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_ACCEPTED / LOCAL_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED / A10_STABILIZATION_PACKAGE_READY_RUNTIME_PENDING`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_OWNER_ZERO_CLIENT_MEDIA_INPUT_ACCEPTED / YOUTUBE_ACCEPTED / INSTAGRAM_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_ACCEPTED / LOCAL_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED / A10_COPY_SAFE_RUNTIME_RETEST_PENDING`
 
-A9.10 remains accepted. A10 does not reopen the accepted transport/transcription workflow; it hardens final-report Markdown presentation and aligns the canonical managed instruction reference.
+A9.10 remains accepted. A10 does not reopen media transport/transcription. It is presentation stabilization for the claim-summary table plus canonical instruction alignment.
 
 Accepted owner-only zero-client ingress:
 - prerecorded YouTube;
@@ -23,12 +23,12 @@ Accepted owner-only zero-client ingress:
 
 Historical/not-active boundaries:
 - Facebook Supadata route is historical/not accepted;
-- ScrapeCreators paid Facebook fallback is reserve-only, unconfigured, inactive and not offerable in active MEDIA BETA;
+- ScrapeCreators paid Facebook fallback is reserve-only, unconfigured, inactive and not offerable;
 - private/authenticated Telegram retrieval is unsupported;
 - paid Telegram fallback is unsupported;
-- A8 Helper remains fallback evidence only and is not normal owner UX.
+- A8 Helper is fallback evidence only and is not normal owner UX.
 
-Repository `main`, production VoiceBridge, external tester rollout and public sharing remain outside the current merge/release gate.
+Repository `main`, production VoiceBridge, external tester rollout and public sharing remain outside the current release gate.
 
 ## Repositories and isolation boundary
 
@@ -64,7 +64,7 @@ Claim-level cross-check enforcement is runtime accepted:
 - achieved cannot exceed visible independent evidence origins;
 - Critic audits material claims before PASS.
 
-Report language defaults to Ukrainian unless explicitly changed by the user. User-visible workflow text, CriticProfile labels, verdicts and final report labels follow the selected report language.
+Report language defaults to Ukrainian unless explicitly changed by the user.
 
 ## A9 runtime markers retained
 
@@ -95,33 +95,53 @@ Report language defaults to Ukrainian unless explicitly changed by the user. Use
 ## A10 stabilization state
 
 Repository package:
-- Builder instructions: `0.9.1-beta-a10`;
-- Action schema target: `0.6.0-a9.10` unchanged;
-- canonical managed reference: `0.5.0-a10-stabilization`;
-- claim-summary strict Markdown hardening: package-ready;
-- actual private-GPT Builder application of `0.9.1-beta-a10`: pending;
-- runtime acceptance of the table fix: pending.
+- Builder package identity remains `0.9.1-beta-a10`;
+- Action schema `0.6.0-a9.10` unchanged;
+- canonical managed reference `0.5.0-a10-stabilization`;
+- strict four-column Markdown table contract present;
+- copy-safe fenced-table fallback added;
+- backend/VoiceBridge unchanged.
 
-Authoritative A10 markers:
-- `builder_runtime_applied = false` for the new A10 package;
-- `gpt_builder_private_update_required = true`;
-- `claim_summary_table_hardening_package_ready = true`;
-- `claim_summary_table_hardening_runtime_applied = false`;
-- `a10_claim_summary_table_runtime_accepted = false`;
-- `stabilization_state = A10_CLAIM_TABLE_HARDENING_PACKAGE_READY_RUNTIME_PENDING`.
+### Runtime attempt 1
 
-The previous A9.10 Builder/runtime acceptance remains historical evidence for the accepted media flow; the `false` A10 Builder marker means only that the new formatting package has not yet been applied to the actual private GPT.
+Owner applied the initial A10 Builder package and reran Telegram fact-check on `https://t.me/techcrimes/12107`.
 
-### A10 table contract
+Observed:
+- CriticProfile gate: PASS;
+- visible `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ`: PASS as four distinct columns;
+- whole-response Copy: FAIL because the rendered table header serialized as `ТвердженняПотрібноОтримано незалежнихВиняток` while row values stayed intact.
 
-For Ukrainian `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ`, the staged Builder package requires exactly:
+This is treated as a ChatGPT UI copy/serialization defect rather than a malformed rendered-table source because the owner screenshot shows four correct visual columns.
+
+### Copy-safe refinement
+
+The Builder now requires both:
 
 ```text
 | Твердження | Потрібно | Отримано незалежних | Виняток |
 | --- | ---: | ---: | --- |
 ```
 
-Every material claim follows as one four-cell row. Header labels must not be merged/concatenated. The values must remain consistent with the visible claim blocks and traceable evidence origins.
+and immediately afterward:
+- heading `КОПІЯ ДЛЯ НАДІЙНОГО КОПІЮВАННЯ`;
+- one fenced `text` code block;
+- the same complete table with literal `|` delimiters;
+- identical values in rendered and copy-safe representations.
+
+Regression coverage: `tests/test_a10_copy_safe_claim_table.py`.
+
+Final refined package head:
+`dc8120d43219cc39c02fa10f6ec0136664af067b`
+
+Final refined-package Tests run:
+`33005278994` -> SUCCESS, including Python 3.13, Python 3.14, Ruff, mypy, repository policy, GPT Store package validation and coverage.
+
+Authoritative A10 markers intentionally remain pending until the refined package is applied to the actual private GPT and retested:
+- `builder_runtime_applied = false`;
+- `gpt_builder_private_update_required = true`;
+- `claim_summary_table_hardening_package_ready = true`;
+- `claim_summary_table_hardening_runtime_applied = false`;
+- `a10_claim_summary_table_runtime_accepted = false`.
 
 Canonical A10 record:
 `51_A10_STABILIZATION_AND_RELEASE_BOUNDARY.md`.
@@ -174,16 +194,15 @@ Local attachment
 
 Actual owner test:
 - local `videoplayback (1).mp4`, approximately 5 MB;
-- request: `Перевірити факти/твердження у прикріпленому відео.`;
 - canonical CriticProfile gate reached;
 - owner selected `1`;
-- AssemblyAI detected Russian with language confidence `0.9984`;
+- AssemblyAI language confidence `0.9984`;
 - source duration `70.668 s`;
 - STT accounting `71 s`;
 - two durable transcript segments;
-- retrieval/provider credits reported `0`;
+- retrieval/provider credits `0`;
 - seven material claims evaluated;
-- unsupported numeric timing claim preserved as `0/1 - SHORTFALL`;
+- real `0/1 - SHORTFALL` preserved;
 - reliability `88/100`;
 - final status `COMPLETED_WITH_LIMITATIONS`;
 - no KRCM Job ID, OpenAI file ID, signed URL or provider credential exposed.
@@ -194,22 +213,22 @@ Canonical records:
 
 ## Credit and replay invariants
 
-- local attachment retrieval credits are `0`; AssemblyAI STT is accounted separately by processed seconds/quota;
-- Telegram public retrieval credits are `0` and has no paid fallback;
-- Facebook active retrieval remains free Cobalt-only;
-- Supadata native hard cap remains 1 explicitly approved credit;
-- Instagram AI fallback requires a separate quote and explicit consent;
-- automatic managed AI fallback is prohibited;
-- `credit_charge_uncertain=true` operations are never automatically retried;
+- local attachment retrieval credits `0`; AssemblyAI STT accounted separately;
+- Telegram public retrieval credits `0`, no paid fallback;
+- Facebook active retrieval free Cobalt-only;
+- Supadata native hard cap one explicitly approved credit;
+- Instagram AI fallback requires separate quote and explicit consent;
+- automatic managed AI fallback prohibited;
+- `credit_charge_uncertain=true` operations never automatically retried;
 - durable duplicate starts reuse existing jobs where defined.
 
 ## Current next boundary
 
-Repository-level A10 package validation must be green, then:
-1. apply `prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md` version `0.9.1-beta-a10` to the actual private MEDIA BETA GPT;
-2. keep the existing Action schema `0.6.0-a9.10`;
-3. run a fresh final-report regression;
-4. confirm that `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ` renders/copies as four distinct Markdown columns and keeps the same cross-check accounting;
-5. only after that mark A10 runtime accepted and clean the runtime-pending markers.
+1. Re-apply the refined `prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md` to the actual private MEDIA BETA GPT.
+2. Do not change/reimport Action schema `0.6.0-a9.10`.
+3. Run a fresh Telegram final-report regression.
+4. Confirm the visual table is four columns.
+5. Confirm the following copy-safe fenced `text` table preserves literal `|` separators when the whole response is copied and matches the visual values exactly.
+6. Only after that mark A10 runtime accepted and clear runtime-pending markers.
 
 External tester/public sharing, repository `main` merge and production VoiceBridge promotion remain paused until a separate explicit owner decision.
