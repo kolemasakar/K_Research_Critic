@@ -192,5 +192,5 @@ release:
   report_label_localization_hardened: true
   report_label_localization_runtime_accepted: true
   external_tester_rollout_paused: true
-  gpt_builder_private_update_required: true
+  gpt_builder_private_update_required: false
   merge_to_public_product_allowed: false
