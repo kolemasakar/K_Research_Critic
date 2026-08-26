@@ -2,7 +2,7 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 5.7
+Version: 5.8
 Status: ACTIVE_CHECKPOINT
 Checkpoint date: 2026-08-26
 
@@ -10,7 +10,7 @@ Checkpoint date: 2026-08-26
 
 Current phase state:
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_COMPLETE / A9_8_OWNER_ZERO_CLIENT_YOUTUBE_COMPLETE / A9_6_INSTAGRAM_MANAGED_COMPLETE / A9_6_FACEBOOK_SUPADATA_NOT_ACCEPTED / A9_7_FACEBOOK_COBALT_LIVE_ACCEPTED / A9_7_I_FACEBOOK_POLICY_BACKEND_HARDENED / A9_7_I_BUILDER_POLICY_APPLIED / A9_7_I_PRIVATE_GPT_E2E_PENDING`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_1_COMPLETE / A9_2_DIRECT_YOUTUBE_BLOCKED / A9_2R_MANAGED_NATIVE_COMPLETE / A9_3_DURABLE_MANAGED_COMPLETE / A9_5_PRIVATE_GPT_ZERO_CLIENT_E2E_COMPLETE / A9_8_OWNER_ZERO_CLIENT_YOUTUBE_COMPLETE / A9_6_INSTAGRAM_MANAGED_COMPLETE / A9_6_FACEBOOK_SUPADATA_NOT_ACCEPTED / A9_7_FACEBOOK_COBALT_LIVE_ACCEPTED / A9_7_I_FACEBOOK_POLICY_BACKEND_HARDENED / A9_7_I_BUILDER_POLICY_APPLIED / A9_7_I_PRIVATE_GPT_E2E_ACCEPTED`
 
 Accepted owner-only zero-client adapters:
 - public prerecorded YouTube;
@@ -22,7 +22,7 @@ Deferred / not accepted:
 - Telegram public video posts;
 - local audio/video attachment.
 
-The active Facebook failure policy is explicit and backend-enforced:
+The active Facebook failure policy is explicit, backend-enforced and now accepted in the actual private GPT:
 
 `Cobalt/free retrieval failure -> FACEBOOK_RETRIEVAL_UNAVAILABLE -> terminal FAILED -> STOP`
 
@@ -105,9 +105,9 @@ Latest NEW-chat regressions in both actual Custom GPTs passed the localization c
 
 `gpt_builder_private_update_required = false` is retained as a legacy compatibility marker.
 
-`builder_policy_fix_runtime_applied = true` records the owner-confirmed corrected A9.7-I Builder-policy reapply on 2026-08-26.
+`builder_policy_fix_runtime_applied = true` records the owner-confirmed corrected A9.7-I Builder-policy application on 2026-08-26.
 
-`a9_7_i_private_gpt_e2e_complete = false` until a fresh NEW-chat Facebook runtime test passes.
+`a9_7_i_private_gpt_e2e_complete = true` records the fresh NEW-chat Facebook policy E2E acceptance on 2026-08-26.
 
 ## Accepted owner media UX
 
@@ -124,7 +124,7 @@ supported public media URL in ChatGPT
  -> Facebook Cobalt success: AssemblyAI -> durable KRCM transcript
  -> Facebook Cobalt failure: retrieval unavailable -> STOP
  -> no paid Facebook offer/preflight/continuation in active MEDIA BETA
- -> CriticProfile gate
+ -> CriticProfile gate only after transcript availability
  -> Research -> Critic
  -> result in same conversation
 ```
@@ -175,13 +175,13 @@ Canonical positive-path acceptance record: `41_A9_7_FACEBOOK_COBALT_LIVE_ACCEPTA
 
 ### A9.7-I - Facebook failure-policy hardening
 
-CODE + CI ACCEPTED on VoiceBridge branch `agent/krc-media-transcript`.
+ACCEPTED end-to-end for the current owner-only private MEDIA BETA policy boundary.
 
 Authoritative VoiceBridge commit:
 
 `1b46f15588840eda5b8f14f5206fd966b69c4887` - `A9: make Cobalt failure terminal unavailable`
 
-Enforced behavior:
+Backend behavior:
 - Cobalt/free retrieval failure becomes `FACEBOOK_RETRIEVAL_UNAVAILABLE`;
 - active managed job becomes terminal `FAILED`;
 - active retrieval chain does not call the paid retriever;
@@ -191,11 +191,17 @@ Enforced behavior:
 
 Regression coverage explicitly asserts no paid fallback and `paidCalls == 0`.
 
-CI for the commit:
-- `A9.7-F Cobalt Package Validate`: PASS;
-- `Validate`: PASS.
+Actual private-GPT NEW-chat acceptance on 2026-08-26:
+- public Reel request routed into the free Facebook flow;
+- free retrieval failed;
+- GPT reported media retrieval unavailable and stopped;
+- no paid Facebook fallback was offered;
+- reported charged credits: `0`;
+- no independent fact-check started without retrieval/transcription.
 
-Canonical hardening record: `43_A9_7_I_FACEBOOK_POLICY_FIX_BACKEND_HARDENING.md`.
+Canonical records:
+- `43_A9_7_I_FACEBOOK_POLICY_FIX_BACKEND_HARDENING.md`;
+- `44_A9_7_I_PRIVATE_GPT_FACEBOOK_POLICY_E2E_ACCEPTANCE.md`.
 
 ## Action-schema compatibility boundary
 
@@ -207,23 +213,23 @@ Historical durable jobs may still contain `AWAITING_RETRIEVAL_CONSENT`; this com
 
 ## Private GPT state
 
-The owner confirmed on 2026-08-26 that the corrected repository Builder instructions were re-applied to the actual private `K-Research & Critic - MEDIA BETA` GPT and the Builder update was completed.
+The corrected Builder policy is applied and the owner NEW-chat Facebook policy E2E is accepted.
 
 Current authoritative markers:
 - `builder_package_ready = true`;
 - `builder_runtime_applied = true`;
 - `builder_policy_fix_runtime_applied = true`;
-- `a9_7_i_private_gpt_e2e_complete = false`.
+- `a9_7_i_private_gpt_e2e_complete = true`;
+- `rollout_state = A9_7_I_PRIVATE_GPT_E2E_ACCEPTED`.
 
-This records manual Builder application only. Runtime behavior is not accepted until the fresh NEW-chat Facebook E2E is observed.
+Positive-path Cobalt retrieval remains accepted by H1 backend evidence; the 2026-08-26 private-GPT acceptance specifically validates the corrected terminal failure behavior.
 
 ## Next task
 
-Run one fresh NEW-chat Facebook zero-client E2E in the actual private owner GPT.
+Facebook A9.7-I is closed. Continue A9 zero-client expansion without changing production or public sharing state.
 
-Acceptance behavior:
-- Cobalt success -> AssemblyAI -> durable transcript -> continue Research/Critic workflow;
-- Cobalt failure -> report media retrieval unavailable -> STOP;
-- no paid Facebook retrieval offer, preflight or continuation;
-- no Helper, beta code, Job ID, cookies or separate media opening;
-- no merge, production change or external rollout.
+Remaining not-accepted ingress targets:
+- Telegram public video posts;
+- local audio/video attachment transport and ingestion.
+
+The next implementation task is to audit the existing VoiceBridge/KRC code for Telegram public-media support and define the smallest isolated zero-client adapter path before writing code.
