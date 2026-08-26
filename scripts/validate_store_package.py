@@ -184,9 +184,9 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(capabilities.get("actions") is True, "private media beta requires Actions")
     _require(capabilities.get("apps") is False, "private media beta must not require Apps")
 
-    _require(instructions.get("version") == "0.7-beta-a9.7-i", "A9.7-I instruction version must be 0.7-beta-a9.7-i")
-    _require(instructions.get("builder_package_version") == "0.7-beta-a9.7-i", "A9.7-I Builder package version must be 0.7-beta-a9.7-i")
-    _require(instructions.get("builder_runtime_applied") is True, "A9.7-I Builder package must record runtime application")
+    _require(instructions.get("version") == "0.8-beta-a9.9", "A9.9 instruction version must be 0.8-beta-a9.9")
+    _require(instructions.get("builder_package_version") == "0.8-beta-a9.9", "A9.9 Builder package version must be 0.8-beta-a9.9")
+    _require(instructions.get("builder_runtime_applied") is False, "A9.9 Builder package must remain pending until private GPT Builder is updated")
     _require(instructions.get("builder_policy_fix_runtime_applied") is True, "A9.7-I corrected Builder policy must record runtime application")
     _require(instructions.get("builder_character_limit") == 8000, "Builder instruction limit must remain 8000")
     _require(instructions.get("canonical_reference") == "prompts/GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md", "managed instruction file must be canonical")
@@ -203,8 +203,8 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(beta.get("browser_assisted_a8_fallback_preserved") is True, "A8 fallback evidence must remain preserved")
     _require(beta.get("managed_job_prefix") == "KRCM_", "managed jobs must use KRCM_ prefix")
     _require(beta.get("public_platforms_live_accepted") == ["youtube", "instagram", "facebook"], "YouTube, Instagram, and the accepted Facebook free path must be declared live accepted")
-    _require(beta.get("public_platforms_in_progress") == [], "No public platform may remain in progress after Facebook Cobalt live acceptance")
-    _require(beta.get("public_platforms_not_started") == ["telegram"], "Telegram must remain not started")
+    _require(beta.get("public_platforms_in_progress") == ["telegram"], "Telegram must remain in progress until private-GPT E2E acceptance")
+    _require(beta.get("public_platforms_not_started") == [], "No public platform may remain not started after A9.9 backend acceptance")
     _require(beta.get("local_upload_live_accepted") is False, "local upload must remain unaccepted")
     _require(beta.get("max_video_seconds") == 3600, "media beta max video must remain 60 minutes")
     _require(beta.get("managed_provider") == "supadata", "managed provider must remain Supadata for native-first paths")
@@ -228,6 +228,14 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(beta.get("managed_facebook_automatic_paid_retrieval") is False, "Facebook paid retrieval must never run automatically")
     _require(beta.get("managed_facebook_stt_provider") == "assemblyai", "Facebook STT provider must be AssemblyAI")
     _require(beta.get("managed_facebook_live_accepted") is True, "Facebook free Cobalt path must be marked live accepted after H1 evidence")
+    _require(beta.get("managed_telegram_code_ready") is True, "A9.9 Telegram managed path must be code-ready")
+    _require(beta.get("managed_telegram_backend_live_accepted") is True, "A9.9 Telegram backend must record isolated live acceptance")
+    _require(beta.get("managed_telegram_public_retrieval_provider") == "telegram_public_web", "Telegram retrieval provider must be public web")
+    _require(beta.get("managed_telegram_retrieval_credits") == 0, "Telegram retrieval credits must remain zero")
+    _require(beta.get("managed_telegram_stt_provider") == "assemblyai", "Telegram STT provider must be AssemblyAI")
+    _require(beta.get("managed_telegram_action_schema_ready") is True, "Telegram Action schema must be package-ready")
+    _require(beta.get("managed_telegram_builder_runtime_applied") is False, "Telegram Builder runtime must remain pending")
+    _require(beta.get("managed_telegram_private_gpt_e2e_complete") is False, "Telegram private-GPT E2E must remain pending")
 
     _require(beta.get("managed_user_beta_access_code_required") is False, "owner must not be asked for a beta code")
     _require(beta.get("managed_owner_access_injected_server_side") is True, "owner admission must be injected server-side")
@@ -241,7 +249,7 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(legacy.get("stt_endpoint") == MEDIA_BETA_ASSEMBLYAI_EU, "A8 fallback STT endpoint must remain AssemblyAI EU")
     _require(legacy.get("status") == "A8_ACCEPTED_FALLBACK_ONLY", "A8 must be fallback only")
 
-    _require(release.get("rollout_state") == "A9_7_I_PRIVATE_GPT_E2E_ACCEPTED", "rollout state must record accepted A9.7-I owner private-GPT E2E")
+    _require(release.get("rollout_state") == "A9_9_TELEGRAM_PACKAGE_READY_BUILDER_PENDING", "rollout state must record A9.9 package-ready Builder-pending state")
     _require(release.get("production_core_unchanged") is True, "private beta must preserve production core")
     _require(release.get("public_store_gpt_unchanged") is True, "private beta must not modify public GPT")
     _require(release.get("user_api_key_required") is False, "private beta must not request user API keys")
@@ -258,7 +266,12 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(release.get("a9_7_i_builder_package_ready") is True, "A9.7-I Builder package must be ready")
     _require(release.get("a9_7_i_builder_runtime_applied") is True, "A9.7-I Builder runtime update must be recorded applied")
     _require(release.get("a9_7_i_builder_policy_fix_runtime_applied") is True, "A9.7-I corrected Builder policy must be applied")
-    _require(release.get("a9_7_i_private_gpt_e2e_complete") is True, "A9.7-I owner private-GPT E2E must be accepted")
+    _require(release.get("a9_7_i_private_gpt_e2e_complete") is True, "A9.7-I owner private-GPT E2E must remain accepted")
+    _require(release.get("a9_9_telegram_backend_complete") is True, "A9.9 Telegram backend acceptance must be complete")
+    _require(release.get("a9_9_telegram_action_package_complete") is True, "A9.9 Telegram Action package must be complete")
+    _require(release.get("a9_9_telegram_builder_runtime_applied") is False, "A9.9 Telegram Builder runtime must remain pending")
+    _require(release.get("a9_9_telegram_private_gpt_e2e_complete") is False, "A9.9 Telegram private-GPT E2E must remain pending")
+    _require(release.get("gpt_builder_private_update_required") is True, "A9.9 must require private Builder package update")
     _require(release.get("external_tester_rollout_paused") is True, "external tester rollout must remain paused")
     _require(release.get("merge_to_public_product_allowed") is False, "private beta must not auto-promote to public product")
 
@@ -282,6 +295,7 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
             "getManagedMediaTranscriptSegments",
             "preflightManagedMediaAiCredits",
             "startManagedMediaAiTranscription",
+            "startManagedTelegramPublicTranscription",
             "Do NOT ask the user for beta access code",
             "Do not expose `KRCM_...` Job IDs",
             "Do not fall back to Helper in the normal owner flow",
@@ -291,7 +305,7 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
             "credit_charge_uncertain=true",
             "1=APPROVE, 2=EDIT, 3=REJECT",
         ],
-        "A9.7-I Builder instructions",
+        "A9.9 Builder instructions",
     )
 
     action_path = root / str(media_action.get("schema", ""))
@@ -304,11 +318,12 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require_tokens(
         action_text,
         [
-            "version: 0.4.0-a9.7-c",
+            "version: 0.5.0-a9.9",
             "operationId: getManagedMediaCapability",
             "operationId: preflightManagedMediaCredits",
             "operationId: startManagedMediaNativeTranscription",
             "operationId: startManagedFacebookFallback",
+            "operationId: startManagedTelegramPublicTranscription",
             "operationId: preflightManagedFacebookRetrievalCredit",
             "operationId: continueManagedFacebookPaidRetrieval",
             "operationId: getManagedMediaTranscriptionStatus",
@@ -327,6 +342,8 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
             "maximum: 1",
             "AWAITING_RETRIEVAL_CONSENT",
             "facebook_retrieval_stt",
+            "telegram_public_retrieval_stt",
+            "telegram_public_web",
             "provider_balance_lookup_performed",
             "retrieval_credits_charged",
             "stt_seconds_charged",
@@ -334,7 +351,7 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
             "reused",
             "bearerAuth",
         ],
-        "A9.7-C managed Action schema",
+        "A9.9 managed Action schema",
     )
     _require("beta_access_code" not in action_text, "user-facing Action schema must not expose beta_access_code")
 

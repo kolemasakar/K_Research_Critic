@@ -1,10 +1,11 @@
 openapi: 3.1.0
 info:
   title: K-Research & Critic Managed Media Beta API
-  version: 0.4.0-a9.7-c
+  version: 0.5.0-a9.9
   description: >-
     Owner-only zero-client managed transcript beta for public YouTube, Instagram,
-    and Facebook media. Existing Supadata native and consent-gated AI paths remain
+    Facebook and supported public Telegram video posts. Existing Supadata native and
+    consent-gated AI paths remain
     available. Facebook retrieval/STT uses a free Cobalt attempt first; if that
     cannot retrieve the public media, a separate local preflight and a new explicit
     one-credit ScrapeCreators approval are required before any paid retrieval.
@@ -19,7 +20,7 @@ paths:
   /api/v1/media/managed:
     get:
       operationId: getManagedMediaCapability
-      summary: Read managed-media beta capabilities and configured Facebook adapters
+      summary: Read managed-media beta capabilities and configured media adapters
       x-openai-isConsequential: false
       responses:
         "200":
@@ -118,6 +119,39 @@ paths:
           description: Closed-beta STT quota is exhausted.
         "503":
           description: Facebook retrieval/STT pipeline is not configured.
+  /api/v1/media/managed/telegram:
+    post:
+      operationId: startManagedTelegramPublicTranscription
+      summary: Retrieve one public Telegram video and transcribe it with AssemblyAI
+      description: >-
+        Use only for a supported public Telegram post URL. Retrieval uses the public
+        Telegram embed surface with zero retrieval credits and no Telegram account, cookies,
+        session, bot token or paid fallback. AssemblyAI STT may use isolated beta quota.
+        Terminal unavailable jobs are not retried automatically.
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TelegramPublicRequest"
+      responses:
+        "200":
+          description: Telegram public-video job completed, failed, or reused from durable state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagedJob"
+        "400":
+          description: Invalid or unsupported Telegram request.
+        "401":
+          description: Private GPT Action authentication failed.
+        "422":
+          description: Public Telegram post or browser-playable video is unavailable.
+        "429":
+          description: Closed-beta STT quota is exhausted.
+        "503":
+          description: Telegram retrieval/STT pipeline is not configured.
   /api/v1/media/managed/transcriptions/{job_id}:
     get:
       operationId: getManagedMediaTranscriptionStatus
@@ -342,7 +376,7 @@ components:
           type: array
           items:
             type: string
-            enum: [youtube, instagram, facebook]
+            enum: [youtube, instagram, facebook, telegram]
         facebook_retrieval_stt_fallback:
           type: boolean
         facebook_free_retrieval_provider:
@@ -366,6 +400,19 @@ components:
           type: string
           const: assemblyai
         facebook_stt_configured:
+          type: boolean
+        telegram_public_retrieval:
+          type: boolean
+        telegram_retrieval_provider:
+          type: string
+          const: telegram_public_web
+        telegram_retrieval_credits:
+          type: integer
+          const: 0
+        telegram_stt_provider:
+          type: string
+          const: assemblyai
+        telegram_stt_configured:
           type: boolean
         automatic_ai_fallback:
           type: boolean
@@ -399,6 +446,19 @@ components:
           type: string
           format: uri
           description: Public HTTPS Facebook Reel/video URL.
+        language_hint:
+          type: string
+          enum: [auto, uk, ru, en]
+          default: auto
+    TelegramPublicRequest:
+      type: object
+      additionalProperties: false
+      required: [url]
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Public HTTPS Telegram post URL with a numeric post id.
         language_hint:
           type: string
           enum: [auto, uk, ru, en]
@@ -657,7 +717,7 @@ components:
           enum: [supadata, assemblyai]
         provider_mode:
           type: string
-          enum: [native, generate, facebook_retrieval_stt]
+          enum: [native, generate, facebook_retrieval_stt, telegram_public_retrieval_stt]
         detected_language:
           anyOf:
             - type: string
@@ -688,7 +748,7 @@ components:
         retrieval_provider:
           anyOf:
             - type: string
-              enum: [cobalt, scrapecreators]
+              enum: [cobalt, scrapecreators, telegram_public_web]
             - type: "null"
         retrieval_credits_charged:
           type: number

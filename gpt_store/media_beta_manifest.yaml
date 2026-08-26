@@ -28,11 +28,11 @@ knowledge:
 instructions:
   file: prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md
   canonical_reference: prompts/GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md
-  version: "0.7-beta-a9.7-i"
-  builder_package_version: "0.7-beta-a9.7-i"
-  builder_target_action_schema_version: "0.4.0-a9.7-c"
+  version: "0.8-beta-a9.9"
+  builder_package_version: "0.8-beta-a9.9"
+  builder_target_action_schema_version: "0.5.0-a9.9"
   builder_package_ready: true
-  builder_runtime_applied: true
+  builder_runtime_applied: false
   builder_policy_fix_runtime_applied: true
   builder_character_limit: 8000
   default_report_language: uk-UA
@@ -105,9 +105,9 @@ beta:
     - youtube
     - instagram
     - facebook
-  public_platforms_in_progress: []
-  public_platforms_not_started:
+  public_platforms_in_progress:
     - telegram
+  public_platforms_not_started: []
   local_upload_live_accepted: false
   max_video_seconds: 3600
   managed_provider: supadata
@@ -134,6 +134,14 @@ beta:
   managed_facebook_automatic_paid_retrieval: false
   managed_facebook_stt_provider: assemblyai
   managed_facebook_live_accepted: true
+  managed_telegram_code_ready: true
+  managed_telegram_backend_live_accepted: true
+  managed_telegram_public_retrieval_provider: telegram_public_web
+  managed_telegram_retrieval_credits: 0
+  managed_telegram_stt_provider: assemblyai
+  managed_telegram_action_schema_ready: true
+  managed_telegram_builder_runtime_applied: false
+  managed_telegram_private_gpt_e2e_complete: false
   managed_user_beta_access_code_required: false
   managed_owner_access_injected_server_side: true
   managed_durable_store: postgres
@@ -157,7 +165,7 @@ beta:
     never_log: true
 
 release:
-  rollout_state: A9_7_I_PRIVATE_GPT_E2E_ACCEPTED
+  rollout_state: A9_9_TELEGRAM_PACKAGE_READY_BUILDER_PENDING
   production_core_unchanged: true
   public_store_gpt_unchanged: true
   user_api_key_required: false
@@ -183,6 +191,10 @@ release:
   a9_7_i_builder_runtime_applied: true
   a9_7_i_builder_policy_fix_runtime_applied: true
   a9_7_i_private_gpt_e2e_complete: true
+  a9_9_telegram_backend_complete: true
+  a9_9_telegram_action_package_complete: true
+  a9_9_telegram_builder_runtime_applied: false
+  a9_9_telegram_private_gpt_e2e_complete: false
   criticprofile_gate_runtime_accepted: true
   cross_check_enforcement_hardened: true
   cross_check_claim_level_enforcement_hardened: true
@@ -192,5 +204,5 @@ release:
   report_label_localization_hardened: true
   report_label_localization_runtime_accepted: true
   external_tester_rollout_paused: true
-  gpt_builder_private_update_required: false
+  gpt_builder_private_update_required: true
   merge_to_public_product_allowed: false

@@ -64,7 +64,8 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert beta["managed_automatic_ai_fallback"] is False
     assert beta["managed_user_beta_access_code_required"] is False
     assert beta["public_platforms_live_accepted"] == ["youtube", "instagram", "facebook"]
-    assert beta["public_platforms_in_progress"] == []
+    assert beta["public_platforms_in_progress"] == ["telegram"]
+    assert beta["public_platforms_not_started"] == []
     assert beta["managed_instagram_ai_fallback_live_accepted"] is True
     assert beta["managed_facebook_retrieval_stt_code_ready"] is True
     assert beta["managed_facebook_free_retrieval_provider"] == "cobalt"
@@ -77,6 +78,14 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert beta["managed_facebook_automatic_paid_retrieval"] is False
     assert beta["managed_facebook_stt_provider"] == "assemblyai"
     assert beta["managed_facebook_live_accepted"] is True
+    assert beta["managed_telegram_code_ready"] is True
+    assert beta["managed_telegram_backend_live_accepted"] is True
+    assert beta["managed_telegram_public_retrieval_provider"] == "telegram_public_web"
+    assert beta["managed_telegram_retrieval_credits"] == 0
+    assert beta["managed_telegram_stt_provider"] == "assemblyai"
+    assert beta["managed_telegram_action_schema_ready"] is True
+    assert beta["managed_telegram_builder_runtime_applied"] is False
+    assert beta["managed_telegram_private_gpt_e2e_complete"] is False
 
     release = manifest["release"]
     assert release["a9_3_durable_managed_complete"] is True
@@ -95,7 +104,7 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert release["cross_check_traceability_runtime_accepted"] is True
     assert release["report_label_localization_hardened"] is True
     assert release["report_label_localization_runtime_accepted"] is True
-    assert release["gpt_builder_private_update_required"] is False
+    assert release["gpt_builder_private_update_required"] is True
 
 
 def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates() -> None:
@@ -111,6 +120,7 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates(
         "/api/v1/media/managed/preflight",
         "/api/v1/media/managed/transcriptions",
         "/api/v1/media/managed/facebook-fallback",
+        "/api/v1/media/managed/telegram",
         "/api/v1/media/managed/transcriptions/{job_id}",
         "/api/v1/media/managed/transcriptions/{job_id}/segments",
         "/api/v1/media/managed/transcriptions/{job_id}/facebook-retrieval-preflight",
@@ -130,6 +140,9 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates(
     facebook_free = paths["/api/v1/media/managed/facebook-fallback"]["post"]
     assert facebook_free["operationId"] == "startManagedFacebookFallback"
     assert facebook_free["x-openai-isConsequential"] is False
+    telegram = paths["/api/v1/media/managed/telegram"]["post"]
+    assert telegram["operationId"] == "startManagedTelegramPublicTranscription"
+    assert telegram["x-openai-isConsequential"] is False
 
     retrieval_preflight = paths[
         "/api/v1/media/managed/transcriptions/{job_id}/facebook-retrieval-preflight"
@@ -178,6 +191,11 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates(
     assert facebook_request["required"] == ["url"]
     assert "credit_consent" not in facebook_request["properties"]
     assert "beta_access_code" not in facebook_request["properties"]
+
+    telegram_request = schema["components"]["schemas"]["TelegramPublicRequest"]
+    assert telegram_request["required"] == ["url"]
+    assert "credit_consent" not in telegram_request["properties"]
+    assert "beta_access_code" not in telegram_request["properties"]
 
     native = schema["components"]["schemas"]["NativeTranscriptRequest"]
     assert native["type"] == "object"
@@ -238,9 +256,10 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates(
         "native",
         "generate",
         "facebook_retrieval_stt",
+        "telegram_public_retrieval_stt",
     }
     retrieval_provider = job["retrieval_provider"]["anyOf"][0]
-    assert set(retrieval_provider["enum"]) == {"cobalt", "scrapecreators"}
+    assert set(retrieval_provider["enum"]) == {"cobalt", "scrapecreators", "telegram_public_web"}
 
 
 def test_private_builder_instructions_fit_limit_and_use_two_stage_profile_gate() -> None:
