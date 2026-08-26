@@ -1,4 +1,5 @@
 # Request Log Public Disablement Runtime Acceptance
+Підтвердження успішного вимкнення публічного журналу запитів у K-Research & Critic.
 
 Date: 2026-08-23
 Status: ACCEPTED
@@ -10,20 +11,9 @@ Verify that after removing the public `logRequest` Action and synchronizing the 
 
 ## Runtime test
 
-NEW-chat request:
+A NEW-chat substantive research request was submitted in Ukrainian.
 
-```text
-Досліди, чи справді регулярні прогулянки покращують якість сну.
-```
-
-Observed first response:
-
-```text
-Профіль збору і критики успішно створено.
-1 - виконати аналіз одразу.
-2 - переглянути і відредагувати профіль збору і критики.
-3 - скасувати дослідження.
-```
+Observed first response: the standard CriticProfile gate appeared directly.
 
 No `script.google.com` Action consent prompt appeared before the gate.
 
