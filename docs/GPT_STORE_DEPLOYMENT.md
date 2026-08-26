@@ -60,7 +60,7 @@ Historical implementation:
 ```text
 GPT Action `logRequest`
  -> Google Apps Script Web App
- -> Google Sheet `K-Research & Critic — Request Log`
+ -> Google Sheet `K-Research & Critic - Request Log`
 ```
 
 It passed technical and NEW-chat runtime tests on 2026-08-23. The prototype is retained but disabled due to user-consent UX, not technical failure.
@@ -94,15 +94,7 @@ Every material factual claim maintains required, achieved_independent and except
 
 Default user-facing language is Ukrainian unless explicitly changed by the user.
 
-For Ukrainian reports use, where applicable:
-
-```text
-ФІНАЛЬНИЙ ЗВІТ
-ПЕРЕВІРКА ТВЕРДЖЕНЬ
-ПРОТОКОЛ ПЕРЕВІРКИ
-ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ
-Твердження | Потрібно | Отримано незалежних | Виняток
-```
+Canonical localized Ukrainian headings, table columns and CriticProfile labels are defined in the active Store instructions and regression tests. Exact non-ASCII user-facing labels are intentionally not duplicated in this ASCII-constrained repository document.
 
 ## 7. Disablement Runtime Acceptance
 
