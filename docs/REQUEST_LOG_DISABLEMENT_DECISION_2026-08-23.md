@@ -1,4 +1,5 @@
 # Request Log Public Disablement Decision
+Рішення про вимкнення публічного журналу запитів у K-Research & Critic.
 
 Date: 2026-08-23
 Status: ACCEPTED / RUNTIME VERIFIED
@@ -33,7 +34,7 @@ prompts/GPT_STORE_REQUEST_LOG_ADDENDUM.md
 docs/PRIVACY_POLICY_REQUEST_LOG.md
 docs/REQUEST_LOG_MVP.md
 docs/REQUEST_LOG_MVP_RUNTIME_ACCEPTANCE_2026-08-23.md
-Google Sheet: K-Research & Critic — Request Log
+Google Sheet: K-Research & Critic - Request Log
 Apps Script deployment
 ```
 
@@ -61,16 +62,7 @@ CriticProfile gate appears directly                  PASS
 repository/public Builder synchronization            PASS
 ```
 
-Observed first response in the post-disable NEW chat:
-
-```text
-Профіль збору і критики успішно створено.
-1 - виконати аналіз одразу.
-2 - переглянути і відредагувати профіль збору і критики.
-3 - скасувати дослідження.
-```
-
-No external Action consent screen appeared before this gate.
+The observed first response in the post-disable NEW chat was the standard CriticProfile gate. No external Action consent screen appeared before that gate.
 
 ## Markers
 
