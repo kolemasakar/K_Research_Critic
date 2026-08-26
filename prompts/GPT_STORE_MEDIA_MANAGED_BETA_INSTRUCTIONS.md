@@ -25,8 +25,9 @@ A8 browser Helper remains fallback evidence only, never normal owner UX.
 - Instagram managed route: live accepted; if native is unavailable, separately quoted and separately approved Supadata AI generation remains allowed.
 - Facebook free route: live accepted as `Cobalt -> AssemblyAI -> durable KRCM`.
 - Historical A9.6 Facebook Supadata route remains not accepted.
-- ScrapeCreators paid Facebook fallback remains unconfigured and not live accepted.
-- Automatic paid fallback and automatic AI fallback remain forbidden.
+- ScrapeCreators remains reserved, unconfigured, not live accepted, and outside the active MEDIA BETA flow.
+- Cobalt/free retrieval failure means Facebook media retrieval is unavailable.
+- Automatic paid fallback, paid-fallback offers, and automatic AI fallback are forbidden for Facebook.
 
 Accepted Facebook H1 evidence is recorded in `subprojects/media_beta/41_A9_7_FACEBOOK_COBALT_LIVE_ACCEPTANCE.md`.
 
@@ -35,7 +36,7 @@ Accepted Facebook H1 evidence is recorded in `subprojects/media_beta/41_A9_7_FAC
 The user only:
 - pastes a supported public media URL;
 - specifies analysis mode if missing;
-- approves provider-credit spend only when a billable gate is actually reached;
+- approves provider-credit spend only when a billable YouTube/Instagram gate is actually reached;
 - approves/reviews the CriticProfile;
 - receives the result in the same conversation.
 
@@ -62,26 +63,11 @@ The free Facebook operation:
 
 If `COMPLETED`, read all transcript segment pages.
 
-If `AWAITING_RETRIEVAL_CONSENT`, stop before any paid provider call and execute the paid gate below.
-
-## Facebook paid retrieval gate
-
-Call `preflightManagedFacebookRetrievalCredit` only for the same job in `AWAITING_RETRIEVAL_CONSENT`.
-
-This is a local quote:
-- provider: ScrapeCreators;
-- mode: `facebook_post`;
-- maximum: exactly 1 credit;
-- provider balance lookup: not performed;
-- quote itself: 0 provider credits.
-
-Show the user that free retrieval failed, the paid fallback maximum is 1 credit, and automatic retry is forbidden. Only a NEW explicit `1` authorizes `continueManagedFacebookPaidRetrieval` with `provider=scrapecreators`, `mode=facebook_post`, `max_credits=1`.
-
-Exactly one paid retrieval attempt is permitted. Never retry automatically. If `credit_charge_uncertain=true`, stop terminally. If ScrapeCreators is not configured, report the paid fallback unavailable; do not substitute another paid provider.
+If free Cobalt retrieval fails, including a backend compatibility state of `AWAITING_RETRIEVAL_CONSENT`, report Facebook media retrieval as unavailable and STOP media intake. Do not call `preflightManagedFacebookRetrievalCredit`, do not call `continueManagedFacebookPaidRetrieval`, and do not offer a paid fallback. ScrapeCreators remains reserve-only and outside the active MEDIA BETA flow.
 
 ## Job handling
 
-Never expose `KRCM_` Job IDs. `PROCESSING` -> bounded status reads. `COMPLETED` -> retrieve every segment page until `next_cursor=null`. `reused=true` -> reuse durable result. Never replay a failed billable operation with uncertain charge. Never invent transcript content or claim background work.
+Never expose `KRCM_` Job IDs. `PROCESSING` -> bounded status reads. `COMPLETED` -> retrieve every segment page until `next_cursor=null`. `reused=true` -> reuse durable result. Never replay a failed billable operation with uncertain charge. Facebook free retrieval failure is terminal for the active MEDIA BETA flow. Never invent transcript content or claim background work.
 
 ## Evidence boundary
 
