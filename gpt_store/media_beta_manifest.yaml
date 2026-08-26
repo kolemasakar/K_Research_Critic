@@ -32,7 +32,7 @@ instructions:
   builder_package_version: "0.9.1-beta-a10"
   builder_target_action_schema_version: "0.6.0-a9.10"
   builder_package_ready: true
-  builder_runtime_applied: false
+  builder_runtime_applied: true
   builder_policy_fix_runtime_applied: true
   builder_character_limit: 8000
   default_report_language: uk-UA
@@ -64,6 +64,7 @@ instructions:
   cross_check_protocol_table_required: true
   cross_check_protocol_markdown_table_strict: true
   cross_check_protocol_header_merge_forbidden: true
+  cross_check_copy_safe_table_required: true
   cross_check_protocol_table_heading_uk: ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ
   cross_check_protocol_table_header_row_uk: "| Твердження | Потрібно | Отримано незалежних | Виняток |"
   cross_check_protocol_table_separator_row: "| --- | ---: | ---: | --- |"
@@ -166,7 +167,7 @@ beta:
   provider_balance_after_a9_3_acceptance: 98
   stabilization_phase: A10
   claim_summary_table_hardening_package_ready: true
-  claim_summary_table_hardening_runtime_applied: false
+  claim_summary_table_hardening_runtime_applied: true
   legacy_browser_assisted:
     job_prefix: KRCC_
     helper_version: "0.2.2"
@@ -185,7 +186,7 @@ beta:
 
 release:
   rollout_state: A9_10_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED
-  stabilization_state: A10_CLAIM_TABLE_HARDENING_PACKAGE_READY_RUNTIME_PENDING
+  stabilization_state: A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED
   production_core_unchanged: true
   public_store_gpt_unchanged: true
   user_api_key_required: false
@@ -223,7 +224,8 @@ release:
   a9_10_attachment_ingestion_live_accepted: true
   a9_10_attachment_private_gpt_e2e_complete: true
   a10_claim_summary_table_hardening_ready: true
-  a10_claim_summary_table_runtime_accepted: false
+  a10_claim_summary_table_runtime_accepted: true
+  a10_copy_safe_claim_table_runtime_accepted: true
   criticprofile_gate_runtime_accepted: true
   cross_check_enforcement_hardened: true
   cross_check_claim_level_enforcement_hardened: true
@@ -233,5 +235,5 @@ release:
   report_label_localization_hardened: true
   report_label_localization_runtime_accepted: true
   external_tester_rollout_paused: true
-  gpt_builder_private_update_required: true
+  gpt_builder_private_update_required: false
   merge_to_public_product_allowed: false
