@@ -157,7 +157,7 @@ beta:
     never_log: true
 
 release:
-  rollout_state: A9_7_I_BUILDER_APPLIED_E2E_PENDING
+  rollout_state: A9_7_I_PRIVATE_GPT_E2E_ACCEPTED
   production_core_unchanged: true
   public_store_gpt_unchanged: true
   user_api_key_required: false
@@ -182,7 +182,7 @@ release:
   a9_7_i_builder_package_ready: true
   a9_7_i_builder_runtime_applied: true
   a9_7_i_builder_policy_fix_runtime_applied: true
-  a9_7_i_private_gpt_e2e_complete: false
+  a9_7_i_private_gpt_e2e_complete: true
   criticprofile_gate_runtime_accepted: true
   cross_check_enforcement_hardened: true
   cross_check_claim_level_enforcement_hardened: true
