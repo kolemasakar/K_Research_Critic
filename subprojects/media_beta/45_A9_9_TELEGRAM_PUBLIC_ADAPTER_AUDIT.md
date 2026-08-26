@@ -1,22 +1,15 @@
 # A9.9 Telegram Public Video Adapter Audit
 Аудит поточного коду і мінімального zero-client шляху для публічних Telegram video posts.
 
-Status: AUDIT_COMPLETE / IMPLEMENTATION_READY
+Status: AUDIT_COMPLETE / IMPLEMENTATION_SLICE_1_IN_PROGRESS
 Date: 2026-08-26
 Scope: isolated KRC MEDIA BETA and VoiceBridge feature branches only
 
 ## Current repository state
 
-VoiceBridge `agent/krc-media-transcript` has no Telegram adapter, Telegram-specific source module, or Telegram-specific regression tests.
+Before A9.9 implementation VoiceBridge `agent/krc-media-transcript` had no Telegram adapter, Telegram-specific source module, or Telegram-specific regression tests.
 
-The current managed URL boundary is explicitly limited to:
-- YouTube;
-- Instagram;
-- Facebook.
-
-`ManagedMediaPlatform` currently contains only `youtube | instagram | facebook` and unsupported URLs return `MEDIA_URL_UNSUPPORTED`.
-
-The existing durable managed-media service is reusable for a Telegram adapter, but its current job view/provider-mode types are platform-specific enough that Telegram must be added deliberately rather than passed through the existing Supadata native route.
+The existing durable managed-media service is reusable for a Telegram adapter, but Telegram must be added deliberately rather than passed through the existing Supadata native route.
 
 ## Provider audit
 
@@ -34,19 +27,23 @@ Decision: DO NOT route Telegram through Cobalt.
 Current Supadata transcript documentation lists YouTube, TikTok, X/Twitter, Instagram, Facebook and public file URLs. Telegram is not listed as a supported social platform.
 
 Sources:
-- `https://docs.supadata.ai/`
-- `https://docs.supadata.ai/api-reference/endpoint/transcript/transcript`
+- `https://docs.supadata.ai/`;
+- `https://docs.supadata.ai/api-reference/endpoint/transcript/transcript`.
 
-Decision: DO NOT treat a `t.me` URL as a supported Supadata social URL. A direct media-file URL discovered from Telegram may be evaluated separately later, but the Telegram post itself must not be sent to Supadata as if it were a supported platform.
+Decision: DO NOT treat a `t.me` URL as a supported Supadata social URL.
 
 ### yt-dlp
 
-The long-standing yt-dlp Telegram support request documents that a `t.me/s/...` generic extraction can behave as a multi-post playlist rather than a precise single-post extractor. There is no accepted dedicated Telegram extractor in the current project.
+The current upstream yt-dlp tree DOES contain a dedicated `TelegramEmbedIE` for URLs of the form `https://t.me/<channel>/<numeric_post_id>`.
+
+It requests the Telegram embed page with `embed=1` and `single`, then selects `tgme_widget_message_video_player`, extracts the `<video src=...>` URL and duration, and supports single-post selection for multi-video posts.
 
 Source:
-`https://github.com/yt-dlp/yt-dlp/issues/2910`
+`https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/extractor/telegram.py`
 
-Decision: DO NOT make generic yt-dlp extraction the canonical first implementation for Telegram posts.
+The VoiceBridge runtime image already installs yt-dlp. This is useful compatibility evidence, but the first A9.9 implementation uses a small native Node retriever for the same public embed surface so the exact-post, host-trust, timeout, size and zero-credit rules remain explicit and fixture-testable inside VoiceBridge.
+
+Decision: dedicated yt-dlp Telegram support is a valid fallback/reference implementation, not the initial routing dependency.
 
 ## Public Telegram web surface
 
@@ -59,21 +56,29 @@ and can be embedded without a Telegram login.
 Source:
 `https://core.telegram.org/widgets/post`
 
-Public `t.me/s/<channel>/<post>` preview pages expose message markup for public channels. Web-preview availability is not equivalent to guaranteed downloadable video availability: some posts expose browser-playable media while other or larger media may remain app-only.
+Observed Telegram embed HTML uses:
+- `data-post="<channel>/<post_id>"` on the message;
+- `tgme_widget_message_video_player` for a browser-playable video;
+- `<video src="https://cdn*.cdn-telegram.org/...mp4?...">` for the direct temporary media URL;
+- `message_video_duration` for duration.
 
-Therefore the adapter must treat media extraction as best-effort and must never request a Telegram account, login code, cookies, MTProto session, bot token, or imported user session to bypass an unavailable public preview.
+A current captured Telegram widget fixture confirms this markup pattern. This aligns with the current upstream yt-dlp Telegram extractor.
 
-## Recommended minimal adapter
+Web-preview availability is not equivalent to guaranteed downloadable video availability. Some media may remain app-only or otherwise unavailable through the public embed surface.
+
+Therefore the adapter is best-effort and must never request a Telegram account, login code, cookies, MTProto session, bot token, or imported user session to bypass an unavailable public preview.
+
+## Minimal adapter
 
 Implement a dedicated free `TelegramPublicWebRetriever` in VoiceBridge.
 
-Accepted input form for the first version:
+Accepted input forms:
 
 `https://t.me/<channel>/<post_id>`
 
-Optional equivalent host:
-
 `https://telegram.me/<channel>/<post_id>`
+
+`https://t.me/s/<channel>/<post_id>`
 
 Normalization target:
 
@@ -84,7 +89,6 @@ Validation rules:
 - public username/channel token only;
 - positive numeric post id required;
 - reject `joinchat`, `+invite`, `addlist`, `share`, login and non-post forms;
-- no redirects to non-Telegram page are trusted as media;
 - no cookies/session state;
 - max source URL length remains 2048.
 
@@ -93,15 +97,15 @@ Retrieval flow:
 ```text
 public t.me post URL
  -> normalize/validate
- -> GET public Telegram web preview
- -> identify exactly the requested data-post=<channel>/<post_id>
- -> extract direct browser-playable video/audio source only from that post
- -> validate media URL and content type
+ -> GET exact Telegram embed with embed=1&single=1
+ -> verify exact data-post=<channel>/<post_id>
+ -> select exact tgme_widget_message_video_player href
+ -> extract direct browser-playable HTTPS Telegram CDN MP4 source
  -> AssemblyAI EU STT
  -> durable KRCM segments
 ```
 
-If the exact post is absent, private, login-required, removed, or has no browser-downloadable media:
+If the exact post is absent, private, login-required, removed, or has no browser-downloadable video:
 
 ```text
 TELEGRAM_MEDIA_UNAVAILABLE -> terminal FAILED -> STOP
@@ -112,11 +116,12 @@ No paid fallback is introduced in A9.9.
 ## Security boundary
 
 The retriever must:
-- fetch only normalized Telegram public web-preview URLs;
-- accept a returned media URL only when it is HTTPS and originates from the expected Telegram/CDN retrieval response path;
+- fetch only normalized Telegram public embed URLs;
+- accept media only from trusted Telegram CDN HTTPS hosts;
+- require an MP4 path for the initial video-only adapter;
 - never fetch arbitrary links embedded in message text;
 - enforce response-size and timeout limits;
-- reject HTML/login/invite results as media;
+- reject non-HTML preview responses;
 - never log full media URLs if they contain temporary access tokens;
 - never expose backend job IDs or credentials to the GPT user;
 - preserve provider cleanup rules for AssemblyAI.
@@ -144,7 +149,7 @@ Recommended fields reuse:
 - transcript characters;
 - durable/reused state.
 
-Do not reuse Facebook-specific `free_retrieval_*` names for new Telegram diagnostics. Add generic or Telegram-specific safe diagnostic fields only if needed.
+Do not reuse Facebook-specific `free_retrieval_*` names for new Telegram diagnostics.
 
 ## Action contract
 
@@ -162,26 +167,26 @@ Request:
 
 Owner admission remains server-side exactly like the existing managed Action.
 
-The operation is free at retrieval time and may consume AssemblyAI STT seconds. No Telegram credit-consent prompt is required because no paid retrieval provider is introduced. Existing STT quota/resource limits still apply.
+The operation is free at retrieval time and may consume AssemblyAI STT seconds. No Telegram retrieval credit-consent prompt is required because no paid retrieval provider is introduced.
 
 ## Acceptance matrix
 
 Automated tests must cover:
 - canonical `t.me/channel/123` normalization;
 - `telegram.me/channel/123` normalization;
+- `t.me/s/channel/123` normalization;
 - query/fragment stripping;
 - invalid/missing post id rejection;
 - invite/private/login URL rejection;
 - exact requested post selection, not neighboring posts;
 - direct video source extraction from fixture HTML;
+- trusted Telegram CDN host requirement;
 - no-media fixture -> terminal unavailable;
-- login/private fixture -> terminal unavailable;
-- redirect/foreign-host media rejection;
 - retrieval timeout/oversize handling;
 - zero retrieval credits;
 - AssemblyAI success -> durable KRCM completion;
 - durable duplicate start reuse;
-- no automatic retry after terminal unavailable.
+- no automatic paid fallback or retry after terminal unavailable.
 
 Live acceptance must include:
 - one public small browser-playable Telegram video post;
@@ -189,14 +194,32 @@ Live acceptance must include:
 - one invalid/private/invite URL negative case;
 - durable transcript reread and segment readback for the positive case.
 
+## Implementation slice 1
+
+VoiceBridge branch implementation now contains:
+- Telegram added to managed URL platform normalization;
+- `TelegramPublicWebRetriever`;
+- exact-post embed parsing;
+- trusted Telegram CDN MP4 filtering;
+- timeout and HTML-size guards;
+- zero retrieval-credit contract;
+- Telegram-specific regression tests.
+
+Current VoiceBridge commits for this slice:
+- `25afbcd3903b9c4e589df16f74a3a9e392287457` - Telegram URL normalization;
+- `0c43c21af8d5ada9c80768906a485b9976813c1e` - Telegram public web retriever;
+- `41f7e69e73576b0c3cf6f3d757e81951bdf0372a` - Telegram retriever regressions.
+
+The retriever is not yet connected to the managed HTTP/Action/durable STT execution path. No Render or Builder change is authorized at this slice.
+
 ## Decision
 
 A9.9 architecture audit: PASS.
 
-Implementation is feasible without a Telegram account and without a paid provider for the subset of public posts whose media is exposed through Telegram's public web surface.
+Implementation is feasible without a Telegram account and without a paid provider for the subset of public posts whose media is exposed through Telegram's public embed surface.
 
-The adapter must be explicitly best-effort. It must not claim universal Telegram video support and must return unavailable when Telegram does not expose a browser-downloadable media asset.
+The adapter must not claim universal Telegram video support and must return unavailable when Telegram does not expose a browser-downloadable media asset.
 
 ## Next step
 
-Implement the URL normalizer/retriever and fixture tests first on `kolemasakar/VoiceBridge:agent/krc-media-transcript`. Do not modify Render, Builder, public KRC, or production VoiceBridge until code/CI is green and an isolated live positive Telegram sample is identified.
+After VoiceBridge CI is green, connect `TelegramPublicWebRetriever` to the managed durable KRCM + AssemblyAI path behind an isolated Telegram operation and add service/HTTP regression coverage. Do not modify Render, Builder, public KRC, or production VoiceBridge before that code path is green.
