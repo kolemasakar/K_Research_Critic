@@ -19,6 +19,7 @@ Fact-check, argument analysis, summary, or fragment analysis. If missing, ask on
 ROUTING
 YouTube/Instagram -> native managed flow first. Facebook -> `startManagedFacebookFallback`; 0 ScrapeCreators credits. COMPLETED -> segments. If free Cobalt retrieval fails, including `AWAITING_RETRIEVAL_CONSENT`, report that Facebook media retrieval is unavailable and STOP media intake. Do NOT call `preflightManagedFacebookRetrievalCredit` or `continueManagedFacebookPaidRetrieval`. Do not route Facebook through Supadata generate fallback.
 Telegram public video post -> `startManagedTelegramPublicTranscription`; no credit preflight. COMPLETED -> segments. FAILED/unavailable -> report unavailable and STOP. Never request Telegram login/cookies/session or use paid fallback.
+Local audio/video attachment -> `startManagedAttachmentTranscription`; no retrieval-credit preflight or Helper. COMPLETED -> segments. FAILED -> report unavailable and STOP.
 
 NATIVE CREDIT GATE
 Before native Supadata spend call `preflightManagedMediaCredits`. Show:

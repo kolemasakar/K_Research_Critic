@@ -1,11 +1,11 @@
 openapi: 3.1.0
 info:
   title: K-Research & Critic Managed Media Beta API
-  version: 0.5.0-a9.9
+  version: 0.6.0-a9.10
   description: >-
     Owner-only zero-client managed transcript beta for public YouTube, Instagram,
-    Facebook and supported public Telegram video posts, plus a non-billable A9.10
-    local-attachment transport probe. Existing Supadata native and consent-gated AI
+    Facebook and supported public Telegram video posts, plus owner-only local
+    audio/video attachments. Existing Supadata native and consent-gated AI
     paths remain available. Facebook retrieval/STT uses the free Cobalt path. If
     Cobalt cannot retrieve the public media, Facebook retrieval is unavailable and
     media intake stops. ScrapeCreators is reserved compatibility surface only and is
@@ -153,6 +153,45 @@ paths:
           description: Closed-beta STT quota is exhausted.
         "503":
           description: Telegram retrieval/STT pipeline is not configured.
+  /api/v1/media/managed/attachment:
+    post:
+      operationId: startManagedAttachmentTranscription
+      summary: Transcribe one local audio or video attachment with AssemblyAI
+      description: >-
+        Transcribe one current-conversation audio/video attachment. ChatGPT supplies
+        openaiFileIdRefs; the isolated backend accepts only trusted OpenAI media,
+        enforces type/size/duration, runs AssemblyAI, and persists KRCM segments.
+        Retrieval credits are zero; no Helper, cookies, session, or user code.
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AttachmentTranscriptRequest"
+      responses:
+        "200":
+          description: Local attachment job completed, failed, or reused from durable state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagedJob"
+        "400":
+          description: Missing, malformed, multiple, or untrusted runtime file reference.
+        "401":
+          description: Private GPT Action bearer authentication failed.
+        "413":
+          description: Attachment exceeds the isolated media size or duration limit.
+        "415":
+          description: Attachment type, extension, or downloaded MIME is unsupported or inconsistent.
+        "422":
+          description: Attachment media or resulting transcript is unusable.
+        "429":
+          description: Closed-beta STT quota is exhausted.
+        "502":
+          description: Temporary OpenAI download or STT provider could not be reached safely.
+        "503":
+          description: Managed local attachment transcription is not configured.
   /api/v1/media/managed/attachment-probe:
     post:
       operationId: probeManagedAttachmentTransport
@@ -454,6 +493,22 @@ components:
           const: assemblyai
         telegram_stt_configured:
           type: boolean
+        local_attachment_transport:
+          type: boolean
+        local_attachment_transcription:
+          type: boolean
+        local_attachment_provider:
+          type: string
+          const: assemblyai
+        local_attachment_retrieval_provider:
+          type: string
+          const: openai_attachment
+        local_attachment_max_bytes:
+          type: integer
+          const: 33554432
+        local_attachment_max_duration_seconds:
+          type: integer
+          minimum: 60
         automatic_ai_fallback:
           type: boolean
         owner_access_injected_server_side:
@@ -499,6 +554,26 @@ components:
           type: string
           format: uri
           description: Public HTTPS Telegram post URL with a numeric post id.
+        language_hint:
+          type: string
+          enum: [auto, uk, ru, en]
+          default: auto
+    AttachmentTranscriptRequest:
+      type: object
+      additionalProperties: false
+      required: [openaiFileIdRefs]
+      properties:
+        openaiFileIdRefs:
+          type: array
+          minItems: 1
+          maxItems: 1
+          items:
+            type: string
+          description: >-
+            Exactly one user-uploaded audio or video file from the current ChatGPT
+            conversation. ChatGPT replaces this string-array schema with the runtime
+            file-reference object containing name, id, mime_type and temporary
+            download_link. The backend never exposes those identifiers or URL.
         language_hint:
           type: string
           enum: [auto, uk, ru, en]
@@ -824,7 +899,7 @@ components:
           enum: [supadata, assemblyai]
         provider_mode:
           type: string
-          enum: [native, generate, facebook_retrieval_stt, telegram_public_retrieval_stt]
+          enum: [native, generate, facebook_retrieval_stt, telegram_public_retrieval_stt, attachment_upload_stt]
         detected_language:
           anyOf:
             - type: string
@@ -855,7 +930,7 @@ components:
         retrieval_provider:
           anyOf:
             - type: string
-              enum: [cobalt, scrapecreators, telegram_public_web]
+              enum: [cobalt, scrapecreators, telegram_public_web, openai_attachment]
             - type: "null"
         retrieval_credits_charged:
           type: number

@@ -7,7 +7,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = ROOT / "gpt_store" / "actions" / "media_attachment_probe_openapi.yaml"
-AUDIT_PATH = ROOT / "subprojects" / "media_beta" / "47_A9_10_LOCAL_UPLOAD_TRANSPORT_AUDIT.md"
+ACCEPTANCE_PATH = ROOT / "subprojects" / "media_beta" / "49_A9_10_ATTACHMENT_TRANSPORT_RUNTIME_ACCEPTANCE.md"
 
 
 def test_attachment_probe_schema_is_non_billable_and_file_ref_only() -> None:
@@ -47,11 +47,11 @@ def test_attachment_probe_schema_is_non_billable_and_file_ref_only() -> None:
     assert "file_id:" not in serialized
 
 
-def test_attachment_probe_audit_keeps_runtime_acceptance_pending() -> None:
-    text = AUDIT_PATH.read_text(encoding="utf-8")
+def test_attachment_transport_runtime_acceptance_is_recorded() -> None:
+    text = ACCEPTANCE_PATH.read_text(encoding="utf-8")
 
-    assert "FEASIBILITY_CONFIRMED_IN_CONTRACT / LIVE_RUNTIME_PROBE_REQUIRED" in text
+    assert "LIVE_RUNTIME_TRANSPORT_ACCEPTED / FULL_INGESTION_PENDING" in text
     assert "probeManagedAttachmentTransport" in text
-    assert "zero credits and zero STT seconds" in text
-    assert "Only after this live probe passes" in text
-    assert "not yet runtime accepted" in text
+    assert "transport_available = true" in text
+    assert "retrieval_credits_charged = 0" in text
+    assert "stt_seconds_charged = 0" in text

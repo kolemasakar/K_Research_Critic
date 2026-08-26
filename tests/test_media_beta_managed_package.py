@@ -109,7 +109,7 @@ def test_media_beta_manifest_uses_zero_client_managed_action() -> None:
     assert release["cross_check_traceability_runtime_accepted"] is True
     assert release["report_label_localization_hardened"] is True
     assert release["report_label_localization_runtime_accepted"] is True
-    assert release["gpt_builder_private_update_required"] is False
+    assert release["gpt_builder_private_update_required"] is True
 
 
 def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates() -> None:
@@ -126,6 +126,7 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates(
         "/api/v1/media/managed/transcriptions",
         "/api/v1/media/managed/facebook-fallback",
         "/api/v1/media/managed/telegram",
+        "/api/v1/media/managed/attachment",
         "/api/v1/media/managed/attachment-probe",
         "/api/v1/media/managed/transcriptions/{job_id}",
         "/api/v1/media/managed/transcriptions/{job_id}/segments",
@@ -149,10 +150,20 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates(
     telegram = paths["/api/v1/media/managed/telegram"]["post"]
     assert telegram["operationId"] == "startManagedTelegramPublicTranscription"
     assert telegram["x-openai-isConsequential"] is False
+    attachment = paths["/api/v1/media/managed/attachment"]["post"]
+    assert attachment["operationId"] == "startManagedAttachmentTranscription"
+    assert attachment["x-openai-isConsequential"] is False
     attachment_probe = paths["/api/v1/media/managed/attachment-probe"]["post"]
     assert attachment_probe["operationId"] == "probeManagedAttachmentTransport"
     assert attachment_probe["x-openai-isConsequential"] is False
 
+    attachment_transcript_request = schema["components"]["schemas"]["AttachmentTranscriptRequest"]
+    assert attachment_transcript_request["required"] == ["openaiFileIdRefs"]
+    transcript_refs = attachment_transcript_request["properties"]["openaiFileIdRefs"]
+    assert transcript_refs["minItems"] == 1
+    assert transcript_refs["maxItems"] == 1
+    assert "beta_access_code" not in attachment_transcript_request["properties"]
+    assert "credit_consent" not in attachment_transcript_request["properties"]
     attachment_request = schema["components"]["schemas"]["AttachmentProbeRequest"]
     assert attachment_request["required"] == ["openaiFileIdRefs"]
     refs = attachment_request["properties"]["openaiFileIdRefs"]
@@ -276,9 +287,10 @@ def test_managed_action_schema_hides_owner_admission_and_preserves_credit_gates(
         "generate",
         "facebook_retrieval_stt",
         "telegram_public_retrieval_stt",
+        "attachment_upload_stt",
     }
     retrieval_provider = job["retrieval_provider"]["anyOf"][0]
-    assert set(retrieval_provider["enum"]) == {"cobalt", "scrapecreators", "telegram_public_web"}
+    assert set(retrieval_provider["enum"]) == {"cobalt", "scrapecreators", "telegram_public_web", "openai_attachment"}
 
 
 def test_private_builder_instructions_fit_limit_and_use_two_stage_profile_gate() -> None:
@@ -297,6 +309,7 @@ def test_private_builder_instructions_fit_limit_and_use_two_stage_profile_gate()
     assert "startManagedMediaNativeTranscription" in text
     assert "preflightManagedMediaAiCredits" in text
     assert "startManagedMediaAiTranscription" in text
+    assert "startManagedAttachmentTranscription" in text
     assert "mode=generate, max_credits=40" in text
     assert "DO NOT reuse native `1`" in text
     assert "Do NOT ask the user for beta access code" in text

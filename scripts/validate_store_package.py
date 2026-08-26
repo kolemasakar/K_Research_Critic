@@ -184,9 +184,9 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(capabilities.get("actions") is True, "private media beta requires Actions")
     _require(capabilities.get("apps") is False, "private media beta must not require Apps")
 
-    _require(instructions.get("version") == "0.8-beta-a9.9", "A9.9 instruction version must be 0.8-beta-a9.9")
-    _require(instructions.get("builder_package_version") == "0.8-beta-a9.9", "A9.9 Builder package version must be 0.8-beta-a9.9")
-    _require(instructions.get("builder_runtime_applied") is True, "A9.9 Builder package must record actual private GPT runtime application")
+    _require(instructions.get("version") == "0.9-beta-a9.10", "A9.10 instruction version must be 0.9-beta-a9.10")
+    _require(instructions.get("builder_package_version") == "0.9-beta-a9.10", "A9.10 Builder package version must be 0.9-beta-a9.10")
+    _require(instructions.get("builder_runtime_applied") is False, "A9.10 Builder package must remain pending until the private GPT is updated")
     _require(instructions.get("builder_policy_fix_runtime_applied") is True, "A9.7-I corrected Builder policy must record runtime application")
     _require(instructions.get("builder_character_limit") == 8000, "Builder instruction limit must remain 8000")
     _require(instructions.get("canonical_reference") == "prompts/GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md", "managed instruction file must be canonical")
@@ -205,7 +205,17 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(beta.get("public_platforms_live_accepted") == ["youtube", "instagram", "facebook", "telegram"], "YouTube, Instagram, Facebook and Telegram owner zero-client paths must be declared live accepted")
     _require(beta.get("public_platforms_in_progress") == [], "No public platform may remain in progress after Telegram private-GPT E2E acceptance")
     _require(beta.get("public_platforms_not_started") == [], "No public platform may remain not started after A9.9 backend acceptance")
-    _require(beta.get("local_upload_live_accepted") is False, "local upload must remain unaccepted")
+    _require(beta.get("local_upload_live_accepted") is False, "local upload must remain unaccepted until full private-GPT E2E")
+    _require(beta.get("managed_attachment_transport_live_accepted") is True, "A9.10 attachment transport runtime must be accepted")
+    _require(beta.get("managed_attachment_backend_code_ready") is True, "A9.10 attachment backend must be code-ready")
+    _require(beta.get("managed_attachment_backend_live_deployed") is True, "A9.10 attachment backend must be deployed to isolated beta")
+    _require(beta.get("managed_attachment_retrieval_provider") == "openai_attachment", "A9.10 attachment retrieval provider must be openai_attachment")
+    _require(beta.get("managed_attachment_retrieval_credits") == 0, "A9.10 attachment retrieval must cost zero credits")
+    _require(beta.get("managed_attachment_stt_provider") == "assemblyai", "A9.10 attachment STT provider must be AssemblyAI")
+    _require(beta.get("managed_attachment_action_schema_ready") is True, "A9.10 attachment Action schema must be ready")
+    _require(beta.get("managed_attachment_builder_runtime_applied") is False, "A9.10 attachment Builder update must remain pending")
+    _require(beta.get("managed_attachment_ingestion_live_accepted") is False, "A9.10 full ingestion must remain pending until a real attachment STT run")
+    _require(beta.get("managed_attachment_private_gpt_e2e_complete") is False, "A9.10 private-GPT E2E must remain pending")
     _require(beta.get("max_video_seconds") == 3600, "media beta max video must remain 60 minutes")
     _require(beta.get("managed_provider") == "supadata", "managed provider must remain Supadata for native-first paths")
     _require(beta.get("managed_provider_mode") == "native_first", "managed mode must remain native-first")
@@ -249,7 +259,7 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(legacy.get("stt_endpoint") == MEDIA_BETA_ASSEMBLYAI_EU, "A8 fallback STT endpoint must remain AssemblyAI EU")
     _require(legacy.get("status") == "A8_ACCEPTED_FALLBACK_ONLY", "A8 must be fallback only")
 
-    _require(release.get("rollout_state") == "A9_9_TELEGRAM_PRIVATE_GPT_E2E_ACCEPTED", "rollout state must record accepted A9.9 owner private-GPT Telegram E2E")
+    _require(release.get("rollout_state") == "A9_10_ATTACHMENT_PACKAGE_READY_BUILDER_PENDING", "rollout state must record A9.10 attachment package ready / Builder pending")
     _require(release.get("production_core_unchanged") is True, "private beta must preserve production core")
     _require(release.get("public_store_gpt_unchanged") is True, "private beta must not modify public GPT")
     _require(release.get("user_api_key_required") is False, "private beta must not request user API keys")
@@ -271,7 +281,14 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require(release.get("a9_9_telegram_action_package_complete") is True, "A9.9 Telegram Action package must be complete")
     _require(release.get("a9_9_telegram_builder_runtime_applied") is True, "A9.9 Telegram Builder runtime must be applied")
     _require(release.get("a9_9_telegram_private_gpt_e2e_complete") is True, "A9.9 Telegram private-GPT E2E must be accepted")
-    _require(release.get("gpt_builder_private_update_required") is False, "A9.9 accepted Builder runtime must not require another private Builder update")
+    _require(release.get("a9_10_attachment_transport_runtime_accepted") is True, "A9.10 attachment transport runtime acceptance must be recorded")
+    _require(release.get("a9_10_attachment_backend_code_ready") is True, "A9.10 attachment backend must be code-ready")
+    _require(release.get("a9_10_attachment_backend_live_deployed") is True, "A9.10 attachment backend must be live on isolated beta")
+    _require(release.get("a9_10_attachment_action_package_complete") is True, "A9.10 attachment Action package must be complete")
+    _require(release.get("a9_10_attachment_builder_runtime_applied") is False, "A9.10 attachment Builder application must remain pending")
+    _require(release.get("a9_10_attachment_ingestion_live_accepted") is False, "A9.10 full attachment ingestion must remain pending")
+    _require(release.get("a9_10_attachment_private_gpt_e2e_complete") is False, "A9.10 attachment private-GPT E2E must remain pending")
+    _require(release.get("gpt_builder_private_update_required") is True, "A9.10 package requires a private Builder update")
     _require(release.get("external_tester_rollout_paused") is True, "external tester rollout must remain paused")
     _require(release.get("merge_to_public_product_allowed") is False, "private beta must not auto-promote to public product")
 
@@ -296,6 +313,7 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
             "preflightManagedMediaAiCredits",
             "startManagedMediaAiTranscription",
             "startManagedTelegramPublicTranscription",
+            "startManagedAttachmentTranscription",
             "Do NOT ask the user for beta access code",
             "Do not expose `KRCM_...` Job IDs",
             "Do not fall back to Helper in the normal owner flow",
@@ -318,12 +336,13 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
     _require_tokens(
         action_text,
         [
-            "version: 0.5.0-a9.9",
+            "version: 0.6.0-a9.10",
             "operationId: getManagedMediaCapability",
             "operationId: preflightManagedMediaCredits",
             "operationId: startManagedMediaNativeTranscription",
             "operationId: startManagedFacebookFallback",
             "operationId: startManagedTelegramPublicTranscription",
+            "operationId: startManagedAttachmentTranscription",
             "operationId: preflightManagedFacebookRetrievalCredit",
             "operationId: continueManagedFacebookPaidRetrieval",
             "operationId: getManagedMediaTranscriptionStatus",
@@ -344,6 +363,8 @@ def validate_media_beta_package(root: Path = ROOT) -> dict:
             "facebook_retrieval_stt",
             "telegram_public_retrieval_stt",
             "telegram_public_web",
+            "attachment_upload_stt",
+            "openai_attachment",
             "provider_balance_lookup_performed",
             "retrieval_credits_charged",
             "stt_seconds_charged",

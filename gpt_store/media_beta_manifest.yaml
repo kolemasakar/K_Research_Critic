@@ -28,11 +28,11 @@ knowledge:
 instructions:
   file: prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md
   canonical_reference: prompts/GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md
-  version: "0.8-beta-a9.9"
-  builder_package_version: "0.8-beta-a9.9"
-  builder_target_action_schema_version: "0.5.0-a9.9"
+  version: "0.9-beta-a9.10"
+  builder_package_version: "0.9-beta-a9.10"
+  builder_target_action_schema_version: "0.6.0-a9.10"
   builder_package_ready: true
-  builder_runtime_applied: true
+  builder_runtime_applied: false
   builder_policy_fix_runtime_applied: true
   builder_character_limit: 8000
   default_report_language: uk-UA
@@ -109,6 +109,18 @@ beta:
   public_platforms_in_progress: []
   public_platforms_not_started: []
   local_upload_live_accepted: false
+  managed_attachment_transport_live_accepted: true
+  managed_attachment_transport_provider: openai_file_refs
+  managed_attachment_backend_code_ready: true
+  managed_attachment_backend_live_deployed: true
+  managed_attachment_retrieval_provider: openai_attachment
+  managed_attachment_retrieval_credits: 0
+  managed_attachment_stt_provider: assemblyai
+  managed_attachment_max_bytes: 33554432
+  managed_attachment_action_schema_ready: true
+  managed_attachment_builder_runtime_applied: false
+  managed_attachment_ingestion_live_accepted: false
+  managed_attachment_private_gpt_e2e_complete: false
   max_video_seconds: 3600
   managed_provider: supadata
   managed_provider_mode: native_first
@@ -165,7 +177,7 @@ beta:
     never_log: true
 
 release:
-  rollout_state: A9_9_TELEGRAM_PRIVATE_GPT_E2E_ACCEPTED
+  rollout_state: A9_10_ATTACHMENT_PACKAGE_READY_BUILDER_PENDING
   production_core_unchanged: true
   public_store_gpt_unchanged: true
   user_api_key_required: false
@@ -195,6 +207,13 @@ release:
   a9_9_telegram_action_package_complete: true
   a9_9_telegram_builder_runtime_applied: true
   a9_9_telegram_private_gpt_e2e_complete: true
+  a9_10_attachment_transport_runtime_accepted: true
+  a9_10_attachment_backend_code_ready: true
+  a9_10_attachment_backend_live_deployed: true
+  a9_10_attachment_action_package_complete: true
+  a9_10_attachment_builder_runtime_applied: false
+  a9_10_attachment_ingestion_live_accepted: false
+  a9_10_attachment_private_gpt_e2e_complete: false
   criticprofile_gate_runtime_accepted: true
   cross_check_enforcement_hardened: true
   cross_check_claim_level_enforcement_hardened: true
@@ -204,5 +223,5 @@ release:
   report_label_localization_hardened: true
   report_label_localization_runtime_accepted: true
   external_tester_rollout_paused: true
-  gpt_builder_private_update_required: false
+  gpt_builder_private_update_required: true
   merge_to_public_product_allowed: false
