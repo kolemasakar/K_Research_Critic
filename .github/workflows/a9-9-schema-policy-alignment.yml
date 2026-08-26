@@ -34,7 +34,7 @@ jobs:
           python -m pip install -r requirements-dev.txt
 
       - name: Align schema policy wording
-        # v3: corrected anchors and YAML-safe compatibility summaries
+        # v4: YAML-safe schema wording plus wrap-safe regression
         run: python scripts/a9_9_schema_policy_alignment_patch.py
 
       - name: Validate
