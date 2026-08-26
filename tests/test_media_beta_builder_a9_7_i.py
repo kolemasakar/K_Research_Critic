@@ -27,7 +27,7 @@ def test_a9_7_i_builder_package_is_applied_but_e2e_pending() -> None:
     assert release["gpt_builder_private_update_required"] is False
 
 
-def test_a9_7_i_builder_contains_facebook_free_and_paid_gate_contracts() -> None:
+def test_a9_7_i_builder_enforces_cobalt_fail_unavailable_without_paid_offer() -> None:
     text = (
         ROOT / "prompts" / "GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md"
     ).read_text(encoding="utf-8")
@@ -36,16 +36,18 @@ def test_a9_7_i_builder_contains_facebook_free_and_paid_gate_contracts() -> None
     assert "Live accepted: YouTube, Instagram Reel, Facebook Video/Reel." in text
     assert "Facebook path: FREE `Cobalt -> AssemblyAI -> durable KRCM`." in text
     assert "startManagedFacebookFallback" in text
+    assert "Cobalt failure means media retrieval is unavailable" in text
     assert "AWAITING_RETRIEVAL_CONSENT" in text
-    assert "preflightManagedFacebookRetrievalCredit" in text
-    assert "continueManagedFacebookPaidRetrieval" in text
-    assert "provider=scrapecreators, mode=facebook_post, max_credits=1" in text
-    assert "Do NOT reuse any earlier `1`" in text
-    assert "Exactly one paid attempt. Never retry automatically." in text
+    assert "report that Facebook media retrieval is unavailable and STOP media intake" in text
+    assert "Do NOT call `preflightManagedFacebookRetrievalCredit`" in text
+    assert "or `continueManagedFacebookPaidRetrieval`" in text
+    assert "do not offer any paid retrieval fallback" in text
     assert "Do not route Facebook through Supadata generate fallback." in text
+    assert "provider=scrapecreators, mode=facebook_post, max_credits=1" not in text
+    assert "Only a NEW explicit `1` authorizes `continueManagedFacebookPaidRetrieval`" not in text
 
 
-def test_a9_7_i_target_action_schema_matches_package() -> None:
+def test_a9_7_i_target_action_schema_keeps_reserved_paid_operations_compatible() -> None:
     manifest = yaml.safe_load(
         (ROOT / "gpt_store" / "media_beta_manifest.yaml").read_text(encoding="utf-8")
     )
@@ -62,6 +64,8 @@ def test_a9_7_i_target_action_schema_matches_package() -> None:
     assert paths["/api/v1/media/managed/facebook-fallback"]["post"]["operationId"] == (
         "startManagedFacebookFallback"
     )
+    # Reserved compatibility operations remain in the schema, but active Builder
+    # instructions explicitly forbid calling or offering them after Cobalt failure.
     assert paths[
         "/api/v1/media/managed/transcriptions/{job_id}/facebook-retrieval-preflight"
     ]["get"]["operationId"] == "preflightManagedFacebookRetrievalCredit"
