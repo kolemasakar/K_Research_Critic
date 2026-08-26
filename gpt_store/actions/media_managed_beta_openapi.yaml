@@ -4,13 +4,13 @@ info:
   version: 0.5.0-a9.9
   description: >-
     Owner-only zero-client managed transcript beta for public YouTube, Instagram,
-    Facebook and supported public Telegram video posts. Existing Supadata native and
-    consent-gated AI paths remain available. Facebook retrieval/STT uses the free
-    Cobalt path. If Cobalt cannot retrieve the public media, Facebook retrieval is
-    unavailable and media intake stops. ScrapeCreators is reserved compatibility
-    surface only and is not active or offerable. AssemblyAI STT runs only after
-    successful media retrieval. Action bearer and owner admission credentials remain
-    server-side.
+    Facebook and supported public Telegram video posts, plus a non-billable A9.10
+    local-attachment transport probe. Existing Supadata native and consent-gated AI
+    paths remain available. Facebook retrieval/STT uses the free Cobalt path. If
+    Cobalt cannot retrieve the public media, Facebook retrieval is unavailable and
+    media intake stops. ScrapeCreators is reserved compatibility surface only and is
+    not active or offerable. AssemblyAI STT runs only after successful media retrieval.
+    Action bearer and owner admission credentials remain server-side.
 x-krc-compatibility:
   previous_schema_marker: "version: 0.3.0-a9.6"
   previous_native_cap_marker: "maximum: 1"
@@ -153,6 +153,45 @@ paths:
           description: Closed-beta STT quota is exhausted.
         "503":
           description: Telegram retrieval/STT pipeline is not configured.
+  /api/v1/media/managed/attachment-probe:
+    post:
+      operationId: probeManagedAttachmentTransport
+      summary: Verify zero-client transport for one attached audio or video file
+      description: >-
+        Use only when the owner explicitly asks to test local attachment transport.
+        Pass exactly one audio/video file from the current conversation through the
+        special openaiFileIdRefs parameter. This operation is non-billable and must
+        not be presented as transcription or analysis success.
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AttachmentProbeRequest"
+      responses:
+        "200":
+          description: The isolated backend received and safely probed the temporary file reference.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AttachmentProbeResult"
+        "400":
+          description: Missing, malformed, multiple, or untrusted runtime file reference.
+        "401":
+          description: Private GPT Action bearer authentication failed.
+        "405":
+          description: POST is required.
+        "413":
+          description: Probe request body exceeded the isolated request limit.
+        "415":
+          description: Attachment type, extension, or downloaded MIME did not satisfy the audio/video probe boundary.
+        "422":
+          description: The temporary file response was empty or otherwise unusable.
+        "502":
+          description: The temporary OpenAI download URL could not be reached safely by the isolated backend.
+        "503":
+          description: Owner-only MEDIA BETA admission or Action authentication is not configured.
   /api/v1/media/managed/transcriptions/{job_id}:
     get:
       operationId: getManagedMediaTranscriptionStatus
@@ -464,6 +503,73 @@ components:
           type: string
           enum: [auto, uk, ru, en]
           default: auto
+    AttachmentProbeRequest:
+      type: object
+      additionalProperties: false
+      required: [openaiFileIdRefs]
+      properties:
+        openaiFileIdRefs:
+          type: array
+          minItems: 1
+          maxItems: 1
+          items:
+            type: string
+          description: >-
+            Exactly one user-uploaded audio or video file from the current ChatGPT
+            conversation. ChatGPT replaces this string-array schema with runtime file
+            reference objects containing name, id, mime_type, and a temporary
+            download_link as defined by the GPT Actions file-transfer contract.
+    AttachmentProbeResult:
+      type: object
+      required:
+        - transport_available
+        - file_class
+        - declared_mime_type
+        - response_mime_type
+        - mime_consistent
+        - probe_bytes_received
+        - probe_byte_limit
+        - range_requested
+        - range_supported
+        - response_truncated_at_probe_limit
+        - retrieval_credits_charged
+        - stt_seconds_charged
+      properties:
+        request_id:
+          type: string
+        transport_available:
+          type: boolean
+          const: true
+        file_class:
+          type: string
+          enum: [audio, video]
+        declared_mime_type:
+          type: string
+        response_mime_type:
+          type: string
+        mime_consistent:
+          type: boolean
+          const: true
+        probe_bytes_received:
+          type: integer
+          minimum: 1
+          maximum: 65536
+        probe_byte_limit:
+          type: integer
+          const: 65536
+        range_requested:
+          type: boolean
+          const: true
+        range_supported:
+          type: boolean
+        response_truncated_at_probe_limit:
+          type: boolean
+        retrieval_credits_charged:
+          type: integer
+          const: 0
+        stt_seconds_charged:
+          type: integer
+          const: 0
     NativeTranscriptRequest:
       type: object
       additionalProperties: false
