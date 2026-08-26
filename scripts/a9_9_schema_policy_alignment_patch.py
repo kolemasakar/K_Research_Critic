@@ -52,7 +52,7 @@ replace_once(
 replace_once(
     SCHEMA,
     '      summary: Read the local one-credit ceiling before paid Facebook retrieval\n',
-    '      summary: Reserved compatibility: inspect legacy Facebook paid-retrieval ceiling\n',
+    '      summary: "Reserved compatibility: inspect legacy Facebook paid-retrieval ceiling"\n',
 )
 
 replace_once(
@@ -70,7 +70,7 @@ replace_once(
 replace_once(
     SCHEMA,
     '      summary: Run exactly one explicitly approved ScrapeCreators retrieval attempt\n',
-    '      summary: Reserved compatibility: legacy explicitly approved Facebook retrieval\n',
+    '      summary: "Reserved compatibility: legacy explicitly approved Facebook retrieval"\n',
 )
 
 replace_once(
