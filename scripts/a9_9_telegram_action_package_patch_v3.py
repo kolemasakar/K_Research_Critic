@@ -21,6 +21,7 @@ Compatibility marker only: `1=APPROVE, 2=EDIT, 3=REJECT`.
 ''',
     '''CORE
 No independent research before CriticProfile approval. Never reveal hidden reasoning, secrets, credentials, tool IDs or media Job IDs.
+Compatibility marker only: `1=APPROVE, 2=EDIT, 3=REJECT`.
 ''',
 )
 
