@@ -2,9 +2,9 @@
 
 Canonical documentation index for K-Research & Critic media-input work.
 
-Version: 4.0
+Version: 4.1
 Status: ACTIVE
-Updated: 2026-08-26
+Updated: 2026-08-27
 
 ## Purpose
 
@@ -20,6 +20,7 @@ It covers:
 - report-label localization;
 - accepted YouTube, Instagram, Facebook, Telegram and local audio/video attachment ingress;
 - completed A10 copy-safe claim-summary stabilization;
+- current release-hold owner-testing state;
 - later optional external/public rollout boundaries.
 
 Repository `main`, production VoiceBridge and public sharing remain separate and are not implicitly authorized by this subproject.
@@ -58,25 +59,27 @@ Repository `main`, production VoiceBridge and public sharing remain separate and
 30. `50_A9_10_PRIVATE_GPT_LOCAL_ATTACHMENT_E2E_ACCEPTANCE.md` - actual owner local-attachment ingestion, CriticProfile and Research/Critic E2E acceptance.
 31. `51_A10_STABILIZATION_AND_RELEASE_BOUNDARY.md` - A10 stabilization design, runtime attempts and release boundary.
 32. `52_A10_SAFE_TABLE_RUNTIME_ACCEPTANCE.md` - accepted owner runtime evidence for the copy-safe claim table.
+33. `53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md` - frozen owner-testing release-hold checkpoint and resume contract.
 
 ## Source-of-truth precedence
 
 When documents disagree:
 1. current code, current CI evidence and verified runtime evidence on active feature branches;
 2. `03_CURRENT_STATE.md`;
-3. `52_A10_SAFE_TABLE_RUNTIME_ACCEPTANCE.md` for A10 runtime acceptance;
-4. `51_A10_STABILIZATION_AND_RELEASE_BOUNDARY.md` for A10 design/release boundary;
-5. `50_A9_10_PRIVATE_GPT_LOCAL_ATTACHMENT_E2E_ACCEPTANCE.md` for accepted local attachment E2E;
-6. `49_A9_10_ATTACHMENT_TRANSPORT_RUNTIME_ACCEPTANCE.md` for attachment transport;
-7. `46_A9_9_PRIVATE_GPT_TELEGRAM_E2E_ACCEPTANCE.md` for Telegram E2E;
-8. `44_A9_7_I_PRIVATE_GPT_FACEBOOK_POLICY_E2E_ACCEPTANCE.md` for Facebook failure policy;
-9. older phase records and decision logs.
+3. `53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md` for the active release-hold decision and resume boundary;
+4. `52_A10_SAFE_TABLE_RUNTIME_ACCEPTANCE.md` for A10 runtime acceptance;
+5. `51_A10_STABILIZATION_AND_RELEASE_BOUNDARY.md` for A10 design/release boundary;
+6. `50_A9_10_PRIVATE_GPT_LOCAL_ATTACHMENT_E2E_ACCEPTANCE.md` for accepted local attachment E2E;
+7. `49_A9_10_ATTACHMENT_TRANSPORT_RUNTIME_ACCEPTANCE.md` for attachment transport;
+8. `46_A9_9_PRIVATE_GPT_TELEGRAM_E2E_ACCEPTANCE.md` for Telegram E2E;
+9. `44_A9_7_I_PRIVATE_GPT_FACEBOOK_POLICY_E2E_ACCEPTANCE.md` for Facebook failure policy;
+10. older phase records and decision logs.
 
 Historical documents do not override later acceptance records.
 
 ## Current phase checkpoint
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_OWNER_ZERO_CLIENT_MEDIA_INPUT_ACCEPTED / YOUTUBE_ACCEPTED / INSTAGRAM_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_ACCEPTED / LOCAL_ATTACHMENT_ACCEPTED / A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_OWNER_ZERO_CLIENT_MEDIA_INPUT_ACCEPTED / YOUTUBE_ACCEPTED / INSTAGRAM_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_ACCEPTED / LOCAL_ATTACHMENT_ACCEPTED / A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED / RELEASE_HOLD_OWNER_TESTING`
 
 ## Accepted Research/Critic contract
 
@@ -149,9 +152,25 @@ KRC: `kolemasakar/K_Research_Critic`, branch `agent/video-url-research`, draft P
 
 VoiceBridge: `kolemasakar/VoiceBridge`, branch `agent/krc-media-transcript`, draft PR #28.
 
+## Current operating mode
+
+`RELEASE_HOLD_OWNER_TESTING`
+
+The owner will continue private testing before making any release decision.
+
+Current release gates:
+- merge to `main`: HOLD;
+- production promotion: HOLD;
+- external testers: HOLD;
+- public sharing / Store rollout: HOLD.
+
+Defects found during this period stay isolated to the feature branches and are revalidated there unless the owner explicitly changes the release decision.
+
 ## Next task
 
-A10 requires no further Builder/backend remediation. The next boundary is a separate owner decision on merge, production promotion, external testing, or public sharing.
+Continue owner-only MEDIA BETA testing. No A10 remediation or release transition is pending by default.
+
+When the owner is ready, revisit each release gate independently rather than treating release as one combined action.
 
 ## Non-negotiable boundary
 
