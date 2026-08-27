@@ -1,225 +1,119 @@
 # VIDEO_INPUT_UPGRADE
-Архітектура додаткового режиму дослідження тверджень із відео без зміни базового текстового workflow.
+Архітектура поточного приватного zero-client медіавходу без зміни public Core workflow.
 
-Version: 0.1
-Status: PREVIEW
-Date: 2026-08-17
+Version: 1.0
+Status: PRIVATE_BETA_ACCEPTED / RELEASE_HOLD_OWNER_TESTING
+Updated: 2026-08-27
 
 ## 1. Objective
 
-Add a video-URL intake path to K-Research & Critic without replacing or weakening the existing production text-research path.
+Add reliable media source acquisition to K-Research & Critic while preserving the existing CriticProfile -> Research -> Critic workflow.
 
-Initial target:
+Current accepted input set is broader than the original YouTube-only preview:
 
 ```text
-public YouTube URL
-source language: auto / uk / ru / en
--> timestamped transcript
--> material claim inventory
--> existing CriticProfile approval gate
--> existing Research -> Critic -> revision loop
--> FINAL REPORT + REVIEW PROTOCOL
+YouTube
+Instagram Reel
+Facebook Video/Reel
+supported public Telegram video post
+one local audio/video attachment
 ```
 
 ## 2. Non-Regression Rule
 
-The existing workflow remains valid and unchanged for ordinary text tasks:
+The public text Core remains independent of media ingestion. A media failure must not weaken or replace the standard research workflow.
+
+## 3. Current Architecture
 
 ```text
-User task
--> CriticProfile
--> user approval/edit/reject
--> Research
--> Critic
--> autonomous revision
--> FINAL REPORT
--> REVIEW PROTOCOL
+MEDIA INPUT
+ -> private MEDIA BETA GPT
+ -> managed Action
+ -> isolated VoiceBridge MEDIA BETA
+ -> source-specific acquisition
+ -> normalized durable KRCM transcript
+ -> claim inventory
+ -> CriticProfile approval gate
+ -> independent Research
+ -> Critic
+ -> final report
 ```
 
-Media ingestion is an optional adapter before the profile gate. It is not a replacement Supervisor, ResearchAgent, CriticAgent, report format, checkpoint contract, or web-search path.
+## 4. Route Matrix
 
-## 3. Architecture
+### YouTube / Instagram
+
+Managed transcript provider path. Billable operations require explicit preflight and user approval. Instagram AI generation requires a separate second approval.
+
+### Facebook
 
 ```text
-USER VIDEO URL
-      |
-      v
-K-Research & Critic media intake
-      |
-      +-- built-in accessible transcript/captions when reliable
-      |
-      +-- Media Transcript Action when configured
-              |
-              v
-       VoiceBridge Cloud
-              |
-              +-- URL allowlist / limits
-              +-- yt-dlp public-media fetch
-              +-- temporary audio
-              +-- AssemblyAI async STT
-              +-- provider delete request
-              v
-       timestamped transcript segments
-      |
-      v
-claim inventory
-      |
-      v
-CriticProfile approval gate
-      |
-      v
-existing Research/Critic pipeline
+free Cobalt retrieval
+ -> success: AssemblyAI -> durable KRCM
+ -> failure: unavailable -> STOP
 ```
 
-## 4. Evidence Boundary
+No automatic or offered paid Facebook fallback is active. ScrapeCreators remains reserve-only compatibility code.
 
-The media transcript is a primary source for what the speaker said.
-
-It is not independent evidence that the statement is correct.
-
-A factual claim from the media must be checked against independent sources under the approved CriticProfile. Repetition of the same video or speaker does not count as an independent cross-check.
-
-## 5. Claim Types
-
-Media intake separates:
+### Telegram
 
 ```text
-FACTUAL_CLAIM
-OPINION
-PREDICTION
-RECOMMENDATION
-RHETORICAL_OR_NON_CHECKABLE
-TRANSCRIPTION_UNCERTAIN
+public Telegram web/embed
+ -> trusted Telegram CDN
+ -> AssemblyAI
+ -> durable KRCM
 ```
 
-Material factual claims should retain a timestamp or transcript segment reference whenever available.
+Retrieval credits are zero. No Telegram account, cookies, session, bot token, or paid fallback is used.
 
-## 6. Factual Verdicts
-
-The final media report may use:
+### Local attachment
 
 ```text
-VERIFIED
-PARTLY_SUPPORTED
-UNSUPPORTED
-CONTRADICTED
-MISLEADING
-UNVERIFIABLE
+one current-conversation attachment
+ -> openaiFileIdRefs
+ -> trusted *.oaiusercontent.com delivery
+ -> bounded download/type/duration checks
+ -> media normalization
+ -> AssemblyAI
+ -> durable KRCM
 ```
 
-`UNSUPPORTED` does not automatically mean false. Opinions, predictions, and recommendations are identified separately when they are not suitable for a factual verdict.
+Maximum accepted attachment size is 32 MiB. Retrieval credits are zero. File IDs and signed URLs are not user-visible.
 
-## 7. Language Baseline
+## 5. Evidence Boundary
 
-Initial explicit language set:
+A transcript proves what the source said. It does not independently establish truth. Material factual claims must be independently checked after CriticProfile approval.
+
+## 6. CriticProfile and Cross-Check Boundary
+
+No independent claim research starts before explicit approval. Cross-check floors remain risk-based and each material factual claim must expose a traceable required/achieved result with SHORTFALL when applicable.
+
+## 7. Durable Media State
+
+Managed media state uses durable `KRCM_` jobs and paged transcript segments. Completed jobs remain reusable where the backend contract defines idempotent reuse. Uncertain-charge provider work is never automatically replayed.
+
+## 8. Security and Privacy
+
+- remote adapters support public content only;
+- no platform passwords/cookies/sessions/account tokens;
+- Action bearer, owner admission, and provider keys remain server-side;
+- temporary source media is not intended as durable storage;
+- full transcripts are excluded from KRC checkpoints;
+- local attachment transport is accepted only through the current-conversation OpenAI file-reference boundary.
+
+## 9. A10 Output Stabilization
+
+The final claim-summary table is rendered normally and duplicated in a fenced `text` block for reliable whole-response copying. This is an accepted mitigation for a ChatGPT UI serialization defect.
+
+## 10. Current Release State
+
+All intended owner-only media inputs and A10 output stabilization are accepted. The feature is nevertheless held in private owner testing.
 
 ```text
-uk - Ukrainian
-ru - Russian
-en - English
-auto - provider language detection
+merge = HOLD
+production promotion = HOLD
+external testers = HOLD
+public rollout = HOLD
 ```
 
-The report language remains controlled by the normal K-Research & Critic language rules and may differ from source language.
-
-## 8. VoiceBridge Reuse
-
-The upgrade reuses VoiceBridge cloud/provider experience but does not depend on its browser-extension capture path.
-
-A new prerecorded-media route is isolated from the existing streaming translation workflow.
-
-The VoiceBridge change is developed on:
-
-```text
-repository: kolemasakar/VoiceBridge
-branch: agent/krc-media-transcript
-```
-
-The K-Research & Critic integration is developed on:
-
-```text
-repository: kolemasakar/K_Research_Critic
-branch: agent/video-url-research
-```
-
-## 9. Security and Privacy
-
-Required controls:
-
-- accept only allowlisted public HTTPS media hosts;
-- use a dedicated Action bearer secret separate from VoiceBridge test access;
-- never expose AssemblyAI credentials to GPT users;
-- delete temporary local media after processing;
-- retain transcript/job state in memory only for a bounded TTL;
-- request deletion of the provider transcript/audio after processing;
-- do not store the full transcript in K-Research & Critic checkpoints;
-- keep the media feature in PREVIEW until provider model-training opt-out is verified;
-- publish a valid privacy-policy URL before Store rollout.
-
-## 10. Failure Handling
-
-If the media path cannot obtain a reliable transcript:
-
-```text
-try reliable built-in/web-accessible captions
--> try configured Media Transcript Action
--> if unavailable/failed, request user transcript/audio/file
--> never infer or fabricate unavailable video content
-```
-
-An asynchronous transcription job may outlive one GPT tool-call window. If bounded status checks do not reach COMPLETED, the user may explicitly continue the same job in the next turn.
-
-## 11. Store Package Changes
-
-Planned package boundary:
-
-```text
-core text mode:
-  external_backend_required: false
-  developer_api_key_required: false
-
-media URL mode:
-  external_backend_required: true
-  developer_provider_key_required: true
-  user_api_key_required: false
-```
-
-The Action schema is:
-
-```text
-gpt_store/actions/media_transcript_openapi.yaml
-```
-
-The privacy document is:
-
-```text
-docs/PRIVACY_POLICY.md
-```
-
-## 12. Release Gates
-
-Do not merge/publish media mode as complete until all applicable gates pass:
-
-```text
-VoiceBridge TypeScript build
-VoiceBridge existing tests
-VoiceBridge media unit tests
-K-Research & Critic full pytest
-repository validation
-Store package validation
-Action schema import in GPT Builder
-Action bearer authentication test
-real YouTube transcription: uk
-real YouTube transcription: ru
-real YouTube transcription: en
-automatic language detection test
-claim extraction / timestamp traceability test
-Research -> Critic REVISE/PASS test
-Free-plan live test
-paid-plan live test
-provider model-training opt-out verified
-privacy-policy public URL configured
-production smoke test
-```
-
-Only after these gates pass should `media_input.rollout_state` move from `PREVIEW_REQUIRED` to a production state and its production smoke-test flag become true.
+The next step is not another mandatory media adapter. It is a future release decision after the owner testing period.

@@ -1,102 +1,98 @@
 # K-Research & Critic MEDIA BETA
-Окремий документаційний підпроєкт для відеоаналізу, закритого beta-тестування та подальшого сталого безкоштовного медіарежиму.
+Короткий вступ до поточного приватного MEDIA BETA та його release-hold меж.
 
-Version: 1.0
-Status: CLOSED_BETA_PREDEPLOY
-Updated: 2026-08-17
+Version: 2.0
+Status: RELEASE_HOLD_OWNER_TESTING
+Updated: 2026-08-27
 
-## Objective
+## Purpose
 
-Allow a user to provide a public YouTube URL and obtain the normal K-Research & Critic workflow over material claims from the video:
+MEDIA BETA is the isolated owner-only zero-client media-input path for K-Research & Critic. It is additive to the public text Core and does not replace or weaken the normal CriticProfile -> Research -> Critic workflow.
 
-```text
-YouTube URL
-  -> transcript acquisition
-  -> timestamped material claim inventory
-  -> CriticProfile
-  -> user APPROVE / EDIT / REJECT
-  -> independent Research
-  -> independent Critic
-  -> autonomous REVISE / PASS loop
-  -> FINAL REPORT
-  -> CLAIM VERIFICATION
-  -> REVIEW PROTOCOL
-```
-
-## Core evidence rule
-
-A transcript proves what the speaker said. It does not independently prove that the statement is true.
-
-Independent external verification starts only after CriticProfile approval.
-
-## Current first-priority mode: CLOSED MEDIA BETA
-
-Target group:
-
-- project owner;
-- up to three additional testers.
-
-Resource controls:
-
-- public YouTube only;
-- source languages: Ukrainian, Russian, English, plus automatic detection;
-- maximum video duration: 60 minutes;
-- one active media job at a time;
-- YouTube captions first;
-- AssemblyAI only when usable captions are unavailable;
-- global AssemblyAI fallback budget: 7200 source-audio seconds per UTC day;
-- fallback audio: mono, 16 kHz, approximately 32 kbps;
-- per-tester access codes;
-- no user-supplied provider/API keys.
-
-## Production isolation
-
-The beta must not replace or modify the validated production services during testing.
-
-Production VoiceBridge endpoint:
-
-`https://voicebridge-cloud-us.onrender.com`
-
-Dedicated beta target:
-
-`https://voicebridge-krc-media-beta-kolemasakar.onrender.com`
-
-The published K-Research & Critic text workflow remains production baseline.
-
-## Repository implementation split
-
-K-Research & Critic contains:
-
-- GPT instructions and workflow semantics;
-- beta Action OpenAPI schema;
-- beta manifest;
-- privacy and product documentation;
-- package validation and regression tests.
-
-VoiceBridge contains:
-
-- URL validation;
-- YouTube metadata and captions acquisition;
-- audio download/optimization fallback;
-- AssemblyAI asynchronous transcription;
-- access-code enforcement;
-- daily STT budget enforcement;
-- transcript paging and temporary retention;
-- provider cleanup attempt;
-- Render beta deployment blueprint.
-
-## Beta is not production
-
-Code-level CI success is necessary but not sufficient. Media beta remains blocked from public production until all live release gates in `02_ROADMAP.md` and `05_TEST_PLAN.md` pass.
-
-## Future direction
-
-After beta validation, the target is a sustainable free media pipeline:
+## Accepted Owner Inputs
 
 ```text
-captions first
-  -> free cloud STT quota when required
-  -> optional local Whisper fallback
+prerecorded YouTube
+Instagram Reel
+public Facebook Video/Reel
+supported public Telegram video post
+one current-conversation local audio/video attachment
 ```
 
-AssemblyAI is a beta/reliability tool, not the intended permanent public free-tier dependency.
+A9 owner media input, A9.10 local attachment, and A10 copy-safe output stabilization are runtime accepted for the private owner GPT.
+
+## Normal Flow
+
+```text
+supported media input
+ -> private GPT Action
+ -> isolated VoiceBridge MEDIA BETA
+ -> durable KRCM transcript
+ -> CriticProfile gate
+ -> explicit owner approval
+ -> Research
+ -> Critic
+ -> localized final report
+```
+
+The transcript proves what the media said, not that its claims are true.
+
+## Critical Route Policies
+
+Facebook:
+
+```text
+Cobalt success -> AssemblyAI -> durable KRCM
+Cobalt failure -> unavailable -> STOP
+paid fallback -> inactive/not offerable
+```
+
+Telegram:
+
+```text
+public web/embed -> trusted Telegram CDN -> AssemblyAI -> durable KRCM
+retrieval credits = 0
+no login/cookies/session/bot token/paid fallback
+```
+
+Local attachment:
+
+```text
+openaiFileIdRefs -> trusted OpenAI temporary delivery -> AssemblyAI -> durable KRCM
+max attachment = 32 MiB
+retrieval credits = 0
+```
+
+## Package State
+
+```text
+Builder package = 0.9.1-beta-a10
+Action schema = 0.6.0-a9.10
+Builder runtime applied = true
+```
+
+The accepted package remains frozen during the owner-testing hold unless a real defect requires a validated change.
+
+## Release Hold
+
+```text
+merge to main = HOLD
+production promotion = HOLD
+external testers = HOLD
+public rollout = HOLD
+```
+
+No release gate is implied by another.
+
+## Read First
+
+```text
+00_INDEX.md
+03_CURRENT_STATE.md
+53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md
+54_PROJECT_DOCUMENTATION_AUDIT_2026_08_27.md
+```
+
+Then use the architecture, roadmap, runbook, test plan, and decision log in this directory.
+
+Historical numbered phase/acceptance records remain evidence and must not override later accepted current-state records.

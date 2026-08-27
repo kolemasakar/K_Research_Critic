@@ -1,185 +1,76 @@
 # MEDIA BETA Architecture
-Архітектура ізольованого медіарежиму та межі відповідальності між K-Research & Critic, VoiceBridge і STT-провайдером.
+Архітектура прийнятого owner-only zero-client MEDIA BETA контуру.
 
-Version: 1.0
-Status: APPROVED_BASELINE
-Updated: 2026-08-17
+Version: 2.0
+Status: ACCEPTED_PRIVATE_ARCHITECTURE / RELEASE_HOLD
+Updated: 2026-08-27
 
-## 1. Architecture goals
-
-- preserve the existing K-Research & Critic text workflow;
-- isolate beta failures from published production services;
-- minimize exhaustible free-tier resource use;
-- keep transcript acquisition separate from claim verification;
-- avoid user API keys;
-- support Ukrainian, Russian, and English source media;
-- keep the design replaceable so AssemblyAI can later be removed from the public free path.
-
-## 2. Closed beta topology
+## Topology
 
 ```text
-Tester
-  |
-  | YouTube URL + tester access code
-  v
-K-Research & Critic - MEDIA BETA
-  |
-  | GPT Action bearer authentication
-  v
-Dedicated VoiceBridge MEDIA BETA service
-  |
-  +--> access-code allowlist
-  +--> URL validation / YouTube metadata
-  +--> duration guard <= 60 min
-  |
-  +--> subtitle-first path
-  |      |
-  |      +--> usable captions found
-  |             -> timestamped transcript
-  |
-  +--> STT fallback path
-         |
-         +--> daily budget reservation
-         +--> concurrency guard = 1
-         +--> download source audio
-         +--> convert to mono 16 kHz ~32 kbps
-         +--> AssemblyAI Universal-2
-         +--> timestamped transcript
-         +--> provider delete request
-
-Transcript
-  -> material claim inventory
-  -> CriticProfile gate
-  -> independent web research after approval
-  -> Critic review
-  -> final report and review protocol
+OWNER
+ -> K-Research & Critic - MEDIA BETA
+ -> private Action bearer
+ -> isolated VoiceBridge MEDIA BETA
+ -> source router
+    -> YouTube/Instagram managed transcript
+    -> Facebook Cobalt -> AssemblyAI
+    -> Telegram public web/embed -> trusted CDN -> AssemblyAI
+    -> local openaiFileIdRefs -> trusted OpenAI delivery -> AssemblyAI
+ -> durable Postgres KRCM job/segments
+ -> CriticProfile
+ -> owner approval
+ -> Research
+ -> Critic
+ -> final report
 ```
 
-## 3. Trust and evidence boundaries
+## Isolation
 
-### Transcript boundary
+KRC feature branch: `agent/video-url-research`, draft PR #8.
+VoiceBridge feature branch: `agent/krc-media-transcript`, draft PR #28.
+Dedicated backend: `voicebridge-krc-media-beta-kolemasakar`.
 
-The transcript is source content, not independent corroboration.
+Public KRC `main` and production VoiceBridge are not deployment targets during the current release hold.
 
-The system may use the transcript before CriticProfile approval only to:
+## Authentication
 
-- determine subject/domain/risk;
-- identify material claims;
-- preserve timestamps;
-- flag transcription uncertainty;
-- propose the CriticProfile.
+The GPT-facing Action uses bearer authentication. Owner admission and provider credentials remain server-side. The normal owner flow does not request a beta code, platform credentials, cookies/session, Helper, file ID, signed URL, or KRCM Job ID.
 
-It must not perform independent truth verification before approval.
+## Durable Job Contract
 
-### Access-code boundary
+Managed jobs use `KRCM_` identifiers internally and durable Postgres state. Completed state and timestamped segments survive backend replacement. Duplicate request reuse is supported where defined. Uncertain-charge operations are never automatically replayed.
 
-Tester codes are beta admission credentials only. They are not provider API keys.
+## Source Adapters
 
-Rules:
+### YouTube / Instagram
 
-- codes are configured server-side;
-- codes are sent only when starting a beta media job;
-- codes are not included in job state;
-- codes are never returned in reports;
-- codes are never checkpointed;
-- codes must not be committed to GitHub.
+Managed provider route. Billable operations require preflight and explicit consent. Instagram AI fallback requires a separate quote and new consent.
 
-### Provider-secret boundary
+### Facebook
 
-The following remain server-side secrets:
+Active route is free Cobalt retrieval only. Successful retrieval may proceed to AssemblyAI and durable KRCM. Cobalt failure is terminal unavailable. ScrapeCreators remains reserved compatibility code only.
 
-- `KRC_MEDIA_ACTION_TOKEN`;
-- `KRC_MEDIA_BETA_CODES`;
-- `ASSEMBLYAI_API_KEY`.
+### Telegram
 
-They must not appear in GPT instructions, checkpoints, repository files, transcripts, or user-visible reports.
+Only supported public post forms are accepted. Retrieval is public web/embed based, follows trusted Telegram media delivery, uses zero retrieval credits, and never requires Telegram authentication or paid fallback.
 
-## 4. Resource protection
+### Local Attachment
 
-Closed beta controls:
+Exactly one supported current-conversation audio/video attachment may be supplied through ChatGPT `openaiFileIdRefs`. Backend acceptance is limited to trusted OpenAI HTTPS media delivery, bounded size/type/duration, no redirects to arbitrary hosts, and no user-visible file token. Current max attachment size is 32 MiB.
 
-- intended testers: 4;
-- max video duration: 3600 seconds;
-- max active jobs: 1;
-- global AssemblyAI fallback budget: 7200 seconds per UTC day;
-- captions consume zero STT budget;
-- duplicate normalized URL/language requests may reuse an existing non-failed job;
-- transcript/job state expires from memory after TTL;
-- temporary media files are deleted after processing.
+## Transcript/Evidence Boundary
 
-Current daily STT budget state is process-memory based. A service restart can reset the budget counter. This is acceptable for closed beta but is not sufficient for a public multi-instance deployment.
+Media acquisition may occur before the CriticProfile. Independent factual verification may not. Transcript content is source evidence for what was said and does not count as an independent truth cross-check.
 
-## 5. Production isolation
+## Critic Contract
 
-The beta must use a dedicated Render service.
+Risk floors are `LOW>=0`, `MEDIUM>=1`, `HIGH>=2`, `CRITICAL>=3`. Every material factual claim tracks `required`, `achieved_independent`, and `exception`. Shortfalls remain visible and qualify the result.
 
-Production:
+## Presentation Contract
 
-`voicebridge-cloud-us.onrender.com`
+A10 requires the normal four-column claim summary plus an identical fenced copy-safe table. The second form mitigates an external ChatGPT whole-response Copy serialization defect.
 
-Beta target:
+## Release Boundary
 
-`voicebridge-krc-media-beta-kolemasakar.onrender.com`
-
-Do not point the beta GPT Action at the production VoiceBridge endpoint.
-
-Do not replace the published K-Research & Critic GPT with the beta package.
-
-## 6. Repository boundaries
-
-### K-Research & Critic
-
-Feature branch: `agent/video-url-research`
-
-Responsibilities:
-
-- workflow rules;
-- claim-verification semantics;
-- CriticProfile gate;
-- beta GPT package;
-- OpenAPI Action contract;
-- checkpoint safety;
-- privacy documentation;
-- Store/package validation.
-
-### VoiceBridge
-
-Feature branch: `agent/krc-media-transcript`
-
-Responsibilities:
-
-- media fetch;
-- subtitle-first ingestion;
-- audio fallback preparation;
-- STT provider integration;
-- beta quota controls;
-- temporary data lifecycle;
-- beta backend API;
-- Render deployment definition.
-
-## 7. Failure behavior
-
-The media path must fail closed when:
-
-- tester code is invalid;
-- URL is unsupported;
-- video exceeds duration limit;
-- concurrency is exhausted;
-- daily STT budget is exhausted and no usable captions exist;
-- media retrieval fails;
-- provider transcription fails;
-- transcript cannot be acquired reliably.
-
-A media failure must not degrade ordinary text research.
-
-## 8. Future replaceability
-
-The transcript acquisition interface must remain provider-neutral enough to allow this later routing:
-
-```text
-YouTube captions
-  -> Cloudflare Workers AI Whisper
-  -> local Whisper / faster-whisper fallback
-```
-
-K-Research & Critic should consume the same normalized timestamped transcript contract regardless of transcript provider.
+Current state is `RELEASE_HOLD_OWNER_TESTING`. Merge, production promotion, external testers, and public rollout are separate future owner decisions.

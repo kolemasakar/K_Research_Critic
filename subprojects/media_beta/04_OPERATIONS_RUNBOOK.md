@@ -1,245 +1,99 @@
 # MEDIA BETA Operations Runbook
-Операційна інструкція для безпечного розгортання, тестування, відкату та керування закритою beta-версією.
+Операційна інструкція для owner-only тестування без merge або production promotion.
 
-Version: 1.0
-Status: PREDEPLOY
-Updated: 2026-08-17
+Version: 2.0
+Status: RELEASE_HOLD_OWNER_TESTING
+Updated: 2026-08-27
 
-## 1. Safety rules
-
-- never deploy media beta over the existing production VoiceBridge service;
-- never commit secrets;
-- never paste provider secrets into GPT instructions;
-- never merge a draft media PR solely to simplify testing unless explicitly approved;
-- verify production health before and after beta deployment;
-- do not expose tester access codes in reports, checkpoints, screenshots, or documentation commits.
-
-## 2. Dedicated Render beta deployment
-
-Repository:
-
-`kolemasakar/VoiceBridge`
-
-Branch:
-
-`agent/krc-media-transcript`
-
-Blueprint:
-
-`render.media-beta.yaml`
-
-Expected service name:
-
-`voicebridge-krc-media-beta-kolemasakar`
-
-Expected public endpoint:
-
-`https://voicebridge-krc-media-beta-kolemasakar.onrender.com`
-
-### Render procedure
-
-1. Open Render Dashboard.
-2. Select New -> Blueprint.
-3. Connect `kolemasakar/VoiceBridge`.
-4. Select branch `agent/krc-media-transcript` if Render does not infer the configured branch.
-5. Select `render.media-beta.yaml` as the Blueprint file.
-6. Confirm the service is a separate Free service and not `voicebridge-cloud-us`.
-7. Configure required secrets in the Render Dashboard.
-8. Deploy.
-9. Record deployment timestamp and resulting endpoint in `03_CURRENT_STATE.md`.
-
-## 3. Required environment secrets
-
-### `KRC_MEDIA_ACTION_TOKEN`
-
-Purpose:
-
-Server-to-server bearer token used by the GPT Action.
-
-Requirements:
-
-- long random value;
-- separate from VoiceBridge test token;
-- never given to beta testers;
-- same value later configured as the GPT Builder Action bearer credential.
-
-### `KRC_MEDIA_BETA_CODES`
-
-Purpose:
-
-Closed-beta tester admission codes.
-
-Recommended initial set:
-
-- owner code;
-- tester 1 code;
-- tester 2 code;
-- tester 3 code.
-
-Requirements:
-
-- independent random values;
-- at least 16 random characters recommended;
-- only distribute one code per tester;
-- rotate a single compromised tester code without changing provider credentials when implementation/config supports it.
-
-### `ASSEMBLYAI_API_KEY`
-
-Purpose:
-
-Fallback STT provider credential.
-
-Requirements:
-
-- server-side only;
-- verify project privacy/model-training configuration before broader rollout;
-- monitor remaining free credit during beta.
-
-## 4. Fixed beta resource configuration
-
-Initial approved beta limits:
+## 1. Active Boundaries
 
 ```text
-MEDIA_MAX_DURATION_SECONDS=3600
-MEDIA_MAX_CONCURRENT_JOBS=1
-MEDIA_DAILY_STT_SECONDS=7200
-MEDIA_JOB_TTL_SECONDS=3600
+KRC branch: agent/video-url-research
+VoiceBridge branch: agent/krc-media-transcript
+private GPT: K-Research & Critic - MEDIA BETA
+beta backend: voicebridge-krc-media-beta-kolemasakar
 ```
 
-Fallback audio target:
+Do not target KRC `main` or production VoiceBridge during the hold.
+
+## 2. Accepted Package
 
 ```text
-mono
-16 kHz
-~32 kbps speech-oriented audio
+Builder instructions: prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md
+Action schema: gpt_store/actions/media_managed_beta_openapi.yaml
+Builder version: 0.9.1-beta-a10
+Action version: 0.6.0-a9.10
 ```
 
-Do not increase these limits during beta without recording a new decision in `06_DECISION_LOG.md`.
+The current package is already applied. Do not re-import it for documentation-only changes.
 
-## 5. Health checks
+## 3. Normal Test Procedure
 
-### Beta backend
+1. Open a NEW chat in the private MEDIA BETA GPT for a clean runtime test.
+2. Provide one supported public URL or one local audio/video attachment.
+3. Specify the requested mode if needed.
+4. Observe source acquisition and any legitimate provider-credit consent gate.
+5. Confirm the CriticProfile gate appears only after transcript availability.
+6. Approve/review/cancel explicitly.
+7. Inspect final claim-level evidence, cross-check counts, SHORTFALL handling, transcript metadata, and copy-safe table.
+8. Record only material defects/evidence; never record secrets or full transcripts in project checkpoints.
 
-Check:
+## 4. Route Expectations
 
-`GET https://voicebridge-krc-media-beta-kolemasakar.onrender.com/api/v1/health`
+YouTube/Instagram: preflight before billable provider work; no automatic AI spend.
 
-Expected:
+Facebook: free Cobalt success continues; Cobalt failure is unavailable/STOP; no paid offer/fallback.
 
-- HTTP 200;
-- service status `ok`;
-- media capability configured;
-- expected supported platform/language hints;
-- beta limits consistent with configuration.
+Telegram: public web/embed route, zero retrieval credits, no account/session/cookies/bot token/paid fallback.
 
-### Production regression guard
+Local attachment: current-conversation file reference only, trusted OpenAI delivery, max 32 MiB, zero retrieval credits, no Helper/file token request.
 
-Also check:
+## 5. Failure Handling
 
-`GET https://voicebridge-cloud-us.onrender.com/api/v1/health`
+- never fabricate transcript content;
+- no blind retry of terminal source failures;
+- no automatic retry when `credit_charge_uncertain=true`;
+- report unavailable when the accepted adapter cannot obtain usable media/transcript;
+- keep failures isolated from public text Core.
 
-Expected:
+## 6. Defect Workflow
 
-- production endpoint remains healthy;
-- production streaming VoiceBridge version/behavior remains unchanged.
+```text
+reproduce
+ -> classify owner: KRC package | VoiceBridge | provider/source | ChatGPT UI
+ -> fix only on owning feature branch
+ -> add regression test where practical
+ -> full relevant CI
+ -> live private retest when runtime behavior changed
+ -> update current-state/audit evidence
+```
 
-## 6. Live backend test order
+## 7. A10 Copy Check
 
-Run in this order:
+The normal rendered claim table may copy incorrectly because of the ChatGPT UI. The fenced copy-safe duplicate must remain correct and must match the rendered values. If the fenced duplicate fails, reopen A10 regression work; if only the known rendered-header Copy defect persists, keep A10 accepted.
 
-1. invalid/no Action bearer token;
-2. invalid beta tester code;
-3. valid tester code + short video with captions;
-4. same URL reuse behavior;
-5. valid tester code + short video without usable captions -> AssemblyAI fallback;
-6. Ukrainian source;
-7. Russian source;
-8. English source;
-9. auto language detection;
-10. >60 minute video rejection;
-11. concurrency rejection;
-12. daily quota behavior;
-13. provider cleanup state.
+## 8. Rollback
 
-Do not begin GPT Builder integration until these backend tests are acceptable.
+If a new Builder package breaks private runtime, restore the last accepted package and diagnose on the feature branch. Do not use production deployment or a `main` merge as rollback.
 
-## 7. GPT Builder beta procedure
+## 9. Release Hold
 
-Create a new GPT. Do not edit the published production GPT.
+All release gates remain HOLD until explicit owner authorization:
+- merge;
+- production promotion;
+- external testers;
+- public rollout.
 
-Name:
+## 10. Recovery Order
 
-`K-Research & Critic - MEDIA BETA`
+```text
+00_INDEX.md
+03_CURRENT_STATE.md
+53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md
+54_PROJECT_DOCUMENTATION_AUDIT_2026_08_27.md
+02_ROADMAP.md
+06_DECISION_LOG.md
+05_TEST_PLAN.md
+```
 
-Use:
-
-- instructions: `prompts/GPT_STORE_MEDIA_BETA_INSTRUCTIONS.md`;
-- Action schema: `gpt_store/actions/media_beta_openapi.yaml`;
-- bearer auth value: same secret as beta backend `KRC_MEDIA_ACTION_TOKEN`;
-- distribution: unlisted/link-only where supported;
-- public privacy policy URL if Builder requires it.
-
-The Action schema must point only to the dedicated beta Render endpoint.
-
-## 8. Tester onboarding
-
-Each tester receives:
-
-- beta GPT link;
-- one tester access code;
-- short instruction: provide YouTube URL, then provide beta code only when prompted;
-- warning not to share the code;
-- request to report failures with video URL, approximate time, visible error, and whether captions were expected.
-
-Do not give testers:
-
-- `KRC_MEDIA_ACTION_TOKEN`;
-- `ASSEMBLYAI_API_KEY`;
-- Render credentials.
-
-## 9. Monitoring during beta
-
-Track at minimum:
-
-- number of media jobs;
-- captions vs AssemblyAI fallback share;
-- total STT seconds reserved/used;
-- Render outbound bandwidth trend;
-- AssemblyAI remaining credits;
-- median/typical transcription latency;
-- failed media fetches;
-- provider cleanup failures;
-- YouTube/yt-dlp errors;
-- user-visible workflow failures after transcript acquisition.
-
-## 10. Rollback
-
-If beta backend is unstable:
-
-- disable or suspend only the dedicated beta Render service;
-- keep production VoiceBridge running;
-- do not change public K-Research & Critic;
-- preserve draft PRs for diagnosis;
-- record failure in `03_CURRENT_STATE.md` and `06_DECISION_LOG.md` if architectural action is required.
-
-If a tester code leaks:
-
-- revoke/rotate the affected code;
-- do not rotate AssemblyAI key unless provider exposure occurred;
-- do not rotate the GPT Action bearer token unless that secret was exposed.
-
-If the GPT Action bearer token leaks:
-
-- rotate `KRC_MEDIA_ACTION_TOKEN` in Render;
-- update the beta GPT Builder Action credential;
-- retest authentication.
-
-## 11. Promotion rule
-
-Closed beta must not be promoted to public media production until:
-
-- all critical tests pass;
-- resource consumption is measured;
-- privacy gates pass;
-- Free-plan behavior is validated;
-- an explicit user decision authorizes promotion.
+Then verify live KRC/VoiceBridge heads and PR states before writing.

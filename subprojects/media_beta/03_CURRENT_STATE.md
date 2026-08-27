@@ -1,220 +1,101 @@
 # MEDIA BETA Current State
+Поточний канонічний стан приватного MEDIA BETA для відновлення без реконструкції історії.
 
-Canonical implementation checkpoint for continuation without reconstruction.
+Version: 6.5
+Status: RELEASE_HOLD_OWNER_TESTING
+Updated: 2026-08-27
 
-Version: 6.4
-Status: ACTIVE_CHECKPOINT
-Checkpoint date: 2026-08-27
+## Executive State
 
-## Executive state
+```text
+A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE
+A9_OWNER_ZERO_CLIENT_MEDIA_INPUT_ACCEPTED
+YOUTUBE_ACCEPTED
+INSTAGRAM_ACCEPTED
+FACEBOOK_COBALT_ACCEPTED
+FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED
+TELEGRAM_ACCEPTED
+LOCAL_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED
+A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED
+RELEASE_HOLD_OWNER_TESTING
+```
 
-Current phase state:
+A9/A9.10/A10 are accepted in the private owner runtime. The owner has chosen an extended private testing period before release decisions.
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_OWNER_ZERO_CLIENT_MEDIA_INPUT_ACCEPTED / YOUTUBE_ACCEPTED / INSTAGRAM_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_ACCEPTED / LOCAL_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED / A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED / RELEASE_HOLD_OWNER_TESTING`
-
-A9 owner-zero-client media ingress and A10 presentation stabilization are accepted for the private owner runtime. The owner has explicitly chosen an extended private testing period before any release decision.
-
-Accepted owner-only zero-client ingress:
-- prerecorded YouTube;
-- Instagram Reel;
-- Facebook Video/Reel through free Cobalt retrieval -> AssemblyAI -> durable KRCM;
-- supported public Telegram video posts through public Telegram web/embed retrieval -> trusted Telegram CDN -> AssemblyAI -> durable KRCM;
-- one local audio/video attachment from the current ChatGPT conversation through `openaiFileIdRefs` -> trusted OpenAI attachment delivery -> AssemblyAI -> durable KRCM.
-
-Historical/not-active boundaries:
-- Facebook Supadata route is historical/not accepted;
-- ScrapeCreators paid Facebook fallback is reserve-only, unconfigured, inactive and not offerable;
-- private/authenticated Telegram retrieval is unsupported;
-- paid Telegram fallback is unsupported;
-- A8 Helper is fallback evidence only and is not normal owner UX.
-
-Repository `main`, production VoiceBridge, external tester rollout and public sharing remain outside the current release gate.
-
-## Repositories and isolation boundary
+## Repositories
 
 KRC:
-- repo `kolemasakar/K_Research_Critic`;
-- branch `agent/video-url-research`;
-- implementation baseline before release-hold metadata: `c8588ec1f13c3c576d3f307a001c1d8964b5128e`;
-- draft PR #8;
-- `main` unchanged.
+
+```text
+repo: kolemasakar/K_Research_Critic
+branch: agent/video-url-research
+implementation baseline before documentation-only release-hold/audit updates: c8588ec1f13c3c576d3f307a001c1d8964b5128e
+draft PR: #8
+```
 
 VoiceBridge:
-- repo `kolemasakar/VoiceBridge`;
-- branch `agent/krc-media-transcript`;
-- implementation head at checkpoint: `20afd2e54b87b4a2a8858961a03e22f78a565189`;
-- draft PR #28;
-- `main` unchanged.
-
-Isolated beta runtime:
-- Render service `voicebridge-krc-media-beta-kolemasakar`;
-- production VoiceBridge not targeted.
-
-## Accepted Research/Critic workflow
-
-Two-stage CriticProfile gate is runtime accepted:
-- profile created before independent research;
-- first gate offers direct run / review-edit / cancel;
-- explicit `1` approves before research;
-- material profile changes require re-approval.
-
-Claim-level cross-check enforcement is runtime accepted:
-- floors `LOW>=0`, `MEDIUM>=1`, `HIGH>=2`, `CRITICAL>=3`;
-- every material factual claim maintains `required / achieved_independent / exception`;
-- independence is based on underlying evidence, not URL count;
-- real shortfalls remain visible and qualified;
-- achieved cannot exceed visible independent evidence origins;
-- Critic audits material claims before PASS.
-
-Report language defaults to Ukrainian unless explicitly changed by the user.
-
-## A9 accepted runtime markers retained
-
-`CRITICPROFILE_TWO_STAGE_GATE_RUNTIME = ACCEPTED`
-
-`CLAIM_LEVEL_CROSS_CHECK_RUNTIME = ACCEPTED`
-
-`CORE_TRACEABILITY_HARDENING_RUNTIME = ACCEPTED`
-
-`CORE_REPORT_LABEL_LOCALIZATION_RUNTIME = ACCEPTED`
-
-`MEDIA_BETA_TRACEABILITY_HARDENING_RUNTIME = ACCEPTED`
-
-`MEDIA_BETA_REPORT_LABEL_LOCALIZATION_RUNTIME = ACCEPTED`
-
-`a9_7_i_private_gpt_e2e_complete = true`
-
-`managed_telegram_private_gpt_e2e_complete = true`
-
-`managed_attachment_transport_live_accepted = true`
-
-`managed_attachment_ingestion_live_accepted = true`
-
-`managed_attachment_private_gpt_e2e_complete = true`
-
-`rollout_state = A9_10_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED`
-
-## A10 stabilization - accepted
-
-Builder package:
-- `0.9.1-beta-a10`;
-- Action schema `0.6.0-a9.10` unchanged;
-- strict four-column Markdown claim-summary contract;
-- mandatory fenced copy-safe duplicate;
-- backend/VoiceBridge unchanged.
-
-### Runtime evidence
-
-Fresh private-GPT regression against `https://t.me/techcrimes/12107`:
-
-- normal CriticProfile gate: PASS;
-- owner selected `1`;
-- visible `ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ`: PASS as four distinct columns;
-- visible claim values: `3/1 NONE`, `2/1 NONE`, `2/1 NONE`, `0/1 SHORTFALL`;
-- real SHORTFALL preserved and final status `ЗАВЕРШЕНО З ОБМЕЖЕННЯМИ`;
-- media/STT `53 s / 53 s`, credits `0`;
-- ordinary whole-response Copy still collapses the rendered table header because of ChatGPT UI serialization;
-- `КОПІЯ ДЛЯ НАДІЙНОГО КОПІЮВАННЯ` survives whole-response Copy with literal `|` delimiters;
-- copied fenced-table rows and values exactly match the visible table.
-
-The remaining rendered-table Copy defect is treated as an external UI limitation. The fenced duplicate is the accepted mitigation.
-
-Authoritative A10 markers:
-- `builder_runtime_applied = true`;
-- `claim_summary_table_hardening_package_ready = true`;
-- `claim_summary_table_hardening_runtime_applied = true`;
-- `a10_claim_summary_table_runtime_accepted = true`;
-- `a10_copy_safe_claim_table_runtime_accepted = true`;
-- `gpt_builder_private_update_required = false`;
-- `stabilization_state = A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED`.
-
-Canonical records:
-- `51_A10_STABILIZATION_AND_RELEASE_BOUNDARY.md`;
-- `52_A10_SAFE_TABLE_RUNTIME_ACCEPTANCE.md`.
-
-## Accepted owner media UX
 
 ```text
-supported public media URL OR one local audio/video attachment
- -> no Helper / beta code / manual Job ID / platform login
- -> route by source type
- -> transcript acquisition
- -> CriticProfile gate only after transcript availability
- -> explicit owner approval
- -> Research -> Critic
- -> localized final report in same conversation
+repo: kolemasakar/VoiceBridge
+branch: agent/krc-media-transcript
+implementation head at audit start: 20afd2e54b87b4a2a8858961a03e22f78a565189
+draft PR: #28
 ```
 
-Routes:
+Use live branch heads as authority after later documentation/regression commits.
+
+## Isolated Runtime
 
 ```text
-YouTube/Instagram
- -> managed native first where applicable
- -> billable Supadata operations retain explicit consent gates
-
-Facebook
- -> startManagedFacebookFallback
- -> Cobalt success -> AssemblyAI -> durable KRCM
- -> Cobalt failure -> media unavailable -> STOP
- -> no active paid Facebook continuation
-
-Telegram
- -> startManagedTelegramPublicTranscription
- -> public Telegram web/embed -> trusted Telegram CDN
- -> AssemblyAI -> durable KRCM
- -> retrieval credits 0
- -> unavailable/no-speech -> STOP
- -> no login/cookies/session/bot token or paid fallback
-
-Local attachment
- -> startManagedAttachmentTranscription
- -> openaiFileIdRefs
- -> trusted *.oaiusercontent.com temporary delivery
- -> bounded ingestion / media normalization
- -> AssemblyAI -> durable KRCM
- -> retrieval credits 0
- -> no Helper or user-facing attachment token
+private GPT: K-Research & Critic - MEDIA BETA
+beta service: voicebridge-krc-media-beta-kolemasakar
+Builder package: 0.9.1-beta-a10
+Action schema: 0.6.0-a9.10
 ```
 
-## A9.10 local attachment accepted state
+## Accepted Inputs
 
-Actual owner test:
-- local `videoplayback (1).mp4`, approximately 5 MB;
-- canonical CriticProfile gate reached;
-- owner selected `1`;
-- AssemblyAI language confidence `0.9984`;
-- source duration `70.668 s`;
-- STT accounting `71 s`;
-- two durable transcript segments;
-- retrieval/provider credits `0`;
-- seven material claims evaluated;
-- real `0/1 - SHORTFALL` preserved;
-- reliability `88/100`;
-- final status `COMPLETED_WITH_LIMITATIONS`;
-- no KRCM Job ID, OpenAI file ID, signed URL or provider credential exposed.
+```text
+prerecorded YouTube
+Instagram Reel
+public Facebook Video/Reel
+supported public Telegram video post
+one local current-conversation audio/video attachment
+```
 
-Canonical records:
-- `49_A9_10_ATTACHMENT_TRANSPORT_RUNTIME_ACCEPTANCE.md`;
-- `50_A9_10_PRIVATE_GPT_LOCAL_ATTACHMENT_E2E_ACCEPTANCE.md`.
+## Route Invariants
 
-## Credit and replay invariants
+YouTube/Instagram: managed transcript route; billable work remains consent-gated.
 
-- local attachment retrieval credits `0`; AssemblyAI STT accounted separately;
-- Telegram public retrieval credits `0`, no paid fallback;
-- Facebook active retrieval free Cobalt-only;
-- Supadata native hard cap one explicitly approved credit;
-- Instagram AI fallback requires separate quote and explicit consent;
-- automatic managed AI fallback prohibited;
-- `credit_charge_uncertain=true` operations never automatically retried;
-- durable duplicate starts reuse existing jobs where defined.
+Facebook: free Cobalt retrieval only. Success may continue to AssemblyAI/KRCM. Failure is unavailable/STOP. ScrapeCreators is unconfigured/inactive/reserve-only and not offerable.
 
-## Release hold owner testing checkpoint
+Telegram: public web/embed only, trusted media delivery, AssemblyAI/KRCM, zero retrieval credits, no auth/session/bot token/paid fallback.
 
-Canonical checkpoint:
+Local attachment: `openaiFileIdRefs`, trusted OpenAI delivery, max 32 MiB, AssemblyAI/KRCM, zero retrieval credits, no user-visible file token.
 
-`53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md`
+## Research/Critic Invariants
 
-Owner decision captured on 2026-08-27:
+- no independent research before profile approval;
+- two-stage profile gate remains accepted;
+- option `1` approves the current profile and starts research;
+- material edits require re-approval;
+- risk floors: LOW 0, MEDIUM 1, HIGH 2, CRITICAL 3;
+- each material factual claim tracks required/achieved/exception;
+- evidence independence is based on origins, not URL count;
+- achieved cannot exceed visible traceable origins;
+- unresolved shortage is SHORTFALL and qualifies final status.
+
+## A10 State
+
+Runtime accepted:
+- visible four-column claim-summary table;
+- copy-safe fenced duplicate with literal pipe delimiters;
+- row values identical between forms;
+- real SHORTFALL preserved.
+
+The ordinary rendered table header may still be corrupted by ChatGPT whole-response Copy. This is an accepted external UI limitation; the fenced duplicate is the mitigation.
+
+## Current Release Decision
 
 ```text
 merge KRC feature branch to main = HOLD
@@ -223,24 +104,20 @@ external tester onboarding = HOLD
 public sharing / Store rollout = HOLD
 ```
 
-Operational mode is continued private owner testing. Defects found during this period are to be fixed and revalidated in the isolated feature branches unless the owner explicitly changes the release decision.
+Canonical release-hold record:
 
-Last verified implementation CI before the release-hold metadata commits:
-- workflow `Tests`;
-- run `33010660835`;
-- head `c8588ec1f13c3c576d3f307a001c1d8964b5128e`;
-- conclusion `SUCCESS`.
+```text
+53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md
+```
 
-## Current next boundary
+Project/documentation audit record:
 
-No additional A10 Builder/runtime repair is pending.
+```text
+54_PROJECT_DOCUMENTATION_AUDIT_2026_08_27.md
+```
 
-Current work mode is `RELEASE_HOLD_OWNER_TESTING`.
+## Current Work Rule
 
-A later owner decision must separately authorize any of:
-1. merge KRC feature branch to `main`;
-2. production VoiceBridge promotion;
-3. external tester onboarding;
-4. public sharing/Store rollout.
+Owner testing may continue. Confirmed defects should be fixed only in the owning isolated feature branch and revalidated there. Do not change public Core or production infrastructure unless the owner explicitly opens a release gate.
 
-Authorization for one release gate must not be inferred as authorization for another. Until separately authorized, all four remain paused.
+No additional A10 Builder remediation is pending.

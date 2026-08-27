@@ -1,377 +1,122 @@
 # MEDIA BETA Decision Log
-Реєстр затверджених рішень щодо архітектури, beta-обмежень і майбутнього безкоштовного медіарежиму.
+Реєстр чинних і історичних рішень MEDIA BETA з актуальними release-hold рішеннями.
 
-Version: 1.6
+Version: 2.0
 Status: ACTIVE
-Updated: 2026-08-21
+Updated: 2026-08-27
 
-## D001 - Media input is additive
+This file is the compact current decision index. Detailed historical rationale remains available in Git history and the numbered phase/acceptance records.
 
-Decision: APPROVED
+## Historical Decisions D001-D022
 
-The media workflow extends K-Research & Critic and does not replace the existing text workflow.
+`D001` Media input is additive to the KRC Core - APPROVED.
 
-Reason:
+`D002` CriticProfile approval remains mandatory before independent research - APPROVED.
 
-Preserve production reliability and allow media failures to degrade only the optional media path.
+`D003` Transcript proves what was said, not truth - APPROVED.
 
-## D002 - CriticProfile gate remains mandatory
+`D004` Closed beta precedes public scaling - APPROVED; original multi-tester target is now operationally superseded by owner-only hold state.
 
-Decision: APPROVED
+`D005` MEDIA BETA uses separate private product identity - APPROVED.
 
-Transcript acquisition and material-claim inventory may occur before approval. Independent claim research may not.
+`D006` MEDIA BETA backend is isolated from production VoiceBridge - APPROVED.
 
-Reason:
+`D007` Historical multi-tester admission used per-tester codes - APPROVED_HISTORICAL; normal current owner flow no longer asks for a code.
 
-Preserve the core K-Research & Critic contract:
+`D008` Subtitle-first principle - retained where reliable, but historical browser-helper implementation decisions are not current normal UX.
 
-`Supervisor proposes -> User approves/edits -> Critic executes`.
+`D009` AssemblyAI is a beta reliability/STT provider, not a permanent public-free commitment - APPROVED.
 
-## D003 - Transcript is not independent evidence
+`D010` Bounded beta resource limits - APPROVED.
 
-Decision: APPROVED
+`D011` Users do not provide provider API keys - APPROVED.
 
-A transcript is evidence of what was said, not evidence that the statement is true.
+`D012` Full transcript is excluded from KRC checkpoints - APPROVED.
 
-Reason:
+`D013` Sustainable free hybrid is a future direction, not current active architecture - APPROVED_DIRECTION.
 
-Prevents self-corroboration and false confidence.
+`D014` Unlimited-free is interpreted operationally, not literally - APPROVED_DIRECTION.
 
-## D004 - Closed MEDIA BETA is first priority
+`D015` Resource limits change only by explicit decision - APPROVED.
 
-Decision: APPROVED
+`D016` Browser-assisted ingress was the A4 fallback architecture - APPROVED_HISTORICAL / FALLBACK_ONLY.
 
-Before public/free scaling work, deploy a controlled beta for the owner and up to three testers.
+`D017` Zero-client media router is public-only for remote platforms and multi-platform - APPROVED.
 
-Reason:
+`D018` Local audio/video upload is a separate approved ingress class - APPROVED; live acceptance later completed in A9.10.
 
-Obtain real reliability and resource measurements with bounded exposure.
+`D019` Managed transcript provider became primary zero-client YouTube approach - APPROVED.
 
-## D005 - Beta uses separate product identity
+`D020` Billable managed-provider operations require explicit user consent - APPROVED.
 
-Decision: APPROVED
+`D021` Managed KRCM jobs are durable and duplicate starts are credit-safe - APPROVED / LIVE_ACCEPTED.
 
-Create `K-Research & Critic - MEDIA BETA` separately from the published GPT.
+`D022` Private owner Action hides beta admission behind bearer authentication and server-side owner admission - APPROVED / LIVE_ACCEPTED.
 
-Reason:
-
-Avoid risking the public text product during media validation.
-
-## D006 - Beta backend is isolated from production VoiceBridge
-
-Decision: APPROVED
-
-Use a dedicated Render service rather than deploy beta code over `voicebridge-cloud-us`.
-
-Reason:
-
-Media fetch/STT instability must not affect validated real-time VoiceBridge.
-
-## D007 - Beta tester admission uses per-tester access codes
-
-Decision: APPROVED
-
-Target: owner + three testers.
-
-Reason:
-
-Personal Custom GPT sharing cannot be relied upon as a strict per-person access-control mechanism. Server-side beta admission provides revocable control over expensive media jobs.
-
-## D008 - Subtitle-first
-
-Decision: SUPERSEDED_FOR_CLIENT_HELPER_BY_D016
-
-Original decision: try usable YouTube captions before STT fallback.
-
-The principle remains valid when a reliable transcript/caption is directly available, but server-side YouTube acquisition from Render is blocked and the current A4.2 browser helper does not yet implement client-side caption extraction.
-
-## D009 - AssemblyAI is beta fallback, not final public dependency
-
-Decision: APPROVED
-
-Use AssemblyAI Universal-2 during closed beta when transcript/caption intake is unavailable.
-
-Reason:
-
-It provides a practical reliable baseline for UK/RU/EN testing, but its free credits are finite and therefore unsuitable as the mandatory permanent public free path.
-
-## D010 - Initial beta resource limits
-
-Decision: APPROVED
-
-- max video: 60 min;
-- max concurrent media jobs: 1;
-- global AssemblyAI budget: 7200 sec per UTC day;
-- STT audio: mono 16 kHz approximately 32 kbps;
-- transcript/job TTL: approximately one hour.
-
-Reason:
-
-Protect Render memory/bandwidth and AssemblyAI free credits during beta.
-
-## D011 - User does not provide provider API keys
-
-Decision: APPROVED
-
-Developer/provider credentials remain server-side. Testers only provide their beta admission code.
-
-Reason:
-
-Better usability and security; preserves intended GPT Store experience.
-
-## D012 - Do not store full transcript in checkpoint
-
-Decision: APPROVED
-
-Checkpoints may retain derived claims/source references but not the complete transcript or beta access code.
-
-Reason:
-
-Reduce persistence, privacy exposure, and checkpoint size.
-
-## D013 - Target post-beta architecture is sustainable free hybrid
-
-Decision: APPROVED_DIRECTION
-
-Preferred target:
-
-```text
-YouTube captions
- -> Cloudflare Workers AI Whisper when required and quota available
- -> local Whisper fallback where practical
-```
-
-AssemblyAI may remain as comparator/emergency fallback but should not be required for the public free path.
-
-Reason:
-
-Remove the one-time external STT-credit exhaustion problem while keeping direct YouTube-link UX.
-
-## D014 - "Unlimited free" is interpreted operationally
-
-Decision: APPROVED_DIRECTION
-
-The project cannot guarantee literally unlimited use. The target is to eliminate permanent paid/exhaustible external STT credits and make remaining limits renewable daily or dependent on owner-controlled local compute.
-
-Reason:
-
-All hosting, networks, source platforms, and ChatGPT plans have physical or policy limits.
-
-## D015 - Changes to beta limits require explicit decision update
-
-Decision: APPROVED
-
-Do not silently raise tester count, duration, concurrency, or daily STT budget.
-
-Reason:
-
-These parameters directly affect cost/resource risk and reliability.
-
-## D016 - Client/browser-assisted ingress replaces cloud YouTube acquisition for A4 beta
-
-Decision: APPROVED
-
-For the current closed beta, use a separate browser helper to capture the same active YouTube tab through the tester browser/network path and upload captured audio to the isolated beta backend.
-
-The beta GPT creates `KRCC_...` jobs with `AWAITING_CLIENT`. The helper uses the tester beta code, but never receives the server-side Action bearer token or provider API key.
-
-Direct reliable transcript/caption intake remains preferred when available. Client-side caption extraction is a planned optimization, not an implemented A4.2 capability.
-
-Reason:
-
-Three Render/cloud acquisition attempts, including a correctly wired current PO Token Provider, were blocked by YouTube datacenter-IP anti-bot enforcement. Client-assisted ingress avoids personal YouTube cookies, paid residential proxy infrastructure, and changes to the validated production VoiceBridge extension while preserving the Free Render beta target.
-
-## D017 - Zero-client media router is public-only and multi-platform
-
-Decision: APPROVED
-Approved: 2026-08-20
-
-The final zero-client media architecture is not limited to YouTube. It should use a platform-neutral MediaSourceRouter with adapters for explicitly validated public media URL types.
-
-Initial target adapters:
-- YouTube public videos;
-- Instagram public Reels/posts containing video;
-- Facebook public Video/Reels;
-- Telegram public posts containing video.
-
-Later public adapters may be added independently after validation.
-
-Access boundary:
-- public URLs only;
-- no user logins, passwords, cookies, authenticated browser sessions, account tokens, or imported session state;
-- no private/friends-only/group-only/account-gated content;
-- do not ask the user for platform credentials;
-- if access requires authentication, fail explicitly with `UNSUPPORTED_PRIVATE_OR_AUTH_REQUIRED`.
-
-Support must be declared per public URL/content type, not as blanket support for an entire platform.
-
-Reason:
-
-The desired product UX is source-agnostic: paste a public media link, select the analysis mode, and receive the result in ChatGPT with no extra browser/media actions. A public-only boundary keeps the system simpler, safer, easier to operate from mobile, and avoids credential/session storage and private-content access risks.
-
-## D018 - Local video/audio upload is an approved media ingress
-
-Decision: APPROVED
-Approved: 2026-08-20
-
-The MediaSourceRouter should support a separate `local_upload` ingress for video/audio files explicitly attached by the owner from local/device storage.
-
-Target behavior:
-- accept local video and audio attachments through a future validated ChatGPT/Custom GPT file-ingest transport;
-- validate file type, size, and duration before processing;
-- prefer usable embedded subtitle/text tracks before STT;
-- otherwise extract/normalize audio and use the accepted EU STT path during the current beta architecture;
-- converge on the same normalized MediaAsset/transcript/job contract used by public URL adapters;
-- do not require any platform login, cookies, browser session, or account token;
-- do not durably retain the original media file after processing unless a future explicit retention decision changes this rule.
-
-The public-only rule in D017 applies to remote platform URL adapters and does not block owner-supplied local files.
-
-Initial local-upload scope is analysis of spoken/transcribed content. Visual-frame evidence extraction from video is a separate future capability and requires its own acceptance scope.
-
-Implementation constraint:
-
-Approval is architectural only. The actual ChatGPT attachment-to-Action/backend transport, supported file types, practical size limits, desktop/mobile behavior, and deletion guarantees must be live-validated before `local_upload` is marked supported.
-
-Reason:
-
-Local upload avoids source-platform anti-bot/authentication dependencies and provides a stable source path for media already available on the owner's device. Reusing the same MediaSourceRouter and normalized transcript contract prevents a separate analysis pipeline and keeps Research/Critic source-agnostic.
-
-## D019 - Managed transcript provider is the primary A9 YouTube ingress for owner beta
-
-Decision: APPROVED
-Approved: 2026-08-20
-
-Direct Render-to-YouTube acquisition for a normal prerecorded public video is treated as blocked by YouTube datacenter-IP anti-bot enforcement after the A9.2 live probe returned a bot/login challenge before metadata or captions.
-
-For the owner-only A9 beta, use a managed transcript provider abstraction instead of continuing blind yt-dlp player-client permutations as the primary strategy.
-
-Primary initial provider:
-
-`Supadata`
-
-Initial provider mode:
-
-`native`
-
-The provider is an implementation detail behind the MediaSourceRouter/managed transcript contract. The architecture must permit later provider replacement or fallback without changing the Research/Critic workflow.
-
-Live acceptance on `https://www.youtube.com/watch?v=IzYyKRx7Qwg` completed with 277 timestamped segments and detected language `ru`.
-
-Reason:
-
-This path achieved the required zero-client public YouTube transcript acquisition from the isolated backend without browser Helper, YouTube cookies, login/session state, or owner-managed residential proxy infrastructure.
-
-## D020 - Managed provider credits require explicit user consent
-
-Decision: APPROVED
-Approved: 2026-08-20
-
-A managed provider operation that may consume credits must not start automatically after the user pastes a media URL.
-
-Required preflight UX:
-- show current available credits;
-- show estimated credit cost for the proposed operation;
-- show estimated remaining balance;
-- ask for explicit user choice `1 = approve`, `2 = reject`;
-- perform no billable transcript operation before approval.
-
-For Supadata native mode the backend hard limit is:
-
-`credit_consent.max_credits = 1`
-
-If native captions/transcript are unavailable, the system must stop at `AWAITING_AI_CONSENT`. It must not automatically transition to a higher-cost AI-generated transcript.
-
-Any managed AI fallback requires a new cost estimate and a second explicit user approval.
-
-Live acceptance:
-
-```text
-plan: Free (100/mo)
-balance before: 100
-approved native cap: 1
-credits charged: 1
-balance after: 99
-AI fallback authorized: false
-```
-
-Reason:
-
-Provider credits are a scarce shared beta resource. Explicit per-operation consent makes the cost visible to the user, prevents accidental fallback spend, and gives the backend a machine-enforceable maximum charge boundary.
-
-## D021 - Managed media jobs are durable and duplicate starts are credit-safe
+## D023 - Facebook Active Route Is Free Cobalt Only
 
 Decision: APPROVED / LIVE_ACCEPTED
-Accepted: 2026-08-21
+Date: 2026-08-24
 
-The owner-only managed zero-client path must persist `KRCM_` job state and timestamped segments in Postgres and must preserve idempotency across runtime replacement.
-
-Required invariants:
-- a completed managed job remains readable after backend restart/process replacement;
-- timestamped transcript segments remain readable after restart;
-- the managed request key identifies an already completed request across processes;
-- a duplicate start returns the existing durable job instead of starting another provider request;
-- an interrupted/uncertain in-flight provider request must never be automatically replayed when its credit outcome is uncertain;
-- provider credit consumption remains bounded by the explicit user-approved operation cap.
-
-Final live acceptance used one approved Supadata native request and then deliberately replaced the runtime provider key with an invalid value before restart and duplicate replay.
-
-Accepted evidence:
+Active Facebook behavior:
 
 ```text
-live_code: 7736f2e7acc5abbb3415e3753d0ca022c1b8d7b2
-job_id: KRCM_6f359971-b061-4db8-b4a2-9f6422f351b6
-status: COMPLETED
-detected_language: ru
-segment_count: 277
-credits_charged: 1
-provider_balance_before: 99
-provider_balance_after: 98
-durable_read_before_restart: PASS
-durable_read_after_restart: PASS
-duplicate_reuse_with_invalid_provider_key: PASS
-valid_provider_key_restore: PASS
+Cobalt success -> AssemblyAI -> durable KRCM
+Cobalt failure -> unavailable -> STOP
 ```
 
-Because the duplicate request succeeded while the provider key was intentionally invalid, the duplicate path demonstrably reused the stored completed job rather than making a second valid provider request.
+ScrapeCreators remains reserve-only, unconfigured, inactive, and not offerable. Automatic or offered paid fallback after Cobalt failure is forbidden.
 
-The accepted implementation also hardens `psql` result parsing so durable reservation reads select the actual seven-field `RETURNING` row rather than assuming the final stdout line is data.
+Reason: preserve zero-client owner UX and prevent silent/accidental paid retrieval.
 
-Reason:
+## D024 - Telegram Public Adapter Is Zero-Credit and No-Auth
 
-Zero-client GPT integration is not safe if a backend restart can lose the transcript or cause an automatic duplicate paid provider call. Durable state plus restart-safe idempotency closes that cost and reliability risk before the private GPT is switched to the managed path.
+Decision: APPROVED / LIVE_ACCEPTED
+Date: 2026-08-26
 
-## D022 - Private owner zero-client Action hides beta admission behind bearer authentication
+Supported public Telegram video posts use public web/embed retrieval, trusted Telegram media delivery, AssemblyAI STT, and durable KRCM. Retrieval credits are zero. No login, cookies, session, bot token, or paid fallback is allowed.
 
-Decision: APPROVED / BACKEND_PREFLIGHT_LIVE_ACCEPTED
-Accepted: 2026-08-21
+Reason: maintain a public-only, credential-free adapter with explicit terminal failure behavior.
 
-For the private owner-only A9.5 path, the normal user must not be asked to enter the historical `OWNER_...` beta admission code.
+## D025 - Local openaiFileIdRefs Attachment Ingestion Is Accepted
 
-Required security and UX contract:
-- the private GPT Action bearer credential remains mandatory;
-- missing or invalid bearer authentication is rejected before any owner admission is injected;
-- after successful bearer authentication, the isolated backend may inject the configured owner beta admission code server-side for managed preflight/start requests that do not contain one;
-- the underlying `MediaBetaGate`, access-code digest, durable request key and credit/idempotency protections remain in force;
-- the GPT-facing OpenAPI schema must not expose `beta_access_code`;
-- the user must never be asked for the Action bearer, owner admission code or provider API key;
-- external tester rollout remains paused and this owner-only rule does not silently redefine the earlier multi-tester A7 access model.
+Decision: APPROVED / LIVE_ACCEPTED
+Date: 2026-08-26
 
-Live backend acceptance:
+One current-conversation audio/video attachment may use ChatGPT `openaiFileIdRefs` transport to the isolated backend. The backend accepts trusted OpenAI temporary HTTPS delivery, validates media, limits attachment size to 32 MiB, normalizes audio/video, uses AssemblyAI STT, and stores durable KRCM segments. Retrieval credits are zero. File IDs/signed URLs are not user-visible.
+
+Reason: provide a stable zero-client source path for owner-local media without platform authentication.
+
+## D026 - Copy-Safe Fenced Claim Table Is the Accepted UI Mitigation
+
+Decision: APPROVED / LIVE_ACCEPTED
+Date: 2026-08-26
+
+The normal four-column table remains required. Because ChatGPT whole-response Copy can collapse the rendered table header, the final report also includes an identical fenced `text` table with literal pipe delimiters.
+
+The fenced duplicate passed owner copy testing and is the accepted mitigation. The external rendered-table Copy defect alone does not reopen A10.
+
+## D027 - Release Hold Owner Testing
+
+Decision: APPROVED
+Date: 2026-08-27
+
+After A9/A9.10/A10 acceptance, the owner chose continued private testing before release.
 
 ```text
-live_code: 970d7cc5819a623ec1d3cc7a70aceb44bfe311b9
-health: ok
-user_beta_access_code_required: false
-owner_access_injected_server_side: true
-provider: supadata/native
-credits_available: 98
-estimated_native_cost: 1
-estimated_after: 97
-transcript_endpoint_called: false
-credits_spent: 0
+merge to main = HOLD
+production promotion = HOLD
+external testers = HOLD
+public rollout = HOLD
 ```
 
-Reason:
+Defects are fixed/revalidated in isolated feature branches during the hold.
 
-The target product contract is URL plus chat choices only. Requiring the owner to copy a beta code would preserve a manual infrastructure step that A9 exists to remove. Bearer-first server-side owner admission removes that UX dependency without exposing credentials or weakening the managed credit gate.
+## D028 - Release Gates Are Independent
+
+Decision: APPROVED
+Date: 2026-08-27
+
+Merge, production promotion, external tester onboarding, and public rollout are separate decisions. Approval of one must never be inferred as approval of another.
+
+Reason: repository integration, infrastructure deployment, audience expansion, and public publication carry different risks and controls.

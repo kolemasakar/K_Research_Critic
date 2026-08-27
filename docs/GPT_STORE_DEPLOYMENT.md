@@ -1,20 +1,15 @@
 # GPT_STORE_DEPLOYMENT
-Документ визначає основну GPT Store-модель розгортання K-Research & Critic без обов'язкового developer API key.
+Модель розгортання public Core та окремого приватного MEDIA BETA.
 
-Version: 1.2
-Status: ACTIVE
+Version: 1.3
+Status: CORE_PUBLISHED / MEDIA_BETA_RELEASE_HOLD
+Updated: 2026-08-27
 
-## 1. Decision
+## 1. Public Core Decision
 
-K-Research & Critic is GPT Store-first.
+K-Research & Critic is GPT Store-first. The public Core is already published and remains the production baseline.
 
-The primary public edition is a Custom GPT distributed through ChatGPT and intended to remain usable by signed-in users whose plan allows access to public GPTs, including the Free plan where the platform makes GPT access available.
-
-The primary edition must not require a developer-owned OpenAI API key, a mandatory external backend, or a pinned API model.
-
-## 2. Primary Runtime: GPT Store Edition
-
-The primary runtime policy is:
+Core runtime policy:
 
 ```text
 channel: chatgpt_store
@@ -22,186 +17,92 @@ model_policy: user_plan
 developer_api_key_required: false
 external_backend_required: false
 recommended_model: null
-allow_user_model_switch: true
+publication_state: published
 ```
 
-`recommended_model: null` is intentional. K-Research & Critic does not pin a model identifier that may later be retired or unavailable to a user. ChatGPT selects an available model according to the user's account and current platform behavior. Users with additional model choices may switch to another available model.
+The public text workflow does not require the MEDIA BETA backend.
 
-The Store package maps research to built-in Web search and Code Interpreter & Data Analysis when those capabilities are available to the current user. Capability absence must produce an explicit limitation rather than fabricated tool use.
+## 2. Private MEDIA BETA Deployment Profile
 
-## 3. Store Package
-
-The publication-ready repository package is defined by:
+The private media test product is separate:
 
 ```text
-gpt_store/manifest.yaml
-prompts/GPT_STORE_INSTRUCTIONS.md
-gpt_store/checkpoint.py
-gpt_store/checkpoint_example.json
-scripts/validate_store_package.py
-docs/GPT_STORE_PACKAGE.md
+name: K-Research & Critic - MEDIA BETA
+channel: chatgpt_private_beta
+publication_state: private_owner_only
+KRC branch: agent/video-url-research
+VoiceBridge branch: agent/krc-media-transcript
+backend: voicebridge-krc-media-beta-kolemasakar
 ```
 
-The package state is:
+Current Builder package:
 
 ```text
-ready_for_manual_publication_test
+instructions: prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md
+canonical reference: prompts/GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md
+Action schema: gpt_store/actions/media_managed_beta_openapi.yaml
+Builder version: 0.9.1-beta-a10
+Action schema version: 0.6.0-a9.10
 ```
 
-This state means the repository package and static validation are complete. It does not mean the GPT has already been published in the GPT Store.
+The Action uses bearer authentication. The bearer, owner admission value, and provider credentials remain server-side.
 
-## 4. Free and Paid User Behavior
+## 3. Accepted Private Runtime
 
-K-Research & Critic does not implement plan detection or billing logic.
+Owner-only runtime acceptance exists for:
+- YouTube;
+- Instagram Reel;
+- Facebook free Cobalt path;
+- supported public Telegram video posts;
+- one local current-conversation audio/video attachment.
 
-Expected platform behavior is:
+A9/A9.10 media ingestion and A10 copy-safe report output are accepted for the private owner runtime.
+
+## 4. Core vs Media Secret Boundary
+
+Public Core requires no developer secret for its normal text workflow.
+
+Private media ingestion requires developer-managed external-service credentials, but users are never asked for those credentials. The private Action bearer and provider keys must not appear in prompts, Knowledge, checkpoints, screenshots, logs, or user-facing reports.
+
+## 5. Release Hold
+
+Current release decision:
 
 ```text
-Free user
-  -> model/capabilities available to that user in ChatGPT
-  -> K-Research & Critic workflow
-
-Paid user
-  -> the same K-Research & Critic workflow
-  -> optional switch to additional models exposed by the user's plan
+merge media feature to main = HOLD
+production VoiceBridge promotion = HOLD
+external media testers = HOLD
+public/Store media rollout = HOLD
 ```
 
-The workflow and CriticProfile rules must not depend on a specific named ChatGPT model.
+Green private-beta CI or runtime acceptance does not authorize any of those transitions.
 
-## 5. No Developer Secret in the Store Edition
+## 6. Later Merge Gate
 
-The GPT Store edition does not require:
+A future merge decision means accepting the media feature changes into the KRC `main` codebase. Merge alone does not authorize production backend promotion or public access.
 
-```text
-OPENAI_API_KEY
-SEARCH_API_KEY
-DATABASE_URL
-```
+## 7. Later Production Promotion Gate
 
-These environment variables remain supported only by optional standalone/server integrations.
+A future production promotion decision must separately validate production environment/secrets, persistence, quotas, health checks, logging, monitoring, rollback, and real smoke tests. The current isolated Render service must not be treated as an automatic production target.
 
-A Store release must not embed developer secrets in GPT instructions, knowledge files, configuration text, or user-visible artifacts.
+## 8. Later External Tester Gate
 
-The core Store manifest keeps Apps and Actions disabled, so no third-party API or Action privacy-policy dependency is required by the package.
+External tester onboarding requires an explicit owner decision plus access-control, privacy, error-reporting, quota, and feedback procedures appropriate to additional users.
 
-## 6. Persistence and Memory Boundary
+## 9. Later Public Rollout Gate
 
-Custom GPT conversations do not use previous GPT conversations, saved memory, or user custom instructions as workflow state.
+Before public sharing/Store rollout, re-verify current OpenAI Custom GPT/Action publication requirements, privacy-policy requirements, provider terms/data handling, scaling/resource controls, monitoring, support, and rollback.
 
-The Store edition therefore uses conversation-local state plus explicit checkpoint/recovery artifacts for continuity across chats.
+No historical platform assumption is a permanent release waiver.
 
-Checkpoint marker:
+## 10. Persistence and Recovery
 
-```text
-K_SUPERVISOR_CHECKPOINT
-```
+Core cross-chat continuation retains the explicit `K_SUPERVISOR_CHECKPOINT` schema where applicable. Full media transcripts and reusable credentials are not stored in KRC checkpoints.
 
-Checkpoint schema version:
-
-```text
-1.0
-```
-
-Only safe orchestration boundaries may be checkpointed. Ambiguous mid-agent states are not replayed automatically.
-
-The existing SQLite persistence layer remains part of the optional standalone/API edition and local engineering/test environment.
-
-## 7. Optional Standalone/API Edition
-
-The repository and standalone engineering core retain the stable technical identifier `K_Supervisor`.
-
-The existing Python runtime is retained as an optional deployment profile:
-
-```text
-K_Supervisor Core
-  |
-  +-- GPT Store Edition       PRIMARY
-  |     - public name: K-Research & Critic
-  |     - ChatGPT-managed model
-  |     - no developer API key
-  |     - no mandatory backend
-  |
-  +-- Standalone/API Edition  OPTIONAL
-        - Python runtime
-        - SQLite persistence
-        - provider factory
-        - provider API keys when required
-```
-
-The OpenAI provider adapter implemented in Phase 11.3 remains an optional adapter for standalone/server execution, development, integration testing, and future external products.
-
-## 8. Architecture Invariants
-
-Both editions preserve:
-
-- Supervisor orchestration semantics;
-- explicit CriticProfile user approval;
-- approved profile immutability;
-- Research-Critic revision loop;
-- evidence and source discipline;
-- PASS/REVISE separation from execution status;
-- explicit failure/limitation states;
-- no hidden chain-of-thought persistence.
-
-The Store Edition implements Research and Critic as separated logical passes inside one ChatGPT runtime. It does not claim process-isolated or model-isolated agent instances.
-
-Deployment-specific infrastructure must not change the workflow contracts.
-
-## 9. Publication Requirements
-
-Before GPT Store publication:
-
-- use the approved manifest and instruction package;
-- enable Web search and Code Interpreter & Data Analysis;
-- keep Apps and Actions disabled for the core package;
-- leave Recommended model unset;
-- do not require an external backend for the free core experience;
-- run the GPT Builder Preview test matrix;
-- verify the workflow on a Free account and at least one paid account;
-- verify that model switching does not break workflow semantics;
-- verify fresh-chat behavior and checkpoint recovery;
-- complete Builder Profile/category/policy requirements when prompted;
-- review current OpenAI GPT Store publication requirements immediately before release.
-
-Actual Store publication and live plan-account validation are manual release operations. Repository CI cannot substitute for those ChatGPT UI/account checks.
-
-## 10. Platform Assumptions
-
-Platform assumptions were re-verified on 2026-08-13 against current OpenAI Help Center documentation:
-
-```text
-https://help.openai.com/en/articles/8554407-gpts-in-chatgpt
-https://help.openai.com/en/articles/8554397-create-a-gpt
-https://help.openai.com/en/articles/8798878
-```
-
-Current relevant facts include:
-
-- signed-in users can use GPTs they have access to;
-- creating/editing GPTs requires an eligible paid plan and is performed on the web;
-- Recommended model is optional and users may switch when additional models are available;
-- public Store publishing can require Builder Profile/category/policy checks;
-- public Actions require a valid Privacy Policy URL;
-- GPT builders cannot view individual user conversations;
-- GPTs start fresh across separate conversations and do not use saved memory, custom instructions, or previous GPT conversations.
-
-OpenAI may change plan availability, model names, model picker behavior, capabilities, or GPT Store rules. These platform facts must be re-verified immediately before public release.
+Managed media jobs use durable KRCM backend state; normal users are not shown those internal Job IDs.
 
 ## 11. Validation
 
-Static package validation:
+After repository package changes, keep the deterministic CI matrix green. Manual ChatGPT Builder/runtime verification is required only when an actual Builder package changes or when a release gate is opened.
 
-```text
-python -m scripts.validate_store_package
-python -m pytest
-```
-
-Phase 11.7 implementation validation:
-
-```text
-Validated head: fb0d84468dddab88f15f425fda217cbabe1b057f
-GitHub Actions: 31666028204
-156 tests passed
-```
-
-Manual publication/Free-plan/paid-model-switch tests remain release gates and are intentionally not represented as completed repository CI checks.
+The documentation-only audit does not require re-applying the already accepted Builder package.
