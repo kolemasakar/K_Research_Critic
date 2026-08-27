@@ -2,17 +2,17 @@
 
 Canonical implementation checkpoint for continuation without reconstruction.
 
-Version: 6.3
+Version: 6.4
 Status: ACTIVE_CHECKPOINT
-Checkpoint date: 2026-08-26
+Checkpoint date: 2026-08-27
 
 ## Executive state
 
 Current phase state:
 
-`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_OWNER_ZERO_CLIENT_MEDIA_INPUT_ACCEPTED / YOUTUBE_ACCEPTED / INSTAGRAM_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_ACCEPTED / LOCAL_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED / A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED`
+`A4_COMPLETE / A5_COMPLETE / A6_COMPLETE / A7_EXTERNAL_ROLLOUT_PAUSED / A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE / A9_OWNER_ZERO_CLIENT_MEDIA_INPUT_ACCEPTED / YOUTUBE_ACCEPTED / INSTAGRAM_ACCEPTED / FACEBOOK_COBALT_ACCEPTED / FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED / TELEGRAM_ACCEPTED / LOCAL_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED / A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED / RELEASE_HOLD_OWNER_TESTING`
 
-A9 owner-zero-client media ingress and A10 presentation stabilization are accepted for the private owner runtime. No public/production promotion follows automatically.
+A9 owner-zero-client media ingress and A10 presentation stabilization are accepted for the private owner runtime. The owner has explicitly chosen an extended private testing period before any release decision.
 
 Accepted owner-only zero-client ingress:
 - prerecorded YouTube;
@@ -35,12 +35,14 @@ Repository `main`, production VoiceBridge, external tester rollout and public sh
 KRC:
 - repo `kolemasakar/K_Research_Critic`;
 - branch `agent/video-url-research`;
+- implementation baseline before release-hold metadata: `c8588ec1f13c3c576d3f307a001c1d8964b5128e`;
 - draft PR #8;
 - `main` unchanged.
 
 VoiceBridge:
 - repo `kolemasakar/VoiceBridge`;
 - branch `agent/krc-media-transcript`;
+- implementation head at checkpoint: `20afd2e54b87b4a2a8858961a03e22f78a565189`;
 - draft PR #28;
 - `main` unchanged.
 
@@ -206,14 +208,39 @@ Canonical records:
 - `credit_charge_uncertain=true` operations never automatically retried;
 - durable duplicate starts reuse existing jobs where defined.
 
+## Release hold owner testing checkpoint
+
+Canonical checkpoint:
+
+`53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md`
+
+Owner decision captured on 2026-08-27:
+
+```text
+merge KRC feature branch to main = HOLD
+production VoiceBridge promotion = HOLD
+external tester onboarding = HOLD
+public sharing / Store rollout = HOLD
+```
+
+Operational mode is continued private owner testing. Defects found during this period are to be fixed and revalidated in the isolated feature branches unless the owner explicitly changes the release decision.
+
+Last verified implementation CI before the release-hold metadata commits:
+- workflow `Tests`;
+- run `33010660835`;
+- head `c8588ec1f13c3c576d3f307a001c1d8964b5128e`;
+- conclusion `SUCCESS`.
+
 ## Current next boundary
 
 No additional A10 Builder/runtime repair is pending.
 
-The next boundary is a separate owner release decision covering any of:
+Current work mode is `RELEASE_HOLD_OWNER_TESTING`.
+
+A later owner decision must separately authorize any of:
 1. merge KRC feature branch to `main`;
 2. production VoiceBridge promotion;
 3. external tester onboarding;
 4. public sharing/Store rollout.
 
-Until separately authorized, all four remain paused.
+Authorization for one release gate must not be inferred as authorization for another. Until separately authorized, all four remain paused.
