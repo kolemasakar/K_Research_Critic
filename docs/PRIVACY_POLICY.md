@@ -95,7 +95,9 @@ The private GPT does not expose internal KRCM Job IDs in normal user-facing outp
 
 ## 8. Speech-to-Text Provider Handling
 
-AssemblyAI is used on accepted routes that require STT after successful/safe media acquisition. Provider-side delete requests are performed where implemented by the accepted backend path, and deletion must not be claimed when it cannot be confirmed.
+AssemblyAI is used on accepted routes that require STT after successful/safe media acquisition. The accepted beta package validates the EU API endpoint `https://api.eu.assemblyai.com`. Provider-side delete requests are performed where implemented by the accepted backend path, and deletion must not be claimed when it cannot be confirmed.
+
+Existing beta validation history recorded the provider statement `files submitted through its European servers are not used for model training`. That wording is retained here as a compatibility/audit assertion for the accepted private package, not as a permanent guarantee for a future public release.
 
 Provider privacy, retention, data-use, regional-routing, and model-training terms can change. They must be re-verified before any future external/public release. This document does not treat an older provider statement as a permanent public-release waiver.
 
