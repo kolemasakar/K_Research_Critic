@@ -1,7 +1,7 @@
 # MEDIA BETA Current State
 Поточний канонічний стан приватного MEDIA BETA для відновлення без реконструкції історії.
 
-Version: 6.7
+Version: 6.8
 Status: RELEASE_HOLD_OWNER_TESTING
 Updated: 2026-08-29
 
@@ -20,10 +20,12 @@ A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED
 NEON_POSTGRESQL_18_CUTOVER_ACCEPTED
 POST_CUTOVER_DURABILITY_REGRESSION_ACCEPTED
 NEON_READ_ONLY_OBSERVATION_CHECKPOINT_ACCEPTED
+NEON_OBSERVATION_EXIT_READINESS_ACCEPTED
+NEON_ROLLBACK_OBSERVATION_CLOSED_OWNER_APPROVED
 RELEASE_HOLD_OWNER_TESTING
 ```
 
-A9/A9.10/A10 are accepted in the private owner runtime. The isolated MEDIA BETA durable store has completed the Render PostgreSQL -> Neon PostgreSQL 18 cutover, owner-only post-cutover durability regression, and a later read-only observation checkpoint. The owner has chosen an extended private testing period before release decisions.
+A9/A9.10/A10 are accepted in the private owner runtime. The isolated MEDIA BETA durable store has completed the Render PostgreSQL -> Neon PostgreSQL 18 migration stream: cutover, owner-only post-cutover durability regression, later read-only observation, final exit-readiness verification, and owner-approved rollback-observation closure. The owner continues private testing before release decisions.
 
 ## Repositories
 
@@ -41,7 +43,7 @@ VoiceBridge:
 ```text
 repo: kolemasakar/VoiceBridge
 branch: agent/krc-media-transcript
-read-only observation checkpoint documentation head at 2026-08-29 sync: 6b014eda96a5b04007cea0d96317a464dbadb8ab
+Neon migration observation-closure documentation head at 2026-08-29 sync: 21127f86ae35625421d0257c59c689407ccdb2ab
 draft PR: #28
 ```
 
@@ -71,11 +73,11 @@ connection mode: direct TLS
 
 The isolated Render service still owns the MEDIA BETA application runtime. Only its protected `KRC_MEDIA_DATABASE_URL` target was changed during the approved cutover.
 
-Rollback store:
+Original Render PostgreSQL:
 
 ```text
 original Render PostgreSQL: voicebridge-krc-media-beta-db
-state: retained intact for rollback
+state: retained intact after observation closure
 source database deletion: NOT AUTHORIZED
 ```
 
@@ -89,6 +91,8 @@ docs/history/KRC_MEDIA_NEON_CUTOVER_2026-08-29.md
 docs/history/KRC_MEDIA_NEON_POSTCUTOVER_LIVE_REGRESSION_2026-08-29.md
 docs/history/KRC_MEDIA_NEON_OBSERVATION_WINDOW_2026-08-29.md
 docs/history/KRC_MEDIA_NEON_OBSERVATION_CHECKPOINT_2026-08-29.md
+docs/history/KRC_MEDIA_NEON_OBSERVATION_EXIT_READINESS_2026-08-29.md
+docs/history/KRC_MEDIA_NEON_OBSERVATION_CLOSURE_2026-08-29.md
 ```
 
 Post-cutover owner-only live regression accepted:
@@ -112,7 +116,15 @@ Later read-only observation checkpoint accepted:
 - provider-consuming work: NONE;
 - rollback trigger observed: NO.
 
-The migration remains in rollback observation state. No source-database deletion or release transition is implied by the cutover/regression/observation PASS results.
+Final observation exit readiness accepted:
+- current Render target remains Neon: PASS;
+- original Render PostgreSQL rollback source recoverable: PASS;
+- managed capability: PASS;
+- Neon durable state stable: PASS;
+- provider-consuming work: NONE;
+- environment/database mutation: NONE.
+
+The owner approved closure of the rollback observation window. Neon remains the active durable store. The original Render PostgreSQL database remains retained; its deletion is still separately gated and not authorized. The database migration stream is complete, but RELEASE_HOLD_OWNER_TESTING remains active.
 
 ## Accepted Inputs
 
@@ -181,6 +193,6 @@ Project/documentation audit record:
 
 ## Current Work Rule
 
-Owner testing and the Neon rollback observation window may continue. Confirmed defects should be fixed only in the owning isolated feature branch and revalidated there. Keep Neon as the active durable store unless a verified rollback trigger occurs. Do not delete the original Render PostgreSQL database, merge either MEDIA branch, change public Core, promote production infrastructure, onboard external testers, or activate paid Facebook/ScrapeCreators behavior unless the owner explicitly opens the corresponding gate.
+Owner testing may continue. The Render PostgreSQL -> Neon migration stream and rollback observation window are closed with Neon as the active durable store. Confirmed defects should be fixed only in the owning isolated feature branch and revalidated there. Do not delete the original Render PostgreSQL database, merge either MEDIA branch, change public Core, promote production infrastructure, onboard external testers, or activate paid Facebook/ScrapeCreators behavior unless the owner explicitly opens the corresponding gate.
 
 No additional A10 Builder remediation is pending.
