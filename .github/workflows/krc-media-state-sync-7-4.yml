@@ -1,0 +1,140 @@
+name: KRC MEDIA State Sync 7.4
+on:
+  push:
+    branches:
+      - agent/video-url-research
+    paths:
+      - .github/workflows/krc-media-state-sync-7-4.yml
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify branch and state baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git branch --show-current)" = "agent/video-url-research"
+          grep -q '^Version: 7.3$' subprojects/media_beta/03_CURRENT_STATE.md
+          grep -q '^STATE_CONTINUATION_NEGATIVE_MATRIX_ACCEPTED$' subprojects/media_beta/03_CURRENT_STATE.md
+          test ! -e subprojects/media_beta/56_CONSENT_CREDIT_QUOTA_NEGATIVE_MATRIX_ACCEPTED.md
+      - name: Sync canonical MEDIA BETA state
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > subprojects/media_beta/56_CONSENT_CREDIT_QUOTA_NEGATIVE_MATRIX_ACCEPTED.md <<'EOF'
+          # MEDIA BETA Consent / Credit / Quota Negative Matrix Checkpoint
+
+          Date: 2026-08-29
+          Status: ACCEPTED
+          Release state: RELEASE_HOLD_OWNER_TESTING
+
+          VoiceBridge implementation:
+          `30d71868987b4ffba3f0ed52e3860f6751242cf7`
+
+          VoiceBridge acceptance record:
+          `docs/history/KRC_MEDIA_CONSENT_CREDIT_QUOTA_NEGATIVE_MATRIX_2026-08-29.md`
+
+          Accepted evidence:
+          - native, metadata, AI-generate, and Facebook reserve consent substitutions fail before billable provider work;
+          - invalid quota durations and exhausted/stale consent states fail closed;
+          - isolated live no-spend consent smoke run `33263832119`: SUCCESS;
+          - Neon managed/client/STT counters remained unchanged during that live smoke;
+          - active managed KRCM routes reserve daily STT quota durably before AssemblyAI;
+          - legacy client-assisted KRCC audio now shares the same PostgreSQL daily STT ledger;
+          - PostgreSQL 18 shared-quota workflow run `33264731836`: SUCCESS;
+          - full cloud suite after final repair: 153/153 PASS;
+          - concurrent KRCM 40s + KRCC 40s against a 60s limit allows exactly one request;
+          - same-job replay does not double-charge quota;
+          - shared schema initialization is serialized to avoid concurrent DDL races;
+          - quota serialization acquires a transaction advisory lock before the quota-reading statement so a waiter receives a fresh MVCC snapshot;
+          - paid Facebook/ScrapeCreators activation: NONE;
+          - Render environment mutation from acceptance smoke: NONE;
+          - release-gate transition: NONE.
+
+          Neon PostgreSQL 18 remains the active durable store. Original Render PostgreSQL remains retained and deletion is not authorized. PR #8 and VoiceBridge PR #28 remain release-gated. This checkpoint does not authorize merge, production promotion, external testing, public rollout, original database deletion, or paid Facebook activation.
+          EOF
+
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('subprojects/media_beta/03_CURRENT_STATE.md')
+          s = p.read_text()
+          def once(old, new):
+              global s
+              c = s.count(old)
+              if c != 1:
+                  raise SystemExit(f'expected one match, found {c}: {old[:100]!r}')
+              s = s.replace(old, new, 1)
+
+          once('Version: 7.3', 'Version: 7.4')
+          once(
+              'STATE_CONTINUATION_NEGATIVE_MATRIX_ACCEPTED\nA10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED',
+              'STATE_CONTINUATION_NEGATIVE_MATRIX_ACCEPTED\nCONSENT_CREDIT_QUOTA_NEGATIVE_MATRIX_ACCEPTED\nA10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED'
+          )
+          once(
+              'The later state/job-read/continuation matrix is also accepted: stale and interrupted job reads fail safely, non-completed jobs do not expose segments, AI and Facebook continuation paths enforce state/platform compatibility, and fresh native retries require a native FAILED target. The owner continues private testing before release decisions.',
+              'The later state/job-read/continuation matrix is also accepted: stale and interrupted job reads fail safely, non-completed jobs do not expose segments, AI and Facebook continuation paths enforce state/platform compatibility, and fresh native retries require a native FAILED target. The consent/credit/quota negative matrix is now accepted as well: provider-credit substitutions fail before provider work, active managed KRCM routes use a durable PostgreSQL STT quota reservation, and the legacy KRCC audio path now competes against that same concurrency-safe daily ledger. The owner continues private testing before release decisions.'
+          )
+          once(
+              'state/continuation acceptance record: docs/history/KRC_MEDIA_STATE_CONTINUATION_NEGATIVE_MATRIX_2026-08-29.md\ndraft PR: #28',
+              'state/continuation acceptance record: docs/history/KRC_MEDIA_STATE_CONTINUATION_NEGATIVE_MATRIX_2026-08-29.md\nconsent/credit/quota implementation: 30d71868987b4ffba3f0ed52e3860f6751242cf7\nconsent/credit/quota acceptance record: docs/history/KRC_MEDIA_CONSENT_CREDIT_QUOTA_NEGATIVE_MATRIX_2026-08-29.md\ndraft PR: #28'
+          )
+          section = '''## Consent / Credit / Quota Negative Matrix Acceptance
+
+Accepted owner-testing record in VoiceBridge:
+
+```text
+docs/history/KRC_MEDIA_CONSENT_CREDIT_QUOTA_NEGATIVE_MATRIX_2026-08-29.md
+```
+
+Implementation and validation:
+- VoiceBridge implementation commit `30d71868987b4ffba3f0ed52e3860f6751242cf7`;
+- native, metadata, AI-generate, and Facebook reserve consent substitutions fail before provider-consuming work: PASS;
+- stale AI caps, exhausted balances, and invalid quota durations fail closed: PASS;
+- isolated Render live no-spend consent smoke run `33263832119`: SUCCESS;
+- live Neon managed/client/STT counters remained unchanged: PASS;
+- active managed KRCM routes reserve STT quota durably before AssemblyAI: PASS;
+- legacy client-assisted KRCC audio shares the same PostgreSQL daily STT ledger: PASS;
+- KRCM/KRCC same-day concurrent reservations are serialized with a transaction advisory lock acquired before the quota-reading statement: PASS;
+- PostgreSQL shared-schema initialization is serialized to avoid concurrent `CREATE TABLE IF NOT EXISTS` races: PASS;
+- final PostgreSQL 18 shared-quota workflow run `33264731836`: SUCCESS;
+- full VoiceBridge cloud suite after the final repair: 153/153 PASS;
+- concurrent KRCM 40s + KRCC 40s against a 60s limit allows exactly one request: PASS;
+- same-job replay does not double-charge quota: PASS;
+- provider-consuming work in the live no-spend acceptance smoke: NONE;
+- Render environment mutation: NONE;
+- paid Facebook/ScrapeCreators activation: NONE.
+
+Intermediate workflow failures were contained diagnostics: one TypeScript harness typing defect, one concurrent schema-initialization DDL race, and one PostgreSQL MVCC snapshot flaw when an advisory lock was acquired inside the same quota statement. The final repair moved quota locking into an explicit transaction statement before the quota read, then passed the full concurrency matrix.
+
+'''
+          once('## Research/Critic Invariants', section + '## Research/Critic Invariants')
+          once(
+              'and the auth/input/replay negative matrix is accepted. Local attachment and Instagram route-boundary audits are accepted.',
+              'and the auth/input/replay negative matrix is accepted. The consent/credit/quota negative matrix is accepted, with one shared durable daily STT ledger spanning active managed KRCM routes and legacy KRCC audio. Local attachment and Instagram route-boundary audits are accepted.'
+          )
+          p.write_text(s)
+          PY
+      - name: Validate synchronized state
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q '^Version: 7.4$' subprojects/media_beta/03_CURRENT_STATE.md
+          grep -q '^CONSENT_CREDIT_QUOTA_NEGATIVE_MATRIX_ACCEPTED$' subprojects/media_beta/03_CURRENT_STATE.md
+          grep -q '30d71868987b4ffba3f0ed52e3860f6751242cf7' subprojects/media_beta/03_CURRENT_STATE.md
+          grep -q '33264731836' subprojects/media_beta/56_CONSENT_CREDIT_QUOTA_NEGATIVE_MATRIX_ACCEPTED.md
+          grep -q 'RELEASE_HOLD_OWNER_TESTING' subprojects/media_beta/56_CONSENT_CREDIT_QUOTA_NEGATIVE_MATRIX_ACCEPTED.md
+      - name: Commit state sync and remove temporary workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/krc-media-state-sync-7-4.yml
+          git add subprojects/media_beta/03_CURRENT_STATE.md subprojects/media_beta/56_CONSENT_CREDIT_QUOTA_NEGATIVE_MATRIX_ACCEPTED.md
+          git commit -m "Sync MEDIA BETA consent credit quota acceptance"
+          git push origin HEAD:agent/video-url-research
