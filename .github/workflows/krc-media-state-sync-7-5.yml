@@ -1,0 +1,32 @@
+name: KRC MEDIA State Sync 7.5
+'on':
+  push:
+    branches:
+      - agent/video-url-research
+    paths:
+      - .github/workflows/krc-media-state-sync-7-5.yml
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply state sync
+        run: python scripts/krc_media_state_sync_7_5.py
+      - name: Validate state sync
+        run: |
+          grep -q '^Version: 7.5$' subprojects/media_beta/03_CURRENT_STATE.md
+          grep -q '^DURABLE_FAIL_CLOSED_NEGATIVE_MATRIX_ACCEPTED$' subprojects/media_beta/03_CURRENT_STATE.md
+          grep -q '33266043667' subprojects/media_beta/57_DURABLE_FAIL_CLOSED_NEGATIVE_MATRIX_ACCEPTED.md
+          grep -q 'RELEASE_HOLD_OWNER_TESTING' subprojects/media_beta/57_DURABLE_FAIL_CLOSED_NEGATIVE_MATRIX_ACCEPTED.md
+      - name: Commit accepted state and remove harness
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/krc-media-state-sync-7-5.yml scripts/krc_media_state_sync_7_5.py
+          git add subprojects/media_beta/03_CURRENT_STATE.md subprojects/media_beta/57_DURABLE_FAIL_CLOSED_NEGATIVE_MATRIX_ACCEPTED.md
+          git commit -m 'Sync MEDIA BETA durable fail-closed acceptance'
+          git push origin HEAD:agent/video-url-research
