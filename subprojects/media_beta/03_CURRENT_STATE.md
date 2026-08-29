@@ -1,7 +1,7 @@
 # MEDIA BETA Current State
 Поточний канонічний стан приватного MEDIA BETA для відновлення без реконструкції історії.
 
-Version: 6.6
+Version: 6.7
 Status: RELEASE_HOLD_OWNER_TESTING
 Updated: 2026-08-29
 
@@ -19,10 +19,11 @@ LOCAL_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED
 A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED
 NEON_POSTGRESQL_18_CUTOVER_ACCEPTED
 POST_CUTOVER_DURABILITY_REGRESSION_ACCEPTED
+NEON_READ_ONLY_OBSERVATION_CHECKPOINT_ACCEPTED
 RELEASE_HOLD_OWNER_TESTING
 ```
 
-A9/A9.10/A10 are accepted in the private owner runtime. The isolated MEDIA BETA durable store has also completed the Render PostgreSQL -> Neon PostgreSQL 18 cutover and owner-only post-cutover durability regression. The owner has chosen an extended private testing period before release decisions.
+A9/A9.10/A10 are accepted in the private owner runtime. The isolated MEDIA BETA durable store has completed the Render PostgreSQL -> Neon PostgreSQL 18 cutover, owner-only post-cutover durability regression, and a later read-only observation checkpoint. The owner has chosen an extended private testing period before release decisions.
 
 ## Repositories
 
@@ -40,7 +41,7 @@ VoiceBridge:
 ```text
 repo: kolemasakar/VoiceBridge
 branch: agent/krc-media-transcript
-post-cutover regression cleanup head at 2026-08-29 sync: 1dca2ad41c3cb9e293f149aaef3d4a095b79ea7e
+read-only observation checkpoint documentation head at 2026-08-29 sync: 6b014eda96a5b04007cea0d96317a464dbadb8ab
 draft PR: #28
 ```
 
@@ -86,6 +87,8 @@ docs/history/KRC_MEDIA_NEON_RESTORE_VERIFY_2026-08-29.md
 docs/history/KRC_MEDIA_NEON_PRECUTOVER_VERIFY_2026-08-29.md
 docs/history/KRC_MEDIA_NEON_CUTOVER_2026-08-29.md
 docs/history/KRC_MEDIA_NEON_POSTCUTOVER_LIVE_REGRESSION_2026-08-29.md
+docs/history/KRC_MEDIA_NEON_OBSERVATION_WINDOW_2026-08-29.md
+docs/history/KRC_MEDIA_NEON_OBSERVATION_CHECKPOINT_2026-08-29.md
 ```
 
 Post-cutover owner-only live regression accepted:
@@ -99,7 +102,17 @@ Post-cutover owner-only live regression accepted:
 - duplicate provider start not observed;
 - paid Facebook fallback/ScrapeCreators not used.
 
-The migration is now in rollback observation state. No source-database deletion or release transition is implied by the cutover/regression PASS.
+Later read-only observation checkpoint accepted:
+- isolated Render service still targets protected Neon direct TLS: PASS;
+- managed capability after inactivity/resume: PASS;
+- PostgreSQL major 18: PASS;
+- non-terminal managed jobs: 0;
+- accepted regression job remains COMPLETED and readable: PASS;
+- accepted persisted regression segments remain readable: PASS;
+- provider-consuming work: NONE;
+- rollback trigger observed: NO.
+
+The migration remains in rollback observation state. No source-database deletion or release transition is implied by the cutover/regression/observation PASS results.
 
 ## Accepted Inputs
 
