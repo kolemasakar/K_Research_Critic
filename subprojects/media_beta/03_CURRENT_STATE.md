@@ -1,7 +1,7 @@
 # MEDIA BETA Current State
 Поточний канонічний стан приватного MEDIA BETA для відновлення без реконструкції історії.
 
-Version: 6.8
+Version: 6.9
 Status: RELEASE_HOLD_OWNER_TESTING
 Updated: 2026-08-29
 
@@ -14,6 +14,7 @@ YOUTUBE_ACCEPTED
 INSTAGRAM_ACCEPTED
 FACEBOOK_COBALT_ACCEPTED
 FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED
+FACEBOOK_COBALT_ONLY_SERVER_HARDENING_ACCEPTED
 TELEGRAM_ACCEPTED
 LOCAL_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED
 A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED
@@ -25,7 +26,7 @@ NEON_ROLLBACK_OBSERVATION_CLOSED_OWNER_APPROVED
 RELEASE_HOLD_OWNER_TESTING
 ```
 
-A9/A9.10/A10 are accepted in the private owner runtime. The isolated MEDIA BETA durable store has completed the Render PostgreSQL -> Neon PostgreSQL 18 migration stream: cutover, owner-only post-cutover durability regression, later read-only observation, final exit-readiness verification, and owner-approved rollback-observation closure. The owner continues private testing before release decisions.
+A9/A9.10/A10 are accepted in the private owner runtime. The isolated MEDIA BETA durable store has completed the Render PostgreSQL -> Neon PostgreSQL 18 migration stream: cutover, owner-only post-cutover durability regression, later read-only observation, final exit-readiness verification, and owner-approved rollback-observation closure. A later owner-testing hardening also aligned the active Facebook server boundary with the already accepted Cobalt-only Builder policy. The owner continues private testing before release decisions.
 
 ## Repositories
 
@@ -43,7 +44,7 @@ VoiceBridge:
 ```text
 repo: kolemasakar/VoiceBridge
 branch: agent/krc-media-transcript
-Neon migration observation-closure documentation head at 2026-08-29 sync: 21127f86ae35625421d0257c59c689407ccdb2ab
+Facebook Cobalt-only live-hardening acceptance head at 2026-08-29 sync: 65d536a445126c47f2646e59ca31e12e7bd35514
 draft PR: #28
 ```
 
@@ -140,11 +141,36 @@ one local current-conversation audio/video attachment
 
 YouTube/Instagram: managed transcript route; billable work remains consent-gated.
 
-Facebook: free Cobalt retrieval only. Success may continue to AssemblyAI/KRCM. Failure is unavailable/STOP. ScrapeCreators is unconfigured/inactive/reserve-only and not offerable.
+Facebook: free Cobalt retrieval only. Success may continue to AssemblyAI/KRCM. Failure is unavailable/STOP. ScrapeCreators is unconfigured/inactive/reserve-only and not offerable. The isolated live HTTP boundary now additionally rejects Facebook on generic Supadata native preflight/start before provider invocation, and managed capability no longer advertises Facebook AI generation as active. The dedicated Cobalt route is unchanged. Historical compatibility internals remain outside the active Builder path.
 
 Telegram: public web/embed only, trusted media delivery, AssemblyAI/KRCM, zero retrieval credits, no auth/session/bot token/paid fallback.
 
 Local attachment: `openaiFileIdRefs`, trusted OpenAI delivery, max 32 MiB, AssemblyAI/KRCM, zero retrieval credits, no user-visible file token.
+
+## Facebook Cobalt-Only Server Hardening
+
+Accepted owner-testing hardening record in VoiceBridge:
+
+```text
+docs/history/KRC_MEDIA_FACEBOOK_COBALT_ONLY_HARDENING_2026-08-29.md
+```
+
+Verified:
+- generic Facebook Supadata preflight blocked at HTTP boundary: PASS;
+- generic Facebook Supadata transcript start blocked at HTTP boundary: PASS;
+- capability `facebook_ai_fallback = false`: PASS;
+- capability `facebook_ai_requires_duration_metadata = false`: PASS;
+- capability `facebook_ai_metadata_credits = 0`: PASS;
+- active Facebook retrieval/STT capability preserved: PASS;
+- automatic paid Facebook retrieval remains false: PASS;
+- full VoiceBridge cloud suite after hardening: 134/134 PASS;
+- isolated live no-provider-spend smoke: PASS;
+- Facebook retrieval endpoint called by smoke: NO;
+- Supadata/AssemblyAI credits consumed by smoke: NO;
+- Render environment mutation: NONE;
+- Neon data mutation: NONE.
+
+This hardening is defense in depth. It does not indicate that the accepted Builder had previously used the forbidden generic Facebook Supadata route; Builder policy already selected the dedicated Cobalt route.
 
 ## Research/Critic Invariants
 
@@ -193,6 +219,6 @@ Project/documentation audit record:
 
 ## Current Work Rule
 
-Owner testing may continue. The Render PostgreSQL -> Neon migration stream and rollback observation window are closed with Neon as the active durable store. Confirmed defects should be fixed only in the owning isolated feature branch and revalidated there. Do not delete the original Render PostgreSQL database, merge either MEDIA branch, change public Core, promote production infrastructure, onboard external testers, or activate paid Facebook/ScrapeCreators behavior unless the owner explicitly opens the corresponding gate.
+Owner testing may continue. The Render PostgreSQL -> Neon migration stream and rollback observation window are closed with Neon as the active durable store. The active Facebook server boundary is now hardened to the accepted Cobalt-only policy. Confirmed defects should be fixed only in the owning isolated feature branch and revalidated there. Do not delete the original Render PostgreSQL database, merge either MEDIA branch, change public Core, promote production infrastructure, onboard external testers, or activate paid Facebook/ScrapeCreators behavior unless the owner explicitly opens the corresponding gate.
 
 No additional A10 Builder remediation is pending.
