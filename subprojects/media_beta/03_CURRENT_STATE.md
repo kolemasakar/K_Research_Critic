@@ -1,7 +1,7 @@
 # MEDIA BETA Current State
 Поточний канонічний стан приватного MEDIA BETA для відновлення без реконструкції історії.
 
-Version: 7.6
+Version: 7.7
 Status: RELEASE_HOLD_OWNER_TESTING
 Updated: 2026-08-29
 
@@ -26,6 +26,7 @@ STATE_CONTINUATION_NEGATIVE_MATRIX_ACCEPTED
 CONSENT_CREDIT_QUOTA_NEGATIVE_MATRIX_ACCEPTED
 DURABLE_FAIL_CLOSED_NEGATIVE_MATRIX_ACCEPTED
 PRIVACY_CLEANUP_NEGATIVE_MATRIX_ACCEPTED
+RETENTION_LOG_REDACTION_NEGATIVE_MATRIX_ACCEPTED
 A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED
 NEON_POSTGRESQL_18_CUTOVER_ACCEPTED
 POST_CUTOVER_DURABILITY_REGRESSION_ACCEPTED
@@ -35,7 +36,7 @@ NEON_ROLLBACK_OBSERVATION_CLOSED_OWNER_APPROVED
 RELEASE_HOLD_OWNER_TESTING
 ```
 
-A9/A9.10/A10 are accepted in the private owner runtime. The isolated MEDIA BETA durable store has completed the Render PostgreSQL -> Neon PostgreSQL 18 migration stream: cutover, owner-only post-cutover durability regression, later read-only observation, final exit-readiness verification, and owner-approved rollback-observation closure. Owner-testing hardening aligned both the Facebook and Telegram active server boundaries with the already accepted dedicated-route Builder policies. Local attachment and Instagram route-boundary audits passed, and the cross-route negative routing matrix is live-accepted: foreign platforms are stopped at the HTTP/parser boundary before provider or durable-store service methods. The later auth/input/replay negative matrix is also accepted: Action bearer failures, malformed/oversized input, invalid methods/IDs/pagination, server-side owner admission, and duplicate replay boundaries were hardened or revalidated without a new provider-consuming media job. The later state/job-read/continuation matrix is also accepted: stale and interrupted job reads fail safely, non-completed jobs do not expose segments, AI and Facebook continuation paths enforce state/platform compatibility, and fresh native retries require a native FAILED target. The consent/credit/quota negative matrix is now accepted as well: provider-credit substitutions fail before provider work, active managed KRCM routes use a durable PostgreSQL STT quota reservation, and the legacy KRCC audio path now competes against that same concurrency-safe daily ledger. The durable fail-closed negative matrix is also accepted: durable-store initialization and durable quota-ledger outages stop before AssemblyAI provider start, and the retained regression covers both managed KRCM and legacy KRCC quota boundaries. The privacy/cleanup negative matrix is also accepted: signed attachment transport URLs and raw owner admission are excluded from durable/public projections, cleanup failure remains explicit, and provider/local temporary cleanup guards are retained. The owner continues private testing before release decisions.
+A9/A9.10/A10 are accepted in the private owner runtime. The isolated MEDIA BETA durable store has completed the Render PostgreSQL -> Neon PostgreSQL 18 migration stream: cutover, owner-only post-cutover durability regression, later read-only observation, final exit-readiness verification, and owner-approved rollback-observation closure. Owner-testing hardening aligned both the Facebook and Telegram active server boundaries with the already accepted dedicated-route Builder policies. Local attachment and Instagram route-boundary audits passed, and the cross-route negative routing matrix is live-accepted: foreign platforms are stopped at the HTTP/parser boundary before provider or durable-store service methods. The later auth/input/replay negative matrix is also accepted: Action bearer failures, malformed/oversized input, invalid methods/IDs/pagination, server-side owner admission, and duplicate replay boundaries were hardened or revalidated without a new provider-consuming media job. The later state/job-read/continuation matrix is also accepted: stale and interrupted job reads fail safely, non-completed jobs do not expose segments, AI and Facebook continuation paths enforce state/platform compatibility, and fresh native retries require a native FAILED target. The consent/credit/quota negative matrix is now accepted as well: provider-credit substitutions fail before provider work, active managed KRCM routes use a durable PostgreSQL STT quota reservation, and the legacy KRCC audio path now competes against that same concurrency-safe daily ledger. The durable fail-closed negative matrix is also accepted: durable-store initialization and durable quota-ledger outages stop before AssemblyAI provider start, and the retained regression covers both managed KRCM and legacy KRCC quota boundaries. The privacy/cleanup negative matrix is also accepted: signed attachment transport URLs and raw owner admission are excluded from durable/public projections, cleanup failure remains explicit, and provider/local temporary cleanup guards are retained. The retention/log-redaction negative matrix is also accepted: normal zero-credit jobs follow configured TTL, charged or uncertain jobs preserve at least a 24-hour recovery window, expired durable state is pruned, structured diagnostics remain metadata-only, and persistence/HTTP paths suppress sensitive log payloads. The owner continues private testing before release decisions.
 
 ## Repositories
 
@@ -65,6 +66,8 @@ durable fail-closed regression head: 8a66e610b89a7e1398b5e8cbe4ac59334ffee5d2
 durable fail-closed acceptance record: docs/history/KRC_MEDIA_DURABLE_FAIL_CLOSED_NEGATIVE_MATRIX_2026-08-29.md
 privacy/cleanup regression: 9d8a3e89823a6228fc76046bc5d9ffe378b79bf0
 privacy/cleanup acceptance record: docs/history/KRC_MEDIA_PRIVACY_CLEANUP_NEGATIVE_MATRIX_2026-08-29.md
+retention/log-redaction corrected regression: 43bd757b541f9dcbffa40041228466a6eaa38c7d
+retention/log-redaction acceptance record: docs/history/KRC_MEDIA_RETENTION_LOG_REDACTION_NEGATIVE_MATRIX_2026-08-29.md
 draft PR: #28
 ```
 
@@ -414,6 +417,33 @@ Implementation and validation:
 - local temporary media cleanup guards remain retained where files are created: PASS;
 - durable schema contains no attachment `download_link` or raw `beta_access_code`: PASS;
 - VoiceBridge run `33266496940`: 162/162 PASS;
+- provider-consuming work: NONE;
+- Render environment mutation: NONE;
+- Neon data mutation requested: NONE;
+- paid Facebook/ScrapeCreators activation: NONE.
+
+This acceptance does not activate the separately pending Gemini 3.5 Transcribe transition plan.
+
+## Retention / Log-Redaction Negative Matrix Acceptance
+
+Accepted owner-testing record in VoiceBridge:
+
+```text
+docs/history/KRC_MEDIA_RETENTION_LOG_REDACTION_NEGATIVE_MATRIX_2026-08-29.md
+```
+
+Validation:
+- retained regression `src/cloud/tests/managed_media_retention_log_redaction.test.ts`;
+- zero-credit/certain managed-media jobs follow the configured normal TTL: PASS;
+- charged or charge-uncertain outcomes preserve at least a 24-hour recovery window: PASS;
+- uncertain provider failure is non-retryable and not automatically replayed: PASS;
+- expired durable managed-media jobs are purged and expired records are excluded from reads: PASS;
+- durable STT quota-ledger records older than two UTC days are pruned: PASS;
+- structured managed-media diagnostic warning is metadata-only and excludes sensitive source/access/transcript/media fields: PASS;
+- durable PostgreSQL stderr payloads are suppressed and generic persistence errors are exposed: PASS;
+- managed-media HTTP responses are `cache-control: no-store` and contain no console request-body logging: PASS;
+- initial VoiceBridge run `33267727322`: 167/168 PASS; the single failure was a test-harness false positive that confused normal response serialization with logging;
+- corrected VoiceBridge run `33267869660`: 168/168 PASS;
 - provider-consuming work: NONE;
 - Render environment mutation: NONE;
 - Neon data mutation requested: NONE;
