@@ -26,4 +26,6 @@ Accepted evidence:
 - paid Facebook/ScrapeCreators activation: NONE;
 - release-gate transition: NONE.
 
+Canonical KRC CI validation target is the finalized feature-branch checkpoint state.
+
 Neon PostgreSQL 18 remains the active durable store. Original Render PostgreSQL remains retained and deletion is not authorized. PR #8 and VoiceBridge PR #28 remain release-gated. This checkpoint does not authorize merge, production promotion, external testing, public rollout, original database deletion, or paid Facebook activation.
