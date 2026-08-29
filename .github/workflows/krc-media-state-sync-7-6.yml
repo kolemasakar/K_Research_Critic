@@ -46,35 +46,38 @@ jobs:
           section_anchor = '\n## Research/Critic Invariants\n'
           if section_anchor not in text:
               raise SystemExit('Research/Critic section anchor not found')
-          section = '''
-## Privacy / Cleanup Negative Matrix Acceptance
-
-Accepted owner-testing record in VoiceBridge:
-
-```text
-docs/history/KRC_MEDIA_PRIVACY_CLEANUP_NEGATIVE_MATRIX_2026-08-29.md
-```
-
-Implementation and validation:
-- retained regression `src/cloud/tests/managed_media_privacy_cleanup.test.ts`;
-- attachment signed OpenAI transport URL is not persisted in durable managed-media records: PASS;
-- raw server owner admission is not persisted or returned in public job projection: PASS;
-- public attachment job projection excludes request/access digests and transcript text: PASS;
-- durable attachment source identity remains `attachment://local-media`: PASS;
-- canonical transcript segments remain persisted as intended evidence: PASS;
-- cleanup failure remains explicit as `provider_data_deleted=false`: PASS;
-- attachment/Facebook/Telegram/KRCC AssemblyAI paths retain provider-delete cleanup guards: PASS;
-- local temporary media cleanup guards remain retained where files are created: PASS;
-- durable schema contains no attachment `download_link` or raw `beta_access_code`: PASS;
-- VoiceBridge run `33266496940`: 162/162 PASS;
-- provider-consuming work: NONE;
-- Render environment mutation: NONE;
-- Neon data mutation requested: NONE;
-- paid Facebook/ScrapeCreators activation: NONE.
-
-This acceptance does not activate the separately pending Gemini 3.5 Transcribe transition plan.
-'''
-          text = text.replace(section_anchor, '\n' + section + section_anchor, 1)
+          section_lines = [
+              '',
+              '## Privacy / Cleanup Negative Matrix Acceptance',
+              '',
+              'Accepted owner-testing record in VoiceBridge:',
+              '',
+              '```text',
+              'docs/history/KRC_MEDIA_PRIVACY_CLEANUP_NEGATIVE_MATRIX_2026-08-29.md',
+              '```',
+              '',
+              'Implementation and validation:',
+              '- retained regression `src/cloud/tests/managed_media_privacy_cleanup.test.ts`;',
+              '- attachment signed OpenAI transport URL is not persisted in durable managed-media records: PASS;',
+              '- raw server owner admission is not persisted or returned in public job projection: PASS;',
+              '- public attachment job projection excludes request/access digests and transcript text: PASS;',
+              '- durable attachment source identity remains `attachment://local-media`: PASS;',
+              '- canonical transcript segments remain persisted as intended evidence: PASS;',
+              '- cleanup failure remains explicit as `provider_data_deleted=false`: PASS;',
+              '- attachment/Facebook/Telegram/KRCC AssemblyAI paths retain provider-delete cleanup guards: PASS;',
+              '- local temporary media cleanup guards remain retained where files are created: PASS;',
+              '- durable schema contains no attachment `download_link` or raw `beta_access_code`: PASS;',
+              '- VoiceBridge run `33266496940`: 162/162 PASS;',
+              '- provider-consuming work: NONE;',
+              '- Render environment mutation: NONE;',
+              '- Neon data mutation requested: NONE;',
+              '- paid Facebook/ScrapeCreators activation: NONE.',
+              '',
+              'This acceptance does not activate the separately pending Gemini 3.5 Transcribe transition plan.',
+              '',
+          ]
+          section = '\n'.join(section_lines)
+          text = text.replace(section_anchor, section + section_anchor, 1)
           path.write_text(text, encoding='utf-8')
           PY
       - name: Validate state sync
