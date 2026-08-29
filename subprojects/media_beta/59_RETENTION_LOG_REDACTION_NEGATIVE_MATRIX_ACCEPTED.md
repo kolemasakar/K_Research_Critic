@@ -3,7 +3,7 @@
 Date: 2026-08-29
 Status: ACCEPTED
 Release state: RELEASE_HOLD_OWNER_TESTING
-KRC canonical target state: Version 7.7
+KRC canonical state: Version 7.7
 
 VoiceBridge acceptance record:
 `docs/history/KRC_MEDIA_RETENTION_LOG_REDACTION_NEGATIVE_MATRIX_2026-08-29.md`
@@ -17,6 +17,9 @@ VoiceBridge corrected regression commit:
 VoiceBridge acceptance-record commit:
 `a0d1d5a380d0d90a42510c3b28f6221385578d52`
 
+KRC canonical-state sync commit:
+`2805a3084c80cbd7e472523317aee3feaa606715`
+
 Accepted evidence:
 - zero-credit/certain managed jobs use the configured normal TTL;
 - charged or charge-uncertain jobs retain at least a 24-hour recovery window;
@@ -26,8 +29,10 @@ Accepted evidence:
 - structured managed-media warning output is metadata-only and excludes sensitive payload fields;
 - PostgreSQL command stderr is suppressed and generic durable-store errors are exposed;
 - managed-media HTTP responses are `cache-control: no-store` and no console request-body logging is present;
-- initial run `33267727322`: 167/168 PASS; the one failure was an overbroad test-harness assertion that confused response serialization with logging;
-- corrected run `33267869660`: SUCCESS, 168/168 PASS;
+- initial VoiceBridge run `33267727322`: 167/168 PASS; the one failure was an overbroad test-harness assertion that confused response serialization with logging;
+- corrected VoiceBridge run `33267869660`: SUCCESS, 168/168 PASS;
+- KRC state-sync run `33268042699`: SUCCESS;
+- temporary KRC state-sync workflow removed after successful canonical-state commit;
 - provider-consuming work: NONE;
 - Render environment mutation: NONE;
 - Neon data mutation requested: NONE;
