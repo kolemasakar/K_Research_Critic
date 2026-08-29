@@ -1,9 +1,9 @@
 # MEDIA BETA Current State
 Поточний канонічний стан приватного MEDIA BETA для відновлення без реконструкції історії.
 
-Version: 6.5
+Version: 6.6
 Status: RELEASE_HOLD_OWNER_TESTING
-Updated: 2026-08-27
+Updated: 2026-08-29
 
 ## Executive State
 
@@ -17,10 +17,12 @@ FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED
 TELEGRAM_ACCEPTED
 LOCAL_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED
 A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED
+NEON_POSTGRESQL_18_CUTOVER_ACCEPTED
+POST_CUTOVER_DURABILITY_REGRESSION_ACCEPTED
 RELEASE_HOLD_OWNER_TESTING
 ```
 
-A9/A9.10/A10 are accepted in the private owner runtime. The owner has chosen an extended private testing period before release decisions.
+A9/A9.10/A10 are accepted in the private owner runtime. The isolated MEDIA BETA durable store has also completed the Render PostgreSQL -> Neon PostgreSQL 18 cutover and owner-only post-cutover durability regression. The owner has chosen an extended private testing period before release decisions.
 
 ## Repositories
 
@@ -38,7 +40,7 @@ VoiceBridge:
 ```text
 repo: kolemasakar/VoiceBridge
 branch: agent/krc-media-transcript
-implementation head at audit start: 20afd2e54b87b4a2a8858961a03e22f78a565189
+post-cutover regression cleanup head at 2026-08-29 sync: 1dca2ad41c3cb9e293f149aaef3d4a095b79ea7e
 draft PR: #28
 ```
 
@@ -52,6 +54,52 @@ beta service: voicebridge-krc-media-beta-kolemasakar
 Builder package: 0.9.1-beta-a10
 Action schema: 0.6.0-a9.10
 ```
+
+## Durable Store State
+
+Active durable store:
+
+```text
+provider: Neon PostgreSQL
+PostgreSQL major: 18
+project: krc-media-beta-neon
+database: krc_media_beta
+region: AWS Europe Central 1 (Frankfurt)
+connection mode: direct TLS
+```
+
+The isolated Render service still owns the MEDIA BETA application runtime. Only its protected `KRC_MEDIA_DATABASE_URL` target was changed during the approved cutover.
+
+Rollback store:
+
+```text
+original Render PostgreSQL: voicebridge-krc-media-beta-db
+state: retained intact for rollback
+source database deletion: NOT AUTHORIZED
+```
+
+Verified migration checkpoints in VoiceBridge:
+
+```text
+docs/KRC_MEDIA_NEON_MIGRATION_PLAN.md
+docs/history/KRC_MEDIA_NEON_RESTORE_VERIFY_2026-08-29.md
+docs/history/KRC_MEDIA_NEON_PRECUTOVER_VERIFY_2026-08-29.md
+docs/history/KRC_MEDIA_NEON_CUTOVER_2026-08-29.md
+docs/history/KRC_MEDIA_NEON_POSTCUTOVER_LIVE_REGRESSION_2026-08-29.md
+```
+
+Post-cutover owner-only live regression accepted:
+- one Supadata native provider start;
+- one provider credit charged;
+- durable Neon write PASS;
+- API job/segment read before restart PASS;
+- exact-head Render restart PASS;
+- API read after restart PASS;
+- idempotent replay PASS;
+- duplicate provider start not observed;
+- paid Facebook fallback/ScrapeCreators not used.
+
+The migration is now in rollback observation state. No source-database deletion or release transition is implied by the cutover/regression PASS.
 
 ## Accepted Inputs
 
@@ -99,9 +147,11 @@ The ordinary rendered table header may still be corrupted by ChatGPT whole-respo
 
 ```text
 merge KRC feature branch to main = HOLD
+merge VoiceBridge PR #28 = HOLD
 production VoiceBridge promotion = HOLD
 external tester onboarding = HOLD
 public sharing / Store rollout = HOLD
+original Render PostgreSQL deletion = HOLD
 ```
 
 Canonical release-hold record:
@@ -118,6 +168,6 @@ Project/documentation audit record:
 
 ## Current Work Rule
 
-Owner testing may continue. Confirmed defects should be fixed only in the owning isolated feature branch and revalidated there. Do not change public Core or production infrastructure unless the owner explicitly opens a release gate.
+Owner testing and the Neon rollback observation window may continue. Confirmed defects should be fixed only in the owning isolated feature branch and revalidated there. Keep Neon as the active durable store unless a verified rollback trigger occurs. Do not delete the original Render PostgreSQL database, merge either MEDIA branch, change public Core, promote production infrastructure, onboard external testers, or activate paid Facebook/ScrapeCreators behavior unless the owner explicitly opens the corresponding gate.
 
 No additional A10 Builder remediation is pending.
