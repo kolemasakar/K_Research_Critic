@@ -1,0 +1,94 @@
+name: KRC MEDIA State Sync 7.6
+'on':
+  push:
+    branches:
+      - agent/video-url-research
+    paths:
+      - .github/workflows/krc-media-state-sync-7-6.yml
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/video-url-research
+          fetch-depth: 0
+      - name: Apply state sync
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('subprojects/media_beta/03_CURRENT_STATE.md')
+          text = path.read_text(encoding='utf-8')
+          if 'Version: 7.5' not in text:
+              raise SystemExit('Expected Version 7.5 not found')
+          text = text.replace('Version: 7.5', 'Version: 7.6', 1)
+          marker = 'DURABLE_FAIL_CLOSED_NEGATIVE_MATRIX_ACCEPTED\n'
+          if marker not in text:
+              raise SystemExit('Durable fail-closed marker not found')
+          text = text.replace(marker, marker + 'PRIVACY_CLEANUP_NEGATIVE_MATRIX_ACCEPTED\n', 1)
+          old = 'The durable fail-closed negative matrix is also accepted: durable-store initialization and durable quota-ledger outages stop before AssemblyAI provider start, and the retained regression covers both managed KRCM and legacy KRCC quota boundaries. The owner continues private testing before release decisions.'
+          new = 'The durable fail-closed negative matrix is also accepted: durable-store initialization and durable quota-ledger outages stop before AssemblyAI provider start, and the retained regression covers both managed KRCM and legacy KRCC quota boundaries. The privacy/cleanup negative matrix is also accepted: signed attachment transport URLs and raw owner admission are excluded from durable/public projections, cleanup failure remains explicit, and provider/local temporary cleanup guards are retained. The owner continues private testing before release decisions.'
+          if old not in text:
+              raise SystemExit('Executive paragraph anchor not found')
+          text = text.replace(old, new, 1)
+          repo_anchor = 'durable fail-closed acceptance record: docs/history/KRC_MEDIA_DURABLE_FAIL_CLOSED_NEGATIVE_MATRIX_2026-08-29.md\n'
+          if repo_anchor not in text:
+              raise SystemExit('VoiceBridge repository anchor not found')
+          text = text.replace(
+              repo_anchor,
+              repo_anchor +
+              'privacy/cleanup regression: 9d8a3e89823a6228fc76046bc5d9ffe378b79bf0\n' +
+              'privacy/cleanup acceptance record: docs/history/KRC_MEDIA_PRIVACY_CLEANUP_NEGATIVE_MATRIX_2026-08-29.md\n',
+              1,
+          )
+          section_anchor = '\n## Research/Critic Invariants\n'
+          if section_anchor not in text:
+              raise SystemExit('Research/Critic section anchor not found')
+          section = '''
+## Privacy / Cleanup Negative Matrix Acceptance
+
+Accepted owner-testing record in VoiceBridge:
+
+```text
+docs/history/KRC_MEDIA_PRIVACY_CLEANUP_NEGATIVE_MATRIX_2026-08-29.md
+```
+
+Implementation and validation:
+- retained regression `src/cloud/tests/managed_media_privacy_cleanup.test.ts`;
+- attachment signed OpenAI transport URL is not persisted in durable managed-media records: PASS;
+- raw server owner admission is not persisted or returned in public job projection: PASS;
+- public attachment job projection excludes request/access digests and transcript text: PASS;
+- durable attachment source identity remains `attachment://local-media`: PASS;
+- canonical transcript segments remain persisted as intended evidence: PASS;
+- cleanup failure remains explicit as `provider_data_deleted=false`: PASS;
+- attachment/Facebook/Telegram/KRCC AssemblyAI paths retain provider-delete cleanup guards: PASS;
+- local temporary media cleanup guards remain retained where files are created: PASS;
+- durable schema contains no attachment `download_link` or raw `beta_access_code`: PASS;
+- VoiceBridge run `33266496940`: 162/162 PASS;
+- provider-consuming work: NONE;
+- Render environment mutation: NONE;
+- Neon data mutation requested: NONE;
+- paid Facebook/ScrapeCreators activation: NONE.
+
+This acceptance does not activate the separately pending Gemini 3.5 Transcribe transition plan.
+'''
+          text = text.replace(section_anchor, '\n' + section + section_anchor, 1)
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Validate state sync
+        run: |
+          grep -Fq 'Version: 7.6' subprojects/media_beta/03_CURRENT_STATE.md
+          grep -Fq 'PRIVACY_CLEANUP_NEGATIVE_MATRIX_ACCEPTED' subprojects/media_beta/03_CURRENT_STATE.md
+          grep -Fq '33266496940' subprojects/media_beta/03_CURRENT_STATE.md
+          grep -Fq 'RELEASE_HOLD_OWNER_TESTING' subprojects/media_beta/03_CURRENT_STATE.md
+          grep -Fq 'does not activate the separately pending Gemini 3.5 Transcribe transition plan' subprojects/media_beta/03_CURRENT_STATE.md
+      - name: Commit accepted state and remove harness
+        run: |
+          rm .github/workflows/krc-media-state-sync-7-6.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add subprojects/media_beta/03_CURRENT_STATE.md .github/workflows/krc-media-state-sync-7-6.yml
+          git commit -m 'Sync MEDIA BETA privacy cleanup acceptance'
+          git push origin HEAD:agent/video-url-research
