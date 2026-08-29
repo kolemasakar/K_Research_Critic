@@ -1,7 +1,7 @@
 # MEDIA BETA Current State
 Поточний канонічний стан приватного MEDIA BETA для відновлення без реконструкції історії.
 
-Version: 7.0
+Version: 7.1
 Status: RELEASE_HOLD_OWNER_TESTING
 Updated: 2026-08-29
 
@@ -20,6 +20,7 @@ TELEGRAM_PUBLIC_ROUTE_SERVER_HARDENING_ACCEPTED
 LOCAL_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED
 LOCAL_ATTACHMENT_ROUTE_BOUNDARY_AUDIT_ACCEPTED
 INSTAGRAM_ROUTE_BOUNDARY_AUDIT_ACCEPTED
+CROSS_ROUTE_NEGATIVE_ROUTING_MATRIX_ACCEPTED
 A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED
 NEON_POSTGRESQL_18_CUTOVER_ACCEPTED
 POST_CUTOVER_DURABILITY_REGRESSION_ACCEPTED
@@ -29,7 +30,7 @@ NEON_ROLLBACK_OBSERVATION_CLOSED_OWNER_APPROVED
 RELEASE_HOLD_OWNER_TESTING
 ```
 
-A9/A9.10/A10 are accepted in the private owner runtime. The isolated MEDIA BETA durable store has completed the Render PostgreSQL -> Neon PostgreSQL 18 migration stream: cutover, owner-only post-cutover durability regression, later read-only observation, final exit-readiness verification, and owner-approved rollback-observation closure. Owner-testing hardening aligned both the Facebook and Telegram active server boundaries with the already accepted dedicated-route Builder policies. Local attachment and Instagram route-boundary audits also passed without requiring additional active-route changes. The owner continues private testing before release decisions.
+A9/A9.10/A10 are accepted in the private owner runtime. The isolated MEDIA BETA durable store has completed the Render PostgreSQL -> Neon PostgreSQL 18 migration stream: cutover, owner-only post-cutover durability regression, later read-only observation, final exit-readiness verification, and owner-approved rollback-observation closure. Owner-testing hardening aligned both the Facebook and Telegram active server boundaries with the already accepted dedicated-route Builder policies. Local attachment and Instagram route-boundary audits passed, and the cross-route negative routing matrix is now live-accepted: foreign platforms are stopped at the HTTP/parser boundary before provider or durable-store service methods. The owner continues private testing before release decisions.
 
 ## Repositories
 
@@ -47,7 +48,8 @@ VoiceBridge:
 ```text
 repo: kolemasakar/VoiceBridge
 branch: agent/krc-media-transcript
-Telegram/local-attachment/Instagram route-boundary live-acceptance head at 2026-08-29 sync: cc838099c4c5d582da1f5e1c781bf29f5b245fbf
+cross-route isolation implementation live-accepted: cd8336c568df510beb8a3a8b4488b7e8ac8cd024
+cross-route acceptance-record head at 2026-08-29 sync: c1ab9a9cabcbc1859373da3106eac58ca67b86fb
 draft PR: #28
 ```
 
@@ -144,11 +146,11 @@ one local current-conversation audio/video attachment
 
 YouTube/Instagram: managed transcript route; billable work remains consent-gated. Instagram Reel AI generation remains available only after native-unavailable state and requires a separate preflight plus separate explicit consent; automatic AI fallback remains false.
 
-Facebook: free Cobalt retrieval only. Success may continue to AssemblyAI/KRCM. Failure is unavailable/STOP. ScrapeCreators is unconfigured/inactive/reserve-only and not offerable. The isolated live HTTP boundary additionally rejects Facebook on generic Supadata native preflight/start before provider invocation, and managed capability no longer advertises Facebook AI generation as active. The dedicated Cobalt route is unchanged. Historical compatibility internals remain outside the active Builder path.
+Facebook: free Cobalt retrieval only. Success may continue to AssemblyAI/KRCM. Failure is unavailable/STOP. ScrapeCreators is unconfigured/inactive/reserve-only and not offerable. The isolated live HTTP boundary rejects Facebook on generic Supadata preflight, lookup, and native start before service/provider work. The dedicated Facebook endpoint rejects Telegram, Instagram, and YouTube before the Facebook service pipeline is reached. Managed capability does not advertise Facebook AI generation as active. Historical compatibility internals remain outside the active Builder path.
 
-Telegram: public web/embed only, trusted media delivery, AssemblyAI/KRCM, zero retrieval credits, no auth/session/bot token/paid fallback. The isolated live HTTP boundary rejects Telegram on generic Supadata native preflight/start before provider invocation, preserving the dedicated `/api/v1/media/managed/telegram` path as the active route.
+Telegram: public web/embed only, trusted media delivery, AssemblyAI/KRCM, zero retrieval credits, no auth/session/bot token/paid fallback. The isolated live HTTP boundary rejects Telegram on generic Supadata preflight, lookup, and native start before service/provider work. The dedicated Telegram endpoint rejects Facebook, Instagram, and YouTube before the Telegram service pipeline is reached.
 
-Local attachment: `openaiFileIdRefs`, trusted OpenAI delivery, max 32 MiB, AssemblyAI/KRCM, zero retrieval credits, no user-visible file token. The attachment-specific parser/downloader boundary rejects malformed placeholders, arbitrary/lookalike hosts, redirects, MIME-class mismatches, and oversize content before active STT where applicable.
+Local attachment: `openaiFileIdRefs`, trusted OpenAI delivery, max 32 MiB, AssemblyAI/KRCM, zero retrieval credits, no user-visible file token. The attachment-specific parser/downloader boundary rejects URL injection, malformed/literal placeholders, arbitrary/lookalike hosts, redirects, MIME-class mismatches, and oversize content before active STT where applicable.
 
 ## Facebook Cobalt-Only Server Hardening
 
@@ -221,6 +223,49 @@ Final VoiceBridge exact-head validation at `cc838099c4c5d582da1f5e1c781bf29f5b24
 - `A9.7-F Cobalt Package Validate` run `33258208232`: SUCCESS;
 - `A9.10 Attachment Probe Validate` run `33258208290`: SUCCESS.
 
+## Cross-Route Isolation Acceptance
+
+Accepted owner-testing hardening record in VoiceBridge:
+
+```text
+docs/history/KRC_MEDIA_CROSS_ROUTE_ISOLATION_2026-08-29.md
+```
+
+Implementation:
+- VoiceBridge implementation commit `cd8336c568df510beb8a3a8b4488b7e8ac8cd024`;
+- generic Supadata lookup rejects Facebook before `service.lookup`: PASS;
+- generic Supadata lookup rejects Telegram before `service.lookup`: PASS;
+- dedicated Telegram endpoint rejects Facebook/Instagram/YouTube before `service.startTelegram`: PASS;
+- dedicated Facebook endpoint rejects Telegram/Instagram/YouTube before `service.startFacebookFallback`: PASS;
+- attachment URL injection and literal placeholder are rejected before `service.startAttachment`: PASS;
+- existing generic Facebook/Telegram preflight and native-start blocks remain intact: PASS.
+
+Static negative routing matrix:
+- hardening workflow run `33259019279`: SUCCESS;
+- full VoiceBridge cloud build/test suite: PASS;
+- fake service entry points remained unreachable for every negative matrix case: PASS.
+
+Isolated Render live negative routing matrix:
+- live smoke run `33259149464`: SUCCESS;
+- exact runtime `cd8336c568df510beb8a3a8b4488b7e8ac8cd024` deployed: PASS;
+- active durable-store target remained protected Neon PostgreSQL: PASS;
+- generic Facebook/TG preflight isolation: PASS;
+- generic Facebook/TG lookup isolation: PASS;
+- generic Facebook/TG native-start isolation: PASS;
+- Telegram foreign-platform ingress blocked: PASS;
+- Facebook foreign-platform ingress blocked: PASS;
+- attachment URL/placeholder injection blocked: PASS;
+- provider-consuming work invoked: NONE;
+- durable-store service methods invoked by the negative matrix: NONE;
+- Render environment mutation: NONE;
+- database mutation requested: NONE;
+- temporary live-smoke workflow removed after success: PASS.
+
+Final VoiceBridge exact-head validation at `c1ab9a9cabcbc1859373da3106eac58ca67b86fb`:
+- `Validate` run `33259235871`: SUCCESS;
+- `A9.7-F Cobalt Package Validate` run `33259235942`: SUCCESS;
+- `A9.10 Attachment Probe Validate` run `33259235877`: SUCCESS.
+
 ## Research/Critic Invariants
 
 - no independent research before profile approval;
@@ -268,6 +313,6 @@ Project/documentation audit record:
 
 ## Current Work Rule
 
-Owner testing may continue. The Render PostgreSQL -> Neon migration stream and rollback observation window are closed with Neon as the active durable store. The active Facebook and Telegram server boundaries are hardened to their accepted dedicated-route policies. Local attachment and Instagram route-boundary audits are accepted. Confirmed defects should be fixed only in the owning isolated feature branch and revalidated there. Do not delete the original Render PostgreSQL database, merge either MEDIA branch, change public Core, promote production infrastructure, onboard external testers, or activate paid Facebook/ScrapeCreators behavior unless the owner explicitly opens the corresponding gate.
+Owner testing may continue. The Render PostgreSQL -> Neon migration stream and rollback observation window are closed with Neon as the active durable store. The active Facebook and Telegram server boundaries are hardened to their accepted dedicated-route policies, and the cross-route negative routing matrix is live-accepted. Local attachment and Instagram route-boundary audits are accepted. Confirmed defects should be fixed only in the owning isolated feature branch and revalidated there. Do not delete the original Render PostgreSQL database, merge either MEDIA branch, change public Core, promote production infrastructure, onboard external testers, or activate paid Facebook/ScrapeCreators behavior unless the owner explicitly opens the corresponding gate.
 
 No additional A10 Builder remediation is pending.
