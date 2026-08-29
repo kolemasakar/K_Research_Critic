@@ -1,7 +1,7 @@
 # MEDIA BETA Current State
 Поточний канонічний стан приватного MEDIA BETA для відновлення без реконструкції історії.
 
-Version: 7.3
+Version: 7.4
 Status: RELEASE_HOLD_OWNER_TESTING
 Updated: 2026-08-29
 
@@ -23,6 +23,7 @@ INSTAGRAM_ROUTE_BOUNDARY_AUDIT_ACCEPTED
 CROSS_ROUTE_NEGATIVE_ROUTING_MATRIX_ACCEPTED
 AUTH_INPUT_REPLAY_NEGATIVE_MATRIX_ACCEPTED
 STATE_CONTINUATION_NEGATIVE_MATRIX_ACCEPTED
+CONSENT_CREDIT_QUOTA_NEGATIVE_MATRIX_ACCEPTED
 A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED
 NEON_POSTGRESQL_18_CUTOVER_ACCEPTED
 POST_CUTOVER_DURABILITY_REGRESSION_ACCEPTED
@@ -32,7 +33,7 @@ NEON_ROLLBACK_OBSERVATION_CLOSED_OWNER_APPROVED
 RELEASE_HOLD_OWNER_TESTING
 ```
 
-A9/A9.10/A10 are accepted in the private owner runtime. The isolated MEDIA BETA durable store has completed the Render PostgreSQL -> Neon PostgreSQL 18 migration stream: cutover, owner-only post-cutover durability regression, later read-only observation, final exit-readiness verification, and owner-approved rollback-observation closure. Owner-testing hardening aligned both the Facebook and Telegram active server boundaries with the already accepted dedicated-route Builder policies. Local attachment and Instagram route-boundary audits passed, and the cross-route negative routing matrix is live-accepted: foreign platforms are stopped at the HTTP/parser boundary before provider or durable-store service methods. The later auth/input/replay negative matrix is also accepted: Action bearer failures, malformed/oversized input, invalid methods/IDs/pagination, server-side owner admission, and duplicate replay boundaries were hardened or revalidated without a new provider-consuming media job. The later state/job-read/continuation matrix is also accepted: stale and interrupted job reads fail safely, non-completed jobs do not expose segments, AI and Facebook continuation paths enforce state/platform compatibility, and fresh native retries require a native FAILED target. The owner continues private testing before release decisions.
+A9/A9.10/A10 are accepted in the private owner runtime. The isolated MEDIA BETA durable store has completed the Render PostgreSQL -> Neon PostgreSQL 18 migration stream: cutover, owner-only post-cutover durability regression, later read-only observation, final exit-readiness verification, and owner-approved rollback-observation closure. Owner-testing hardening aligned both the Facebook and Telegram active server boundaries with the already accepted dedicated-route Builder policies. Local attachment and Instagram route-boundary audits passed, and the cross-route negative routing matrix is live-accepted: foreign platforms are stopped at the HTTP/parser boundary before provider or durable-store service methods. The later auth/input/replay negative matrix is also accepted: Action bearer failures, malformed/oversized input, invalid methods/IDs/pagination, server-side owner admission, and duplicate replay boundaries were hardened or revalidated without a new provider-consuming media job. The later state/job-read/continuation matrix is also accepted: stale and interrupted job reads fail safely, non-completed jobs do not expose segments, AI and Facebook continuation paths enforce state/platform compatibility, and fresh native retries require a native FAILED target. The consent/credit/quota negative matrix is now accepted as well: provider-credit substitutions fail before provider work, active managed KRCM routes use a durable PostgreSQL STT quota reservation, and the legacy KRCC audio path now competes against that same concurrency-safe daily ledger. The owner continues private testing before release decisions.
 
 ## Repositories
 
@@ -56,6 +57,8 @@ auth/input/replay implementation: e83a13a09b9bbcf293fb4f2d705f4ea7f15712b7
 auth/input/replay acceptance-record head at 2026-08-29 sync: 4ef9784655c413625e364b9f6eb1a43f1d26b96d
 state/continuation implementation: 8da6011cbd8f1134f125266951eebaef894be31c
 state/continuation acceptance record: docs/history/KRC_MEDIA_STATE_CONTINUATION_NEGATIVE_MATRIX_2026-08-29.md
+consent/credit/quota implementation: 30d71868987b4ffba3f0ed52e3860f6751242cf7
+consent/credit/quota acceptance record: docs/history/KRC_MEDIA_CONSENT_CREDIT_QUOTA_NEGATIVE_MATRIX_2026-08-29.md
 draft PR: #28
 ```
 
@@ -329,6 +332,34 @@ Implementation and validation:
 
 Harness-only failures before acceptance were confined to one invalid temporary workflow definition and one malformed regression fixture job ID; neither executed provider-consuming work or changed runtime/database state.
 
+## Consent / Credit / Quota Negative Matrix Acceptance
+
+Accepted owner-testing record in VoiceBridge:
+
+```text
+docs/history/KRC_MEDIA_CONSENT_CREDIT_QUOTA_NEGATIVE_MATRIX_2026-08-29.md
+```
+
+Implementation and validation:
+- VoiceBridge implementation commit `30d71868987b4ffba3f0ed52e3860f6751242cf7`;
+- native, metadata, AI-generate, and Facebook reserve consent substitutions fail before provider-consuming work: PASS;
+- stale AI caps, exhausted balances, and invalid quota durations fail closed: PASS;
+- isolated Render live no-spend consent smoke run `33263832119`: SUCCESS;
+- live Neon managed/client/STT counters remained unchanged: PASS;
+- active managed KRCM routes reserve STT quota durably before AssemblyAI: PASS;
+- legacy client-assisted KRCC audio shares the same PostgreSQL daily STT ledger: PASS;
+- KRCM/KRCC same-day concurrent reservations are serialized with a transaction advisory lock acquired before the quota-reading statement: PASS;
+- PostgreSQL shared-schema initialization is serialized to avoid concurrent `CREATE TABLE IF NOT EXISTS` races: PASS;
+- final PostgreSQL 18 shared-quota workflow run `33264731836`: SUCCESS;
+- full VoiceBridge cloud suite after the final repair: 153/153 PASS;
+- concurrent KRCM 40s + KRCC 40s against a 60s limit allows exactly one request: PASS;
+- same-job replay does not double-charge quota: PASS;
+- provider-consuming work in the live no-spend acceptance smoke: NONE;
+- Render environment mutation: NONE;
+- paid Facebook/ScrapeCreators activation: NONE.
+
+Intermediate workflow failures were contained diagnostics: one TypeScript harness typing defect, one concurrent schema-initialization DDL race, and one PostgreSQL MVCC snapshot flaw when an advisory lock was acquired inside the same quota statement. The final repair moved quota locking into an explicit transaction statement before the quota read, then passed the full concurrency matrix.
+
 ## Research/Critic Invariants
 
 - no independent research before profile approval;
@@ -376,6 +407,6 @@ Project/documentation audit record:
 
 ## Current Work Rule
 
-Owner testing may continue. The Render PostgreSQL -> Neon migration stream and rollback observation window are closed with Neon as the active durable store. The active Facebook and Telegram server boundaries are hardened to their accepted dedicated-route policies, the cross-route negative routing matrix is live-accepted, and the auth/input/replay negative matrix is accepted. Local attachment and Instagram route-boundary audits are accepted. Confirmed defects should be fixed only in the owning isolated feature branch and revalidated there. Do not delete the original Render PostgreSQL database, merge either MEDIA branch, change public Core, promote production infrastructure, onboard external testers, or activate paid Facebook/ScrapeCreators behavior unless the owner explicitly opens the corresponding gate.
+Owner testing may continue. The Render PostgreSQL -> Neon migration stream and rollback observation window are closed with Neon as the active durable store. The active Facebook and Telegram server boundaries are hardened to their accepted dedicated-route policies, the cross-route negative routing matrix is live-accepted, and the auth/input/replay negative matrix is accepted. The consent/credit/quota negative matrix is accepted, with one shared durable daily STT ledger spanning active managed KRCM routes and legacy KRCC audio. Local attachment and Instagram route-boundary audits are accepted. Confirmed defects should be fixed only in the owning isolated feature branch and revalidated there. Do not delete the original Render PostgreSQL database, merge either MEDIA branch, change public Core, promote production infrastructure, onboard external testers, or activate paid Facebook/ScrapeCreators behavior unless the owner explicitly opens the corresponding gate.
 
 No additional A10 Builder remediation is pending.
