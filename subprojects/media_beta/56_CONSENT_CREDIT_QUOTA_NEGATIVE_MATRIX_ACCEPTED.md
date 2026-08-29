@@ -3,6 +3,7 @@
 Date: 2026-08-29
 Status: ACCEPTED
 Release state: RELEASE_HOLD_OWNER_TESTING
+KRC canonical state: Version 7.4
 
 VoiceBridge implementation:
 `30d71868987b4ffba3f0ed52e3860f6751242cf7`
