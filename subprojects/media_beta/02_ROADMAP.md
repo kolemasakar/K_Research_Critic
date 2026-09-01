@@ -1,8 +1,8 @@
 # MEDIA BETA Roadmap
 Поточний roadmap приватного MEDIA BETA після завершення A9-A10 та під час M3 prerecorded provider-evidence migration track.
 
-Version: 3.9
-Status: RELEASE_HOLD_OWNER_TESTING / M3_ACTIVE
+Version: 4.0
+Status: RELEASE_HOLD_OWNER_TESTING / M3_READY_FOR_AB
 Updated: 2026-09-01
 
 ## Product Position
@@ -19,272 +19,191 @@ active KRC provider-migration branch: agent/krc-media-gemini-migration
 
 VoiceBridge supplies reusable technology, backend implementation, and validation evidence. It is not the parent product and does not independently authorize KRC MEDIA BETA release decisions.
 
-## Completed Historical Baseline
+## Accepted Runtime Baseline
 
 ```text
-A4-A7 closed-beta infrastructure and provider validation   COMPLETE/HISTORICAL
-A8 browser-assisted owner baseline                        COMPLETE/FALLBACK_ONLY
+A8 browser-assisted owner baseline                 COMPLETE / FALLBACK_ONLY
+A9 owner zero-client media input                   COMPLETE / ACCEPTED
+A9.10 local attachment                             COMPLETE / ACCEPTED
+A10 copy-safe claim-summary stabilization           COMPLETE / ACCEPTED
+Builder package                                     0.9.1-beta-a10
+Action schema                                       0.6.0-a9.10
+release state                                       RELEASE_HOLD_OWNER_TESTING
 ```
 
-The A8 Helper remains evidence/fallback only and is not normal owner UX.
+Accepted owner inputs remain YouTube, Instagram Reel, Facebook Video/Reel through free Cobalt, supported public Telegram video, and one current-conversation local audio/video attachment.
 
-## A9 Owner Zero-Client Media Input
-
-Status: COMPLETE / ACCEPTED.
+Accepted policy remains unchanged:
 
 ```text
-YouTube managed route                       ACCEPTED
-Instagram managed route                     ACCEPTED
-Facebook free Cobalt route                  ACCEPTED
-Facebook Cobalt failure -> unavailable      ACCEPTED
-Telegram public route                       ACCEPTED
-local attachment transport + ingestion      ACCEPTED
-CriticProfile integration                   ACCEPTED
-claim-level cross-check enforcement         ACCEPTED
+Facebook Cobalt failure -> unavailable
+NO automatic paid fallback
+ScrapeCreators reserve only / inactive
+Telegram public-only / zero retrieval credits
+local attachment max 32 MiB / zero retrieval credits
 ```
 
-## A9.10 Local Attachment
+## VoiceBridge Shared Baseline
 
-Status: COMPLETE / ACCEPTED.
-
-Accepted flow:
-
-```text
-current-conversation audio/video attachment
- -> openaiFileIdRefs
- -> trusted OpenAI temporary delivery
- -> bounded ingestion
- -> AssemblyAI
- -> durable KRCM
- -> CriticProfile
- -> Research/Critic
-```
-
-Retrieval credits are zero. Accepted max attachment size is 32 MiB.
-
-## A10 Stabilization
-
-Status: COMPLETE / ACCEPTED.
-
-Delivered:
-- strict visible four-column claim-summary table;
-- mandatory fenced copy-safe duplicate;
-- runtime preservation of real SHORTFALL;
-- external ChatGPT Copy defect documented rather than hidden.
-
-Builder package: `0.9.1-beta-a10`.
-Action schema: `0.6.0-a9.10`.
-
-## VoiceBridge Gemini Migration - Accepted Shared Baseline
-
-VoiceBridge has already completed its own real-time STT migration to Gemini and subsequently closed Phase 2 Universal Cloud Audio.
+VoiceBridge live streaming migration to Gemini is complete and separate from KRC prerecorded migration.
 
 ```text
 VoiceBridge main                               a426ae331721dd36291874e45380faf603d854cf
-VoiceBridge streaming STT default              Gemini gemini-3.5-transcribe-live
+VoiceBridge streaming default                  Gemini gemini-3.5-transcribe-live
 VoiceBridge streaming rollback                 AssemblyAI universal-streaming-english
 VoiceBridge Phase 2                            COMPLETE / CONTROLLED E2E VALIDATED
-VoiceBridge main Validate                      SUCCESS
 ```
 
-This completed migration changes the shared VoiceBridge technology baseline used by future KRC forward-port work, but it does not change the accepted KRC prerecorded provider in the current private runtime.
-
-Provider separation is explicit:
+KRC prerecorded provider state remains:
 
 ```text
-VoiceBridge live streaming STT
-  selector: STT_PROVIDER
-  default: gemini
-  model: gemini-3.5-transcribe-live
-  state: ACCEPTED DEFAULT
-
-KRC MEDIA BETA prerecorded STT
-  selector: KRC_MEDIA_STT_PROVIDER
-  active provider: assemblyai
-  active model: universal-2
-  Gemini candidate model: gemini-3.5-transcribe
-  state: ASSEMBLYAI ACTIVE / GEMINI INACTIVE
+selector: KRC_MEDIA_STT_PROVIDER
+active provider: AssemblyAI
+active model: universal-2
+Gemini candidate: gemini-3.5-transcribe
+Gemini normal activation: FALSE
 ```
 
-The current KRC migration implementation enforces `KRC_MEDIA_STT_PROVIDER=assemblyai` as the only normal provider value until the explicit Gemini activation gate. The Gemini prerecorded adapter is available only through the controlled candidate path.
-
-The KRC migration branch is based on VoiceBridge main commit `eba77183bee29621aa6c7cb859737a10edb6e4d4`. The compared delta to the accepted VoiceBridge Phase 2 baseline is documentation/closure synchronization only; no additional runtime-code re-port is required solely because of that delta.
-
-Impact classification:
-
-```text
-current owner MEDIA BETA behavior             UNCHANGED
-current prerecorded STT provider              UNCHANGED / ASSEMBLYAI
-provider-neutral architecture                 IMPROVED
-Gemini candidate implementation               AVAILABLE / INACTIVE
-VoiceBridge project baseline                  ADVANCED / PHASE 2 COMPLETE
-KRC M3 evidence requirement                   STILL REQUIRED
-release state                                 UNCHANGED / HOLD
-```
-
-The accepted VoiceBridge Live A/B result is useful technology evidence but is not equivalent to KRC prerecorded evidence and cannot close M3.
+VoiceBridge live Gemini acceptance does not substitute for KRC prerecorded M3 evidence and does not activate Gemini for normal KRC jobs.
 
 ## Active Track: KRC Gemini Prerecorded Forward Migration
 
-This KRC-specific engineering track is additive to the accepted private runtime. It does not activate Gemini for normal KRC MEDIA BETA jobs and does not authorize a release gate.
+```text
+M0 migration preflight                         COMPLETE
+M1 provider abstraction                        PASS
+M2 Gemini prerecorded adapter                  PASS / INACTIVE
+M3 offline evaluator                           PASS
+M3 same-asset execution contract               PASS
+M3 corpus manifest/readiness contract          PASS
+M3 byte-exact evidence helper                  PASS
+M3 first clean-public asset tranche            ACCEPTED
+M3 independent reference review                COMPLETE 3/3
+M3 READY_FOR_AB clean tranche                  TRUE 3/3
+M3 provider-consuming A/B                      NOT_RUN
+M4 new-infrastructure canary                    NOT_STARTED
+M5 provider/new-infrastructure cutover          NOT_AUTHORIZED
+```
 
-Technical authority for the current forward-port implementation/evidence:
+Technical authority:
 
 ```text
 VoiceBridge branch: agent/krc-media-gemini-migration
-current observed head: c98c77521c919611b735971451e72366dedd2750
+current evidence head: 90ca4f354a466f7f5ffdba20de246eb033b369a8
 VoiceBridge draft PR: #45
-latest fully validated evidence head: 922cf2487e59337d6b6a15d8e2c3f8cebdec36b8
-Validate run: 33506170380 SUCCESS
-cloud tests: 224/224 PASS
-repository-docs: PASS
-browser-extension: PASS
+latest pre-acceptance validated head: 6dd00fefcf9f29de4af37ce5417dddec988d4562
+Validate run: 33525309306 SUCCESS
+final-reference exact-head Validate: 33527873644 running at roadmap write
 ```
 
-The `c98c775...` delta records candidate reference-transcript hashes only and does not change runtime behavior or provider activation.
+The final-reference head adds evidence documentation only; it does not activate Gemini or change runtime provider behavior.
 
-### M0 - Recovery / Migration Preflight
+## M3 Accepted Clean-Public Evidence
 
-Status: COMPLETE.
-
-### M1 - Provider Abstraction
-
-Status: PASS.
-
-AssemblyAI remains the active KRC prerecorded provider behind the provider-neutral boundary.
-
-### M2 - Gemini Prerecorded Adapter
-
-Status: PASS / INACTIVE.
+### ua-clean-public-001
 
 ```text
-candidate: gemini-3.5-transcribe
-normal KRC activation: FALSE
-active KRC prerecorded provider: AssemblyAI universal-2
+asset SHA-256:
+98e29c2276533699c67454de16b713d9846f668b6cc32b7591a0b2eb8a275a8c
+
+original candidate reference: REJECTED AFTER LISTENING REVIEW
+corrected final reference SHA-256:
+2ec614c71321a8747b6bb50fb57a7c341bcad9150a09c5cb2a1825ebfc0f828e
+reference_review_state: independent_reviewed
+readiness: READY_FOR_AB
 ```
 
-### M3 - Evidence and Same-Asset A/B Gate
-
-Status: ACTIVE.
-
-Completed:
+### ru-clean-public-001
 
 ```text
-offline A/B evaluator                         PASS
-same-asset execution contract                 PASS
-corpus manifest/readiness contract             PASS
-byte-exact evidence preparation helper         PASS
-initial official-publisher source tranche      CAPTURE_BLOCKED / RETAINED AS PROVENANCE
-version-pinned clean-public asset tranche      CAPTURED / ACCEPTED
-asset SHA-256 evidence                         ACCEPTED 3/3
-reference source candidates                    LOCKED 3/3
-reference artifact candidate bytes             CREATED OUTSIDE GITHUB
-reference artifact candidate SHA-256           CREATED 3/3
+asset SHA-256:
+d066239503c4e7406ebeb47423334b5109aa6b30d62046d0338a04e41b4c52f5
+
+final reference SHA-256:
+1c7ac3953951270a56bf5927c86a26d28281ca9b958981c9ab56776837faaadf
+reference_review_state: independent_reviewed
+readiness: READY_FOR_AB
 ```
 
-Accepted clean-public cases:
+### en-clean-public-001
 
 ```text
-ua-clean-public-001
-audio SHA-256: 98e29c2276533699c67454de16b713d9846f668b6cc32b7591a0b2eb8a275a8c
-candidate reference SHA-256: d9a6dbf5f2d0d1f8c200b11736982f3c9b2c02741d2303c96a359fe30015e461
+asset SHA-256:
+63a4b1e4c1dc655ac70961ffbf518acd249df237e5a0152faae9a4a836949715
 
-ru-clean-public-001
-audio SHA-256: d066239503c4e7406ebeb47423334b5109aa6b30d62046d0338a04e41b4c52f5
-candidate reference SHA-256: 1c7ac3953951270a56bf5927c86a26d28281ca9b958981c9ab56776837faaadf
-
-en-clean-public-001
-audio SHA-256: 63a4b1e4c1dc655ac70961ffbf518acd249df237e5a0152faae9a4a836949715
-candidate reference SHA-256: 044267656cd78db47edd50fead3ae70f8f7240f3c1f3523cc53b94594de5ecfa
+final reference SHA-256:
+044267656cd78db47edd50fead3ae70f8f7240f3c1f3523cc53b94594de5ecfa
+reference_review_state: independent_reviewed
+readiness: READY_FOR_AB
 ```
 
-Candidate reference hashes are not final accepted reference digests. They prove only that byte-stable candidate artifacts exist outside GitHub.
+Reference transcript bytes remain outside GitHub. GitHub stores only digests, provenance metadata, and review state.
 
-Current evidence state:
+The Ukrainian upstream candidate was correctly rejected after independent listening revealed a material lexical mismatch. The corrected local reference artifact was recreated using UTF-8, LF, exactly one terminal newline, no pre-hash normalization, then re-hashed. This evidence correction does not alter the accepted media asset hash.
+
+## Current Evidence State
 
 ```text
 REAL_ASSET_BYTES_CAPTURED                     TRUE
 REAL_ASSETS_SELECTED                          TRUE
 ASSET_SHA256_ACCEPTED                         TRUE / 3 OF 3
-REFERENCE_SOURCE_CANDIDATES_LOCKED             TRUE / 3 OF 3
-REFERENCE_ARTIFACT_CANDIDATE_BYTES_CREATED     TRUE
-REFERENCE_ARTIFACT_CANDIDATE_SHA256_CREATED    TRUE / 3 OF 3
-REFERENCE_AUDIO_RECONCILIATION_COMPLETE        FALSE
-REFERENCE_SHA256_ACCEPTED                      FALSE
-REFERENCE_REVIEW_STATE                         LISTENING_REVIEW_PENDING
-READY_FOR_AB                                   FALSE
-M3_LIVE_AB                                     NOT_RUN
+REFERENCE_LISTENING_REVIEW_COMPLETED           TRUE / 3 OF 3
+FINAL_REFERENCE_SHA256_ACCEPTED                TRUE / 3 OF 3
+REFERENCE_REVIEW_STATE                         independent_reviewed / 3 OF 3
+READY_FOR_AB                                   TRUE / 3 OF 3
+M3_PROVIDER_AB                                 NOT_RUN
+ASSEMBLYAI_M3_CALLS                            NONE
+GEMINI_M3_MEDIA_CALLS                          NONE
+GEMINI_PRERECORDED_ACTIVE                      FALSE
 ```
 
-### CURRENT ROADMAP POSITION
+## CURRENT ROADMAP POSITION
 
 ```text
-M3 INDEPENDENT LISTENING REVIEW + FINAL REFERENCE SHA-256
+M3 READY_FOR_AB / PROVIDER-CONSUMING A/B AUTHORIZATION GATE
 ```
 
-Required transition:
+Next transition:
 
 ```text
-CANDIDATE_BYTES_HASHED
- -> listen to each exact accepted audio asset end-to-end
- -> reconcile every spoken token and clipping boundary
- -> correct candidate transcript bytes if required
- -> recompute final reference transcript SHA-256
- -> set reference_review_state=independent_reviewed
- -> READY_FOR_AB
- -> same-asset AssemblyAI universal-2 vs Gemini gemini-3.5-transcribe A/B
+READY_FOR_AB
+ -> explicit authorization for provider-consuming test
+ -> same exact media asset to AssemblyAI universal-2
+ -> same exact media asset to Gemini gemini-3.5-transcribe
+ -> capture provider output + latency/cost metadata
+ -> deterministic comparison against final reference
  -> manual factual/hallucination review
  -> M3 closure decision
 ```
 
-No AssemblyAI or Gemini M3 corpus transcription call has been made. Provider-consuming A/B remains unauthorized until `READY_FOR_AB` is reached.
+Provider-consuming AssemblyAI/Gemini execution is a separate action. Reaching `READY_FOR_AB` does not itself authorize spending provider credits or activating Gemini for normal KRC jobs.
 
-The VoiceBridge live provider acceptance must not be substituted for this gate. KRC uses a different model (`gemini-3.5-transcribe`), prerecorded/file semantics, different duration/timestamp constraints, and an evidence-oriented fidelity standard.
-
-### M4 - New-Infrastructure Canary
+## M4 - New-Infrastructure Canary
 
 Status: NOT STARTED.
 
-Prerequisite: deployment-image parity audit for the target VoiceBridge runtime, including KRC media/runtime dependencies.
+M4 requires a KRC-specific deployment-image parity audit covering media retrieval, probing/transcoding, managed KRC HTTP routes, Neon/PostgreSQL tooling, quota ledger, retention/provider cleanup, privacy/log-redaction guards, and route isolation.
 
-Current VoiceBridge main Phase 2 completion is positive evidence for the target cloud baseline, but it does not prove KRC-specific deployment-image parity for media retrieval, probing/transcoding, PostgreSQL tooling, durable state, or KRC Action routes.
+VoiceBridge Phase 2 completion is positive shared-infrastructure evidence but is not sufficient by itself to close this KRC-specific gate.
 
-### M5 - Cutover Decision
+## M5 - Cutover Decision
 
 Status: NOT AUTHORIZED.
 
 Any KRC prerecorded provider or infrastructure cutover requires separate explicit owner approval and verified rollback to the accepted AssemblyAI path.
 
-## Current Phase: Release Hold Owner Testing
+## Release Hold
 
-Status: ACTIVE.
-
-Canonical release checkpoint:
+All release gates remain closed and independent:
 
 ```text
-53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md
+R1 merge selected MEDIA BETA work toward main   HOLD
+R2 backend/production promotion                 HOLD
+R3 external testers                             HOLD
+R4 public sharing / Store rollout               HOLD
 ```
 
-Current decisions:
-
-```text
-merge to KRC main = HOLD
-production/backend promotion = HOLD
-external tester onboarding = HOLD
-public sharing/Store rollout = HOLD
-```
-
-During this phase, owner testing, defect correction, regression hardening, documentation maintenance, and the explicitly activated M3 evidence track are in scope. None of these activities automatically advances a release gate.
-
-## Future Release Gates
-
-R1 Merge: accept selected MEDIA BETA product changes toward `main`.
-R2 Production promotion: deploy/promote the media backend to approved production infrastructure.
-R3 External testers: enable a controlled non-owner group.
-R4 Public rollout: public sharing/Store availability.
-
-Each requires a separate explicit decision. No gate inherits approval from another.
+M3 completion, favorable Gemini evidence, successful CI, or VoiceBridge Phase 2 completion does not automatically authorize any release gate.
 
 ## Optional Future Sustainability Work
 
-Cloudflare/local Whisper or other provider-neutral cost reductions remain a future optional architecture track. They are not a prerequisite for continued private owner testing and must not silently replace the accepted beta route.
+Cloudflare/local Whisper or other provider-neutral cost reductions remain optional future work. They are not prerequisites for private owner testing and must not silently replace the accepted beta route.
