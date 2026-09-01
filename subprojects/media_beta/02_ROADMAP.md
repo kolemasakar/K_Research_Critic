@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 Поточний roadmap приватного MEDIA BETA після завершення A9-A10 та під час M3 prerecorded provider-evidence migration track.
 
-Version: 3.8
+Version: 3.9
 Status: RELEASE_HOLD_OWNER_TESTING / M3_ACTIVE
 Updated: 2026-09-01
 
@@ -108,7 +108,7 @@ KRC MEDIA BETA prerecorded STT
 
 The current KRC migration implementation enforces `KRC_MEDIA_STT_PROVIDER=assemblyai` as the only normal provider value until the explicit Gemini activation gate. The Gemini prerecorded adapter is available only through the controlled candidate path.
 
-The KRC migration branch is based on VoiceBridge main commit `eba77183bee29621aa6c7cb859737a10edb6e4d4`. Current VoiceBridge main is 13 commits ahead of that base. The compared delta contains Phase 2 documentation and closure synchronization only; no additional runtime-code re-port is required solely because of those 13 commits.
+The KRC migration branch is based on VoiceBridge main commit `eba77183bee29621aa6c7cb859737a10edb6e4d4`. The compared delta to the accepted VoiceBridge Phase 2 baseline is documentation/closure synchronization only; no additional runtime-code re-port is required solely because of that delta.
 
 Impact classification:
 
@@ -132,11 +132,16 @@ Technical authority for the current forward-port implementation/evidence:
 
 ```text
 VoiceBridge branch: agent/krc-media-gemini-migration
-current verified head: 7c2cac849d9322a8b532815ac3be44e87bd52e27
+current observed head: c98c77521c919611b735971451e72366dedd2750
 VoiceBridge draft PR: #45
-exact-head Validate run: 33480804395 SUCCESS
+latest fully validated evidence head: 922cf2487e59337d6b6a15d8e2c3f8cebdec36b8
+Validate run: 33506170380 SUCCESS
 cloud tests: 224/224 PASS
+repository-docs: PASS
+browser-extension: PASS
 ```
+
+The `c98c775...` delta records candidate reference-transcript hashes only and does not change runtime behavior or provider activation.
 
 ### M0 - Recovery / Migration Preflight
 
@@ -165,56 +170,74 @@ Status: ACTIVE.
 Completed:
 
 ```text
-offline A/B evaluator                        PASS
-same-asset execution contract                PASS
-corpus manifest/readiness contract            PASS
-byte-exact evidence preparation helper        PASS
-first public source tranche                   LOCKED
+offline A/B evaluator                         PASS
+same-asset execution contract                 PASS
+corpus manifest/readiness contract             PASS
+byte-exact evidence preparation helper         PASS
+initial official-publisher source tranche      CAPTURE_BLOCKED / RETAINED AS PROVENANCE
+version-pinned clean-public asset tranche      CAPTURED / ACCEPTED
+asset SHA-256 evidence                         ACCEPTED 3/3
+reference source candidates                    LOCKED 3/3
+reference artifact candidate bytes             CREATED OUTSIDE GITHUB
+reference artifact candidate SHA-256           CREATED 3/3
 ```
 
-First locked cases:
+Accepted clean-public cases:
 
 ```text
 ua-clean-public-001
+audio SHA-256: 98e29c2276533699c67454de16b713d9846f668b6cc32b7591a0b2eb8a275a8c
+candidate reference SHA-256: d9a6dbf5f2d0d1f8c200b11736982f3c9b2c02741d2303c96a359fe30015e461
+
 ru-clean-public-001
+audio SHA-256: d066239503c4e7406ebeb47423334b5109aa6b30d62046d0338a04e41b4c52f5
+candidate reference SHA-256: 1c7ac3953951270a56bf5927c86a26d28281ca9b958981c9ab56776837faaadf
+
 en-clean-public-001
+audio SHA-256: 63a4b1e4c1dc655ac70961ffbf518acd249df237e5a0152faae9a4a836949715
+candidate reference SHA-256: 044267656cd78db47edd50fead3ae70f8f7240f3c1f3523cc53b94594de5ecfa
 ```
+
+Candidate reference hashes are not final accepted reference digests. They prove only that byte-stable candidate artifacts exist outside GitHub.
 
 Current evidence state:
 
 ```text
-FIRST_PUBLIC_SOURCE_TRANCHE_LOCKED            TRUE
-REAL_ASSET_BYTES_CAPTURED                     FALSE
-ASSET_SHA256                                  NOT_CREATED
-REFERENCE_TRANSCRIPT_SHA256                   NOT_CREATED
-READY_FOR_AB                                  FALSE
-M3_LIVE_AB                                    NOT_RUN
+REAL_ASSET_BYTES_CAPTURED                     TRUE
+REAL_ASSETS_SELECTED                          TRUE
+ASSET_SHA256_ACCEPTED                         TRUE / 3 OF 3
+REFERENCE_SOURCE_CANDIDATES_LOCKED             TRUE / 3 OF 3
+REFERENCE_ARTIFACT_CANDIDATE_BYTES_CREATED     TRUE
+REFERENCE_ARTIFACT_CANDIDATE_SHA256_CREATED    TRUE / 3 OF 3
+REFERENCE_AUDIO_RECONCILIATION_COMPLETE        FALSE
+REFERENCE_SHA256_ACCEPTED                      FALSE
+REFERENCE_REVIEW_STATE                         LISTENING_REVIEW_PENDING
+READY_FOR_AB                                   FALSE
+M3_LIVE_AB                                     NOT_RUN
 ```
 
 ### CURRENT ROADMAP POSITION
 
 ```text
-M3 BYTE CAPTURE + SHA-256
+M3 INDEPENDENT LISTENING REVIEW + FINAL REFERENCE SHA-256
 ```
 
 Required transition:
 
 ```text
-SOURCE_LOCKED_PENDING_BYTE_CAPTURE
- -> capture exact media bytes
- -> compute byte-exact asset SHA-256
- -> do not retain raw media as GitHub artifact
- -> delete temporary media after hashing
- -> prepare/reconcile independent reference transcript
- -> compute reference transcript SHA-256
- -> independent review
+CANDIDATE_BYTES_HASHED
+ -> listen to each exact accepted audio asset end-to-end
+ -> reconcile every spoken token and clipping boundary
+ -> correct candidate transcript bytes if required
+ -> recompute final reference transcript SHA-256
+ -> set reference_review_state=independent_reviewed
  -> READY_FOR_AB
- -> same-asset AssemblyAI vs Gemini prerecorded A/B
+ -> same-asset AssemblyAI universal-2 vs Gemini gemini-3.5-transcribe A/B
  -> manual factual/hallucination review
  -> M3 closure decision
 ```
 
-The byte-capture step must not itself call AssemblyAI or Gemini.
+No AssemblyAI or Gemini M3 corpus transcription call has been made. Provider-consuming A/B remains unauthorized until `READY_FOR_AB` is reached.
 
 The VoiceBridge live provider acceptance must not be substituted for this gate. KRC uses a different model (`gemini-3.5-transcribe`), prerecorded/file semantics, different duration/timestamp constraints, and an evidence-oriented fidelity standard.
 
