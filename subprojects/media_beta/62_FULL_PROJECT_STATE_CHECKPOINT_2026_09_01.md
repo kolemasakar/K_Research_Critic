@@ -1,4 +1,5 @@
 # K-Research & Critic MEDIA BETA - Full Project State Checkpoint
+Повний канонічний checkpoint стану KRC Core, MEDIA BETA, VoiceBridge та їх взаємозв'язків.
 
 Version: 1.0
 Status: CANONICAL_RECOVERY_CHECKPOINT / RELEASE_HOLD_OWNER_TESTING / M3_ACTIVE
