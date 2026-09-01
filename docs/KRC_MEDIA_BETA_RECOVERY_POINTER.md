@@ -6,9 +6,9 @@ Updated: 2026-09-01
 
 `K-Research & Critic - MEDIA BETA` is the closed-beta media module of the published `K-Research & Critic` product.
 
-The public Core remains on `K_Research_Critic/main` and is not activated or modified by MEDIA BETA runtime work.
+The public Core remains on `K_Research_Critic/main` and is not activated or functionally modified by MEDIA BETA runtime/provider-evidence work.
 
-## Canonical Current Checkpoint
+## Canonical current checkpoint
 
 Repository:
 
@@ -20,34 +20,43 @@ Branch:
 
 Path:
 
-`subprojects/media_beta/64_M3_READY_FOR_AB_CHECKPOINT_2026_09_01.md`
+`subprojects/media_beta/68_M3B_AB_COMPLETE_OWNER_DECISION_CHECKPOINT_2026_09_01.md`
 
 Recovery command:
 
-`recover KRC MEDIA BETA M3 READY_FOR_AB checkpoint 2026-09-01`
+`recover KRC MEDIA BETA M3B A/B complete owner decision checkpoint 2026-09-01`
 
 For the complete earlier cross-repository baseline, also read:
 
 `subprojects/media_beta/62_FULL_PROJECT_STATE_CHECKPOINT_2026_09_01.md`
 
-## Current High-Level State
+## Current high-level state
 
 ```text
 PUBLIC CORE                             PUBLISHED / MAINTENANCE
 MEDIA BETA                              CLOSED BETA / RELEASE HOLD
 VOICEBRIDGE LIVE GEMINI                 ACCEPTED DEFAULT
-KRC PRERECORDED ASSEMBLYAI              ACTIVE
+KRC PRERECORDED ASSEMBLYAI              ACTIVE / universal-2
 KRC GEMINI PRERECORDED                  IMPLEMENTED / INACTIVE
-KRC PROVIDER MIGRATION                  M3 ACTIVE
-ASSET SHA-256                           ACCEPTED 3/3
-FINAL REFERENCE SHA-256                 ACCEPTED 3/3
-REFERENCE REVIEW                        independent_reviewed 3/3
-READY_FOR_AB                            TRUE 3/3
-M3 PROVIDER A/B                         NOT RUN
-CURRENT MILESTONE                       PROVIDER-CONSUMING A/B AUTHORIZATION GATE
-R1/R2/R3/R4                             HOLD
+M3 FIRST PROVIDER A/B                    COMPLETE
+M3B EXPANDED REFERENCE REVIEW            COMPLETE 4/4
+M3B PROVIDER A/B                         COMPLETE / 8 OF 8 SUCCESS
+SEVEN-CASE GLOBAL WINNER                 NOT ESTABLISHED
+GEMINI PRERECORDED TECHNICAL FUNCTION    PASS
+PROVIDER CUTOVER                         NOT AUTHORIZED
+CURRENT MILESTONE                        OWNER M3 CLOSURE DECISION
+R1/R2/R3/R4                              HOLD
 ```
 
-The current M3 evidence-ready state does not authorize AssemblyAI/Gemini test spend by itself and does not activate Gemini for normal KRC prerecorded jobs.
+M3B workflow evidence:
 
-This pointer does not authorize merge, backend promotion, external testers, public rollout, provider cutover, or any change to the public KRC Builder.
+```text
+run: 33545803364
+result: SUCCESS
+artifact id: 9815474860
+artifact digest: sha256:27553dfea4c4b641f54cfd8113b9a91396f262a6d2b9dc4c928a57f72964e80f
+```
+
+The completed A/B evidence does not activate Gemini for normal KRC prerecorded jobs and does not authorize another provider-consuming run.
+
+This pointer does not authorize merge, backend promotion, external testers, public rollout, provider cutover, or any change to the public KRC Builder/runtime.
