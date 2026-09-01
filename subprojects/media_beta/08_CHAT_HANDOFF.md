@@ -1,28 +1,29 @@
 # MEDIA BETA Chat Handoff
 Канонічна інструкція відновлення K-Research & Critic - MEDIA BETA у новому чаті.
 
-Version: 4.0
+Version: 4.1
 Status: ACTIVE_HANDOFF / RELEASE_HOLD_OWNER_TESTING / M3_ACTIVE
 Checkpoint date: 2026-09-01
 
 ## Recovery Command
 
-`recover KRC MEDIA BETA full state checkpoint 2026-09-01`
+`recover KRC MEDIA BETA M3 reference review checkpoint 2026-09-01`
 
 ## Mandatory Recovery Order
 
-1. `subprojects/media_beta/62_FULL_PROJECT_STATE_CHECKPOINT_2026_09_01.md`
-2. `subprojects/media_beta/00_INDEX.md`
-3. `subprojects/media_beta/61_VOICEBRIDGE_GEMINI_IMPACT_AUDIT_2026_09_01.md`
-4. `subprojects/media_beta/60_PROJECT_DOCUMENTATION_AUDIT_AND_M3_ROADMAP_SYNC_2026_09_01.md`
-5. `subprojects/media_beta/03_CURRENT_STATE.md`
-6. `subprojects/media_beta/53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md`
-7. `subprojects/media_beta/01_ARCHITECTURE.md`
-8. `subprojects/media_beta/02_ROADMAP.md`
-9. `subprojects/media_beta/06_DECISION_LOG.md`
-10. `subprojects/media_beta/04_OPERATIONS_RUNBOOK.md` and `05_TEST_PLAN.md` as needed.
+1. `subprojects/media_beta/63_M3_REFERENCE_REVIEW_CHECKPOINT_2026_09_01.md`
+2. `subprojects/media_beta/62_FULL_PROJECT_STATE_CHECKPOINT_2026_09_01.md`
+3. `subprojects/media_beta/00_INDEX.md`
+4. `subprojects/media_beta/61_VOICEBRIDGE_GEMINI_IMPACT_AUDIT_2026_09_01.md`
+5. `subprojects/media_beta/60_PROJECT_DOCUMENTATION_AUDIT_AND_M3_ROADMAP_SYNC_2026_09_01.md`
+6. `subprojects/media_beta/03_CURRENT_STATE.md`
+7. `subprojects/media_beta/53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md`
+8. `subprojects/media_beta/01_ARCHITECTURE.md`
+9. `subprojects/media_beta/02_ROADMAP.md`
+10. `subprojects/media_beta/06_DECISION_LOG.md`
+11. `subprojects/media_beta/04_OPERATIONS_RUNBOOK.md` and `05_TEST_PLAN.md` as needed.
 
-After reading the checkpoint, verify current GitHub heads and CI before any write.
+After reading the checkpoints, verify current GitHub heads and CI before any write or provider-consuming operation.
 
 ## Product / Repository Context
 
@@ -49,32 +50,26 @@ VoiceBridge
 
 VoiceBridge is not the parent product and cannot authorize KRC release gates.
 
-## Snapshot Heads to Compare Against
-
-The full-state checkpoint recorded these pre-write/current external heads:
+## Latest Validated Engineering Evidence
 
 ```text
-K_Research_Critic/main
-17cb85361c2e5727e3de176a05b2a55660e5e2be
-CI 33486314648 SUCCESS
-
-K_Research_Critic/agent/video-url-research
-pre-full-checkpoint head c29d8626df8bb799742cd0cc970e7e65d4fc254f
-CI 33486527423 SUCCESS
-PR #8: OPEN / DRAFT / UNMERGED / mergeable=false at snapshot
-
-VoiceBridge/main
-a426ae331721dd36291874e45380faf603d854cf
-CI 33290771682 SUCCESS
-Phase 2 COMPLETE
+K_Research_Critic/agent/video-url-research roadmap evidence head
+fe6c56aae6208527bba0cddfdeac5a55ff3ef357
+CI 33521649491 SUCCESS
+Python 3.13 PASS
+Python 3.14 PASS
+quality gates PASS
 
 VoiceBridge/agent/krc-media-gemini-migration
-7c2cac849d9322a8b532815ac3be44e87bd52e27
-CI 33480804395 SUCCESS
-PR #45: OPEN / DRAFT / UNMERGED / mergeable=true at snapshot
+c98c77521c919611b735971451e72366dedd2750
+CI 33521717978 SUCCESS
+cloud 224/224 PASS
+browser-extension PASS
+repository-docs PASS
+PR #45 OPEN / DRAFT / UNMERGED
 ```
 
-The KRC MEDIA BETA branch advances when checkpoint/index/handoff documentation is committed. Use the live branch head after recovery and inspect any delta from the checkpoint before modifying code.
+KRC checkpoint/index/handoff documentation commits may advance the branch after the validated roadmap head. They are documentation-only, but their exact-head CI must still be checked during recovery.
 
 ## Current Functional Checkpoint
 
@@ -90,13 +85,36 @@ KRC_MEDIA_GEMINI_M0_COMPLETE
 KRC_MEDIA_GEMINI_M1_PASS
 KRC_MEDIA_GEMINI_M2_PASS_INACTIVE
 KRC_MEDIA_GEMINI_M3_ACTIVE
-FIRST_PUBLIC_SOURCE_TRANCHE_LOCKED
-REAL_ASSET_BYTES_CAPTURED_FALSE
+M3_BYTE_CAPTURE_ACCEPTED
+REAL_ASSET_BYTES_CAPTURED_TRUE
+ASSET_SHA256_ACCEPTED_3_OF_3
+REFERENCE_SOURCE_CANDIDATES_LOCKED_3_OF_3
+REFERENCE_ARTIFACT_CANDIDATE_SHA256_CREATED_3_OF_3
+REFERENCE_AUDIO_RECONCILIATION_COMPLETE_FALSE
+REFERENCE_SHA256_ACCEPTED_FALSE
 READY_FOR_AB_FALSE
 M3_LIVE_PRERECORDED_AB_NOT_RUN
-CURRENT_MILESTONE_M3_BYTE_CAPTURE_SHA256
+CURRENT_MILESTONE_M3_INDEPENDENT_LISTENING_REVIEW
 RELEASE_HOLD_OWNER_TESTING
 ```
+
+## Accepted M3 Clean-Public Evidence
+
+```text
+ua-clean-public-001
+asset SHA-256: 98e29c2276533699c67454de16b713d9846f668b6cc32b7591a0b2eb8a275a8c
+candidate reference SHA-256: d9a6dbf5f2d0d1f8c200b11736982f3c9b2c02741d2303c96a359fe30015e461
+
+ru-clean-public-001
+asset SHA-256: d066239503c4e7406ebeb47423334b5109aa6b30d62046d0338a04e41b4c52f5
+candidate reference SHA-256: 1c7ac3953951270a56bf5927c86a26d28281ca9b958981c9ab56776837faaadf
+
+en-clean-public-001
+asset SHA-256: 63a4b1e4c1dc655ac70961ffbf518acd249df237e5a0152faae9a4a836949715
+candidate reference SHA-256: 044267656cd78db47edd50fead3ae70f8f7240f3c1f3523cc53b94594de5ecfa
+```
+
+The three candidate reference hashes are not final accepted reference digests until actual independent listening review is complete.
 
 ## Accepted Owner Inputs
 
@@ -139,6 +157,8 @@ R1 merge selected MEDIA BETA work toward main = HOLD
 R2 backend/production promotion = HOLD
 R3 external testers = HOLD
 R4 public rollout = HOLD
+M4 canary = NOT_STARTED
+M5 cutover = NOT_AUTHORIZED
 ```
 
 Do not infer authorization to change any gate from a request to fix/test the private beta or continue M3 engineering work.
@@ -146,22 +166,23 @@ Do not infer authorization to change any gate from a request to fix/test the pri
 ## Exact Continuation Point
 
 ```text
-M3 BYTE CAPTURE + SHA-256
+M3 INDEPENDENT LISTENING REVIEW + FINAL REFERENCE SHA-256
 ```
 
-Next valid technical operation:
+Next valid operation:
 
 ```text
-capture exact bytes for the locked public source tranche
- -> SHA-256 exact media bytes
- -> do not retain raw media as GitHub artifact
- -> delete temporary media after hashing
- -> do not call AssemblyAI/Gemini in byte-capture step
- -> prepare/review reference transcript evidence
- -> reference SHA-256
+listen to each exact accepted audio asset end-to-end
+ -> reconcile candidate transcript against actual speech
+ -> correct only actual mismatches/clipping boundaries
+ -> keep UTF-8 + LF + exactly one terminal newline
+ -> recompute SHA-256 after any change
+ -> mark independent_reviewed only after real review
  -> READY_FOR_AB
  -> controlled same-asset prerecorded AssemblyAI/Gemini A/B
 ```
+
+Do not use AssemblyAI, Gemini, another STT provider, or upstream annotation alone as a substitute for the independent listening review.
 
 ## Continuation Rule
 
@@ -169,4 +190,4 @@ During the hold, continue only owner testing, defect remediation, regression har
 
 ## Terminal Marker
 
-`MEDIA_BETA_HANDOFF_V4_FULL_STATE_M3_BYTE_CAPTURE`
+`MEDIA_BETA_HANDOFF_V4_1_M3_REFERENCE_LISTENING_REVIEW`
