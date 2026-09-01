@@ -1,17 +1,29 @@
 # MEDIA BETA Architecture
-Архітектура прийнятого owner-only zero-client MEDIA BETA контуру.
+Архітектура прийнятого owner-only zero-client MEDIA BETA контуру та ізольованого provider-migration треку.
 
-Version: 2.0
-Status: ACCEPTED_PRIVATE_ARCHITECTURE / RELEASE_HOLD
-Updated: 2026-08-27
+Version: 2.1
+Status: ACCEPTED_PRIVATE_ARCHITECTURE / RELEASE_HOLD / M3_ACTIVE
+Updated: 2026-09-01
 
-## Topology
+## Product Hierarchy
+
+```text
+K-Research & Critic
+ -> public Core: K_Research_Critic/main
+ -> closed-beta module: K-Research & Critic - MEDIA BETA
+      -> KRC product state/roadmap authority: K_Research_Critic
+      -> media/backend technology and implementation evidence: VoiceBridge
+```
+
+VoiceBridge is a technology and backend implementation source. It is not the parent KRC product and cannot independently authorize a KRC release gate.
+
+## Accepted Runtime Topology
 
 ```text
 OWNER
  -> K-Research & Critic - MEDIA BETA
  -> private Action bearer
- -> isolated VoiceBridge MEDIA BETA
+ -> isolated VoiceBridge MEDIA BETA runtime
  -> source router
     -> YouTube/Instagram managed transcript
     -> Facebook Cobalt -> AssemblyAI
@@ -25,13 +37,61 @@ OWNER
  -> final report
 ```
 
-## Isolation
+## Isolation and Engineering Branches
 
-KRC feature branch: `agent/video-url-research`, draft PR #8.
-VoiceBridge feature branch: `agent/krc-media-transcript`, draft PR #28.
-Dedicated backend: `voicebridge-krc-media-beta-kolemasakar`.
+Accepted KRC beta product/documentation branch:
 
-Public KRC `main` and production VoiceBridge are not deployment targets during the current release hold.
+```text
+K_Research_Critic: agent/video-url-research
+```
+
+Legacy/accepted VoiceBridge KRC-media runtime lineage:
+
+```text
+VoiceBridge: agent/krc-media-transcript
+```
+
+Active provider-migration forward-port:
+
+```text
+VoiceBridge: agent/krc-media-gemini-migration
+Draft PR: #45
+```
+
+Dedicated beta backend remains `voicebridge-krc-media-beta-kolemasakar` until a separately approved infrastructure transition. Public KRC Core and production/backend promotion are not implicit targets during the current release hold.
+
+## Prerecorded STT Provider Boundary
+
+Current accepted runtime provider:
+
+```text
+KRC prerecorded STT -> AssemblyAI universal-2
+```
+
+Active migration architecture under validation:
+
+```text
+KRC prerecorded STT
+ -> MediaTranscriptionProvider
+      -> AssemblyAI adapter          ACTIVE/ROLLBACK
+      -> Gemini prerecorded adapter  IMPLEMENTED / INACTIVE
+```
+
+VoiceBridge live STT provider selection is independent from the KRC prerecorded provider selection.
+
+Current migration checkpoint:
+
+```text
+M0 COMPLETE
+M1 PASS
+M2 PASS / GEMINI INACTIVE
+M3 ACTIVE
+CURRENT: M3 BYTE CAPTURE + SHA-256
+READY_FOR_AB: FALSE
+M3_LIVE_AB: NOT_RUN
+```
+
+No current M3 evidence-preparation step activates Gemini for normal MEDIA BETA jobs.
 
 ## Authentication
 
@@ -59,6 +119,19 @@ Only supported public post forms are accepted. Retrieval is public web/embed bas
 
 Exactly one supported current-conversation audio/video attachment may be supplied through ChatGPT `openaiFileIdRefs`. Backend acceptance is limited to trusted OpenAI HTTPS media delivery, bounded size/type/duration, no redirects to arbitrary hosts, and no user-visible file token. Current max attachment size is 32 MiB.
 
+## M3 Evidence Boundary
+
+The first three public corpus source candidates are locked, but no case is yet `READY_FOR_AB`.
+
+```text
+exact media bytes captured             FALSE
+asset SHA-256                           NOT_CREATED
+reference transcript SHA-256            NOT_CREATED
+live AssemblyAI/Gemini corpus A/B       NOT_RUN
+```
+
+The current valid transition is exact media-byte capture and SHA-256 hashing, followed by independent reference preparation/review. Raw media must not be retained as a GitHub artifact by that capture step.
+
 ## Transcript/Evidence Boundary
 
 Media acquisition may occur before the CriticProfile. Independent factual verification may not. Transcript content is source evidence for what was said and does not count as an independent truth cross-check.
@@ -73,4 +146,4 @@ A10 requires the normal four-column claim summary plus an identical fenced copy-
 
 ## Release Boundary
 
-Current state is `RELEASE_HOLD_OWNER_TESTING`. Merge, production promotion, external testers, and public rollout are separate future owner decisions.
+Current state is `RELEASE_HOLD_OWNER_TESTING`. Merge, backend/production promotion, external testers, and public rollout are separate future owner decisions. Completion of M3 does not itself approve any of those gates.
