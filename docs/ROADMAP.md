@@ -1,7 +1,7 @@
 # ROADMAP
 План завершеного Core та поточного ізольованого MEDIA BETA розширення.
 
-Version: 1.9
+Version: 1.10
 Status: CORE_MAINTENANCE / MEDIA_BETA_RELEASE_HOLD / M3_ACTIVE
 Updated: 2026-09-01
 
@@ -58,9 +58,41 @@ supported public Telegram video post
 one local audio/video attachment
 ```
 
-## 4. Active Provider-Evidence Track
+## 4. VoiceBridge Technology Baseline
 
-The currently active technical track is the KRC prerecorded STT forward migration implemented and validated in VoiceBridge branch `agent/krc-media-gemini-migration`.
+VoiceBridge has completed its own real-time STT migration and Phase 2 closure.
+
+```text
+VoiceBridge main                               a426ae331721dd36291874e45380faf603d854cf
+streaming STT default                          Gemini gemini-3.5-transcribe-live
+streaming rollback                             AssemblyAI universal-streaming-english
+Phase 2 Universal Cloud Audio                  COMPLETE
+main exact-head Validate                       SUCCESS
+```
+
+This is a shared technology baseline, not a KRC prerecorded provider cutover.
+
+The provider domains remain deliberately separate:
+
+```text
+VoiceBridge live streaming:
+  STT_PROVIDER=gemini
+  state=ACCEPTED DEFAULT
+
+KRC prerecorded:
+  KRC_MEDIA_STT_PROVIDER=assemblyai
+  active model=AssemblyAI universal-2
+  Gemini candidate=gemini-3.5-transcribe
+  state=IMPLEMENTED / INACTIVE
+```
+
+The KRC forward-port code currently enforces AssemblyAI as the only normal KRC prerecorded selector value until the Gemini activation gate. The Gemini prerecorded provider exists only as a controlled candidate path.
+
+The KRC migration branch was created from VoiceBridge main at `eba77183bee29621aa6c7cb859737a10edb6e4d4`. Current VoiceBridge main is 13 commits ahead of that base; the compared delta consists of Phase 2 documentation/closure changes rather than additional runtime implementation. This does not create an immediate KRC runtime re-port requirement, but current VoiceBridge main documentation is authoritative for VoiceBridge project state.
+
+## 5. Active KRC Prerecorded Provider-Evidence Track
+
+The active KRC-specific technical track remains the prerecorded STT forward migration in VoiceBridge branch `agent/krc-media-gemini-migration`.
 
 ```text
 M0 migration preflight                         COMPLETE
@@ -86,13 +118,15 @@ SOURCE_LOCKED_PENDING_BYTE_CAPTURE
  -> independent reference transcript preparation and review
  -> reference transcript SHA-256
  -> READY_FOR_AB
- -> same-asset AssemblyAI vs Gemini A/B
+ -> same-asset AssemblyAI vs Gemini prerecorded A/B
  -> manual factual/hallucination review
 ```
 
 The byte-capture step is evidence preparation only and must not itself invoke AssemblyAI or Gemini.
 
-## 5. Current Work Mode
+The completed VoiceBridge Live A/B cannot substitute for this KRC prerecorded A/B because the model, transport/input mode, corpus, duration/timestamp behavior, and evidence-integrity requirements differ.
+
+## 6. Current Work Mode
 
 Current state:
 
@@ -108,13 +142,14 @@ Canonical release checkpoint:
 subprojects/media_beta/53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md
 ```
 
-Canonical current engineering overlay:
+Canonical current engineering overlays:
 
 ```text
 subprojects/media_beta/60_PROJECT_DOCUMENTATION_AUDIT_AND_M3_ROADMAP_SYNC_2026_09_01.md
+subprojects/media_beta/61_VOICEBRIDGE_GEMINI_IMPACT_AUDIT_2026_09_01.md
 ```
 
-## 6. Independent Release Gates
+## 7. Independent Release Gates
 
 The next release-management decisions are intentionally separate:
 
@@ -129,7 +164,7 @@ Current state for all four gates: `HOLD`.
 
 A future approval of one gate must not be interpreted as approval of another. M3 technical acceptance would not itself approve any R1-R4 gate.
 
-## 7. Release Preconditions
+## 8. Release Preconditions
 
 Before any later release transition, verify at least:
 - current feature-branch CI;
@@ -141,10 +176,10 @@ Before any later release transition, verify at least:
 
 For M4 specifically, deployment-image parity must be proven before canary work.
 
-## 8. Future Optional Cost/Sustainability Work
+## 9. Future Optional Cost/Sustainability Work
 
 The sustainable-free-media concept remains optional future architecture. It is not an active requirement during the release hold and must not silently replace the accepted owner beta. Any Cloudflare/local Whisper work requires a new explicit engineering decision and new acceptance tests.
 
-## 9. Successor Platform
+## 10. Successor Platform
 
 The former general Modular Agent Platform direction is developed in a separate repository/project named `K_Supervisor`. It is not a future numbered phase of K-Research & Critic.
