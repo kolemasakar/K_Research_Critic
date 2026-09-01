@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
-Поточний roadmap приватного MEDIA BETA після завершення A9-A10 та під час M3 provider-evidence migration track.
+Поточний roadmap приватного MEDIA BETA після завершення A9-A10 та під час M3 prerecorded provider-evidence migration track.
 
-Version: 3.7
+Version: 3.8
 Status: RELEASE_HOLD_OWNER_TESTING / M3_ACTIVE
 Updated: 2026-09-01
 
@@ -14,7 +14,7 @@ product/roadmap authority: kolemasakar/K_Research_Critic
 public Core: main
 closed-beta product branch: agent/video-url-research
 technology/backend implementation source: kolemasakar/VoiceBridge
-active provider-migration branch: agent/krc-media-gemini-migration
+active KRC provider-migration branch: agent/krc-media-gemini-migration
 ```
 
 VoiceBridge supplies reusable technology, backend implementation, and validation evidence. It is not the parent product and does not independently authorize KRC MEDIA BETA release decisions.
@@ -75,15 +75,64 @@ Delivered:
 Builder package: `0.9.1-beta-a10`.
 Action schema: `0.6.0-a9.10`.
 
-## Active Track: Gemini Prerecorded Forward Migration
+## VoiceBridge Gemini Migration - Accepted Shared Baseline
 
-This engineering track is additive to the accepted private runtime. It does not activate Gemini for normal KRC MEDIA BETA jobs and does not authorize a release gate.
+VoiceBridge has already completed its own real-time STT migration to Gemini and subsequently closed Phase 2 Universal Cloud Audio.
+
+```text
+VoiceBridge main                               a426ae331721dd36291874e45380faf603d854cf
+VoiceBridge streaming STT default              Gemini gemini-3.5-transcribe-live
+VoiceBridge streaming rollback                 AssemblyAI universal-streaming-english
+VoiceBridge Phase 2                            COMPLETE / CONTROLLED E2E VALIDATED
+VoiceBridge main Validate                      SUCCESS
+```
+
+This completed migration changes the shared VoiceBridge technology baseline used by future KRC forward-port work, but it does not change the accepted KRC prerecorded provider in the current private runtime.
+
+Provider separation is explicit:
+
+```text
+VoiceBridge live streaming STT
+  selector: STT_PROVIDER
+  default: gemini
+  model: gemini-3.5-transcribe-live
+  state: ACCEPTED DEFAULT
+
+KRC MEDIA BETA prerecorded STT
+  selector: KRC_MEDIA_STT_PROVIDER
+  active provider: assemblyai
+  active model: universal-2
+  Gemini candidate model: gemini-3.5-transcribe
+  state: ASSEMBLYAI ACTIVE / GEMINI INACTIVE
+```
+
+The current KRC migration implementation enforces `KRC_MEDIA_STT_PROVIDER=assemblyai` as the only normal provider value until the explicit Gemini activation gate. The Gemini prerecorded adapter is available only through the controlled candidate path.
+
+The KRC migration branch is based on VoiceBridge main commit `eba77183bee29621aa6c7cb859737a10edb6e4d4`. Current VoiceBridge main is 13 commits ahead of that base. The compared delta contains Phase 2 documentation and closure synchronization only; no additional runtime-code re-port is required solely because of those 13 commits.
+
+Impact classification:
+
+```text
+current owner MEDIA BETA behavior             UNCHANGED
+current prerecorded STT provider              UNCHANGED / ASSEMBLYAI
+provider-neutral architecture                 IMPROVED
+Gemini candidate implementation               AVAILABLE / INACTIVE
+VoiceBridge project baseline                  ADVANCED / PHASE 2 COMPLETE
+KRC M3 evidence requirement                   STILL REQUIRED
+release state                                 UNCHANGED / HOLD
+```
+
+The accepted VoiceBridge Live A/B result is useful technology evidence but is not equivalent to KRC prerecorded evidence and cannot close M3.
+
+## Active Track: KRC Gemini Prerecorded Forward Migration
+
+This KRC-specific engineering track is additive to the accepted private runtime. It does not activate Gemini for normal KRC MEDIA BETA jobs and does not authorize a release gate.
 
 Technical authority for the current forward-port implementation/evidence:
 
 ```text
 VoiceBridge branch: agent/krc-media-gemini-migration
-current verified head before this KRC roadmap sync: 7c2cac849d9322a8b532815ac3be44e87bd52e27
+current verified head: 7c2cac849d9322a8b532815ac3be44e87bd52e27
 VoiceBridge draft PR: #45
 exact-head Validate run: 33480804395 SUCCESS
 cloud tests: 224/224 PASS
@@ -160,12 +209,14 @@ SOURCE_LOCKED_PENDING_BYTE_CAPTURE
  -> compute reference transcript SHA-256
  -> independent review
  -> READY_FOR_AB
- -> same-asset AssemblyAI vs Gemini A/B
+ -> same-asset AssemblyAI vs Gemini prerecorded A/B
  -> manual factual/hallucination review
  -> M3 closure decision
 ```
 
 The byte-capture step must not itself call AssemblyAI or Gemini.
+
+The VoiceBridge live provider acceptance must not be substituted for this gate. KRC uses a different model (`gemini-3.5-transcribe`), prerecorded/file semantics, different duration/timestamp constraints, and an evidence-oriented fidelity standard.
 
 ### M4 - New-Infrastructure Canary
 
@@ -173,11 +224,13 @@ Status: NOT STARTED.
 
 Prerequisite: deployment-image parity audit for the target VoiceBridge runtime, including KRC media/runtime dependencies.
 
+Current VoiceBridge main Phase 2 completion is positive evidence for the target cloud baseline, but it does not prove KRC-specific deployment-image parity for media retrieval, probing/transcoding, PostgreSQL tooling, durable state, or KRC Action routes.
+
 ### M5 - Cutover Decision
 
 Status: NOT AUTHORIZED.
 
-Any provider or infrastructure cutover requires separate explicit owner approval and verified rollback to the accepted AssemblyAI path.
+Any KRC prerecorded provider or infrastructure cutover requires separate explicit owner approval and verified rollback to the accepted AssemblyAI path.
 
 ## Current Phase: Release Hold Owner Testing
 
