@@ -1,15 +1,17 @@
 # ROADMAP
-План завершеного розвитку K-Research & Critic та межі подальшого maintenance.
+План завершеного розвитку K-Research & Critic, поточного закритого MEDIA BETA модуля та меж подальшого maintenance.
 
-Version: 1.14
-Status: MAINTENANCE
-Updated: 2026-08-23
+Version: 1.15
+Status: CORE_MAINTENANCE / MEDIA_BETA_CLOSED_BETA
+Updated: 2026-09-01
 
 ## 1. Purpose
 
-This roadmap records the completed implementation path for K-Research & Critic and narrowly scoped future product improvements.
+This roadmap records the completed implementation path for the published K-Research & Critic Core and the separately isolated closed-beta MEDIA BETA extension.
 
-K-Research & Critic is a finished GPT Store product. Its active product-development roadmap ends with Phase 12. Future work in this repository is limited to maintenance, compatibility, security, regression fixes, and separately approved narrow product improvements.
+The public K-Research & Critic Core is a finished GPT Store product. Its active Core product-development roadmap ends with Phase 12. Future Core work is limited to maintenance, compatibility, security, regression fixes, and separately approved narrow product improvements.
+
+K-Research & Critic - MEDIA BETA is an additive closed-beta module of K-Research & Critic. It is developed and validated separately so that MEDIA work does not silently alter the published Core. The module uses technology and backend implementation work developed in VoiceBridge, but VoiceBridge is a technology source/implementation repository rather than the parent product or product-roadmap authority.
 
 The previously planned Modular Agent Platform is no longer Phase 13 of this product. That direction is transferred to the separate `K_Supervisor` project.
 
@@ -29,6 +31,7 @@ The previously planned Modular Agent Platform is no longer Phase 13 of this prod
 - Private chain-of-thought is never required for auditability.
 - Cross-chat continuation uses the explicit checkpoint contract when requested.
 - Non-essential telemetry must not degrade the normal public request UX.
+- Closed-beta MEDIA work must remain isolated from the published Core until a separate explicit release decision.
 
 ## 3. Completed Core
 
@@ -85,7 +88,7 @@ The repository and actual public Builder are synchronized for the no-Action publ
 
 ## 6. Maintenance Scope
 
-Allowed future work:
+Allowed future Core work:
 
 ```text
 bug/security fixes
@@ -140,9 +143,61 @@ docs/REQUEST_LOG_DISABLEMENT_DECISION_2026-08-23.md
 
 Do not re-enable the public Action unless the owner explicitly accepts the consent UX or a different telemetry architecture avoids it.
 
+## 6.2 K-Research & Critic - MEDIA BETA
+
+Status: `CLOSED_BETA / RELEASE_HOLD_OWNER_TESTING`
+
+Product hierarchy:
+
+```text
+K-Research & Critic
+  -> public Core: K_Research_Critic/main
+  -> closed beta module: K-Research & Critic - MEDIA BETA
+       -> product documentation/state authority: K_Research_Critic
+       -> media/backend technology and validation source: VoiceBridge
+```
+
+The accepted private MEDIA BETA runtime already covers the A9/A9.10/A10 zero-client media path for supported YouTube, Instagram, Facebook, Telegram, and one current-conversation local audio/video attachment. These accepted beta capabilities do not imply public Core activation or merge.
+
+The currently active engineering track is the prerecorded STT/provider forward migration on VoiceBridge. The current verified position is:
+
+```text
+A9/A9.10/A10 private runtime baseline          ACCEPTED
+release hold                                  ACTIVE
+M0 migration preflight                        COMPLETE
+M1 provider abstraction                       PASS
+M2 Gemini prerecorded adapter                 PASS / INACTIVE
+M3 offline evaluator/contracts/preparation    PASS
+first public corpus source tranche            LOCKED
+exact real media bytes captured               FALSE
+asset SHA-256 evidence                        NOT_CREATED
+reference transcript SHA-256                  NOT_CREATED
+READY_FOR_AB                                  FALSE
+M3 live AssemblyAI/Gemini A/B                 NOT_RUN
+CURRENT MILESTONE                             M3 BYTE CAPTURE + SHA-256
+M4 new-infrastructure canary                  NOT_STARTED
+M5 provider/new-infrastructure cutover        NOT_AUTHORIZED
+```
+
+Current M3 transition:
+
+```text
+SOURCE_LOCKED_PENDING_BYTE_CAPTURE
+ -> capture exact public media bytes
+ -> compute byte-exact asset SHA-256
+ -> delete temporary raw media / do not retain raw media as CI artifact
+ -> prepare and independently review reference transcript evidence
+ -> compute reference transcript SHA-256
+ -> READY_FOR_AB
+ -> same-asset AssemblyAI vs Gemini A/B
+ -> manual factual/hallucination review
+```
+
+No AssemblyAI/Gemini corpus provider call is authorized merely by this documentation state. Gemini prerecorded remains an inactive candidate until later evidence gates and explicit owner decisions pass.
+
 ## 7. Current Activation Boundary
 
-Current accepted Builder state:
+Current accepted public Builder state:
 
 ```text
 Actions: disabled
@@ -150,18 +205,35 @@ Apps: disabled
 Web search: enabled
 Code Interpreter & Data Analysis: enabled
 REQUEST LOGGING instruction block: absent
-privacy-policy URL required by active package: no
+privacy-policy URL required by active public package: no
 ```
 
-## 8. Modular Agent Platform Transfer
+MEDIA BETA has its own isolated closed-beta Action/backend contour. Its existence does not change the public Builder boundary above.
+
+## 8. MEDIA BETA Release Gates
+
+The beta release gates remain independent and on hold:
+
+```text
+R1 - merge KRC MEDIA BETA feature work toward main        HOLD
+R2 - promote/replace beta backend infrastructure          HOLD
+R3 - enable controlled external testers                   HOLD
+R4 - public sharing / Store rollout                       HOLD
+```
+
+Approval of one gate does not authorize another. The active M3 provider-evaluation work is a technical evidence track, not approval of any release gate.
+
+## 9. Modular Agent Platform Transfer
 
 General modular platform work remains in separate `K_Supervisor`.
 
-## 9. Legacy Engineering Identifiers
+## 10. Legacy Engineering Identifiers
 
 Stable compatibility identifiers may retain `K_Supervisor`, including `K_SUPERVISOR_CHECKPOINT` and `runtime/k_supervisor.db`.
 
-## 10. Canonical Project Documents
+## 11. Canonical Project Documents
+
+Public/Core documents:
 
 ```text
 PROJECT_FILE_STANDARD.md
@@ -184,19 +256,23 @@ REQUEST_LOG_MVP_RUNTIME_ACCEPTANCE_2026-08-23.md
 REQUEST_LOG_DISABLEMENT_DECISION_2026-08-23.md
 ```
 
-## 11. Current Implementation State
+Closed-beta MEDIA documentation is maintained in the MEDIA BETA feature/subproject documentation and synchronized by explicit audit/checkpoint records. VoiceBridge KRC-media history files provide implementation and validation evidence but do not replace KRC product-roadmap authority.
+
+## 12. Current Implementation State
 
 ```text
-Phase 0-12                                COMPLETE
-GPT Store publication                    COMPLETE
-2026-08-23 public Core runtime hardening ACCEPTED
-Request-log prototype                    IMPLEMENTED / TESTED / RETAINED
-Request-log public usage                 DISABLED_DUE_TO_USER_CONSENT_UX
-Repository Instructions without logging COMPLETE
-Repository actions=false                 COMPLETE
-Public Builder Action removal            COMPLETE
-Public Builder Instructions resync       COMPLETE
-Post-disable NEW-chat smoke test         PASS
-Repository / public Builder sync         COMPLETE
-Current repository mode                 MAINTENANCE
+Public Core Phase 0-12                       COMPLETE
+GPT Store Core publication                   COMPLETE
+2026-08-23 public Core runtime hardening     ACCEPTED
+Request-log prototype                        IMPLEMENTED / TESTED / RETAINED
+Request-log public usage                     DISABLED_DUE_TO_USER_CONSENT_UX
+Public repository / Builder sync             COMPLETE
+Public Core repository mode                  MAINTENANCE
+K-Research & Critic - MEDIA BETA             CLOSED_BETA
+MEDIA BETA accepted runtime baseline         A9/A9.10/A10 ACCEPTED
+MEDIA BETA release state                     RELEASE_HOLD_OWNER_TESTING
+Gemini prerecorded migration                 M3 ACTIVE
+Current MEDIA BETA engineering milestone     M3 BYTE CAPTURE + SHA-256
+M3 live A/B                                  NOT_RUN
+Public Core changed by current beta work     NO
 ```
