@@ -1,4 +1,5 @@
 # K-Research & Critic - MEDIA BETA Recovery Pointer
+Канонічний покажчик на повний checkpoint закритого MEDIA BETA з public Core.
 
 Status: ACTIVE POINTER / PUBLIC CORE UNCHANGED
 Updated: 2026-09-01
