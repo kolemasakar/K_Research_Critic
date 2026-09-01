@@ -1,7 +1,7 @@
 # ROADMAP
 План завершеного розвитку K-Research & Critic, поточного закритого MEDIA BETA модуля та меж подальшого maintenance.
 
-Version: 1.15
+Version: 1.16
 Status: CORE_MAINTENANCE / MEDIA_BETA_CLOSED_BETA
 Updated: 2026-09-01
 
@@ -159,7 +159,55 @@ K-Research & Critic
 
 The accepted private MEDIA BETA runtime already covers the A9/A9.10/A10 zero-client media path for supported YouTube, Instagram, Facebook, Telegram, and one current-conversation local audio/video attachment. These accepted beta capabilities do not imply public Core activation or merge.
 
-The currently active engineering track is the prerecorded STT/provider forward migration on VoiceBridge. The current verified position is:
+### VoiceBridge Gemini migration impact
+
+VoiceBridge has already completed and accepted its own real-time streaming STT migration:
+
+```text
+VoiceBridge main                               a426ae331721dd36291874e45380faf603d854cf
+VoiceBridge Phase 1 streaming STT default      Gemini gemini-3.5-transcribe-live
+VoiceBridge AssemblyAI streaming provider      explicit rollback
+VoiceBridge Phase 2 Universal Cloud Audio      COMPLETE
+VoiceBridge main exact-head validation         SUCCESS
+```
+
+This completed VoiceBridge migration is relevant to KRC MEDIA BETA as a validated shared technology baseline, but it does not automatically switch KRC prerecorded transcription.
+
+The two provider domains are intentionally separate:
+
+```text
+VoiceBridge live streaming STT
+  STT_PROVIDER=gemini
+  model=gemini-3.5-transcribe-live
+  state=ACCEPTED DEFAULT
+
+KRC MEDIA BETA prerecorded STT
+  KRC_MEDIA_STT_PROVIDER=assemblyai
+  active model=AssemblyAI universal-2
+  Gemini candidate=gemini-3.5-transcribe
+  state=IMPLEMENTED / INACTIVE
+```
+
+The current VoiceBridge KRC migration code enforces this separation: the normal KRC provider type remains AssemblyAI-only until the explicit Gemini activation gate, while the Gemini prerecorded adapter is exposed only as a candidate path for controlled evaluation.
+
+Therefore the direct impact on the accepted owner MEDIA BETA runtime is currently:
+
+```text
+normal KRC prerecorded provider changed        NO
+Builder package changed                        NO
+Action schema changed                          NO
+isolated beta endpoint changed                 NO
+Neon state changed                             NO
+release gates changed                          NO
+provider-neutral migration readiness           IMPROVED
+Gemini prerecorded evaluation path             AVAILABLE / INACTIVE
+```
+
+VoiceBridge main advanced 13 commits after the KRC migration branch base. The compared delta is documentation synchronization/Phase 2 closure only and introduces no additional runtime code delta requiring an immediate KRC re-port. Current VoiceBridge main documentation should nevertheless be treated as the authoritative VoiceBridge project baseline.
+
+### Current KRC prerecorded migration position
+
+The separately scoped KRC prerecorded provider track remains:
 
 ```text
 A9/A9.10/A10 private runtime baseline          ACCEPTED
@@ -189,11 +237,11 @@ SOURCE_LOCKED_PENDING_BYTE_CAPTURE
  -> prepare and independently review reference transcript evidence
  -> compute reference transcript SHA-256
  -> READY_FOR_AB
- -> same-asset AssemblyAI vs Gemini A/B
+ -> same-asset AssemblyAI vs Gemini prerecorded A/B
  -> manual factual/hallucination review
 ```
 
-No AssemblyAI/Gemini corpus provider call is authorized merely by this documentation state. Gemini prerecorded remains an inactive candidate until later evidence gates and explicit owner decisions pass.
+VoiceBridge Live A/B evidence must not be reused as if it were KRC prerecorded evidence: the model, input mode, duration constraints, timestamp behavior, corpus, and evidence-integrity requirements differ. No AssemblyAI/Gemini prerecorded corpus provider call is authorized merely by the completed VoiceBridge live migration.
 
 ## 7. Current Activation Boundary
 
@@ -221,7 +269,7 @@ R3 - enable controlled external testers                   HOLD
 R4 - public sharing / Store rollout                       HOLD
 ```
 
-Approval of one gate does not authorize another. The active M3 provider-evaluation work is a technical evidence track, not approval of any release gate.
+Approval of one gate does not authorize another. The active M3 prerecorded provider-evaluation work is a technical evidence track, not approval of any release gate.
 
 ## 9. Modular Agent Platform Transfer
 
@@ -268,11 +316,15 @@ Request-log prototype                        IMPLEMENTED / TESTED / RETAINED
 Request-log public usage                     DISABLED_DUE_TO_USER_CONSENT_UX
 Public repository / Builder sync             COMPLETE
 Public Core repository mode                  MAINTENANCE
+VoiceBridge live Gemini migration             COMPLETE / ACCEPTED
+VoiceBridge Phase 2                           COMPLETE
 K-Research & Critic - MEDIA BETA             CLOSED_BETA
 MEDIA BETA accepted runtime baseline         A9/A9.10/A10 ACCEPTED
 MEDIA BETA release state                     RELEASE_HOLD_OWNER_TESTING
-Gemini prerecorded migration                 M3 ACTIVE
+KRC prerecorded active provider              AssemblyAI universal-2
+KRC Gemini prerecorded candidate             IMPLEMENTED / INACTIVE
+KRC Gemini prerecorded migration             M3 ACTIVE
 Current MEDIA BETA engineering milestone     M3 BYTE CAPTURE + SHA-256
-M3 live A/B                                  NOT_RUN
+M3 live prerecorded A/B                      NOT_RUN
 Public Core changed by current beta work     NO
 ```
