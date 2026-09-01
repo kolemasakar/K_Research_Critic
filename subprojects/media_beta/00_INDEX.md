@@ -1,8 +1,8 @@
 # MEDIA BETA Documentation Index
 Канонічний індекс документації приватного K-Research & Critic MEDIA BETA.
 
-Version: 4.6
-Status: ACTIVE / RELEASE_HOLD_OWNER_TESTING / M3_ACTIVE
+Version: 4.7
+Status: ACTIVE / RELEASE_HOLD_OWNER_TESTING / M3_READY_FOR_AB
 Updated: 2026-09-01
 
 ## Purpose
@@ -13,16 +13,16 @@ This directory is the self-contained documentation root for the isolated private
 
 ## Canonical Reading Order
 
-1. `63_M3_REFERENCE_REVIEW_CHECKPOINT_2026_09_01.md` - current recovery checkpoint after accepted asset byte capture and candidate reference hashing; current gate is independent listening review plus final reference SHA-256.
-2. `62_FULL_PROJECT_STATE_CHECKPOINT_2026_09_01.md` - complete cross-repository baseline across KRC Core, MEDIA BETA, VoiceBridge, runtime/provider boundaries, release gates, and pre-capture M3 state.
-3. `README.md` - current scope and release hold.
-4. `61_VOICEBRIDGE_GEMINI_IMPACT_AUDIT_2026_09_01.md` - interpretation of the completed VoiceBridge live Gemini migration and its bounded impact on KRC prerecorded MEDIA BETA.
-5. `60_PROJECT_DOCUMENTATION_AUDIT_AND_M3_ROADMAP_SYNC_2026_09_01.md` - product hierarchy, active VoiceBridge KRC migration branch, and M3 roadmap overlay.
-6. `03_CURRENT_STATE.md` - accepted operational baseline through the 2026-08-29 hardening state.
-7. `53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md` - owner release decision and recovery boundary.
-8. `54_PROJECT_DOCUMENTATION_AUDIT_2026_08_27.md` - previous A9/A10 documentation synchronization record.
+1. `64_M3_READY_FOR_AB_CHECKPOINT_2026_09_01.md` - current recovery checkpoint after independent listening review and final reference hashing; the first three clean-public cases are READY_FOR_AB and provider-consuming A/B is not yet run.
+2. `63_M3_REFERENCE_REVIEW_CHECKPOINT_2026_09_01.md` - historical checkpoint immediately before final listening-review closure.
+3. `62_FULL_PROJECT_STATE_CHECKPOINT_2026_09_01.md` - complete cross-repository baseline across KRC Core, MEDIA BETA, VoiceBridge, runtime/provider boundaries, release gates, and pre-capture M3 state.
+4. `README.md` - current scope and release hold.
+5. `61_VOICEBRIDGE_GEMINI_IMPACT_AUDIT_2026_09_01.md` - interpretation of the completed VoiceBridge live Gemini migration and its bounded impact on KRC prerecorded MEDIA BETA.
+6. `60_PROJECT_DOCUMENTATION_AUDIT_AND_M3_ROADMAP_SYNC_2026_09_01.md` - product hierarchy, active VoiceBridge KRC migration branch, and M3 roadmap overlay.
+7. `03_CURRENT_STATE.md` - accepted operational baseline through the 2026-08-29 hardening state.
+8. `53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md` - owner release decision and recovery boundary.
 9. `01_ARCHITECTURE.md` - current architecture including separate VoiceBridge live and KRC prerecorded STT domains.
-10. `02_ROADMAP.md` - current roadmap including the active KRC prerecorded M3 provider-evidence track.
+10. `02_ROADMAP.md` - current roadmap including M3 READY_FOR_AB state.
 11. `04_OPERATIONS_RUNBOOK.md` - owner testing/defect operations.
 12. `05_TEST_PLAN.md` - current regressions and hold testing.
 13. `06_DECISION_LOG.md` - compact decision authority.
@@ -32,49 +32,40 @@ This directory is the self-contained documentation root for the isolated private
 
 ## Current Acceptance Records
 
-Key accepted late A9/A10 and current cross-project records:
-
 ```text
-44_A9_7_I_PRIVATE_GPT_FACEBOOK_POLICY_E2E_ACCEPTANCE.md
-45_A9_9_TELEGRAM_PUBLIC_ADAPTER_AUDIT.md
-46_A9_9_PRIVATE_GPT_TELEGRAM_E2E_ACCEPTANCE.md
-47_A9_10_LOCAL_UPLOAD_TRANSPORT_AUDIT.md
-49_A9_10_ATTACHMENT_TRANSPORT_RUNTIME_ACCEPTANCE.md
-50_A9_10_PRIVATE_GPT_LOCAL_ATTACHMENT_E2E_ACCEPTANCE.md
-51_A10_STABILIZATION_AND_RELEASE_BOUNDARY.md
-52_A10_SAFE_TABLE_RUNTIME_ACCEPTANCE.md
 53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md
-54_PROJECT_DOCUMENTATION_AUDIT_2026_08_27.md
-55_STATE_CONTINUATION_NEGATIVE_MATRIX_ACCEPTED.md
-56_CONSENT_CREDIT_QUOTA_NEGATIVE_MATRIX_ACCEPTED.md
-57_DURABLE_FAIL_CLOSED_NEGATIVE_MATRIX_ACCEPTED.md
-58_PRIVACY_CLEANUP_NEGATIVE_MATRIX_ACCEPTED.md
-59_RETENTION_LOG_REDACTION_NEGATIVE_MATRIX_ACCEPTED.md
 60_PROJECT_DOCUMENTATION_AUDIT_AND_M3_ROADMAP_SYNC_2026_09_01.md
 61_VOICEBRIDGE_GEMINI_IMPACT_AUDIT_2026_09_01.md
 62_FULL_PROJECT_STATE_CHECKPOINT_2026_09_01.md
 63_M3_REFERENCE_REVIEW_CHECKPOINT_2026_09_01.md
+64_M3_READY_FOR_AB_CHECKPOINT_2026_09_01.md
 ```
 
-VoiceBridge provides detailed implementation/evidence records for both its accepted live Gemini baseline and the separate KRC prerecorded M0-M3 migration track.
+VoiceBridge detailed M3 evidence authority includes:
 
-Earlier numbered files remain historical evidence and should be read only when their phase details are needed.
+```text
+docs/history/2026-09-01_KRC_MEDIA_M3_BYTE_CAPTURE_ACCEPTANCE.md
+docs/history/2026-09-01_KRC_MEDIA_M3_REFERENCE_TRANSCRIPT_PREPARATION.md
+docs/history/2026-09-01_KRC_MEDIA_M3_REFERENCE_LISTENING_REVIEW_PARTIAL.md
+docs/history/2026-09-01_KRC_MEDIA_M3_REFERENCE_REVIEW_ACCEPTANCE.md
+```
 
 ## Source-of-Truth Precedence
 
 When documents disagree:
+
 1. current code, exact-head CI, and verified current runtime evidence;
-2. `63_M3_REFERENCE_REVIEW_CHECKPOINT_2026_09_01.md` for the current M3 recovery position and accepted clean-public evidence state;
+2. `64_M3_READY_FOR_AB_CHECKPOINT_2026_09_01.md` for current M3 readiness and final reference evidence;
 3. `62_FULL_PROJECT_STATE_CHECKPOINT_2026_09_01.md` for the complete 2026-09-01 cross-repository baseline;
-4. `61_VOICEBRIDGE_GEMINI_IMPACT_AUDIT_2026_09_01.md` for interpretation of VoiceBridge live-provider changes versus KRC prerecorded state;
-5. `60_PROJECT_DOCUMENTATION_AUDIT_AND_M3_ROADMAP_SYNC_2026_09_01.md` for the cross-repository KRC migration overlay;
-6. `03_CURRENT_STATE.md` for the accepted operational runtime baseline;
-7. `53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md` for release decisions;
-8. latest accepted phase/capability record for the specific capability;
+4. `61_VOICEBRIDGE_GEMINI_IMPACT_AUDIT_2026_09_01.md` for VoiceBridge live versus KRC prerecorded interpretation;
+5. `60_PROJECT_DOCUMENTATION_AUDIT_AND_M3_ROADMAP_SYNC_2026_09_01.md` for the cross-repository migration overlay;
+6. `03_CURRENT_STATE.md` for accepted operational runtime baseline;
+7. `53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md` for release authority;
+8. latest accepted phase/capability record;
 9. `06_DECISION_LOG.md` for policy decisions;
 10. older phase/transition records.
 
-VoiceBridge technical evidence is authoritative for the implementation it validates, but it cannot independently authorize KRC product release gates.
+VoiceBridge implementation evidence is authoritative for what it validates, but it cannot independently authorize KRC product release gates.
 
 ## Current Phase Marker
 
@@ -93,15 +84,35 @@ KRC_MEDIA_GEMINI_M3_ACTIVE
 M3_BYTE_CAPTURE_ACCEPTED
 REAL_ASSET_BYTES_CAPTURED_TRUE
 ASSET_SHA256_ACCEPTED_3_OF_3
-REFERENCE_SOURCE_CANDIDATES_LOCKED_3_OF_3
-REFERENCE_ARTIFACT_CANDIDATE_SHA256_CREATED_3_OF_3
-REFERENCE_AUDIO_RECONCILIATION_COMPLETE_FALSE
-REFERENCE_SHA256_ACCEPTED_FALSE
-READY_FOR_AB_FALSE
-M3_LIVE_PRERECORDED_AB_NOT_RUN
-M3_INDEPENDENT_LISTENING_REVIEW_NEXT
+REFERENCE_LISTENING_REVIEW_COMPLETED_3_OF_3
+FINAL_REFERENCE_SHA256_ACCEPTED_3_OF_3
+REFERENCE_REVIEW_STATE_INDEPENDENT_REVIEWED_3_OF_3
+READY_FOR_AB_TRUE_3_OF_3
+M3_PROVIDER_AB_NOT_RUN
+KRC_GEMINI_PRERECORDED_INACTIVE
 RELEASE_HOLD_OWNER_TESTING
 ```
+
+## Current M3 Evidence
+
+```text
+ua-clean-public-001
+asset: 98e29c2276533699c67454de16b713d9846f668b6cc32b7591a0b2eb8a275a8c
+final reference: 2ec614c71321a8747b6bb50fb57a7c341bcad9150a09c5cb2a1825ebfc0f828e
+state: READY_FOR_AB
+
+ru-clean-public-001
+asset: d066239503c4e7406ebeb47423334b5109aa6b30d62046d0338a04e41b4c52f5
+final reference: 1c7ac3953951270a56bf5927c86a26d28281ca9b958981c9ab56776837faaadf
+state: READY_FOR_AB
+
+en-clean-public-001
+asset: 63a4b1e4c1dc655ac70961ffbf518acd249df237e5a0152faae9a4a836949715
+final reference: 044267656cd78db47edd50fead3ae70f8f7240f3c1f3523cc53b94594de5ecfa
+state: READY_FOR_AB
+```
+
+The Ukrainian original candidate reference was rejected after independent listening and replaced by a corrected outside-GitHub artifact before the final digest was accepted.
 
 ## Active Engineering Branches
 
@@ -110,27 +121,13 @@ KRC public Core: kolemasakar/K_Research_Critic / main
 KRC MEDIA BETA: kolemasakar/K_Research_Critic / agent/video-url-research / draft PR #8
 VoiceBridge current project baseline: kolemasakar/VoiceBridge / main
 VoiceBridge active KRC prerecorded migration: agent/krc-media-gemini-migration
-VoiceBridge migration head: c98c77521c919611b735971451e72366dedd2750
+VoiceBridge migration head: 90ca4f354a466f7f5ffdba20de246eb033b369a8
 VoiceBridge migration draft PR: #45
-VoiceBridge exact-head Validate: 33521717978 SUCCESS
-legacy VoiceBridge KRC Media branch: agent/krc-media-transcript (historical/runtime lineage)
-```
-
-KRC PR #8 and VoiceBridge PR #45 remain integration/evidence mechanisms only; neither draft PR state authorizes a product release gate.
-
-## Accepted Owner Media Inputs
-
-```text
-YouTube
-Instagram Reel
-Facebook Video/Reel via free Cobalt
-supported public Telegram video post
-one local current-conversation audio/video attachment
+VoiceBridge exact-head Validate: 33527873644 SUCCESS
+legacy VoiceBridge KRC Media branch: agent/krc-media-transcript
 ```
 
 ## Current Package
-
-Accepted private runtime baseline:
 
 ```text
 Builder package: 0.9.1-beta-a10
@@ -140,32 +137,28 @@ active KRC prerecorded provider: AssemblyAI universal-2
 Gemini prerecorded candidate active: false
 ```
 
-The completed VoiceBridge streaming provider migration does not alter these package/runtime values.
-
 ## Current Roadmap Position
 
 ```text
-M3 INDEPENDENT LISTENING REVIEW + FINAL REFERENCE SHA-256
+M3 READY_FOR_AB / PROVIDER-CONSUMING A/B AUTHORIZATION GATE
 ```
 
-Asset byte evidence is accepted for the first three clean-public cases. Candidate reference artifacts and candidate hashes exist outside GitHub. They must now be reconciled against the exact accepted audio before any reference digest can be accepted or any case can reach `READY_FOR_AB`.
+The evidence-readiness gate is complete. The next operation is a controlled same-asset AssemblyAI `universal-2` versus Gemini `gemini-3.5-transcribe` A/B run, but this is provider-consuming work and requires separate authorization.
 
-No AssemblyAI/Gemini M3 corpus call is authorized before this review gate completes.
+Reaching READY_FOR_AB does not activate Gemini for normal KRC jobs and does not authorize any release gate.
 
 ## Recovery Command
 
 ```text
-recover KRC MEDIA BETA M3 reference review checkpoint 2026-09-01
+recover KRC MEDIA BETA M3 READY_FOR_AB checkpoint 2026-09-01
 ```
 
-Always read `63_M3_REFERENCE_REVIEW_CHECKPOINT_2026_09_01.md` first, then `62_FULL_PROJECT_STATE_CHECKPOINT_2026_09_01.md`, and verify live GitHub heads/CI before any write or provider-consuming action.
+Always read `64_M3_READY_FOR_AB_CHECKPOINT_2026_09_01.md` first and verify live GitHub heads/CI before provider-consuming work.
 
 ## Non-Negotiable Hold Boundary
 
 Do not merge MEDIA BETA into public Core, change the public KRC Builder, promote/replace the beta backend, enable external testers, publish/share MEDIA publicly, activate Gemini prerecorded for normal KRC jobs, enable automatic paid fallback, or weaken credit/privacy/traceability gates without a separate explicit owner decision.
 
-VoiceBridge Phase 2 completion and KRC M3 provider-evidence work do not themselves approve any release gate.
-
 ## Documentation Naming Exception
 
-This subproject predates the repository-wide preference against numeric-prefix ordering. Existing numbered phase/acceptance files are retained as stable historical references. New numbered records are added only when they are distinct immutable phase/checkpoint/audit artifacts, not as revisions of stable documents.
+This subproject predates the repository-wide preference against numeric-prefix ordering. Existing numbered phase/acceptance files are retained as stable historical references. New numbered records are added only when they are distinct immutable phase/checkpoint/audit artifacts.
