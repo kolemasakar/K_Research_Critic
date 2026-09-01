@@ -1,5 +1,5 @@
 # K-Research & Critic - MEDIA BETA Recovery Pointer
-Канонічний покажчик на повний checkpoint закритого MEDIA BETA з public Core.
+Канонічний покажчик на актуальний checkpoint закритого MEDIA BETA з public Core.
 
 Status: ACTIVE POINTER / PUBLIC CORE UNCHANGED
 Updated: 2026-09-01
@@ -8,7 +8,7 @@ Updated: 2026-09-01
 
 The public Core remains on `K_Research_Critic/main` and is not activated or modified by MEDIA BETA runtime work.
 
-## Canonical Full-State Checkpoint
+## Canonical Current Checkpoint
 
 Repository:
 
@@ -20,24 +20,15 @@ Branch:
 
 Path:
 
-`subprojects/media_beta/62_FULL_PROJECT_STATE_CHECKPOINT_2026_09_01.md`
+`subprojects/media_beta/64_M3_READY_FOR_AB_CHECKPOINT_2026_09_01.md`
 
 Recovery command:
 
-`recover KRC MEDIA BETA full state checkpoint 2026-09-01`
+`recover KRC MEDIA BETA M3 READY_FOR_AB checkpoint 2026-09-01`
 
-The checkpoint records the current relationships between:
+For the complete earlier cross-repository baseline, also read:
 
-```text
-K-Research & Critic public Core
-K-Research & Critic - MEDIA BETA
-VoiceBridge main
-VoiceBridge KRC prerecorded Gemini migration branch
-accepted isolated MEDIA BETA runtime/durable state
-provider boundaries
-release gates
-current M3 continuation point
-```
+`subprojects/media_beta/62_FULL_PROJECT_STATE_CHECKPOINT_2026_09_01.md`
 
 ## Current High-Level State
 
@@ -48,8 +39,15 @@ VOICEBRIDGE LIVE GEMINI                 ACCEPTED DEFAULT
 KRC PRERECORDED ASSEMBLYAI              ACTIVE
 KRC GEMINI PRERECORDED                  IMPLEMENTED / INACTIVE
 KRC PROVIDER MIGRATION                  M3 ACTIVE
-CURRENT MILESTONE                       M3 BYTE CAPTURE + SHA-256
+ASSET SHA-256                           ACCEPTED 3/3
+FINAL REFERENCE SHA-256                 ACCEPTED 3/3
+REFERENCE REVIEW                        independent_reviewed 3/3
+READY_FOR_AB                            TRUE 3/3
+M3 PROVIDER A/B                         NOT RUN
+CURRENT MILESTONE                       PROVIDER-CONSUMING A/B AUTHORIZATION GATE
 R1/R2/R3/R4                             HOLD
 ```
+
+The current M3 evidence-ready state does not authorize AssemblyAI/Gemini test spend by itself and does not activate Gemini for normal KRC prerecorded jobs.
 
 This pointer does not authorize merge, backend promotion, external testers, public rollout, provider cutover, or any change to the public KRC Builder.
