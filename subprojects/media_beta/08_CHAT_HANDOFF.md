@@ -1,27 +1,26 @@
 # MEDIA BETA Chat Handoff
 Канонічна інструкція відновлення K-Research & Critic - MEDIA BETA у новому чаті.
 
-Version: 4.3
-Status: ACTIVE_HANDOFF / RELEASE_HOLD_OWNER_TESTING / M3B_READY_FOR_AB
+Version: 4.4
+Status: ACTIVE_HANDOFF / RELEASE_HOLD_OWNER_TESTING / M3B_AB_COMPLETE_OWNER_DECISION_PENDING
 Checkpoint date: 2026-09-01
 
 ## Recovery command
 
-`recover KRC MEDIA BETA M3B ready-for-A/B checkpoint 2026-09-01`
+`recover KRC MEDIA BETA M3B A/B complete owner decision checkpoint 2026-09-01`
 
 ## Mandatory recovery order
 
-1. `subprojects/media_beta/67_M3B_READY_FOR_AB_CHECKPOINT_2026_09_01.md`
-2. `subprojects/media_beta/65_M3_AB_COMPLETE_OWNER_DECISION_CHECKPOINT_2026_09_01.md`
-3. `subprojects/media_beta/62_FULL_PROJECT_STATE_CHECKPOINT_2026_09_01.md`
-4. `subprojects/media_beta/00_INDEX.md`
-5. `subprojects/media_beta/61_VOICEBRIDGE_GEMINI_IMPACT_AUDIT_2026_09_01.md`
-6. `subprojects/media_beta/60_PROJECT_DOCUMENTATION_AUDIT_AND_M3_ROADMAP_SYNC_2026_09_01.md`
+1. `subprojects/media_beta/68_M3B_AB_COMPLETE_OWNER_DECISION_CHECKPOINT_2026_09_01.md`
+2. `subprojects/media_beta/67_M3B_READY_FOR_AB_CHECKPOINT_2026_09_01.md`
+3. `subprojects/media_beta/65_M3_AB_COMPLETE_OWNER_DECISION_CHECKPOINT_2026_09_01.md`
+4. `subprojects/media_beta/62_FULL_PROJECT_STATE_CHECKPOINT_2026_09_01.md`
+5. `subprojects/media_beta/00_INDEX.md`
+6. `subprojects/media_beta/02_ROADMAP.md`
 7. `subprojects/media_beta/03_CURRENT_STATE.md`
 8. `subprojects/media_beta/53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md`
 9. `subprojects/media_beta/01_ARCHITECTURE.md`
-10. `subprojects/media_beta/02_ROADMAP.md`
-11. `subprojects/media_beta/06_DECISION_LOG.md`
+10. `subprojects/media_beta/06_DECISION_LOG.md`
 
 Verify current GitHub heads and CI before any write, provider-consuming operation, merge, deployment, or activation decision.
 
@@ -38,65 +37,63 @@ K-Research & Critic
     role: closed-beta module
     product/roadmap authority: K_Research_Critic
     branch: agent/video-url-research
-    PR: #8
+    PR: #8 draft/open/unmerged
     release state: RELEASE_HOLD_OWNER_TESTING
 
 VoiceBridge
  -> technology/backend implementation source
- -> main: accepted VoiceBridge project baseline
+ -> main: accepted shared baseline
  -> agent/krc-media-gemini-migration: active KRC prerecorded migration / PR #45
 ```
 
 VoiceBridge cannot independently authorize KRC product release gates.
 
-## Current M3 state
+## Current M3 evidence
 
-First tranche:
-
-```text
-M3_FIRST_TRANCHE_AB                         COMPLETE 3/3
-AssemblyAI token-weighted WER               3.23%
-Gemini token-weighted WER                   6.45%
-first-tranche preference                    ASSEMBLYAI_FOR_THIS_TRANCHE
-Gemini prerecorded technical function       PASS
-```
-
-M3B expanded tranche:
+First provider tranche:
 
 ```text
-M3B_NEW_CASES                               4
-M3B_ASSET_BYTES_CAPTURED                    TRUE 4/4
-M3B_ASSET_SHA256_ACCEPTED                   TRUE 4/4
-M3B_LOCAL_ASSET_SHA256_VERIFIED             TRUE 4/4
-M3B_REFERENCE_INDEPENDENT_REVIEW            COMPLETE 4/4
-M3B_FINAL_REFERENCE_SHA256_ACCEPTED         TRUE 4/4
-M3B_READY_FOR_AB                            TRUE 4/4
-M3B_PROVIDER_AB                             NOT_RUN
+M3_FIRST_TRANCHE_AB: COMPLETE
+AssemblyAI token-weighted WER: 3.23%
+Gemini token-weighted WER: 6.45%
+first-tranche preference: ASSEMBLYAI_FOR_THIS_TRANCHE
 ```
 
-The owner independently listened to all four exact M3B assets after local SHA-256 verification. JACKHAMMER, VOSK NUMERIC, LIBRISPEECH, and HARVARD all passed without transcript correction.
-
-## M3B final reference hashes
+Expanded M3B tranche:
 
 ```text
-en-long-harvard-001
-f9e9eddbd0130ab1505d877a18cb29a26492114ecda86b9e7da92ec29b78b211
-
-en-noisy-jackhammer-001
-cf62ebe3e7e89f77272a5f6fdf296d2860af8e738799d939a672c08fe4484724
-
-en-numeric-vosk-001
-cc73ecc627780d8b6ef02fd5d8b093d85f21420a9a646b871e3ce0a0934eb1f4
-
-en-hard-librispeech-001
-a5bbd76f41e8929020cacf75c98208b7d6a42d6b669c95a8e8303f27ac97ec49
+M3B_ASSET_SHA256_ACCEPTED: TRUE 4/4
+M3B_REFERENCE_INDEPENDENT_REVIEW: COMPLETE 4/4
+M3B_PROVIDER_AB: COMPLETE
+M3B_PROVIDER_RESULTS: SUCCESS 8/8
+M3B_LEXICAL_WER: TIE_FOR_THIS_TRANCHE
+M3B_NUMERIC_SEQUENCE_FIDELITY: GEMINI_PREFERRED_FOR_THIS_FIXTURE
 ```
 
-Transcript bodies remain outside GitHub.
+Execution authority:
 
-VoiceBridge acceptance authority:
+```text
+VoiceBridge workflow: KRC Media M3B Live A-B
+run: 33545803364
+source commit: 4f55dab95abe5518b9205cb5666ad457795416d7
+result: SUCCESS
+artifact id: 9815474860
+artifact digest: sha256:27553dfea4c4b641f54cfd8113b9a91396f262a6d2b9dc4c928a57f72964e80f
+raw media artifact: FALSE
+```
 
-`docs/history/2026-09-01_KRC_MEDIA_M3B_REFERENCE_REVIEW_ACCEPTANCE.md`
+Seven-case synthesis:
+
+```text
+reviewed reference tokens: 117
+AssemblyAI lexical WER: 13.68%
+Gemini lexical WER: 14.53%
+AssemblyAI mean latency: 3346.43 ms
+Gemini mean latency: 3555.86 ms
+SEVEN_CASE_GLOBAL_WINNER: NOT_ESTABLISHED
+```
+
+Numeric interpretation is mixed: an earlier RU case favored AssemblyAI for numeric-format clarity; the M3B numeric sequence fixture favored Gemini for complete digit-sequence preservation.
 
 ## Provider separation
 
@@ -137,27 +134,19 @@ provider cutover: NOT_AUTHORIZED
 ## Exact continuation point
 
 ```text
-M3B READY_FOR_AB / SECOND PROVIDER-CONSUMING A/B AUTHORIZATION GATE
+M3B A/B COMPLETE / OWNER M3 CLOSURE DECISION
 ```
 
-Only after explicit owner authorization:
+Owner decision options:
 
 ```text
-4 exact accepted M3B assets
-x 2 providers
-= maximum 8 provider submissions
-
-AssemblyAI universal-2
-Gemini gemini-3.5-transcribe
- -> capture outputs
- -> deterministic comparison against final references
- -> manual factual/hallucination review
- -> seven-case evidence synthesis
- -> M3 closure or further-corpus decision
+1. RETAIN_ASSEMBLYAI_AND_CLOSE_M3
+2. M3C_TARGETED_CORPUS
+3. HOLD_WITHOUT_CUTOVER
 ```
 
-Do not infer provider-spend authorization from `READY_FOR_AB`. Do not activate Gemini for normal KRC jobs as part of the test.
+A further provider-consuming run is not implied by the completed A/B and requires separate explicit authorization.
 
 ## Terminal marker
 
-`MEDIA_BETA_HANDOFF_V4_3_M3B_READY_FOR_AB_PROVIDER_AUTHORIZATION`
+`MEDIA_BETA_HANDOFF_V4_4_M3B_AB_COMPLETE_OWNER_DECISION`
