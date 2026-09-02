@@ -1,8 +1,8 @@
 # MEDIA BETA Roadmap
 Поточний roadmap приватного K-Research & Critic MEDIA BETA.
 
-Version: 4.3
-Status: RELEASE_HOLD_OWNER_TESTING / M3_CLOSED / M4_IMAGE_PARITY_READY / OWNER_CANARY_DECISION
+Version: 4.4
+Status: RELEASE_HOLD_OWNER_TESTING / M3_CLOSED / M4_OWNER_CANARY_ACCEPTED / R1_R2_HOLD
 Updated: 2026-09-02
 
 ## Product position
@@ -69,63 +69,88 @@ Initial repository preflight found missing `ffmpeg`/`ffprobe` and `psql` in the 
 
 ### M4.1 image parity remediation - COMPLETE / ACCEPTED
 
-VoiceBridge final runtime image now installs the required media and PostgreSQL client tooling.
-
-Exact acceptance:
+Exact accepted evidence:
 
 ```text
-VoiceBridge commit: 6a9491359795840ec9e79c9edc0ea82f595e9784
+VoiceBridge target commit: 6a9491359795840ec9e79c9edc0ea82f595e9784
 Validate run: 33577022166
-krc-image-parity: SUCCESS
-cloud: SUCCESS
-browser-extension: SUCCESS
-repository-docs: SUCCESS
+final image build: PASS
+ffmpeg/ffprobe: PASS
+psql: PASS
+no-provider startup smoke: PASS
 ```
 
-CI proves:
+### M4.2 bounded owner-only canary - COMPLETE / ACCEPTED
+
+The owner explicitly authorized a temporary live canary on the isolated MEDIA BETA Render service.
+
+Canary evidence:
 
 ```text
-final image builds: PASS
-ffmpeg available/working: PASS
-ffprobe available/working: PASS
-psql available/working: PASS
-no-provider KRC startup smoke: PASS
+workflow run: 33580592224
+result: SUCCESS
+exact target temporarily live: 6a9491359795840ec9e79c9edc0ea82f595e9784
+real STT fixture: public Telegram techcrimes/12107
+provider: AssemblyAI universal-2
+STT seconds: 53
+retrieval credits: 0
+provider cleanup: PASS
+durable Neon readback: PASS
+duplicate reuse: PASS
+STT reservation rows for job: 1
+invalid/private Telegram boundary: PASS
+mandatory rollback: PASS
 ```
+
+The isolated Render service was restored to exact pre-canary commit:
+
+`2f0f02769dbdf2e8240e6b08867ecef2faaede16`
 
 VoiceBridge authority:
 
-`docs/history/2026-09-02_KRC_MEDIA_M4_IMAGE_PARITY_REMEDIATION_ACCEPTANCE.md`
+`docs/history/2026-09-02_KRC_MEDIA_M4_OWNER_CANARY_ACCEPTANCE.md`
 
-### M4.2 owner deployment/canary - OWNER DECISION REQUIRED
+### M4 post-canary gate
 
-No external deployment has occurred.
+The canary is acceptance evidence only. It does not permanently promote the M4 target.
 
-Before canary execution, revalidate the exact target Render service, branch/commit, environment configuration, Neon connectivity, Cobalt health, AssemblyAI operating state, Action compatibility, and rollback target.
+```text
+M4_IMAGE_PARITY: PASS
+M4_OWNER_CANARY: PASS
+M4_PERMANENT_BACKEND_PROMOTION: NOT_AUTHORIZED
+```
 
-Then owner must explicitly authorize the exact deployment/canary scope.
+The next owner decision must keep repository integration and backend promotion separate:
+
+```text
+R1: merge selected MEDIA BETA work toward main - separate decision
+R2: permanently promote tested backend target - separate decision
+```
+
+Before either gate, reverify current heads/CI, exact diffs/scope, current Render live baseline, rollback target, environment state, Neon connectivity, and release-hold invariants.
 
 ## M5 - Provider/new-infrastructure cutover
 
 Status: NOT_AUTHORIZED.
 
-M5 is not implied by M4 image readiness or an eventual owner-only canary.
+M5 is not implied by M4 canary acceptance. Gemini prerecorded remains inactive and Hybrid C/D remains deferred.
 
 ## Release hold
 
 ```text
 R1 merge selected MEDIA BETA work toward main   HOLD
-R2 backend/production promotion                 HOLD unless separately scoped for owner canary
+R2 backend/production promotion                 HOLD
 R3 external testers                             HOLD
 R4 public sharing / Store rollout               HOLD
 ```
 
 ## Current checkpoint
 
-`71_M4_IMAGE_PARITY_READY_OWNER_CANARY_DECISION_CHECKPOINT_2026_09_02.md`
+`72_M4_OWNER_CANARY_ACCEPTED_ROLLBACK_COMPLETE_CHECKPOINT_2026_09_02.md`
 
 ## Exact continuation point
 
 ```text
-M4.2 OWNER DEPLOYMENT/CANARY DECISION
-NO EXTERNAL DEPLOYMENT WITHOUT EXPLICIT APPROVAL
+OWNER POST-CANARY DECISION
+R1 MERGE AND R2 BACKEND PROMOTION REMAIN SEPARATE GATES
 ```
