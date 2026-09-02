@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 Реєстр чинних і історичних рішень MEDIA BETA з актуальними release-hold рішеннями.
 
-Version: 2.2
+Version: 2.3
 Status: ACTIVE
 Updated: 2026-09-02
 
@@ -208,3 +208,38 @@ Canonical checkpoint:
 VoiceBridge preflight authority:
 
 `docs/history/2026-09-02_KRC_MEDIA_M4_DEPLOYMENT_IMAGE_PARITY_PREFLIGHT.md`
+
+## D031 - M4 Final-Image Parity Remediation Is Accepted
+
+Decision: ACCEPTED / OWNER_CANARY_AUTHORIZATION_PENDING
+Date: 2026-09-02
+
+VoiceBridge M4.1 feature-branch remediation installed the required runtime tooling and added CI validation of the final Docker image.
+
+Exact validated evidence:
+
+```text
+VoiceBridge acceptance commit: 6a9491359795840ec9e79c9edc0ea82f595e9784
+Validate run: 33577022166
+krc-image-parity: SUCCESS
+cloud: SUCCESS
+browser-extension: SUCCESS
+repository-docs: SUCCESS
+```
+
+The final image proves working `ffmpeg`, `ffprobe`, and `psql`, and passes a no-provider-call KRC managed-route startup smoke.
+
+Therefore:
+
+```text
+M4_IMAGE_PARITY: PASS
+M4_CANARY_PREREQUISITE_IMAGE_PARITY: PASS
+M4_DEPLOYMENT: NOT_PERFORMED
+M4_CANARY: NOT_RUN
+```
+
+Repository/CI readiness does not authorize an external deployment. A separate owner decision is mandatory before deployment or an owner-only canary.
+
+Canonical checkpoint:
+
+`71_M4_IMAGE_PARITY_READY_OWNER_CANARY_DECISION_CHECKPOINT_2026_09_02.md`
