@@ -1,8 +1,8 @@
 # MEDIA BETA Roadmap
 Поточний roadmap приватного K-Research & Critic MEDIA BETA.
 
-Version: 4.2
-Status: RELEASE_HOLD_OWNER_TESTING / M3_CLOSED / M4_PREFLIGHT_BLOCKED
+Version: 4.3
+Status: RELEASE_HOLD_OWNER_TESTING / M3_CLOSED / M4_IMAGE_PARITY_READY / OWNER_CANARY_DECISION
 Updated: 2026-09-02
 
 ## Product position
@@ -17,21 +17,18 @@ technology/backend implementation source: kolemasakar/VoiceBridge
 KRC media migration branch: agent/krc-media-gemini-migration
 ```
 
-VoiceBridge supplies technology, implementation, and validation evidence. It does not independently authorize KRC product release gates.
-
 ## Accepted runtime baseline
 
 ```text
-A8 browser-assisted owner baseline          COMPLETE / FALLBACK_ONLY
-A9 owner zero-client media input            COMPLETE / ACCEPTED
-A9.10 local attachment                      COMPLETE / ACCEPTED
-A10 copy-safe claim-summary stabilization   COMPLETE / ACCEPTED
-Builder package                              0.9.1-beta-a10
-Action schema                                0.6.0-a9.10
-release state                                RELEASE_HOLD_OWNER_TESTING
+A9 / A9.10 / A10                           ACCEPTED
+Builder package                            0.9.1-beta-a10
+Action schema                              0.6.0-a9.10
+release state                              RELEASE_HOLD_OWNER_TESTING
+KRC prerecorded provider                   AssemblyAI universal-2
+Gemini prerecorded normal activation       FALSE
 ```
 
-Accepted policy remains unchanged:
+Policy remains:
 
 ```text
 Facebook Cobalt failure -> unavailable
@@ -41,123 +38,94 @@ Telegram public-only / zero retrieval credits
 local attachment max 32 MiB / zero retrieval credits
 ```
 
-## Provider boundary
-
-```text
-VoiceBridge live default: Gemini gemini-3.5-transcribe-live
-KRC prerecorded active provider: AssemblyAI universal-2
-Gemini prerecorded candidate: gemini-3.5-transcribe
-Gemini normal prerecorded activation: FALSE
-provider cutover now: FALSE
-```
-
 ## M3 - Provider evidence
 
 Status: CLOSED.
 
 ```text
-M0 migration preflight                         COMPLETE
-M1 provider abstraction                        PASS
-M2 Gemini prerecorded adapter                  PASS / INACTIVE
-M3 offline evaluator                           PASS
-M3 first clean-public reference review         COMPLETE 3/3
-M3 first provider A/B                          COMPLETE 3/3 x 2
-M3B expanded corpus byte acceptance            COMPLETE 4/4
-M3B independent reference review               COMPLETE 4/4
-M3B second provider A/B                        COMPLETE 4/4 x 2
-M3 manual factual/hallucination review          COMPLETE
-M3 closure                                      CLOSED / RETAIN_ASSEMBLYAI_CURRENT_PROVIDER
+first A/B tranche: COMPLETE
+expanded M3B A/B: COMPLETE
+manual factual/hallucination review: COMPLETE
+seven-case global winner: NOT_ESTABLISHED
+current provider retained: AssemblyAI universal-2
+provider cutover now: FALSE
 ```
 
-Seven-case synthesis:
-
-```text
-reviewed reference tokens: 117
-AssemblyAI lexical WER: 13.68%
-Gemini lexical WER: 14.53%
-SEVEN_CASE_GLOBAL_WINNER: NOT_ESTABLISHED
-```
-
-The evidence does not justify a current provider cutover.
-
-## Deferred free-first Hybrid C/D
+## Deferred Hybrid C/D
 
 Status: PLANNED / NOT_IMPLEMENTED.
 
-D029 records the future architecture to be reconsidered only after AssemblyAI free credits are exhausted:
+Implementation trigger remains AssemblyAI free-credit exhaustion, followed by fresh owner authorization and revalidation of mutable Gemini quota/model/privacy assumptions.
 
-```text
-Gemini Transcribe Live -> preferred free route for eligible jobs
-Gemini unary Transcribe -> timestamps/diarization feature route when free quota permits
-AssemblyAI universal-2 -> retained rollback/fallback; billable use disabled by default
-```
-
-Detailed plan:
+Product plan:
 
 `69_POST_ASSEMBLYAI_FREE_CREDITS_HYBRID_STT_PLAN_2026_09_02.md`
 
-No implementation is authorized before the trigger and a fresh owner decision.
-
 ## M4 - New-infrastructure readiness
 
-Status: PREFLIGHT_COMPLETE / CANARY_BLOCKED_ON_IMAGE_PARITY.
+### M4.0 preflight - COMPLETE
 
-Repository-only preflight against the VoiceBridge KRC migration branch found:
+Initial repository preflight found missing `ffmpeg`/`ffprobe` and `psql` in the final VoiceBridge runtime image.
 
-```text
-shared server mounts KRC managed routes        PASS_STATIC
-KRC configuration/env surface                  PASS_STATIC
-Node 24 runtime contract                       PASS_STATIC
-Facebook Cobalt HTTP transport                 PASS_STATIC
-Telegram public route                          PASS_STATIC
-ffmpeg/ffprobe in final runtime image           FAIL / MISSING
-psql in final runtime image                     FAIL / MISSING
-```
+### M4.1 image parity remediation - COMPLETE / ACCEPTED
 
-Why these are hard blockers:
+VoiceBridge final runtime image now installs the required media and PostgreSQL client tooling.
 
-- accepted local attachment processing spawns `ffmpeg` and `ffprobe`;
-- durable KRC PostgreSQL/Neon persistence spawns `psql`;
-- the current `node:24-alpine` runtime Docker stage installs only Node production dependencies.
-
-VoiceBridge evidence:
-
-`docs/history/2026-09-02_KRC_MEDIA_M4_DEPLOYMENT_IMAGE_PARITY_PREFLIGHT.md`
-
-### M4 next engineering step
+Exact acceptance:
 
 ```text
-M4.1 image parity remediation
- -> add minimum final-image packages for ffmpeg/ffprobe + psql
- -> add CI final-image command validation
- -> add no-provider-call KRC startup smoke
- -> full VoiceBridge validation
- -> STOP at owner deployment/canary authorization gate
+VoiceBridge commit: 6a9491359795840ec9e79c9edc0ea82f595e9784
+Validate run: 33577022166
+krc-image-parity: SUCCESS
+cloud: SUCCESS
+browser-extension: SUCCESS
+repository-docs: SUCCESS
 ```
 
-No deployment or canary is authorized by repository readiness work.
+CI proves:
+
+```text
+final image builds: PASS
+ffmpeg available/working: PASS
+ffprobe available/working: PASS
+psql available/working: PASS
+no-provider KRC startup smoke: PASS
+```
+
+VoiceBridge authority:
+
+`docs/history/2026-09-02_KRC_MEDIA_M4_IMAGE_PARITY_REMEDIATION_ACCEPTANCE.md`
+
+### M4.2 owner deployment/canary - OWNER DECISION REQUIRED
+
+No external deployment has occurred.
+
+Before canary execution, revalidate the exact target Render service, branch/commit, environment configuration, Neon connectivity, Cobalt health, AssemblyAI operating state, Action compatibility, and rollback target.
+
+Then owner must explicitly authorize the exact deployment/canary scope.
 
 ## M5 - Provider/new-infrastructure cutover
 
 Status: NOT_AUTHORIZED.
 
-M5 remains separate from both the current M4 infrastructure work and the deferred post-credit Hybrid C/D plan.
+M5 is not implied by M4 image readiness or an eventual owner-only canary.
 
 ## Release hold
 
 ```text
 R1 merge selected MEDIA BETA work toward main   HOLD
-R2 backend/production promotion                 HOLD
+R2 backend/production promotion                 HOLD unless separately scoped for owner canary
 R3 external testers                             HOLD
 R4 public sharing / Store rollout               HOLD
 ```
 
 ## Current checkpoint
 
-`70_M3_CLOSED_M4_PREFLIGHT_BLOCKED_CHECKPOINT_2026_09_02.md`
+`71_M4_IMAGE_PARITY_READY_OWNER_CANARY_DECISION_CHECKPOINT_2026_09_02.md`
 
 ## Exact continuation point
 
 ```text
-M4.1 VOICEBRIDGE IMAGE-PARITY REMEDIATION / NO DEPLOYMENT
+M4.2 OWNER DEPLOYMENT/CANARY DECISION
+NO EXTERNAL DEPLOYMENT WITHOUT EXPLICIT APPROVAL
 ```
