@@ -1,9 +1,9 @@
 # MEDIA BETA Decision Log
 Реєстр чинних і історичних рішень MEDIA BETA з актуальними release-hold рішеннями.
 
-Version: 2.0
+Version: 2.1
 Status: ACTIVE
-Updated: 2026-08-27
+Updated: 2026-09-02
 
 This file is the compact current decision index. Detailed historical rationale remains available in Git history and the numbered phase/acceptance records.
 
@@ -120,3 +120,49 @@ Date: 2026-08-27
 Merge, production promotion, external tester onboarding, and public rollout are separate decisions. Approval of one must never be inferred as approval of another.
 
 Reason: repository integration, infrastructure deployment, audience expansion, and public publication carry different risks and controls.
+
+## D029 - Post-AssemblyAI Free-Credit Hybrid C/D Is the Planned Free-First Direction
+
+Decision: APPROVED_PLAN / NOT_IMPLEMENTED
+Date: 2026-09-02
+
+The owner selected the combined Hybrid C/D direction as the planned STT architecture **after AssemblyAI free credits are exhausted**.
+
+Current runtime remains unchanged:
+
+```text
+active KRC prerecorded provider: AssemblyAI universal-2
+Gemini normal prerecorded activation: FALSE
+hybrid implementation now: FALSE
+```
+
+Planned future routing direction:
+
+```text
+Gemini 3.5 Transcribe Live
+  -> preferred free route for eligible jobs without word timestamps/diarization
+
+Gemini 3.5 Transcribe unary
+  -> free feature route when timestamps and/or diarization are required and quota allows
+
+AssemblyAI universal-2
+  -> retained rollback/fallback technology
+  -> billable fallback disabled by default after free credits expire
+  -> paid use requires separate explicit owner authorization
+```
+
+No automatic paid provider fallback is authorized.
+
+Before implementation, mutable assumptions must be revalidated: Gemini model availability, Free Tier limits, language coverage, Live session restrictions, privacy/data-use policy, and actual remaining AssemblyAI balance.
+
+Targeted validation before cutover must cover code-switching, noisy Ukrainian/Russian, multi-speaker media, telephone-bandwidth speech, longer real-world media, numeric/date/name fidelity, and Gemini unary-versus-Live parity where applicable.
+
+Detailed product plan:
+
+`69_POST_ASSEMBLYAI_FREE_CREDITS_HYBRID_STT_PLAN_2026_09_02.md`
+
+Technical implementation plan:
+
+`kolemasakar/VoiceBridge` -> `docs/planning/2026-09-02_KRC_POST_ASSEMBLYAI_FREE_CREDITS_HYBRID_STT_IMPLEMENTATION_PLAN.md`
+
+This decision does not authorize code changes, provider activation, deployment, merge, external testing, public rollout, or provider-consuming validation now.
