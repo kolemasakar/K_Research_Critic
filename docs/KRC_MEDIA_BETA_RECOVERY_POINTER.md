@@ -20,11 +20,11 @@ Branch:
 
 Path:
 
-`subprojects/media_beta/71_M4_IMAGE_PARITY_READY_OWNER_CANARY_DECISION_CHECKPOINT_2026_09_02.md`
+`subprojects/media_beta/72_M4_OWNER_CANARY_ACCEPTED_ROLLBACK_COMPLETE_CHECKPOINT_2026_09_02.md`
 
 Recovery command:
 
-`recover KRC MEDIA BETA checkpoint 71 M4 image parity ready owner canary decision 2026-09-02`
+`recover KRC MEDIA BETA checkpoint 72 M4 owner canary accepted rollback complete 2026-09-02`
 
 ## Current high-level state
 
@@ -35,26 +35,39 @@ KRC PRERECORDED ASSEMBLYAI              ACTIVE / universal-2
 KRC GEMINI PRERECORDED                  IMPLEMENTED / INACTIVE
 M3                                       CLOSED
 FUTURE HYBRID C/D                        PLANNED / NOT IMPLEMENTED
-HYBRID TRIGGER                           ASSEMBLYAI FREE CREDITS EXHAUSTED
+HYBRID TRIGGER                           ASSEMBLYAI FREE CREDITS EXHAUSTED + FRESH OWNER GATE
 M4 PREFLIGHT                             COMPLETE
 M4 IMAGE PARITY                          PASS
-M4 DEPLOYMENT                            NOT PERFORMED
-M4 CANARY                                NOT RUN
-CURRENT MILESTONE                        OWNER DEPLOYMENT/CANARY DECISION
+M4 OWNER CANARY                          PASS
+M4 REAL STT                              PASS
+M4 DURABILITY / IDEMPOTENCY              PASS
+M4 ROLLBACK                              PASS
+M4 PERMANENT BACKEND PROMOTION           NOT AUTHORIZED
+CURRENT MILESTONE                        OWNER POST-CANARY DECISION
 PROVIDER CUTOVER                         NOT AUTHORIZED
 R1/R2/R3/R4                              HOLD
 ```
 
-VoiceBridge M4 image-parity authority:
+VoiceBridge owner-canary authority:
 
-`docs/history/2026-09-02_KRC_MEDIA_M4_IMAGE_PARITY_REMEDIATION_ACCEPTANCE.md`
+`docs/history/2026-09-02_KRC_MEDIA_M4_OWNER_CANARY_ACCEPTANCE.md`
 
-Exact validated VoiceBridge evidence:
+Exact canary evidence:
 
 ```text
-commit: 6a9491359795840ec9e79c9edc0ea82f595e9784
-Validate run: 33577022166
-all four jobs: SUCCESS
+M4 target: 6a9491359795840ec9e79c9edc0ea82f595e9784
+workflow run: 33580592224
+result: SUCCESS
+real Telegram -> AssemblyAI STT: PASS
+stt_seconds_charged: 53
+retrieval credits: 0
+provider cleanup: PASS
+Neon durable readback: PASS
+duplicate reuse / single reservation: PASS
+rollback: PASS
+restored Render commit: 2f0f02769dbdf2e8240e6b08867ecef2faaede16
 ```
 
-This pointer does not authorize deployment, M4 canary, provider cutover, merge, external testers, public rollout, or any change to the public KRC Builder/runtime.
+The canary target was temporary and the isolated Render service was restored to its exact pre-canary commit. The one-shot workflow was removed after execution.
+
+This pointer does not authorize permanent backend promotion, provider cutover, merge, external testers, public rollout, Gemini prerecorded activation, Hybrid C/D activation, or any change to the public KRC Builder/runtime.
