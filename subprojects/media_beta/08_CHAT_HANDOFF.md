@@ -1,18 +1,18 @@
 # MEDIA BETA Chat Handoff
 Канонічна інструкція відновлення K-Research & Critic - MEDIA BETA у новому чаті.
 
-Version: 4.6
-Status: ACTIVE_HANDOFF / RELEASE_HOLD_OWNER_TESTING / M3_CLOSED / M4_IMAGE_PARITY_READY / OWNER_CANARY_DECISION
+Version: 4.7
+Status: ACTIVE_HANDOFF / RELEASE_HOLD_OWNER_TESTING / M3_CLOSED / M4_OWNER_CANARY_ACCEPTED
 Checkpoint date: 2026-09-02
 
 ## Recovery command
 
-`recover KRC MEDIA BETA checkpoint 71 M4 image parity ready owner canary decision 2026-09-02`
+`recover KRC MEDIA BETA checkpoint 72 M4 owner canary accepted rollback complete 2026-09-02`
 
 ## Mandatory recovery order
 
-1. `subprojects/media_beta/71_M4_IMAGE_PARITY_READY_OWNER_CANARY_DECISION_CHECKPOINT_2026_09_02.md`
-2. `subprojects/media_beta/70_M3_CLOSED_M4_PREFLIGHT_BLOCKED_CHECKPOINT_2026_09_02.md`
+1. `subprojects/media_beta/72_M4_OWNER_CANARY_ACCEPTED_ROLLBACK_COMPLETE_CHECKPOINT_2026_09_02.md`
+2. `subprojects/media_beta/71_M4_IMAGE_PARITY_READY_OWNER_CANARY_DECISION_CHECKPOINT_2026_09_02.md`
 3. `subprojects/media_beta/69_POST_ASSEMBLYAI_FREE_CREDITS_HYBRID_STT_PLAN_2026_09_02.md`
 4. `subprojects/media_beta/68_M3B_AB_COMPLETE_OWNER_DECISION_CHECKPOINT_2026_09_01.md`
 5. `subprojects/media_beta/62_FULL_PROJECT_STATE_CHECKPOINT_2026_09_01.md`
@@ -21,7 +21,7 @@ Checkpoint date: 2026-09-02
 8. `subprojects/media_beta/06_DECISION_LOG.md`
 9. `subprojects/media_beta/53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md`
 
-Verify current GitHub heads and CI before any write, provider-consuming operation, merge, deployment, or activation decision.
+Verify current GitHub heads and CI plus current external infrastructure before any write, provider-consuming operation, merge, permanent deployment, or activation decision.
 
 ## Current provider decision
 
@@ -30,59 +30,59 @@ M3: CLOSED
 current KRC prerecorded provider: AssemblyAI universal-2
 Gemini prerecorded normal activation: FALSE
 provider cutover now: FALSE
-Hybrid C/D: PLANNED / NOT_IMPLEMENTED until AssemblyAI free-credit trigger
+Hybrid C/D: PLANNED / NOT_IMPLEMENTED until AssemblyAI free-credit trigger plus fresh owner approval
 ```
 
 ## M4 current state
 
-M4 repository preflight and final-image remediation are complete.
+M4 final-image parity and bounded owner-only canary are accepted.
 
-VoiceBridge acceptance authority:
+VoiceBridge authorities:
 
 `docs/history/2026-09-02_KRC_MEDIA_M4_IMAGE_PARITY_REMEDIATION_ACCEPTANCE.md`
 
-Exact accepted evidence:
+`docs/history/2026-09-02_KRC_MEDIA_M4_OWNER_CANARY_ACCEPTANCE.md`
+
+Exact canary evidence:
 
 ```text
-VoiceBridge commit: 6a9491359795840ec9e79c9edc0ea82f595e9784
-Validate run: 33577022166
-krc-image-parity: SUCCESS
-cloud: SUCCESS
-browser-extension: SUCCESS
-repository-docs: SUCCESS
+M4 target: 6a9491359795840ec9e79c9edc0ea82f595e9784
+workflow run: 33580592224
+result: SUCCESS
+isolated Render service: voicebridge-krc-media-beta-kolemasakar
+real Telegram -> AssemblyAI job: PASS
+STT seconds: 53
+retrieval credits: 0
+provider cleanup: PASS
+Neon durable readback: PASS
+duplicate reuse / one STT reservation: PASS
+invalid/private Telegram boundary: PASS
+mandatory rollback: PASS
+restored pre-canary commit: 2f0f02769dbdf2e8240e6b08867ecef2faaede16
 ```
 
-The final runtime image contains and validates:
-
-```text
-ffmpeg
-ffprobe
-psql
-```
-
-The final image also passes a no-provider-call KRC managed-route startup smoke.
+The one-shot canary workflow was removed after execution. No permanent M4 backend promotion occurred.
 
 ```text
 M4_IMAGE_PARITY: PASS
-M4_DEPLOYMENT: NOT_PERFORMED
-M4_CANARY: NOT_RUN
+M4_OWNER_CANARY: PASS
+M4_PERMANENT_BACKEND_PROMOTION: NOT_AUTHORIZED
 ```
 
 ## Exact continuation point
 
 ```text
-M4 OWNER DEPLOYMENT/CANARY DECISION
+OWNER POST-CANARY DECISION
+R1 MERGE AND R2 BACKEND PROMOTION REMAIN SEPARATE GATES
 ```
 
-Do not deploy or start a canary without explicit owner approval.
-
-If owner approval is later given, first revalidate the exact target service, exact commit/image, environment presence without exposing secrets, Neon connectivity, Cobalt health, AssemblyAI operating state, Action compatibility, and rollback target.
+Before R1 or R2, revalidate current repository heads/CI, scope/diff, Render live baseline, rollback target, environment presence without exposing secrets, Neon connectivity, provider state, and release-hold invariants.
 
 ## Release boundary
 
 ```text
 R1 merge: HOLD
-R2 backend/production promotion: HOLD unless separately scoped for owner canary
+R2 backend/production promotion: HOLD
 R3 external testers: HOLD
 R4 public rollout: HOLD
 ```
@@ -90,6 +90,7 @@ R4 public rollout: HOLD
 ## Critical policy recovery
 
 - Facebook: Cobalt fail -> unavailable; no automatic paid fallback.
+- ScrapeCreators: reserve only / inactive.
 - Telegram: public-only, zero retrieval credits.
 - Local attachment: max 32 MiB, zero retrieval credits.
 - AssemblyAI remains active while current free-credit plan remains in effect.
@@ -100,4 +101,4 @@ R4 public rollout: HOLD
 
 ## Terminal marker
 
-`MEDIA_BETA_HANDOFF_V4_6_M4_IMAGE_PARITY_READY_OWNER_CANARY_DECISION`
+`MEDIA_BETA_HANDOFF_V4_7_M4_OWNER_CANARY_ACCEPTED_POST_CANARY_GATE`
