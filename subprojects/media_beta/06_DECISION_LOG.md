@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 Реєстр чинних і історичних рішень MEDIA BETA з актуальними release-hold рішеннями.
 
-Version: 2.3
+Version: 2.4
 Status: ACTIVE
 Updated: 2026-09-02
 
@@ -243,3 +243,54 @@ Repository/CI readiness does not authorize an external deployment. A separate ow
 Canonical checkpoint:
 
 `71_M4_IMAGE_PARITY_READY_OWNER_CANARY_DECISION_CHECKPOINT_2026_09_02.md`
+
+## D032 - M4 Bounded Owner-Only Canary Is Accepted and Rolled Back
+
+Decision: ACCEPTED / ROLLBACK_COMPLETE / PERMANENT_PROMOTION_NOT_AUTHORIZED
+Date: 2026-09-02
+
+The owner explicitly authorized a bounded M4 owner-only canary against the isolated MEDIA BETA Render/Neon contour.
+
+Exact execution evidence:
+
+```text
+VoiceBridge M4 target: 6a9491359795840ec9e79c9edc0ea82f595e9784
+workflow run: 33580592224
+result: SUCCESS
+real STT route: public Telegram -> AssemblyAI universal-2
+STT seconds: 53
+retrieval credits: 0
+provider cleanup: PASS
+Neon durable readback: PASS
+duplicate reuse: PASS
+single STT reservation: PASS
+invalid/private Telegram boundary: PASS
+mandatory rollback: PASS
+```
+
+The isolated Render service was restored to exact pre-canary commit:
+
+`2f0f02769dbdf2e8240e6b08867ecef2faaede16`
+
+The one-shot canary workflow was removed after execution. No permanent backend promotion occurred.
+
+Therefore:
+
+```text
+M4_OWNER_CANARY: PASS
+M4_PERMANENT_BACKEND_PROMOTION: NOT_AUTHORIZED
+R1 merge: HOLD
+R2 backend promotion: HOLD
+R3 external testers: HOLD
+R4 public rollout: HOLD
+```
+
+The canary does not activate Gemini prerecorded, Hybrid C/D, or any automatic paid fallback.
+
+Canonical checkpoint:
+
+`72_M4_OWNER_CANARY_ACCEPTED_ROLLBACK_COMPLETE_CHECKPOINT_2026_09_02.md`
+
+VoiceBridge authority:
+
+`docs/history/2026-09-02_KRC_MEDIA_M4_OWNER_CANARY_ACCEPTANCE.md`
