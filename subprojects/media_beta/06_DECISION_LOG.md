@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 Реєстр чинних і історичних рішень MEDIA BETA з актуальними release-hold рішеннями.
 
-Version: 2.1
+Version: 2.2
 Status: ACTIVE
 Updated: 2026-09-02
 
@@ -166,3 +166,45 @@ Technical implementation plan:
 `kolemasakar/VoiceBridge` -> `docs/planning/2026-09-02_KRC_POST_ASSEMBLYAI_FREE_CREDITS_HYBRID_STT_IMPLEMENTATION_PLAN.md`
 
 This decision does not authorize code changes, provider activation, deployment, merge, external testing, public rollout, or provider-consuming validation now.
+
+## D030 - Close M3 With AssemblyAI Retained; M4 Starts as Repository-Only Preflight
+
+Decision: APPROVED / M3_CLOSED / M4_PREFLIGHT
+Date: 2026-09-02
+
+The owner continued the project after recording D029. Because Hybrid C/D is explicitly deferred until AssemblyAI free credits are exhausted, the current M3 provider decision is closed without a cutover.
+
+```text
+M3: CLOSED
+current KRC prerecorded provider: AssemblyAI universal-2
+Gemini normal prerecorded activation: FALSE
+provider cutover now: FALSE
+future Hybrid C/D: PLANNED / NOT_IMPLEMENTED
+```
+
+The next phase is M4 infrastructure readiness. M4 begins with repository/image parity verification only; no deployment or canary is implied.
+
+The first M4 preflight found two hard blockers in the current VoiceBridge cloud Docker image definition:
+
+```text
+ffmpeg/ffprobe required by accepted local attachment processing: MISSING
+psql required by durable PostgreSQL/Neon persistence: MISSING
+```
+
+Therefore:
+
+```text
+M4_PREFLIGHT: COMPLETE
+M4_CANARY_READY: FALSE
+M4_DEPLOYMENT: NOT_AUTHORIZED
+```
+
+Required next work is feature-branch image remediation plus CI image-parity evidence. Any actual deployment/canary requires a separate owner authorization after those checks pass.
+
+Canonical checkpoint:
+
+`70_M3_CLOSED_M4_PREFLIGHT_BLOCKED_CHECKPOINT_2026_09_02.md`
+
+VoiceBridge preflight authority:
+
+`docs/history/2026-09-02_KRC_MEDIA_M4_DEPLOYMENT_IMAGE_PARITY_PREFLIGHT.md`
