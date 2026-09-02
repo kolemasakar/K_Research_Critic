@@ -1,503 +1,218 @@
 # MEDIA BETA Current State
 Поточний канонічний стан приватного MEDIA BETA для відновлення без реконструкції історії.
 
-Version: 7.7
-Status: RELEASE_HOLD_OWNER_TESTING
-Updated: 2026-08-29
+Version: 8.0
+Status: RELEASE_HOLD_OWNER_TESTING / M3_CLOSED / M4_OWNER_CANARY_ACCEPTED
+Updated: 2026-09-02
 
-## Executive State
-
-```text
-A8_BROWSER_ASSISTED_OWNER_BASELINE_COMPLETE
-A9_OWNER_ZERO_CLIENT_MEDIA_INPUT_ACCEPTED
-YOUTUBE_ACCEPTED
-INSTAGRAM_ACCEPTED
-FACEBOOK_COBALT_ACCEPTED
-FACEBOOK_FAILURE_POLICY_E2E_ACCEPTED
-FACEBOOK_COBALT_ONLY_SERVER_HARDENING_ACCEPTED
-TELEGRAM_ACCEPTED
-TELEGRAM_PUBLIC_ROUTE_SERVER_HARDENING_ACCEPTED
-LOCAL_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED
-LOCAL_ATTACHMENT_ROUTE_BOUNDARY_AUDIT_ACCEPTED
-INSTAGRAM_ROUTE_BOUNDARY_AUDIT_ACCEPTED
-CROSS_ROUTE_NEGATIVE_ROUTING_MATRIX_ACCEPTED
-AUTH_INPUT_REPLAY_NEGATIVE_MATRIX_ACCEPTED
-STATE_CONTINUATION_NEGATIVE_MATRIX_ACCEPTED
-CONSENT_CREDIT_QUOTA_NEGATIVE_MATRIX_ACCEPTED
-DURABLE_FAIL_CLOSED_NEGATIVE_MATRIX_ACCEPTED
-PRIVACY_CLEANUP_NEGATIVE_MATRIX_ACCEPTED
-RETENTION_LOG_REDACTION_NEGATIVE_MATRIX_ACCEPTED
-A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED
-NEON_POSTGRESQL_18_CUTOVER_ACCEPTED
-POST_CUTOVER_DURABILITY_REGRESSION_ACCEPTED
-NEON_READ_ONLY_OBSERVATION_CHECKPOINT_ACCEPTED
-NEON_OBSERVATION_EXIT_READINESS_ACCEPTED
-NEON_ROLLBACK_OBSERVATION_CLOSED_OWNER_APPROVED
-RELEASE_HOLD_OWNER_TESTING
-```
-
-A9/A9.10/A10 are accepted in the private owner runtime. The isolated MEDIA BETA durable store has completed the Render PostgreSQL -> Neon PostgreSQL 18 migration stream: cutover, owner-only post-cutover durability regression, later read-only observation, final exit-readiness verification, and owner-approved rollback-observation closure. Owner-testing hardening aligned both the Facebook and Telegram active server boundaries with the already accepted dedicated-route Builder policies. Local attachment and Instagram route-boundary audits passed, and the cross-route negative routing matrix is live-accepted: foreign platforms are stopped at the HTTP/parser boundary before provider or durable-store service methods. The later auth/input/replay negative matrix is also accepted: Action bearer failures, malformed/oversized input, invalid methods/IDs/pagination, server-side owner admission, and duplicate replay boundaries were hardened or revalidated without a new provider-consuming media job. The later state/job-read/continuation matrix is also accepted: stale and interrupted job reads fail safely, non-completed jobs do not expose segments, AI and Facebook continuation paths enforce state/platform compatibility, and fresh native retries require a native FAILED target. The consent/credit/quota negative matrix is now accepted as well: provider-credit substitutions fail before provider work, active managed KRCM routes use a durable PostgreSQL STT quota reservation, and the legacy KRCC audio path now competes against that same concurrency-safe daily ledger. The durable fail-closed negative matrix is also accepted: durable-store initialization and durable quota-ledger outages stop before AssemblyAI provider start, and the retained regression covers both managed KRCM and legacy KRCC quota boundaries. The privacy/cleanup negative matrix is also accepted: signed attachment transport URLs and raw owner admission are excluded from durable/public projections, cleanup failure remains explicit, and provider/local temporary cleanup guards are retained. The retention/log-redaction negative matrix is also accepted: normal zero-credit jobs follow configured TTL, charged or uncertain jobs preserve at least a 24-hour recovery window, expired durable state is pruned, structured diagnostics remain metadata-only, and persistence/HTTP paths suppress sensitive log payloads. The owner continues private testing before release decisions.
-
-## Repositories
-
-KRC:
+## Executive state
 
 ```text
-repo: kolemasakar/K_Research_Critic
-branch: agent/video-url-research
-implementation baseline before documentation-only release-hold/audit updates: c8588ec1f13c3c576d3f307a001c1d8964b5128e
-draft PR: #8
+PUBLIC CORE                               PUBLISHED / MAINTENANCE
+MEDIA BETA                                CLOSED BETA / OWNER TESTING
+A9 / A9.10 / A10                          ACCEPTED
+M3 PROVIDER EVIDENCE                      COMPLETE
+M3                                        CLOSED
+M4 IMAGE PARITY                           PASS
+M4 OWNER-ONLY CANARY                      PASS
+M4 PERMANENT BACKEND PROMOTION            NOT AUTHORIZED
+R1 / R2 / R3 / R4                         HOLD
 ```
 
-VoiceBridge:
+Current recovery authority:
+
+`72_M4_OWNER_CANARY_ACCEPTED_ROLLBACK_COMPLETE_CHECKPOINT_2026_09_02.md`
+
+Earlier full operational baseline remains available in checkpoint 62 and Git history; this file intentionally summarizes the current state rather than duplicating the full historical audit trail.
+
+## Product and repository boundary
 
 ```text
-repo: kolemasakar/VoiceBridge
-branch: agent/krc-media-transcript
-cross-route isolation implementation live-accepted: cd8336c568df510beb8a3a8b4488b7e8ac8cd024
-cross-route acceptance-record head at 2026-08-29 sync: c1ab9a9cabcbc1859373da3106eac58ca67b86fb
-auth/input/replay implementation: e83a13a09b9bbcf293fb4f2d705f4ea7f15712b7
-auth/input/replay acceptance-record head at 2026-08-29 sync: 4ef9784655c413625e364b9f6eb1a43f1d26b96d
-state/continuation implementation: 8da6011cbd8f1134f125266951eebaef894be31c
-state/continuation acceptance record: docs/history/KRC_MEDIA_STATE_CONTINUATION_NEGATIVE_MATRIX_2026-08-29.md
-consent/credit/quota implementation: 30d71868987b4ffba3f0ed52e3860f6751242cf7
-consent/credit/quota acceptance record: docs/history/KRC_MEDIA_CONSENT_CREDIT_QUOTA_NEGATIVE_MATRIX_2026-08-29.md
-durable fail-closed regression head: 8a66e610b89a7e1398b5e8cbe4ac59334ffee5d2
-durable fail-closed acceptance record: docs/history/KRC_MEDIA_DURABLE_FAIL_CLOSED_NEGATIVE_MATRIX_2026-08-29.md
-privacy/cleanup regression: 9d8a3e89823a6228fc76046bc5d9ffe378b79bf0
-privacy/cleanup acceptance record: docs/history/KRC_MEDIA_PRIVACY_CLEANUP_NEGATIVE_MATRIX_2026-08-29.md
-retention/log-redaction corrected regression: 43bd757b541f9dcbffa40041228466a6eaa38c7d
-retention/log-redaction acceptance record: docs/history/KRC_MEDIA_RETENTION_LOG_REDACTION_NEGATIVE_MATRIX_2026-08-29.md
-draft PR: #28
+product: K-Research & Critic
+public Core repo: kolemasakar/K_Research_Critic
+public Core branch: main
+MEDIA BETA branch: agent/video-url-research
+VoiceBridge repo: kolemasakar/VoiceBridge
+VoiceBridge KRC migration branch: agent/krc-media-gemini-migration
+VoiceBridge PR: #45 / draft / unmerged unless reverified otherwise
 ```
 
-Use live branch heads as authority after later documentation/regression commits.
+VoiceBridge is the technology/backend source. `K_Research_Critic` remains product and roadmap authority.
 
-## Isolated Runtime
+## Current STT provider boundary
 
 ```text
-private GPT: K-Research & Critic - MEDIA BETA
-beta service: voicebridge-krc-media-beta-kolemasakar
-Builder package: 0.9.1-beta-a10
-Action schema: 0.6.0-a9.10
+KRC prerecorded active provider: AssemblyAI
+active model: universal-2
+Gemini prerecorded candidate: gemini-3.5-transcribe
+Gemini prerecorded normal activation: FALSE
+provider cutover now: FALSE
 ```
 
-## Durable Store State
+VoiceBridge live streaming remains a separate provider domain and does not change the KRC prerecorded provider decision.
 
-Active durable store:
+## Deferred free-first plan
+
+Hybrid C/D is recorded as a future plan only:
 
 ```text
-provider: Neon PostgreSQL
-PostgreSQL major: 18
-project: krc-media-beta-neon
-database: krc_media_beta
-region: AWS Europe Central 1 (Frankfurt)
-connection mode: direct TLS
+state: PLANNED / NOT IMPLEMENTED
+trigger: AssemblyAI free credits exhausted
+additional gate: fresh owner authorization and mutable-assumption revalidation
 ```
 
-The isolated Render service still owns the MEDIA BETA application runtime. Only its protected `KRC_MEDIA_DATABASE_URL` target was changed during the approved cutover.
-
-Original Render PostgreSQL:
+Planned future roles:
 
 ```text
-original Render PostgreSQL: voicebridge-krc-media-beta-db
-state: retained intact after observation closure
-source database deletion: NOT AUTHORIZED
+Gemini Transcribe Live -> preferred free eligible route
+Gemini unary Transcribe -> timestamps/diarization feature route when free quota permits
+AssemblyAI universal-2 -> rollback/fallback technology; paid use disabled by default
 ```
 
-Verified migration checkpoints in VoiceBridge:
+No implementation or automatic paid fallback is currently authorized.
+
+Product plan:
+
+`69_POST_ASSEMBLYAI_FREE_CREDITS_HYBRID_STT_PLAN_2026_09_02.md`
+
+## Active accepted media routes
 
 ```text
-docs/KRC_MEDIA_NEON_MIGRATION_PLAN.md
-docs/history/KRC_MEDIA_NEON_RESTORE_VERIFY_2026-08-29.md
-docs/history/KRC_MEDIA_NEON_PRECUTOVER_VERIFY_2026-08-29.md
-docs/history/KRC_MEDIA_NEON_CUTOVER_2026-08-29.md
-docs/history/KRC_MEDIA_NEON_POSTCUTOVER_LIVE_REGRESSION_2026-08-29.md
-docs/history/KRC_MEDIA_NEON_OBSERVATION_WINDOW_2026-08-29.md
-docs/history/KRC_MEDIA_NEON_OBSERVATION_CHECKPOINT_2026-08-29.md
-docs/history/KRC_MEDIA_NEON_OBSERVATION_EXIT_READINESS_2026-08-29.md
-docs/history/KRC_MEDIA_NEON_OBSERVATION_CLOSURE_2026-08-29.md
+YouTube / supported Instagram -> managed transcript path with existing consent gates
+Facebook -> free Cobalt retrieval only -> AssemblyAI -> durable KRCM
+Telegram -> public web/embed retrieval -> AssemblyAI -> durable KRCM
+local attachment -> openaiFileIdRefs -> media normalization -> AssemblyAI -> durable KRCM
 ```
 
-Post-cutover owner-only live regression accepted:
-- one Supadata native provider start;
-- one provider credit charged;
-- durable Neon write PASS;
-- API job/segment read before restart PASS;
-- exact-head Render restart PASS;
-- API read after restart PASS;
-- idempotent replay PASS;
-- duplicate provider start not observed;
-- paid Facebook fallback/ScrapeCreators not used.
-
-Later read-only observation checkpoint accepted:
-- isolated Render service still targets protected Neon direct TLS: PASS;
-- managed capability after inactivity/resume: PASS;
-- PostgreSQL major 18: PASS;
-- non-terminal managed jobs: 0;
-- accepted regression job remains COMPLETED and readable: PASS;
-- accepted persisted regression segments remain readable: PASS;
-- provider-consuming work: NONE;
-- rollback trigger observed: NO.
-
-Final observation exit readiness accepted:
-- current Render target remains Neon: PASS;
-- original Render PostgreSQL rollback source recoverable: PASS;
-- managed capability: PASS;
-- Neon durable state stable: PASS;
-- provider-consuming work: NONE;
-- environment/database mutation: NONE.
-
-The owner approved closure of the rollback observation window. Neon remains the active durable store. The original Render PostgreSQL database remains retained; its deletion is still separately gated and not authorized. The database migration stream is complete, but RELEASE_HOLD_OWNER_TESTING remains active.
-
-## Accepted Inputs
+Critical policies:
 
 ```text
-prerecorded YouTube
-Instagram Reel
-public Facebook Video/Reel
-supported public Telegram video post
-one local current-conversation audio/video attachment
+Facebook Cobalt failure -> unavailable / STOP
+ScrapeCreators -> reserve only / inactive
+no automatic paid provider fallback
+Telegram retrieval credits -> 0
+local attachment retrieval credits -> 0
+local attachment max size -> 32 MiB
 ```
 
-## Route Invariants
+## Durable state
 
-YouTube/Instagram: managed transcript route; billable work remains consent-gated. Instagram Reel AI generation remains available only after native-unavailable state and requires a separate preflight plus separate explicit consent; automatic AI fallback remains false.
+Active durable store remains Neon PostgreSQL for the isolated MEDIA BETA contour.
 
-Facebook: free Cobalt retrieval only. Success may continue to AssemblyAI/KRCM. Failure is unavailable/STOP. ScrapeCreators is unconfigured/inactive/reserve-only and not offerable. The isolated live HTTP boundary rejects Facebook on generic Supadata preflight, lookup, and native start before service/provider work. The dedicated Facebook endpoint rejects Telegram, Instagram, and YouTube before the Facebook service pipeline is reached. Managed capability does not advertise Facebook AI generation as active. Historical compatibility internals remain outside the active Builder path.
-
-Telegram: public web/embed only, trusted media delivery, AssemblyAI/KRCM, zero retrieval credits, no auth/session/bot token/paid fallback. The isolated live HTTP boundary rejects Telegram on generic Supadata preflight, lookup, and native start before service/provider work. The dedicated Telegram endpoint rejects Facebook, Instagram, and YouTube before the Telegram service pipeline is reached.
-
-Local attachment: `openaiFileIdRefs`, trusted OpenAI delivery, max 32 MiB, AssemblyAI/KRCM, zero retrieval credits, no user-visible file token. The attachment-specific parser/downloader boundary rejects URL injection, malformed/literal placeholders, arbitrary/lookalike hosts, redirects, MIME-class mismatches, and oversize content before active STT where applicable.
-
-## Facebook Cobalt-Only Server Hardening
-
-Accepted owner-testing hardening record in VoiceBridge:
+Accepted runtime contract:
 
 ```text
-docs/history/KRC_MEDIA_FACEBOOK_COBALT_ONLY_HARDENING_2026-08-29.md
+durable_store: postgres
+restart_resilient_jobs: true
+duplicate start reuses existing job: true
+durable STT quota ledger: active
 ```
 
-Verified:
-- generic Facebook Supadata preflight blocked at HTTP boundary: PASS;
-- generic Facebook Supadata transcript start blocked at HTTP boundary: PASS;
-- capability `facebook_ai_fallback = false`: PASS;
-- capability `facebook_ai_requires_duration_metadata = false`: PASS;
-- capability `facebook_ai_metadata_credits = 0`: PASS;
-- active Facebook retrieval/STT capability preserved: PASS;
-- automatic paid Facebook retrieval remains false: PASS;
-- full VoiceBridge cloud suite after hardening: 134/134 PASS;
-- isolated live no-provider-spend smoke: PASS;
-- Facebook retrieval endpoint called by smoke: NO;
-- Supadata/AssemblyAI credits consumed by smoke: NO;
-- Render environment mutation: NONE;
-- Neon data mutation: NONE.
+The M4 owner canary directly verified Neon connectivity, required KRC tables, durable job readback, segment readback, and idempotent duplicate reuse.
 
-This hardening is defense in depth. It does not indicate that the accepted Builder had previously used the forbidden generic Facebook Supadata route; Builder policy already selected the dedicated Cobalt route.
+## M3 closure
 
-## Telegram / Attachment / Instagram Route-Boundary Acceptance
-
-Accepted owner-testing audit/hardening record in VoiceBridge:
+Seven reviewed cases across the first and expanded A/B tranches did not establish a global STT quality winner.
 
 ```text
-docs/history/KRC_MEDIA_ROUTE_BOUNDARY_AUDIT_2026-08-29.md
+AssemblyAI lexical WER: 13.68%
+Gemini lexical WER: 14.53%
+SEVEN_CASE_GLOBAL_WINNER: NOT_ESTABLISHED
 ```
 
-Telegram verified:
-- generic Telegram Supadata preflight blocked at HTTP boundary: PASS;
-- generic Telegram Supadata transcript start blocked at HTTP boundary: PASS;
-- both stops occur before generic Supadata service invocation: PASS;
-- dedicated Telegram public route preserved: PASS;
-- `telegram_public_retrieval = true`: PASS;
-- `telegram_retrieval_provider = telegram_public_web`: PASS;
-- `telegram_retrieval_credits = 0`: PASS.
+M3 was closed retaining AssemblyAI `universal-2` as the current KRC prerecorded provider.
 
-Local attachment verified:
-- attachment-specific runtime `openaiFileIdRefs` boundary preserved: PASS;
-- exactly one runtime file object required: PASS;
-- trusted `.oaiusercontent.com` delivery boundary preserved: PASS;
-- redirects/lookalike hosts/MIME mismatch/oversize content blocked by regression coverage: PASS;
-- malformed attachment placeholder rejected in isolated live smoke before STT: PASS;
-- retrieval credits remain 0: PASS.
+## M4 image parity
 
-Instagram verified:
-- supported Reel/video URL boundary remains intentional on generic managed Supadata route: PASS;
-- unsupported profile URL rejected in isolated live smoke before provider work: PASS;
-- native provider work remains explicit one-credit consent-gated: PASS;
-- Reel AI remains separate-preflight/separate-consent gated after native-unavailable: PASS;
-- automatic AI fallback remains false: PASS.
+VoiceBridge M4 target:
 
-Live no-provider-spend route-boundary smoke:
-- VoiceBridge workflow run `33258126715`: SUCCESS;
-- exact audited runtime deployed: PASS;
-- protected Neon durable-store target unchanged: PASS;
-- provider-consuming work invoked by smoke: NONE;
-- Render environment mutation: NONE;
-- Neon data mutation: NONE;
-- temporary live-smoke workflow removed after success: PASS.
+`6a9491359795840ec9e79c9edc0ea82f595e9784`
 
-Final VoiceBridge exact-head validation at `cc838099c4c5d582da1f5e1c781bf29f5b245fbf`:
-- `Validate` run `33258208158`: SUCCESS;
-- `A9.7-F Cobalt Package Validate` run `33258208232`: SUCCESS;
-- `A9.10 Attachment Probe Validate` run `33258208290`: SUCCESS.
+Validate run:
 
-## Cross-Route Isolation Acceptance
+`33577022166` - SUCCESS.
 
-Accepted owner-testing hardening record in VoiceBridge:
+Accepted final-image requirements:
 
 ```text
-docs/history/KRC_MEDIA_CROSS_ROUTE_ISOLATION_2026-08-29.md
+ffmpeg: PASS
+ffprobe: PASS
+psql: PASS
+final Docker image build: PASS
+no-provider KRC startup smoke: PASS
 ```
 
-Implementation:
-- VoiceBridge implementation commit `cd8336c568df510beb8a3a8b4488b7e8ac8cd024`;
-- generic Supadata lookup rejects Facebook before `service.lookup`: PASS;
-- generic Supadata lookup rejects Telegram before `service.lookup`: PASS;
-- dedicated Telegram endpoint rejects Facebook/Instagram/YouTube before `service.startTelegram`: PASS;
-- dedicated Facebook endpoint rejects Telegram/Instagram/YouTube before `service.startFacebookFallback`: PASS;
-- attachment URL injection and literal placeholder are rejected before `service.startAttachment`: PASS;
-- existing generic Facebook/Telegram preflight and native-start blocks remain intact: PASS.
+Authority:
 
-Static negative routing matrix:
-- hardening workflow run `33259019279`: SUCCESS;
-- full VoiceBridge cloud build/test suite: PASS;
-- fake service entry points remained unreachable for every negative matrix case: PASS.
+`docs/history/2026-09-02_KRC_MEDIA_M4_IMAGE_PARITY_REMEDIATION_ACCEPTANCE.md`
 
-Isolated Render live negative routing matrix:
-- live smoke run `33259149464`: SUCCESS;
-- exact runtime `cd8336c568df510beb8a3a8b4488b7e8ac8cd024` deployed: PASS;
-- active durable-store target remained protected Neon PostgreSQL: PASS;
-- generic Facebook/TG preflight isolation: PASS;
-- generic Facebook/TG lookup isolation: PASS;
-- generic Facebook/TG native-start isolation: PASS;
-- Telegram foreign-platform ingress blocked: PASS;
-- Facebook foreign-platform ingress blocked: PASS;
-- attachment URL/placeholder injection blocked: PASS;
-- provider-consuming work invoked: NONE;
-- durable-store service methods invoked by the negative matrix: NONE;
-- Render environment mutation: NONE;
-- database mutation requested: NONE;
-- temporary live-smoke workflow removed after success: PASS.
+## M4 bounded owner-only canary
 
-Final VoiceBridge exact-head validation at `c1ab9a9cabcbc1859373da3106eac58ca67b86fb`:
-- `Validate` run `33259235871`: SUCCESS;
-- `A9.7-F Cobalt Package Validate` run `33259235942`: SUCCESS;
-- `A9.10 Attachment Probe Validate` run `33259235877`: SUCCESS.
+Owner-authorized live canary workflow run:
 
-## Auth / Input / Replay Negative Matrix Acceptance
+`33580592224` - SUCCESS.
 
-Accepted owner-testing record in VoiceBridge:
+Isolated service:
+
+`voicebridge-krc-media-beta-kolemasakar`
+
+Temporarily tested exact target:
+
+`6a9491359795840ec9e79c9edc0ea82f595e9784`
+
+One real accepted Telegram fixture was processed through AssemblyAI:
 
 ```text
-docs/history/KRC_MEDIA_AUTH_INPUT_REPLAY_NEGATIVE_MATRIX_2026-08-29.md
+KRCM job: KRCM_8c0f6a9e-b3c9-4c9a-8978-69d6c5acc535
+status: COMPLETED
+provider: assemblyai
+STT seconds: 53
+retrieval credits: 0
+segment count: 1
+provider cleanup: PASS
 ```
 
-Implementation and validation:
-- VoiceBridge implementation commit `e83a13a09b9bbcf293fb4f2d705f4ea7f15712b7`;
-- caller-supplied `beta_access_code` can no longer override the configured server owner admission code: PASS;
-- missing Action bearer fails before service work: PASS;
-- invalid/malformed Action bearer fails before service work: PASS;
-- malformed JSON and oversized request bodies fail before service work: PASS;
-- wrong HTTP methods and malformed job IDs fail closed: PASS;
-- invalid/out-of-range pagination fails before segment reads: PASS;
-- injection-shaped pagination fails closed; static application validation returns `INVALID_PAGINATION`, while the isolated live path may be denied earlier by the upstream edge: PASS;
-- duplicate native replay remains a single provider start in fake-provider regression even when the caller varies a supplied beta code: PASS;
-- full VoiceBridge cloud suite in corrected hardening run `33260208780`: 142/142 PASS;
-- final isolated live no-spend run `33260540049`: SUCCESS;
-- exact hardened implementation deployed for live acceptance: PASS;
-- provider-consuming media work during live acceptance: NONE;
-- Render environment mutation: NONE;
-- Neon database mutation requested: NONE.
-
-The first hardening workflow attempt stopped on a TypeScript test-harness compile defect before an implementation commit was pushed. Two early live-smoke harness attempts were also refined: the second showed that an injection-shaped pagination query is rejected by the upstream edge with HTTP 403 before the application can emit its own `INVALID_PAGINATION`. These harness corrections do not represent provider, durable-store, or runtime-data failures.
-
-Final VoiceBridge exact-head validation at `4ef9784655c413625e364b9f6eb1a43f1d26b96d`:
-- `Validate` run `33260645359`: SUCCESS;
-- `A9.7-F Cobalt Package Validate` run `33260645389`: SUCCESS;
-- `A9.10 Attachment Probe Validate` run `33260645358`: SUCCESS.
-
-## State / Job Read / Continuation Negative Matrix Acceptance
-
-Accepted owner-testing record in VoiceBridge:
+Canary additionally proved:
 
 ```text
-docs/history/KRC_MEDIA_STATE_CONTINUATION_NEGATIVE_MATRIX_2026-08-29.md
+owner bearer boundary: PASS
+Cobalt configured/reachable: PASS
+ScrapeCreators inactive: PASS
+Neon connectivity/schema: PASS
+no-provider durable mutation: NONE
+durable readback: PASS
+duplicate reuse: PASS
+one durable job row: PASS
+one STT reservation row: PASS
+invalid/private Telegram boundary: PASS
 ```
 
-Implementation and validation:
-- VoiceBridge implementation commit `8da6011cbd8f1134f125266951eebaef894be31c`;
-- missing and expired durable job IDs fail closed: PASS;
-- orphan persisted `PROCESSING` is reconciled to `FAILED` without provider replay: PASS;
-- segments are exposed only for `COMPLETED`: PASS;
-- AI continuation rejects unsupported platform and wrong state before generated-provider work: PASS;
-- Facebook retrieval continuation now independently requires a Facebook source URL in addition to provider mode/state: PASS;
-- fresh native retry now independently requires the FAILED target to have `provider_mode=native`: PASS;
-- full VoiceBridge cloud suite in accepted repair run `33261652699`: 146/146 PASS;
-- isolated Render read-only unknown-job smoke run `33261788902`: SUCCESS;
-- live unknown job/segment/AI/Facebook continuation preflight reads returned `404 / MEDIA_TRANSCRIPT_NOT_FOUND`: PASS;
-- provider-consuming work during live smoke: NONE;
-- Render environment mutation: NONE;
-- Neon database mutation requested: NONE.
+Mandatory rollback restored exact pre-canary Render commit:
 
-Harness-only failures before acceptance were confined to one invalid temporary workflow definition and one malformed regression fixture job ID; neither executed provider-consuming work or changed runtime/database state.
+`2f0f02769dbdf2e8240e6b08867ecef2faaede16`
 
-## Consent / Credit / Quota Negative Matrix Acceptance
+Post-rollback health passed. The one-shot canary workflow was removed after execution.
 
-Accepted owner-testing record in VoiceBridge:
+Authority:
+
+`docs/history/2026-09-02_KRC_MEDIA_M4_OWNER_CANARY_ACCEPTANCE.md`
+
+## Current release boundary
 
 ```text
-docs/history/KRC_MEDIA_CONSENT_CREDIT_QUOTA_NEGATIVE_MATRIX_2026-08-29.md
+R1 merge selected MEDIA BETA work toward main   HOLD
+R2 permanent backend promotion                  HOLD
+R3 external testers                             HOLD
+R4 public rollout                               HOLD
 ```
 
-Implementation and validation:
-- VoiceBridge implementation commit `30d71868987b4ffba3f0ed52e3860f6751242cf7`;
-- native, metadata, AI-generate, and Facebook reserve consent substitutions fail before provider-consuming work: PASS;
-- stale AI caps, exhausted balances, and invalid quota durations fail closed: PASS;
-- isolated Render live no-spend consent smoke run `33263832119`: SUCCESS;
-- live Neon managed/client/STT counters remained unchanged: PASS;
-- active managed KRCM routes reserve STT quota durably before AssemblyAI: PASS;
-- legacy client-assisted KRCC audio shares the same PostgreSQL daily STT ledger: PASS;
-- KRCM/KRCC same-day concurrent reservations are serialized with a transaction advisory lock acquired before the quota-reading statement: PASS;
-- PostgreSQL shared-schema initialization is serialized to avoid concurrent `CREATE TABLE IF NOT EXISTS` races: PASS;
-- final PostgreSQL 18 shared-quota workflow run `33264731836`: SUCCESS;
-- full VoiceBridge cloud suite after the final repair: 153/153 PASS;
-- concurrent KRCM 40s + KRCC 40s against a 60s limit allows exactly one request: PASS;
-- same-job replay does not double-charge quota: PASS;
-- provider-consuming work in the live no-spend acceptance smoke: NONE;
-- Render environment mutation: NONE;
-- paid Facebook/ScrapeCreators activation: NONE.
+M4 canary acceptance does not imply any of these gates.
 
-Intermediate workflow failures were contained diagnostics: one TypeScript harness typing defect, one concurrent schema-initialization DDL race, and one PostgreSQL MVCC snapshot flaw when an advisory lock was acquired inside the same quota statement. The final repair moved quota locking into an explicit transaction statement before the quota read, then passed the full concurrency matrix.
-
-## Durable Fail-Closed Negative Matrix Acceptance
-
-Accepted owner-testing record in VoiceBridge:
+## Exact continuation point
 
 ```text
-docs/history/KRC_MEDIA_DURABLE_FAIL_CLOSED_NEGATIVE_MATRIX_2026-08-29.md
+OWNER POST-CANARY DECISION
+R1 MERGE AND R2 PERMANENT BACKEND PROMOTION REMAIN SEPARATE GATES
 ```
 
-Regression and validation:
-- retained regression file `src/cloud/tests/managed_media_durable_fail_closed.test.ts`;
-- managed durable-store initialization outage stops before job reservation/provider work: PASS;
-- managed durable quota-ledger outage fails before AssemblyAI provider start: PASS;
-- failed quota-ledger case retains zero retrieval credits and zero STT seconds: PASS;
-- attachment, Telegram, and Facebook managed STT routes share the durable `reserveSttQuota` boundary: PASS;
-- legacy KRCC reserves durable quota before AssemblyAI transcriber construction: PASS;
-- KRCC durable quota/store errors expose explicit fail-closed 503-class errors: PASS;
-- initial matrix run `33265879771` exposed only three static test-harness source-path errors after the two behavioral outage tests had already passed;
-- corrected matrix run `33265955398`: SUCCESS;
-- temporary feature-branch matrix workflow removed after success: PASS;
-- final tested VoiceBridge feature head after cleanup: `8a66e610b89a7e1398b5e8cbe4ac59334ffee5d2`;
-- exact-head verification run `33266043667`: SUCCESS;
-- provider-consuming media work during this acceptance block: NONE;
-- Render environment mutation: NONE;
-- Neon data mutation requested by this acceptance block: NONE;
-- paid Facebook/ScrapeCreators activation: NONE.
-
-No runtime implementation change was required by this block; the only failed attempt was a static test-harness path defect. Release authorization remains unchanged.
-
-## Privacy / Cleanup Negative Matrix Acceptance
-
-Accepted owner-testing record in VoiceBridge:
-
-```text
-docs/history/KRC_MEDIA_PRIVACY_CLEANUP_NEGATIVE_MATRIX_2026-08-29.md
-```
-
-Implementation and validation:
-- retained regression `src/cloud/tests/managed_media_privacy_cleanup.test.ts`;
-- attachment signed OpenAI transport URL is not persisted in durable managed-media records: PASS;
-- raw server owner admission is not persisted or returned in public job projection: PASS;
-- public attachment job projection excludes request/access digests and transcript text: PASS;
-- durable attachment source identity remains `attachment://local-media`: PASS;
-- canonical transcript segments remain persisted as intended evidence: PASS;
-- cleanup failure remains explicit as `provider_data_deleted=false`: PASS;
-- attachment/Facebook/Telegram/KRCC AssemblyAI paths retain provider-delete cleanup guards: PASS;
-- local temporary media cleanup guards remain retained where files are created: PASS;
-- durable schema contains no attachment `download_link` or raw `beta_access_code`: PASS;
-- VoiceBridge run `33266496940`: 162/162 PASS;
-- provider-consuming work: NONE;
-- Render environment mutation: NONE;
-- Neon data mutation requested: NONE;
-- paid Facebook/ScrapeCreators activation: NONE.
-
-This acceptance does not activate the separately pending Gemini 3.5 Transcribe transition plan.
-
-## Retention / Log-Redaction Negative Matrix Acceptance
-
-Accepted owner-testing record in VoiceBridge:
-
-```text
-docs/history/KRC_MEDIA_RETENTION_LOG_REDACTION_NEGATIVE_MATRIX_2026-08-29.md
-```
-
-Validation:
-- retained regression `src/cloud/tests/managed_media_retention_log_redaction.test.ts`;
-- zero-credit/certain managed-media jobs follow the configured normal TTL: PASS;
-- charged or charge-uncertain outcomes preserve at least a 24-hour recovery window: PASS;
-- uncertain provider failure is non-retryable and not automatically replayed: PASS;
-- expired durable managed-media jobs are purged and expired records are excluded from reads: PASS;
-- durable STT quota-ledger records older than two UTC days are pruned: PASS;
-- structured managed-media diagnostic warning is metadata-only and excludes sensitive source/access/transcript/media fields: PASS;
-- durable PostgreSQL stderr payloads are suppressed and generic persistence errors are exposed: PASS;
-- managed-media HTTP responses are `cache-control: no-store` and contain no console request-body logging: PASS;
-- initial VoiceBridge run `33267727322`: 167/168 PASS; the single failure was a test-harness false positive that confused normal response serialization with logging;
-- corrected VoiceBridge run `33267869660`: 168/168 PASS;
-- provider-consuming work: NONE;
-- Render environment mutation: NONE;
-- Neon data mutation requested: NONE;
-- paid Facebook/ScrapeCreators activation: NONE.
-
-This acceptance does not activate the separately pending Gemini 3.5 Transcribe transition plan.
-
-## Research/Critic Invariants
-
-- no independent research before profile approval;
-- two-stage profile gate remains accepted;
-- option `1` approves the current profile and starts research;
-- material edits require re-approval;
-- risk floors: LOW 0, MEDIUM 1, HIGH 2, CRITICAL 3;
-- each material factual claim tracks required/achieved/exception;
-- evidence independence is based on origins, not URL count;
-- achieved cannot exceed visible traceable origins;
-- unresolved shortage is SHORTFALL and qualifies final status.
-
-## A10 State
-
-Runtime accepted:
-- visible four-column claim-summary table;
-- copy-safe fenced duplicate with literal pipe delimiters;
-- row values identical between forms;
-- real SHORTFALL preserved.
-
-The ordinary rendered table header may still be corrupted by ChatGPT whole-response Copy. This is an accepted external UI limitation; the fenced duplicate is the mitigation.
-
-## Current Release Decision
-
-```text
-merge KRC feature branch to main = HOLD
-merge VoiceBridge PR #28 = HOLD
-production VoiceBridge promotion = HOLD
-external tester onboarding = HOLD
-public sharing / Store rollout = HOLD
-original Render PostgreSQL deletion = HOLD
-```
-
-Canonical release-hold record:
-
-```text
-53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md
-```
-
-Project/documentation audit record:
-
-```text
-54_PROJECT_DOCUMENTATION_AUDIT_2026_08_27.md
-```
-
-## Current Work Rule
-
-Owner testing may continue. The Render PostgreSQL -> Neon migration stream and rollback observation window are closed with Neon as the active durable store. The active Facebook and Telegram server boundaries are hardened to their accepted dedicated-route policies, the cross-route negative routing matrix is live-accepted, and the auth/input/replay negative matrix is accepted. The consent/credit/quota negative matrix is accepted, with one shared durable daily STT ledger spanning active managed KRCM routes and legacy KRCC audio. Local attachment and Instagram route-boundary audits are accepted. Confirmed defects should be fixed only in the owning isolated feature branch and revalidated there. Do not delete the original Render PostgreSQL database, merge either MEDIA branch, change public Core, promote production infrastructure, onboard external testers, or activate paid Facebook/ScrapeCreators behavior unless the owner explicitly opens the corresponding gate.
-
-No additional A10 Builder remediation is pending.
+Before either R1 or R2, reverify current repository heads/CI, exact scope/diff, current Render live baseline and rollback target, environment presence without exposing secrets, Neon connectivity, provider state, and release-hold invariants.
