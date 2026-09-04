@@ -1,7 +1,8 @@
 # K-Research & Critic - MEDIA BETA Recovery Pointer
-Канонічний покажчик на поточний стан MEDIA BETA після live R2 Render promotion та часткового bounded canary.
 
-Status: ACTIVE POINTER / R2 LIVE PROMOTED / CANARY PARTIAL / MANUAL MEDIA CANARY REQUIRED / R3 HOLD
+Канонічний покажчик поточного стану MEDIA BETA після R2 live promotion, невдалого YouTube Supadata canary та repository-only переходу public YouTube/Instagram на self-hosted Cobalt.
+
+Status: ACTIVE POINTER / R2 LIVE BASELINE / PUBLIC COBALT CANDIDATE REPOSITORY PASS / DEPLOYMENT + CANARY PENDING / R3 HOLD
 Updated: 2026-09-04
 
 `K-Research & Critic - MEDIA BETA` remains an additive MEDIA capability planned for the existing published `K-Research & Critic` identity.
@@ -18,7 +19,7 @@ Branch:
 
 Path:
 
-`subprojects/media_beta/81_R2_LIVE_PROMOTION_PARTIAL_CANARY_2026_09_04.md`
+`subprojects/media_beta/82_R2_PUBLIC_COBALT_RECONCILIATION_REPOSITORY_SYNC_2026_09_04.md`
 
 ## Current gate state
 
@@ -28,95 +29,107 @@ R1   COMPLETE
 R2-A PASS
 R2-B PASS
 R2-C COMPLETE
-R2   LIVE PROMOTED / CANARY PARTIAL
+R2   LIVE BASELINE / COBALT REPOSITORY CANDIDATE PASS / DEPLOYMENT + CANARY PENDING
 R3   HOLD
 R4   HOLD
 ```
 
 ## Current live backend
 
+Read-only Render recheck confirms:
+
 ```text
 Render MEDIA service: voicebridge-krc-media-beta-kolemasakar
 service id: srv-da1kic5bedkc73d6fk60
-live deploy: dep-dadf9t6kb8uc7399jmc0
-live commit: 3a00d67bac0883a55f0f9c5eacf16e11acae85fe
+live deploy: dep-dadfu1mq1p3s73dgv5m0
+live commit: 7c8806713ea75b0809b638f102e31d8d3af86150
 status: live
-rollback target: 2f0f02769dbdf2e8240e6b08867ecef2faaede16
 autoDeploy: no
-configured branch: agent/krc-media-transcript
 ```
 
-Before promotion, `archive/krc-media-transcript-pre-r2-20260904` was created at the previous configured branch head `a0d1d5a380d0d90a42510c3b28f6221385578d52`.
+Current live still contains the Supadata public path. It is the immediate rollback point for the next exact Cobalt candidate deployment.
 
-## Active free-only policy
+Historical original R2 rollback baseline:
+
+`2f0f02769dbdf2e8240e6b08867ecef2faaede16`
+
+## Current repository candidate
+
+VoiceBridge:
 
 ```text
-KRC_MEDIA_PUBLIC_MODE=true
-KRC_MEDIA_FREE_TIER_ONLY=true
-KRC_MEDIA_ASSEMBLYAI_FREE_TRIAL_ONLY=true
+repository: kolemasakar/VoiceBridge
+branch: agent/krc-media-gemini-migration
+candidate: 4384b8dc8ef949ded7859495808b7f138eb8244d
+commit: R2 public media: route YouTube and Instagram through Cobalt
+Validate: 33916332270 / SUCCESS
+cloud tests: 239 passed / 0 failed
+PR #45: OPEN / DRAFT / UNMERGED / mergeable=true
+```
+
+The candidate has not been deployed.
+
+## Public free-only routing target
+
+```text
+YouTube   -> self-hosted Cobalt -> AssemblyAI universal-2 -> durable KRCM/Neon
+Instagram -> self-hosted Cobalt -> AssemblyAI universal-2 -> durable KRCM/Neon
+Facebook  -> self-hosted Cobalt -> AssemblyAI universal-2 -> durable KRCM/Neon
+Telegram  -> public Telegram web -> AssemblyAI universal-2 -> durable KRCM/Neon
+```
+
+Supadata remains historical/private compatibility code but is no longer required by `KRC_MEDIA_PUBLIC_MODE` in the repository candidate.
+
+Paid retrieval fallback remains forbidden. ScrapeCreators remains inactive in public free-only mode.
+
+## Canary finding
+
+Private YouTube Action canary attempts failed closed on the Supadata public/free-tier dependency. No successful transcript was produced and no paid fallback was enabled.
+
+This triggered architecture reconciliation rather than further weakening of the Supadata guard.
+
+The next live validation must occur only after exact deployment of `4384b8dc...` and must cover:
+
+```text
+YouTube via Cobalt
+Instagram via Cobalt
+Facebook via Cobalt
+Telegram via public web
+Action authentication
+provider/quota fail-closed behavior
+Core KRC isolation
+no paid fallback
+no secret/transcript leakage
+```
+
+## Active STT policy
+
+```text
 KRC_MEDIA_STT_PROVIDER=assemblyai
-KRC_MEDIA_TRANSCRIBE_MODEL=gemini-3.5-transcribe
-MEDIA_DAILY_STT_SECONDS=7200
-MEDIA_MAX_CONCURRENT_JOBS=1
-RATE_LIMIT_REQUESTS_PER_MINUTE=60
-ScrapeCreators paid fallback disabled
+AssemblyAI model=universal-2
+AssemblyAI continuation=Free balance only
+paid AssemblyAI continuation=forbidden
+post-AssemblyAI target=Gemini prerecorded
+Gemini automatic cutover=not implemented
+Gemini Free public activation=separate disclosure + explicit consent gate
+paid Gemini fallback=none
 ```
 
-AssemblyAI remains the active KRC prerecorded provider while its Free credit remains. After exhaustion, the product target is Gemini prerecorded STT, but the automatic runtime cutover is not yet implemented.
+## Administrative state
 
-## Promotion validation completed
+The accidental temporary Render service `noop` was manually deleted by the owner and deletion was confirmed through the Render connector.
 
-```text
-exact candidate identity        PASS
-Render build/deploy             PASS
-runtime process start           PASS
-free-only policy env            APPLIED
-Neon schema/connectivity        PASS
-post-start runtime error scan   PASS
-rollback identity               PRESERVED
-```
+## Public KRC boundary
 
-Post-promotion Neon read-only state:
-
-```text
-database: krc_media_beta
-schema: public
-expected MEDIA tables: 3
-managed_jobs: 2
-client_jobs: 0
-stt_seconds_today: 0
-```
-
-## Remaining R2 canary
-
-Before R2 can be called complete, use the existing private `K-Research & Critic - MEDIA BETA` GPT to run authenticated bounded canaries for:
-
-```text
-YouTube
-Telegram
-Instagram
-Facebook
-```
-
-Then confirm:
-
-- successful Action authentication without exposing credentials;
-- provider/quota failure remains MEDIA-only and fail-closed;
-- no paid fallback;
-- Core KRC remains usable;
-- no secret/transcript leakage in runtime logs.
-
-## Administrative cleanup
-
-An unrelated temporary Render service `noop` (`srv-dadf9am1egvs73d7ktj0`) was accidentally created during connector capability discovery. It is not referenced by KRC routing and does not affect the production MEDIA endpoint. The current Render connector has no delete-service operation, so it requires manual deletion in the Render Dashboard.
+The existing published `K-Research & Critic` GPT remains unchanged. No public MEDIA Action has been attached in Builder. R3 remains a separate explicit owner gate.
 
 ## Retained invariant
 
 ```text
 MEDIA unavailable/fails -> MEDIA unavailable/fails closed
-Core KRC               -> remains usable
+Core KRC               -> remains user-accessible and functional
 ```
 
-R3 remains a separate owner gate. No ChatGPT Builder update or public KRC configuration change occurred during R2 promotion.
+Recovery must start from checkpoint 82.
 
-Recovery must start from checkpoint 81.
+Before any state-changing action, re-read exact GitHub heads/CI, current Render live deploy, PR #45 state, and the current KRC public Builder state. Do not deploy, mutate Render/Neon, merge PR #45, activate Gemini, or update the public GPT without fresh explicit owner authorization.
