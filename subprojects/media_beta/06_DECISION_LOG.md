@@ -1,9 +1,9 @@
 # MEDIA BETA Decision Log
 Реєстр чинних і історичних рішень MEDIA BETA з актуальними release-hold рішеннями.
 
-Version: 2.4
+Version: 2.5
 Status: ACTIVE
-Updated: 2026-09-02
+Updated: 2026-09-04
 
 This file is the compact current decision index. Detailed historical rationale remains available in Git history and the numbered phase/acceptance records.
 
@@ -294,3 +294,65 @@ Canonical checkpoint:
 VoiceBridge authority:
 
 `docs/history/2026-09-02_KRC_MEDIA_M4_OWNER_CANARY_ACCEPTANCE.md`
+
+## D033 - Preserve the Existing Published KRC Identity; MEDIA Integration Uses a Separate Safety-Gated Update Sequence
+
+Decision: APPROVED_PLAN / NOT_EXECUTED
+Date: 2026-09-04
+
+The owner confirmed the current product reality:
+
+```text
+KRC public GPT: already published and user-accessible
+KRC MEDIA BETA GPT: owner-only / not separately published
+```
+
+The integration strategy must preserve the existing public KRC identity. Repository integration must not be treated as a GPT publication event, and the private MEDIA BETA GPT must never become a dependency required to use Core KRC.
+
+Mandatory invariant:
+
+```text
+MEDIA unavailable/fails -> MEDIA operation fails closed or becomes unavailable
+Core KRC              -> remains accessible and functional
+```
+
+The owner approved the following independent gate sequence:
+
+```text
+R0  Public KRC Update Safety Preflight
+R1  Repository integration
+R2  Permanent MEDIA backend promotion/readiness
+R3  Update the existing published KRC GPT
+R4  Post-update public-access + Core regression verification
+```
+
+### R0 is mandatory before R1-R3 execution
+
+R0 must be no-live-change and must verify at execution time:
+
+- the existing public KRC is still accessible;
+- the same GPT identity is editable by the owner;
+- an Update path for that existing published GPT is available;
+- current sharing/publication state is recorded;
+- current OpenAI requirements for updating a published GPT and public Actions are revalidated;
+- required Privacy Policy URL/state is valid;
+- current GPT configuration is captured sufficiently for rollback/reconstruction;
+- public KRC URL/identity can be preserved.
+
+If safe update of the same existing published GPT cannot be confirmed without creating/republishing a new GPT, STOP.
+
+R1, R2, R3, and R4 remain separately authorized gates. Approval of repository integration does not authorize backend promotion or live GPT Update. Approval of backend readiness does not authorize live GPT Update.
+
+Before R3 `Update`, Preview must prove both Core regression safety and MEDIA functionality, including a forced MEDIA failure where Core remains usable. The exact pre-update GPT configuration must be retained for rollback/reconstruction.
+
+Immediately after any separately authorized R3 Update, R4 must verify the same public KRC identity/URL remains accessible and that Core works independently of MEDIA.
+
+Detailed product plan:
+
+`planning/PUBLIC_KRC_MEDIA_INTEGRATION_UPDATE_SAFETY_PLAN_2026_09_04.md`
+
+VoiceBridge technical plan:
+
+`kolemasakar/VoiceBridge` -> `docs/planning/2026-09-04_KRC_PUBLIC_GPT_MEDIA_INTEGRATION_SAFETY_PREFLIGHT.md`
+
+This decision changes planning/governance only. It does not authorize or perform repository merge, permanent Render promotion, live GPT Update, new GPT publication, external tester expansion, public MEDIA rollout, Gemini prerecorded activation, Hybrid C/D implementation, or automatic paid fallback.
