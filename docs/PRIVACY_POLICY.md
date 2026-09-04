@@ -1,7 +1,8 @@
 # PRIVACY_POLICY
+
 Політика конфіденційності для майбутньої публічної MEDIA-функції K-Research & Critic; до окремого R3 оновлення GPT ця редакція є підготовленим кандидатом і не активує публічний MEDIA-доступ.
 
-Version: 2.0-candidate
+Version: 2.1-candidate
 Status: PUBLIC_MEDIA_CANDIDATE / NOT_YET_ACTIVATED / FREE_TIER_ONLY
 Updated: 2026-09-04
 
@@ -59,11 +60,15 @@ Reusable secrets must not be written to reports, checkpoints, public logs, or no
 
 ### YouTube and Instagram
 
-The service may use Supadata to obtain a managed transcript for supported public URLs. The public configuration is restricted to the provider Free tier. If the Free allowance is unavailable or exhausted, the operation fails closed rather than purchasing or automatically continuing with paid retrieval.
+The public MEDIA candidate uses the project's self-hosted Cobalt retrieval service for supported public YouTube and Instagram video URLs. The backend requests an audio-oriented media representation and may then send the retrieved audio to the active free-only speech-to-text provider.
+
+The initial Instagram public scope is limited to supported public single-video Reel/video-post forms. Multi-asset picker/carousel responses fail closed rather than selecting an item implicitly.
+
+If Cobalt cannot retrieve the public media, processing stops as unavailable. There is no automatic Supadata fallback and no automatic paid retrieval fallback in the public free-only configuration.
 
 ### Facebook
 
-The service uses the self-hosted Cobalt retrieval path for supported public Facebook video/reel media. Retrieved audio may then be sent to the active free-only speech-to-text provider.
+The service uses the same self-hosted Cobalt retrieval path for supported public Facebook video/reel media. Retrieved audio may then be sent to the active free-only speech-to-text provider.
 
 If Cobalt cannot retrieve the public media, processing stops as unavailable. ScrapeCreators and automatic paid Facebook retrieval are not permitted in the public free-only configuration.
 
@@ -100,16 +105,18 @@ The public MEDIA feature is designed to operate only within free provider/servic
 Current safety rules include:
 
 ```text
-Supadata Free plan only
-no Supadata Auto Recharge path used by KRC
+self-hosted Cobalt retrieval for public YouTube/Instagram/Facebook
+Cobalt retrieval credits charged by KRC: 0
 AssemblyAI Free-plan use only
 no automatic paid AssemblyAI continuation
-Facebook Cobalt free retrieval only
 no ScrapeCreators credential in public free-only mode
 no automatic paid retrieval fallback
+no automatic Supadata fallback from public Cobalt routes
 Gemini Free route only after separate validation/activation
 provider/resource exhaustion -> MEDIA unavailable / fail closed
 ```
+
+`0 retrieval credits` describes the KRC provider-credit accounting for the self-hosted retrieval route; it does not mean that hosting, bandwidth, or other infrastructure has no resource cost.
 
 Users are not charged by K-Research & Critic for MEDIA processing.
 
@@ -131,8 +138,10 @@ Before any public provider activation, the project must re-check the then-curren
 
 - AssemblyAI provider-side deletion is attempted where supported and must be reported accurately;
 - Google Gemini Free Tier data-use terms must be disclosed before the Gemini route is enabled for public users;
-- Supadata receives only the supported public URL and operation parameters needed for its route;
-- Cobalt is operated as the project's free retrieval component for Facebook and is not a paid fallback service.
+- Cobalt is operated by the project as the free retrieval component for supported public YouTube, Instagram, and Facebook media and is not a paid fallback service;
+- Telegram retrieval uses only the supported public web/media route and does not require account/session credentials.
+
+Historical/private compatibility code may contain provider adapters that are not part of the public route. Their presence in the repository does not by itself authorize public transmission to those providers.
 
 ## 9. Data Minimization and Security
 
