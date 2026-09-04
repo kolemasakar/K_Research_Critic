@@ -2,7 +2,7 @@
 
 Канонічний індекс документації K-Research & Critic MEDIA BETA.
 
-Version: 6.0
+Version: 6.1
 Status: ACTIVE / CHECKPOINT_82 / R2_PUBLIC_COBALT_REPOSITORY_PASS / DEPLOYMENT_AND_CANARY_PENDING / R3_HOLD
 Updated: 2026-09-04
 
@@ -43,10 +43,6 @@ VoiceBridge technical reconciliation:
 
 `docs/history/2026-09-04_KRC_MEDIA_PUBLIC_COBALT_ROUTING_RECONCILIATION.md`
 
-VoiceBridge R2-C promotion plan:
-
-`docs/planning/2026-09-04_KRC_MEDIA_R2C_PUBLIC_PRIVACY_RENDER_PROMOTION_PLAN.md`
-
 ## Current repository state
 
 KRC canonical repository:
@@ -57,14 +53,16 @@ branch: main
 current recovery checkpoint: 82
 ```
 
-VoiceBridge candidate:
+VoiceBridge synchronized candidate:
 
 ```text
 repository: kolemasakar/VoiceBridge
 branch: agent/krc-media-gemini-migration
-candidate: 4384b8dc8ef949ded7859495808b7f138eb8244d
-Validate: 33916332270 / SUCCESS
-cloud: 239 passed / 0 failed
+current head: 5003689ad2fe4c850d47dc7777c50470820b0bff
+Cobalt implementation: 4384b8dc8ef949ded7859495808b7f138eb8244d
+current-head Validate: 33917780763 / SUCCESS
+implementation Validate: 33916332270 / SUCCESS
+implementation cloud: 239 passed / 0 failed
 PR #45: OPEN / DRAFT / UNMERGED / mergeable=true
 ```
 
@@ -73,12 +71,13 @@ PR #45: OPEN / DRAFT / UNMERGED / mergeable=true
 ```text
 LIVE Render commit:          7c8806713ea75b0809b638f102e31d8d3af86150
 LIVE Render deploy:          dep-dadfu1mq1p3s73dgv5m0
-REPOSITORY CANDIDATE:        4384b8dc8ef949ded7859495808b7f138eb8244d
+COBALT IMPLEMENTATION:       4384b8dc8ef949ded7859495808b7f138eb8244d
+SYNCHRONIZED VOICEBRIDGE:    5003689ad2fe4c850d47dc7777c50470820b0bff
 NEXT IMMEDIATE ROLLBACK:     7c8806713ea75b0809b638f102e31d8d3af86150
 HISTORICAL R2 ROLLBACK:      2f0f02769dbdf2e8240e6b08867ecef2faaede16
 ```
 
-The repository candidate is not deployed yet.
+The synchronized Cobalt candidate is not deployed yet.
 
 ## Current public MEDIA routing target
 
@@ -103,6 +102,12 @@ post-AssemblyAI target: Gemini prerecorded
 Gemini automatic cutover: NOT IMPLEMENTED
 Gemini public Free activation: separate disclosure + explicit user consent gate
 ```
+
+## Known package gap before R3
+
+The recovery/checkpoint documentation, privacy candidate, VoiceBridge reconciliation note, and PR #45 are synchronized to the Cobalt architecture.
+
+`gpt_store/actions/media_managed_beta_openapi.yaml` still describes the older Supadata-native Action request contract. It must be revised and validated before R3. The public GPT remains unchanged and has no MEDIA Action attached, so this repository mismatch is not a live-public exposure.
 
 ## Gate sequence and current point
 
