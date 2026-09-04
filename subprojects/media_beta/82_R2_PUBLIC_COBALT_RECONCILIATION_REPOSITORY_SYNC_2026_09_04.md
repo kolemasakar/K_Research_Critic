@@ -5,13 +5,13 @@ Status: R2_LIVE_BASELINE / PUBLIC_COBALT_CANDIDATE_REPOSITORY_PASS / DEPLOYMENT_
 
 ## Scope
 
-This checkpoint supersedes checkpoint 81 as the canonical recovery point after the failed YouTube Supadata canary sequence, architecture reconciliation, and repository-only migration of public YouTube/Instagram retrieval to self-hosted Cobalt.
+This checkpoint supersedes checkpoint 81 as the canonical recovery point after the failed YouTube Supadata canary sequence, architecture reconciliation, repository-only migration of public YouTube/Instagram retrieval to self-hosted Cobalt, and cross-repository documentation synchronization.
 
-No Render deployment, Render environment mutation, Neon mutation, ChatGPT Builder update, public GPT change, PR merge, Gemini activation, or provider-consuming canary was performed while creating this checkpoint.
+No Render deployment, Render environment mutation, Neon mutation, ChatGPT Builder update, public GPT change, PR merge, Gemini activation, or provider-consuming canary was performed while creating/finalizing this checkpoint.
 
 ## Current live backend baseline
 
-Read-only Render recheck on 2026-09-04 confirms the currently live MEDIA deployment is:
+Read-only Render recheck on 2026-09-04 confirms:
 
 ```text
 Render service: voicebridge-krc-media-beta-kolemasakar
@@ -32,8 +32,6 @@ Historical original R2 rollback baseline remains:
 
 The private MEDIA BETA YouTube canary was attempted through the authenticated GPT Action path.
 
-Observed sequence:
-
 ```text
 attempt 1 -> fail closed before provider processing because required public/free-only runtime flags were absent
 runtime flags -> applied
@@ -53,7 +51,7 @@ Repository/history review established:
 - Telegram had already moved to `public web -> AssemblyAI` with zero retrieval credits.
 - Permanent public YouTube/Instagram reliance on Supadata had not been independently validated as the final free-only architecture.
 
-The accepted public candidate architecture is now:
+Accepted public candidate architecture:
 
 ```text
 YouTube   -> self-hosted Cobalt -> AssemblyAI universal-2 -> durable KRCM/Neon
@@ -62,11 +60,11 @@ Facebook  -> self-hosted Cobalt -> AssemblyAI universal-2 -> durable KRCM/Neon
 Telegram  -> public Telegram web -> AssemblyAI universal-2 -> durable KRCM/Neon
 ```
 
-Supadata remains only as historical/private compatibility code. It is not required by `KRC_MEDIA_PUBLIC_MODE` in the new repository candidate.
+Supadata remains historical/private compatibility code. It is not required by `KRC_MEDIA_PUBLIC_MODE` in the synchronized repository candidate.
 
 No paid retrieval fallback is authorized. ScrapeCreators remains forbidden in public free-only mode.
 
-## VoiceBridge repository candidate
+## VoiceBridge repository state
 
 Repository:
 
@@ -76,15 +74,11 @@ Branch:
 
 `agent/krc-media-gemini-migration`
 
-Repository candidate:
+Cobalt implementation commit:
 
 `4384b8dc8ef949ded7859495808b7f138eb8244d`
 
-Commit message:
-
-`R2 public media: route YouTube and Instagram through Cobalt`
-
-Validate workflow:
+Implementation Validate:
 
 ```text
 run: 33916332270
@@ -95,7 +89,20 @@ browser-extension: PASS
 krc-image-parity: PASS
 ```
 
-Repository behavior verified by tests:
+Current synchronized VoiceBridge head:
+
+`5003689ad2fe4c850d47dc7777c50470820b0bff`
+
+This is a documentation-only descendant of `4384b8dc...`.
+
+Current-head Validate:
+
+```text
+run: 33917780763
+conclusion: SUCCESS
+```
+
+Repository behavior verified by regression tests:
 
 ```text
 public MEDIA does not require SUPADATA_API_KEY
@@ -108,29 +115,29 @@ duplicate public job is reused without second retrieval/STT
 YouTube public start no longer requires Supadata credit consent
 ```
 
-VoiceBridge PR #45 remains:
+VoiceBridge PR #45 is synchronized to checkpoint 82 and remains:
 
 ```text
 OPEN
 DRAFT
 UNMERGED
 mergeable=true
+head=5003689ad2fe4c850d47dc7777c50470820b0bff
 ```
 
 ## Public Cobalt release boundary
 
-The repository candidate is not live yet.
-
-Current divergence:
+The synchronized repository candidate is not live yet.
 
 ```text
-LIVE Render:              7c8806713ea75b0809b638f102e31d8d3af86150
-REPOSITORY CANDIDATE:     4384b8dc8ef949ded7859495808b7f138eb8244d
-NEXT IMMEDIATE ROLLBACK:  7c8806713ea75b0809b638f102e31d8d3af86150
-HISTORICAL R2 ROLLBACK:   2f0f02769dbdf2e8240e6b08867ecef2faaede16
+LIVE Render:                  7c8806713ea75b0809b638f102e31d8d3af86150
+COBALT IMPLEMENTATION:       4384b8dc8ef949ded7859495808b7f138eb8244d
+SYNCHRONIZED VOICEBRIDGE:    5003689ad2fe4c850d47dc7777c50470820b0bff
+NEXT IMMEDIATE ROLLBACK:     7c8806713ea75b0809b638f102e31d8d3af86150
+HISTORICAL R2 ROLLBACK:      2f0f02769dbdf2e8240e6b08867ecef2faaede16
 ```
 
-The next state-changing release step must deploy the exact repository candidate, not an unspecified branch head.
+The next state-changing release step must deploy an exact accepted synchronized commit, not an unspecified moving branch head.
 
 ## Provider policy retained
 
@@ -152,7 +159,13 @@ The accidental temporary Render service `noop` was manually deleted by the owner
 
 The existing published `K-Research & Critic` GPT remains unchanged and still has no public MEDIA Action attached.
 
-Therefore the current live VoiceBridge changes affect the isolated MEDIA backend/private MEDIA BETA path only. R3 remains the separate gate where the existing public GPT Builder configuration would be updated.
+R3 remains the separate gate where the existing public GPT Builder configuration would be updated.
+
+## Known repository package gap before R3
+
+The recovery checkpoint, recovery pointer, MEDIA index, privacy candidate, VoiceBridge reconciliation note and PR #45 are synchronized to the Cobalt architecture.
+
+The existing KRC GPT Action OpenAPI/Builder package still contains the older Supadata-native request semantics. It must be updated and validated before R3. Its stale presence does not change the currently published GPT because the public GPT still has no MEDIA Action attached.
 
 ## Gate state
 
@@ -184,6 +197,7 @@ Recovery must start from this checkpoint 82, then re-read:
 2. VoiceBridge branch `agent/krc-media-gemini-migration` exact head and Validate state;
 3. Render current live deployment for `srv-da1kic5bedkc73d6fk60`;
 4. VoiceBridge `docs/history/2026-09-04_KRC_MEDIA_PUBLIC_COBALT_ROUTING_RECONCILIATION.md`;
-5. PR #45 state.
+5. PR #45 state;
+6. KRC GPT Action OpenAPI package state before R3.
 
 Do not deploy, mutate Render/Neon, merge PR #45, activate Gemini, or edit the public GPT Builder without a fresh explicit owner authorization for that state-changing gate.
