@@ -1,5 +1,4 @@
 # K-Research & Critic - MEDIA BETA Recovery Pointer
-
 Канонічний покажчик поточного стану MEDIA BETA після R2 live promotion, невдалого YouTube Supadata canary та repository-only переходу public YouTube/Instagram на self-hosted Cobalt.
 
 Status: ACTIVE POINTER / R2 LIVE BASELINE / PUBLIC COBALT CANDIDATE REPOSITORY PASS / DEPLOYMENT + CANARY PENDING / R3 HOLD
@@ -60,14 +59,15 @@ VoiceBridge:
 ```text
 repository: kolemasakar/VoiceBridge
 branch: agent/krc-media-gemini-migration
-candidate: 4384b8dc8ef949ded7859495808b7f138eb8244d
-commit: R2 public media: route YouTube and Instagram through Cobalt
-Validate: 33916332270 / SUCCESS
-cloud tests: 239 passed / 0 failed
+current synchronized head: 5003689ad2fe4c850d47dc7777c50470820b0bff
+Cobalt implementation commit: 4384b8dc8ef949ded7859495808b7f138eb8244d
+Validate current head: 33917780763 / SUCCESS
+Validate implementation: 33916332270 / SUCCESS
+implementation cloud tests: 239 passed / 0 failed
 PR #45: OPEN / DRAFT / UNMERGED / mergeable=true
 ```
 
-The candidate has not been deployed.
+The current VoiceBridge head is a documentation-only descendant of the Cobalt implementation commit. The Cobalt candidate has not been deployed.
 
 ## Public free-only routing target
 
@@ -88,7 +88,7 @@ Private YouTube Action canary attempts failed closed on the Supadata public/free
 
 This triggered architecture reconciliation rather than further weakening of the Supadata guard.
 
-The next live validation must occur only after exact deployment of `4384b8dc...` and must cover:
+The next live validation must occur only after exact deployment of the synchronized Cobalt candidate and must cover:
 
 ```text
 YouTube via Cobalt
