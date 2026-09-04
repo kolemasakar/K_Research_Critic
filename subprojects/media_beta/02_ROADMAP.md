@@ -1,21 +1,24 @@
 # MEDIA BETA Roadmap
 Поточний roadmap приватного K-Research & Critic MEDIA BETA.
 
-Version: 4.4
-Status: RELEASE_HOLD_OWNER_TESTING / M3_CLOSED / M4_OWNER_CANARY_ACCEPTED / R1_R2_HOLD
-Updated: 2026-09-02
+Version: 4.5
+Status: RELEASE_HOLD_OWNER_TESTING / M3_CLOSED / M4_OWNER_CANARY_ACCEPTED / PUBLIC_KRC_UPDATE_SAFETY_PREFLIGHT_PLANNED
+Updated: 2026-09-04
 
 ## Product position
 
-`K-Research & Critic - MEDIA BETA` is a closed-beta module of the published `K-Research & Critic` product.
+`K-Research & Critic - MEDIA BETA` is a closed-beta module of the already-published `K-Research & Critic` product.
 
 ```text
 product/roadmap authority: kolemasakar/K_Research_Critic
-public Core: main
+public Core: main / already published GPT / user-accessible
 closed-beta product branch: agent/video-url-research
+private MEDIA BETA GPT: owner-only
 technology/backend implementation source: kolemasakar/VoiceBridge
 KRC media migration branch: agent/krc-media-gemini-migration
 ```
+
+The future integration target is the **existing published KRC identity**. MEDIA must remain additive and failure-isolated; a MEDIA backend/action failure must never make Core KRC unavailable.
 
 ## Accepted runtime baseline
 
@@ -110,9 +113,7 @@ VoiceBridge authority:
 
 `docs/history/2026-09-02_KRC_MEDIA_M4_OWNER_CANARY_ACCEPTANCE.md`
 
-### M4 post-canary gate
-
-The canary is acceptance evidence only. It does not permanently promote the M4 target.
+### M4 post-canary state
 
 ```text
 M4_IMAGE_PARITY: PASS
@@ -120,37 +121,130 @@ M4_OWNER_CANARY: PASS
 M4_PERMANENT_BACKEND_PROMOTION: NOT_AUTHORIZED
 ```
 
-The next owner decision must keep repository integration and backend promotion separate:
+## Public KRC + MEDIA integration safety plan
+
+The owner approved a new mandatory safety sequence before any merge/promotion/live GPT update.
+
+Product plan:
+
+`planning/PUBLIC_KRC_MEDIA_INTEGRATION_UPDATE_SAFETY_PLAN_2026_09_04.md`
+
+VoiceBridge technical plan:
+
+`docs/planning/2026-09-04_KRC_PUBLIC_GPT_MEDIA_INTEGRATION_SAFETY_PREFLIGHT.md`
+
+### R0 - Public KRC Update Safety Preflight
+
+Status: PLANNED / REQUIRED NEXT.
+
+This is a **no-live-change** preflight. It must verify that the already-published KRC identity can be preserved and safely updated before any live GPT operation.
+
+Required evidence includes:
+
+- current public KRC remains user-accessible;
+- same GPT can still be edited by owner;
+- an `Update` path for the existing published GPT is available at execution time;
+- current sharing/publication state is recorded;
+- current OpenAI update/public-Action requirements are revalidated;
+- Privacy Policy requirements for Actions are satisfied;
+- current GPT configuration is captured sufficiently for rollback/reconstruction;
+- public KRC URL/identity is preserved;
+- current MEDIA owner-only admission assumptions are identified before public exposure.
+
+If safe update of the existing published GPT cannot be verified without creating/republishing a new GPT, STOP.
+
+### R1 - Repository integration
+
+Status: HOLD until R0 PASS + explicit owner authorization.
+
+Purpose: integrate selected MEDIA code/docs into the KRC repository while leaving the live published GPT untouched.
+
+Required invariant:
 
 ```text
-R1: merge selected MEDIA BETA work toward main - separate decision
-R2: permanently promote tested backend target - separate decision
+MEDIA failure/unavailability -> MEDIA unavailable
+Core KRC -> remains usable
 ```
 
-Before either gate, reverify current heads/CI, exact diffs/scope, current Render live baseline, rollback target, environment state, Neon connectivity, and release-hold invariants.
+R1 does not authorize R2 or R3.
+
+### R2 - Permanent MEDIA backend promotion/readiness
+
+Status: HOLD / separate owner decision.
+
+Before promotion, verify:
+
+- exact Render target and rollback;
+- Neon connectivity/durability;
+- public-user admission/auth design;
+- provider/quota policies;
+- Cobalt-only Facebook behavior;
+- no automatic paid fallback;
+- backend failure isolation from Core.
+
+R2 does not authorize live GPT update.
+
+### R3 - Update existing published KRC GPT
+
+Status: HOLD / critical live-product gate.
+
+Planned path, only if current Builder capabilities still support it:
+
+```text
+existing published KRC
+  -> Edit
+  -> Draft changes only
+  -> add MEDIA additively
+  -> Preview Core regression
+  -> Preview MEDIA regression
+  -> explicit owner authorization
+  -> Update existing GPT
+```
+
+Do not create or depend on a new GPT publication event.
+
+### R4 - Post-update public-access verification
+
+Status: HOLD until R3.
+
+Immediately after an authorized R3 update verify:
+
+- same public KRC URL remains accessible;
+- Core KRC works without MEDIA;
+- MEDIA works as intended;
+- MEDIA failures do not degrade Core;
+- no private MEDIA BETA identity is required by users;
+- sharing state did not unexpectedly change;
+- rollback remains available if a critical regression appears.
+
+## Gate model
+
+```text
+R0  Public KRC Update Safety Preflight
+R1  Repository integration
+R2  Permanent MEDIA backend promotion/readiness
+R3  Update existing published KRC GPT
+R4  Post-update public-access + Core regression verification
+```
+
+Every gate is independent. Approval of one must never imply approval of the next.
 
 ## M5 - Provider/new-infrastructure cutover
 
 Status: NOT_AUTHORIZED.
 
-M5 is not implied by M4 canary acceptance. Gemini prerecorded remains inactive and Hybrid C/D remains deferred.
+M5 is not implied by M4 canary acceptance or the public-KRC integration plan. Gemini prerecorded remains inactive and Hybrid C/D remains deferred.
 
-## Release hold
-
-```text
-R1 merge selected MEDIA BETA work toward main   HOLD
-R2 backend/production promotion                 HOLD
-R3 external testers                             HOLD
-R4 public sharing / Store rollout               HOLD
-```
-
-## Current checkpoint
+## Current operational checkpoint
 
 `72_M4_OWNER_CANARY_ACCEPTED_ROLLBACK_COMPLETE_CHECKPOINT_2026_09_02.md`
+
+Checkpoint 72 remains the operational recovery authority because the 2026-09-04 changes are planning/governance only and performed no live runtime transition.
 
 ## Exact continuation point
 
 ```text
-OWNER POST-CANARY DECISION
-R1 MERGE AND R2 BACKEND PROMOTION REMAIN SEPARATE GATES
+R0 PUBLIC KRC UPDATE SAFETY PREFLIGHT
+NO LIVE GPT CHANGE
+NO MERGE / PERMANENT BACKEND PROMOTION / GPT UPDATE WITHOUT SEPARATE AUTHORIZATION
 ```
