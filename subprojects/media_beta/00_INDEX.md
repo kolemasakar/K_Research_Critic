@@ -1,107 +1,130 @@
 # MEDIA BETA Documentation Index
-Канонічний індекс документації приватного K-Research & Critic MEDIA BETA.
 
-Version: 5.4
-Status: ACTIVE / CROSS_SYSTEM_CHECKPOINT_73 / R0_PUBLIC_KRC_UPDATE_PREFLIGHT_NEXT
+Канонічний індекс документації K-Research & Critic MEDIA BETA.
+
+Version: 6.0
+Status: ACTIVE / CHECKPOINT_82 / R2_PUBLIC_COBALT_REPOSITORY_PASS / DEPLOYMENT_AND_CANARY_PENDING / R3_HOLD
 Updated: 2026-09-04
 
 ## Product boundary
 
-`K-Research & Critic - MEDIA BETA` is a closed-beta module of the already-published `K-Research & Critic` product. `K_Research_Critic` remains the product/roadmap authority. VoiceBridge provides media/backend technology, implementation, and validation evidence.
+`K-Research & Critic - MEDIA BETA` is an additive MEDIA capability intended for the already-published `K-Research & Critic` product. `K_Research_Critic` remains the product/release authority. VoiceBridge provides the isolated MEDIA backend implementation and validation evidence.
 
-Owner-confirmed product reality:
-
-```text
-public KRC: already published / user-accessible
-KRC MEDIA BETA: owner-only / not separately published
-future public integration target: same existing public KRC identity
-```
-
-MEDIA must remain additive and failure-isolated. Public KRC must never depend on the private MEDIA BETA GPT identity.
-
-## Canonical reading order
-
-1. `73_PUBLIC_KRC_MEDIA_VOICEBRIDGE_CROSS_SYSTEM_TRANSITION_CHECKPOINT_2026_09_04.md` - current cross-system recovery authority.
-2. `planning/PUBLIC_KRC_MEDIA_INTEGRATION_UPDATE_SAFETY_PLAN_2026_09_04.md` - approved R0-R4 integration safety plan.
-3. `72_M4_OWNER_CANARY_ACCEPTED_ROLLBACK_COMPLETE_CHECKPOINT_2026_09_02.md` - accepted M4 canary evidence and rollback.
-4. `69_POST_ASSEMBLYAI_FREE_CREDITS_HYBRID_STT_PLAN_2026_09_02.md` - deferred future Hybrid C/D plan.
-5. `68_M3B_AB_COMPLETE_OWNER_DECISION_CHECKPOINT_2026_09_01.md` - completed provider evidence before M3 closure.
-6. `62_FULL_PROJECT_STATE_CHECKPOINT_2026_09_01.md` - earlier complete cross-repository baseline.
-7. `02_ROADMAP.md`, `03_CURRENT_STATE.md`, `06_DECISION_LOG.md`, `08_CHAT_HANDOFF.md` - roadmap/state/decisions/handoff.
-
-VoiceBridge cross-system technical reference:
-
-`docs/history/2026-09-04_KRC_MEDIA_VOICEBRIDGE_CROSS_SYSTEM_TRANSITION_CHECKPOINT.md`
-
-VoiceBridge public-integration technical plan:
-
-`docs/planning/2026-09-04_KRC_PUBLIC_GPT_MEDIA_INTEGRATION_SAFETY_PREFLIGHT.md`
-
-## Current repository state frozen by checkpoint 73
+Current product reality:
 
 ```text
-KRC main observed head:                 39629886e9f1f3841661c759f75279f779a937c8
-KRC MEDIA branch pre-checkpoint head:   5241c36460f7dfe4222ab1b4f0b933cb4da0281c
-KRC MEDIA Tests:                       33870130947 / SUCCESS
-KRC PR #8:                             OPEN / DRAFT / UNMERGED / DIRTY
-KRC MEDIA vs main:                     ahead 568 / behind 78
-
-VoiceBridge pre-reference head:         0252751ca3f4e04b60423cb506de630680fd83a7
-VoiceBridge Validate:                  33860807242 / SUCCESS
-VoiceBridge PR #45:                    OPEN / DRAFT / UNMERGED / mergeable=true
+public KRC: already published / user-accessible / unchanged
+private KRC MEDIA BETA: Action-enabled test surface
+future public MEDIA target: same existing public KRC identity
 ```
 
-## Current provider/runtime state
-
-```text
-M3: CLOSED
-current KRC prerecorded provider: AssemblyAI universal-2
-Gemini prerecorded normal activation: FALSE
-provider cutover now: FALSE
-Hybrid C/D: PLANNED / NOT IMPLEMENTED
-Hybrid trigger: AssemblyAI free credits exhausted + fresh owner decision
-
-M4_IMAGE_PARITY: PASS
-M4_OWNER_CANARY: PASS
-M4_REAL_STT: PASS
-M4_DURABILITY/IDEMPOTENCY: PASS
-M4_ROLLBACK: PASS
-M4_PERMANENT_BACKEND_PROMOTION: NOT AUTHORIZED
-```
-
-Canary workflow: `33580592224` / SUCCESS.
-
-## Approved next gate sequence
-
-```text
-R0  Public KRC Update Safety Preflight
-R1  Repository integration
-R2  Permanent MEDIA backend promotion/readiness
-R3  Update existing published KRC GPT
-R4  Post-update public-access + Core regression verification
-```
-
-Current point:
-
-```text
-R0: NEXT / NO LIVE CHANGE
-R1: HOLD
-R2: HOLD
-R3: HOLD
-R4: HOLD
-```
-
-R1 must not direct-merge PR #8 as-is because the branch is currently divergent/dirty. R0 must pass first, then a dedicated integration/conflict strategy is required.
-
-## Critical invariant
+Critical invariant:
 
 ```text
 MEDIA unavailable/fails -> MEDIA unavailable/fails closed
-Core KRC              -> remains user-accessible and functional
+Core KRC               -> remains user-accessible and functional
 ```
+
+## Canonical reading order
+
+1. `82_R2_PUBLIC_COBALT_RECONCILIATION_REPOSITORY_SYNC_2026_09_04.md` - current canonical recovery checkpoint.
+2. `81_R2_LIVE_PROMOTION_PARTIAL_CANARY_2026_09_04.md` - previous live promotion baseline and partial canary checkpoint.
+3. `80_R2C_PUBLIC_PRIVACY_RENDER_PROMOTION_READY_2026_09_04.md` - pre-promotion privacy/release plan.
+4. `79_R2B_FAILURE_ISOLATION_FREE_QUOTA_PASS_2026_09_04.md` - failure-isolation evidence.
+5. `78_R2A_PUBLIC_FREE_TIER_ADMISSION_PASS_2026_09_04.md` - public free-only admission policy.
+6. `75_R1_REPOSITORY_INTEGRATION_COMPLETE_CHECKPOINT_2026_09_04.md` - completed R1 repository integration.
+7. `planning/PUBLIC_KRC_MEDIA_INTEGRATION_UPDATE_SAFETY_PLAN_2026_09_04.md` - R0-R4 release safety plan.
+
+Recovery pointer:
+
+`../../docs/KRC_MEDIA_BETA_RECOVERY_POINTER.md`
+
+VoiceBridge technical reconciliation:
+
+`docs/history/2026-09-04_KRC_MEDIA_PUBLIC_COBALT_ROUTING_RECONCILIATION.md`
+
+VoiceBridge R2-C promotion plan:
+
+`docs/planning/2026-09-04_KRC_MEDIA_R2C_PUBLIC_PRIVACY_RENDER_PROMOTION_PLAN.md`
+
+## Current repository state
+
+KRC canonical repository:
+
+```text
+repository: kolemasakar/K_Research_Critic
+branch: main
+current recovery checkpoint: 82
+```
+
+VoiceBridge candidate:
+
+```text
+repository: kolemasakar/VoiceBridge
+branch: agent/krc-media-gemini-migration
+candidate: 4384b8dc8ef949ded7859495808b7f138eb8244d
+Validate: 33916332270 / SUCCESS
+cloud: 239 passed / 0 failed
+PR #45: OPEN / DRAFT / UNMERGED / mergeable=true
+```
+
+## Current live backend versus repository candidate
+
+```text
+LIVE Render commit:          7c8806713ea75b0809b638f102e31d8d3af86150
+LIVE Render deploy:          dep-dadfu1mq1p3s73dgv5m0
+REPOSITORY CANDIDATE:        4384b8dc8ef949ded7859495808b7f138eb8244d
+NEXT IMMEDIATE ROLLBACK:     7c8806713ea75b0809b638f102e31d8d3af86150
+HISTORICAL R2 ROLLBACK:      2f0f02769dbdf2e8240e6b08867ecef2faaede16
+```
+
+The repository candidate is not deployed yet.
+
+## Current public MEDIA routing target
+
+```text
+YouTube   -> self-hosted Cobalt -> AssemblyAI universal-2 -> KRCM/Neon
+Instagram -> self-hosted Cobalt -> AssemblyAI universal-2 -> KRCM/Neon
+Facebook  -> self-hosted Cobalt -> AssemblyAI universal-2 -> KRCM/Neon
+Telegram  -> public Telegram web -> AssemblyAI universal-2 -> KRCM/Neon
+```
+
+Supadata remains only as historical/private compatibility code. It is not required by `KRC_MEDIA_PUBLIC_MODE` in the current VoiceBridge repository candidate.
+
+ScrapeCreators paid retrieval remains forbidden in public free-only mode. No automatic paid retrieval/STT fallback is authorized.
+
+## STT provider state
+
+```text
+current KRC prerecorded provider: AssemblyAI universal-2
+AssemblyAI use: Free balance only
+paid AssemblyAI continuation: forbidden
+post-AssemblyAI target: Gemini prerecorded
+Gemini automatic cutover: NOT IMPLEMENTED
+Gemini public Free activation: separate disclosure + explicit user consent gate
+```
+
+## Gate sequence and current point
+
+```text
+R0   PASS
+R1   COMPLETE
+R2-A PASS
+R2-B PASS
+R2-C COMPLETE
+R2   LIVE BASELINE / COBALT REPOSITORY CANDIDATE PASS / DEPLOYMENT + CANARY PENDING
+R3   HOLD
+R4   HOLD
+```
+
+R2 is not complete. The next state-changing gate is exact deployment of the VoiceBridge Cobalt candidate followed by bounded authenticated canaries and Core-isolation verification.
+
+## Administrative state
+
+The accidental temporary Render service `noop` has been deleted and its absence was confirmed through the Render connector.
 
 ## Recovery command
 
-`recover KRC MEDIA BETA cross-system checkpoint 73 public KRC MEDIA VoiceBridge 2026-09-04`
+`recover KRC MEDIA BETA checkpoint 82 public Cobalt reconciliation 2026-09-04`
 
-Before any state-changing action, reverify current GitHub heads/CI, current OpenAI Builder/update capabilities, and current external infrastructure.
+Before any state-changing action, reverify current GitHub heads and CI, current Render live deployment, current PR #45 state, and current public GPT Builder configuration.
