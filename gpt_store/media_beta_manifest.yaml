@@ -1,0 +1,239 @@
+schema_version: "0.6-beta"
+
+product:
+  name: K-Research & Critic - MEDIA BETA
+  description: |-
+    Приватне owner-only тестування zero-client аналізу публічних YouTube-відео, Instagram Reel, Facebook, Telegram media та локальних audio/video вкладень.
+    (owner-only zero-client media-input beta for K-Research & Critic.)
+  default_language: uk-UA
+  primary_channel: chatgpt_private_beta
+  publication_state: private_owner_only
+
+model:
+  policy: user_plan
+  recommended_model: null
+  allow_user_model_switch: true
+
+capabilities:
+  web_search: true
+  code_interpreter_data_analysis: true
+  image_generation: false
+  apps: false
+  actions: true
+
+knowledge:
+  required: false
+  files: []
+
+instructions:
+  file: prompts/GPT_STORE_MEDIA_BETA_BUILDER_INSTRUCTIONS.md
+  canonical_reference: prompts/GPT_STORE_MEDIA_MANAGED_BETA_INSTRUCTIONS.md
+  version: "0.9.1-beta-a10"
+  builder_package_version: "0.9.1-beta-a10"
+  builder_target_action_schema_version: "0.6.0-a9.10"
+  builder_package_ready: true
+  builder_runtime_applied: true
+  builder_policy_fix_runtime_applied: true
+  builder_character_limit: 8000
+  default_report_language: uk-UA
+  report_language_follows_source_language: false
+  verdict_labels_localized_to_report_language: true
+  user_visible_labels_localized_to_report_language: true
+  criticprofile_field_labels_localized_to_report_language: true
+  ukrainian_required_headings:
+    - ФІНАЛЬНИЙ ЗВІТ
+    - ПЕРЕВІРКА ТВЕРДЖЕНЬ
+    - ПРОТОКОЛ ПЕРЕВІРКИ
+    - ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ
+  profile_gate_mode: two_stage_direct_or_review
+  profile_auto_display: false
+  profile_direct_run_approves_profile: true
+  profile_review_option: 2
+  profile_cancel_option: 3
+  recovered_review_required_uses_same_gate: true
+  required_cross_checks_enforced: true
+  cross_check_independence_required: true
+  cross_check_shortfall_must_be_reported: true
+  cross_check_protocol_summary_required: true
+  cross_check_claim_level_ledger_required: true
+  cross_check_claim_level_output_required: true
+  cross_check_unqualified_pass_on_shortfall_forbidden: true
+  cross_check_traceability_required: true
+  cross_check_achieved_cannot_exceed_visible_origins: true
+  cross_check_systematic_review_counts_as_one_origin: true
+  cross_check_protocol_table_required: true
+  cross_check_protocol_markdown_table_strict: true
+  cross_check_protocol_header_merge_forbidden: true
+  cross_check_copy_safe_table_required: true
+  cross_check_protocol_table_heading_uk: ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ
+  cross_check_protocol_table_header_row_uk: "| Твердження | Потрібно | Отримано незалежних | Виняток |"
+  cross_check_protocol_table_separator_row: "| --- | ---: | ---: | --- |"
+  cross_check_protocol_table_columns:
+    - Твердження
+    - Потрібно
+    - Отримано незалежних
+    - Виняток
+  cross_check_ledger_fields:
+    - required
+    - achieved_independent
+    - exception
+  cross_check_floor_by_risk:
+    LOW: 0
+    MEDIUM: 1
+    HIGH: 2
+    CRITICAL: 3
+
+actions:
+  media_transcript:
+    enabled: true
+    schema: gpt_store/actions/media_managed_beta_openapi.yaml
+    authentication: bearer_api_key
+    server: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
+    privacy_policy_document: docs/PRIVACY_POLICY.md
+
+checkpoint:
+  schema_version: "1.0"
+  marker: K_SUPERVISOR_CHECKPOINT
+  contract: gpt_store/checkpoint.py
+  example: gpt_store/checkpoint_example.json
+
+beta:
+  access_model: private_gpt_action_bearer_plus_server_owner_admission
+  intended_testers: 1
+  owner_only: true
+  ingress_mode: managed_zero_client
+  browser_helper_required: false
+  browser_helper_normal_flow_allowed: false
+  browser_assisted_a8_fallback_preserved: true
+  managed_job_prefix: KRCM_
+  public_platforms_live_accepted:
+    - youtube
+    - instagram
+    - facebook
+    - telegram
+  public_platforms_in_progress: []
+  public_platforms_not_started: []
+  local_upload_live_accepted: true
+  managed_attachment_transport_live_accepted: true
+  managed_attachment_transport_provider: openai_file_refs
+  managed_attachment_backend_code_ready: true
+  managed_attachment_backend_live_deployed: true
+  managed_attachment_retrieval_provider: openai_attachment
+  managed_attachment_retrieval_credits: 0
+  managed_attachment_stt_provider: assemblyai
+  managed_attachment_max_bytes: 33554432
+  managed_attachment_action_schema_ready: true
+  managed_attachment_builder_runtime_applied: true
+  managed_attachment_ingestion_live_accepted: true
+  managed_attachment_private_gpt_e2e_complete: true
+  max_video_seconds: 3600
+  managed_provider: supadata
+  managed_provider_mode: native_first
+  managed_native_credit_cost: 1
+  managed_credit_preflight_required: true
+  managed_explicit_user_consent_required: true
+  managed_automatic_ai_fallback: false
+  managed_ai_requires_second_consent: true
+  managed_instagram_ai_fallback_live_accepted: true
+  managed_instagram_ai_rate_credits_per_minute: 2
+  managed_instagram_ai_hard_cap_credits: 40
+  managed_facebook_retrieval_stt_code_ready: true
+  managed_facebook_free_retrieval_provider: cobalt
+  managed_facebook_free_path_live_accepted: true
+  managed_facebook_free_failure_behavior: unavailable
+  managed_facebook_paid_retrieval_provider: scrapecreators
+  managed_facebook_paid_retrieval_configured: false
+  managed_facebook_paid_fallback_live_accepted: false
+  managed_facebook_paid_retrieval_active: false
+  managed_facebook_paid_offer_allowed: false
+  managed_facebook_paid_retrieval_max_credits: 1
+  managed_facebook_paid_retrieval_requires_separate_consent: true
+  managed_facebook_automatic_paid_retrieval: false
+  managed_facebook_stt_provider: assemblyai
+  managed_facebook_live_accepted: true
+  managed_telegram_code_ready: true
+  managed_telegram_backend_live_accepted: true
+  managed_telegram_public_retrieval_provider: telegram_public_web
+  managed_telegram_retrieval_credits: 0
+  managed_telegram_stt_provider: assemblyai
+  managed_telegram_action_schema_ready: true
+  managed_telegram_builder_runtime_applied: true
+  managed_telegram_private_gpt_e2e_complete: true
+  managed_user_beta_access_code_required: false
+  managed_owner_access_injected_server_side: true
+  managed_durable_store: postgres
+  managed_restart_resilient_jobs: true
+  managed_duplicate_start_reuses_job: true
+  provider_balance_after_a9_3_acceptance: 98
+  stabilization_phase: A10
+  claim_summary_table_hardening_package_ready: true
+  claim_summary_table_hardening_runtime_applied: true
+  legacy_browser_assisted:
+    job_prefix: KRCC_
+    helper_version: "0.2.2"
+    daily_stt_seconds: 7200
+    durable_store: postgres
+    stt_provider: assemblyai
+    stt_endpoint: https://api.eu.assemblyai.com
+    status: A8_ACCEPTED_FALLBACK_ONLY
+  credential_handling:
+    action_bearer_server_side: true
+    owner_beta_admission_server_side: true
+    provider_key_server_side: true
+    never_echo: true
+    never_checkpoint: true
+    never_log: true
+
+release:
+  rollout_state: A9_10_ATTACHMENT_PRIVATE_GPT_E2E_ACCEPTED
+  stabilization_state: A10_COPY_SAFE_CLAIM_TABLE_RUNTIME_ACCEPTED
+  production_core_unchanged: true
+  public_store_gpt_unchanged: true
+  user_api_key_required: false
+  user_beta_access_code_required: false
+  developer_provider_key_required: true
+  external_backend_required: true
+  a4_live_validation_complete: true
+  a5_builder_validation_complete: true
+  a6_owner_operator_e2e_complete: true
+  a8_browser_assisted_owner_baseline_complete: true
+  a9_1_server_stt_eu_complete: true
+  a9_2_direct_youtube_blocked: true
+  a9_2r_managed_native_complete: true
+  a9_3_durable_managed_complete: true
+  a9_5_private_gpt_integration_complete: true
+  a9_8_owner_zero_client_acceptance_complete: true
+  a9_6_instagram_managed_complete: true
+  a9_6_facebook_complete: false
+  a9_7_c_facebook_runtime_code_ready: true
+  a9_7_c_facebook_live_acceptance_complete: true
+  a9_7_h1_facebook_cobalt_live_acceptance_complete: true
+  a9_7_i_builder_package_ready: true
+  a9_7_i_builder_runtime_applied: true
+  a9_7_i_builder_policy_fix_runtime_applied: true
+  a9_7_i_private_gpt_e2e_complete: true
+  a9_9_telegram_backend_complete: true
+  a9_9_telegram_action_package_complete: true
+  a9_9_telegram_builder_runtime_applied: true
+  a9_9_telegram_private_gpt_e2e_complete: true
+  a9_10_attachment_transport_runtime_accepted: true
+  a9_10_attachment_backend_code_ready: true
+  a9_10_attachment_backend_live_deployed: true
+  a9_10_attachment_action_package_complete: true
+  a9_10_attachment_builder_runtime_applied: true
+  a9_10_attachment_ingestion_live_accepted: true
+  a9_10_attachment_private_gpt_e2e_complete: true
+  a10_claim_summary_table_hardening_ready: true
+  a10_claim_summary_table_runtime_accepted: true
+  a10_copy_safe_claim_table_runtime_accepted: true
+  criticprofile_gate_runtime_accepted: true
+  cross_check_enforcement_hardened: true
+  cross_check_claim_level_enforcement_hardened: true
+  cross_check_claim_level_runtime_accepted: true
+  cross_check_traceability_hardened: true
+  cross_check_traceability_runtime_accepted: true
+  report_label_localization_hardened: true
+  report_label_localization_runtime_accepted: true
+  external_tester_rollout_paused: true
+  gpt_builder_private_update_required: false
+  merge_to_public_product_allowed: false
