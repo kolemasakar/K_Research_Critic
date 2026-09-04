@@ -1,27 +1,52 @@
 # MEDIA BETA Chat Handoff
 Канонічна інструкція відновлення K-Research & Critic - MEDIA BETA у новому чаті.
 
-Version: 4.7
-Status: ACTIVE_HANDOFF / RELEASE_HOLD_OWNER_TESTING / M3_CLOSED / M4_OWNER_CANARY_ACCEPTED
+Version: 4.8
+Status: ACTIVE_HANDOFF / RELEASE_HOLD_OWNER_TESTING / M3_CLOSED / M4_OWNER_CANARY_ACCEPTED / R0_PUBLIC_KRC_UPDATE_PREFLIGHT_NEXT
 Checkpoint date: 2026-09-02
+Planning update: 2026-09-04
 
 ## Recovery command
 
 `recover KRC MEDIA BETA checkpoint 72 M4 owner canary accepted rollback complete 2026-09-02`
 
+Then immediately read:
+
+`subprojects/media_beta/planning/PUBLIC_KRC_MEDIA_INTEGRATION_UPDATE_SAFETY_PLAN_2026_09_04.md`
+
 ## Mandatory recovery order
 
 1. `subprojects/media_beta/72_M4_OWNER_CANARY_ACCEPTED_ROLLBACK_COMPLETE_CHECKPOINT_2026_09_02.md`
-2. `subprojects/media_beta/71_M4_IMAGE_PARITY_READY_OWNER_CANARY_DECISION_CHECKPOINT_2026_09_02.md`
-3. `subprojects/media_beta/69_POST_ASSEMBLYAI_FREE_CREDITS_HYBRID_STT_PLAN_2026_09_02.md`
-4. `subprojects/media_beta/68_M3B_AB_COMPLETE_OWNER_DECISION_CHECKPOINT_2026_09_01.md`
-5. `subprojects/media_beta/62_FULL_PROJECT_STATE_CHECKPOINT_2026_09_01.md`
-6. `subprojects/media_beta/00_INDEX.md`
-7. `subprojects/media_beta/02_ROADMAP.md`
-8. `subprojects/media_beta/06_DECISION_LOG.md`
+2. `subprojects/media_beta/planning/PUBLIC_KRC_MEDIA_INTEGRATION_UPDATE_SAFETY_PLAN_2026_09_04.md`
+3. `subprojects/media_beta/00_INDEX.md`
+4. `subprojects/media_beta/02_ROADMAP.md`
+5. `subprojects/media_beta/03_CURRENT_STATE.md`
+6. `subprojects/media_beta/06_DECISION_LOG.md`
+7. `subprojects/media_beta/69_POST_ASSEMBLYAI_FREE_CREDITS_HYBRID_STT_PLAN_2026_09_02.md`
+8. `subprojects/media_beta/68_M3B_AB_COMPLETE_OWNER_DECISION_CHECKPOINT_2026_09_01.md`
 9. `subprojects/media_beta/53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md`
 
-Verify current GitHub heads and CI plus current external infrastructure before any write, provider-consuming operation, merge, permanent deployment, or activation decision.
+VoiceBridge technical safety plan:
+
+`docs/planning/2026-09-04_KRC_PUBLIC_GPT_MEDIA_INTEGRATION_SAFETY_PREFLIGHT.md`
+
+Verify current GitHub heads/CI, current OpenAI Builder/update capabilities, and current external infrastructure before any write, provider-consuming operation, merge, permanent deployment, or live GPT update.
+
+## Product reality
+
+```text
+public KRC GPT:                    already published / user-accessible
+private KRC MEDIA BETA GPT:        owner-only / not separately published
+integration target:                existing published KRC identity
+new GPT publication dependency:    FORBIDDEN
+```
+
+MEDIA must remain additive and failure-isolated:
+
+```text
+MEDIA failure/unavailability -> MEDIA unavailable/fails closed
+Core KRC                   -> remains user-accessible and functional
+```
 
 ## Current provider decision
 
@@ -33,59 +58,48 @@ provider cutover now: FALSE
 Hybrid C/D: PLANNED / NOT_IMPLEMENTED until AssemblyAI free-credit trigger plus fresh owner approval
 ```
 
-## M4 current state
-
-M4 final-image parity and bounded owner-only canary are accepted.
-
-VoiceBridge authorities:
-
-`docs/history/2026-09-02_KRC_MEDIA_M4_IMAGE_PARITY_REMEDIATION_ACCEPTANCE.md`
-
-`docs/history/2026-09-02_KRC_MEDIA_M4_OWNER_CANARY_ACCEPTANCE.md`
-
-Exact canary evidence:
+## M4 accepted state
 
 ```text
-M4 target: 6a9491359795840ec9e79c9edc0ea82f595e9784
-workflow run: 33580592224
-result: SUCCESS
-isolated Render service: voicebridge-krc-media-beta-kolemasakar
+M4_IMAGE_PARITY: PASS
+M4_OWNER_CANARY: PASS
 real Telegram -> AssemblyAI job: PASS
 STT seconds: 53
 retrieval credits: 0
 provider cleanup: PASS
 Neon durable readback: PASS
 duplicate reuse / one STT reservation: PASS
-invalid/private Telegram boundary: PASS
 mandatory rollback: PASS
-restored pre-canary commit: 2f0f02769dbdf2e8240e6b08867ecef2faaede16
-```
-
-The one-shot canary workflow was removed after execution. No permanent M4 backend promotion occurred.
-
-```text
-M4_IMAGE_PARITY: PASS
-M4_OWNER_CANARY: PASS
 M4_PERMANENT_BACKEND_PROMOTION: NOT_AUTHORIZED
 ```
 
-## Exact continuation point
+VoiceBridge canary run: `33580592224` / SUCCESS.
+
+The isolated Render service was restored to exact pre-canary commit `2f0f02769dbdf2e8240e6b08867ecef2faaede16`.
+
+## New independent gate sequence
 
 ```text
-OWNER POST-CANARY DECISION
-R1 MERGE AND R2 BACKEND PROMOTION REMAIN SEPARATE GATES
+R0  Public KRC Update Safety Preflight
+R1  Repository integration
+R2  Permanent MEDIA backend promotion/readiness
+R3  Update existing published KRC GPT
+R4  Post-update public-access + Core regression verification
 ```
 
-Before R1 or R2, revalidate current repository heads/CI, scope/diff, Render live baseline, rollback target, environment presence without exposing secrets, Neon connectivity, provider state, and release-hold invariants.
-
-## Release boundary
+Current gate state:
 
 ```text
-R1 merge: HOLD
-R2 backend/production promotion: HOLD
-R3 external testers: HOLD
-R4 public rollout: HOLD
+R0: PLANNED / REQUIRED NEXT / NO LIVE CHANGE
+R1: HOLD
+R2: HOLD
+R3: HOLD
+R4: HOLD
 ```
+
+R0 must verify the same existing public KRC can still be edited and updated without requiring a new GPT publication event; record sharing/publication state; revalidate current public Action/Privacy requirements; preserve the current KRC URL/identity; and capture the current GPT configuration sufficiently for rollback/reconstruction.
+
+If safe update of the existing published GPT cannot be verified, STOP before merge/promotion/live GPT changes.
 
 ## Critical policy recovery
 
@@ -98,7 +112,12 @@ R4 public rollout: HOLD
 - CriticProfile gate remains before Research.
 - per-claim independent cross-check accounting remains mandatory.
 - A10 copy-safe summary remains mandatory.
+- public KRC identity must be preserved through future MEDIA integration.
+
+## Exact continuation point
+
+`R0 PUBLIC KRC UPDATE SAFETY PREFLIGHT / NO LIVE GPT CHANGE`
 
 ## Terminal marker
 
-`MEDIA_BETA_HANDOFF_V4_7_M4_OWNER_CANARY_ACCEPTED_POST_CANARY_GATE`
+`MEDIA_BETA_HANDOFF_V4_8_R0_PUBLIC_KRC_UPDATE_SAFETY_PREFLIGHT_NEXT`
