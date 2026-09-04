@@ -1,83 +1,100 @@
 # MEDIA BETA Chat Handoff
 Канонічна інструкція відновлення K-Research & Critic - MEDIA BETA у новому чаті.
 
-Version: 4.8
-Status: ACTIVE_HANDOFF / RELEASE_HOLD_OWNER_TESTING / M3_CLOSED / M4_OWNER_CANARY_ACCEPTED / R0_PUBLIC_KRC_UPDATE_PREFLIGHT_NEXT
-Checkpoint date: 2026-09-02
-Planning update: 2026-09-04
+Version: 4.9
+Status: ACTIVE_HANDOFF / CROSS_SYSTEM_CHECKPOINT_73 / R0_PUBLIC_KRC_UPDATE_PREFLIGHT_NEXT
+Checkpoint date: 2026-09-04
 
 ## Recovery command
 
-`recover KRC MEDIA BETA checkpoint 72 M4 owner canary accepted rollback complete 2026-09-02`
-
-Then immediately read:
-
-`subprojects/media_beta/planning/PUBLIC_KRC_MEDIA_INTEGRATION_UPDATE_SAFETY_PLAN_2026_09_04.md`
+`recover KRC MEDIA BETA cross-system checkpoint 73 public KRC MEDIA VoiceBridge 2026-09-04`
 
 ## Mandatory recovery order
 
-1. `subprojects/media_beta/72_M4_OWNER_CANARY_ACCEPTED_ROLLBACK_COMPLETE_CHECKPOINT_2026_09_02.md`
+1. `subprojects/media_beta/73_PUBLIC_KRC_MEDIA_VOICEBRIDGE_CROSS_SYSTEM_TRANSITION_CHECKPOINT_2026_09_04.md`
 2. `subprojects/media_beta/planning/PUBLIC_KRC_MEDIA_INTEGRATION_UPDATE_SAFETY_PLAN_2026_09_04.md`
-3. `subprojects/media_beta/00_INDEX.md`
-4. `subprojects/media_beta/02_ROADMAP.md`
-5. `subprojects/media_beta/03_CURRENT_STATE.md`
-6. `subprojects/media_beta/06_DECISION_LOG.md`
-7. `subprojects/media_beta/69_POST_ASSEMBLYAI_FREE_CREDITS_HYBRID_STT_PLAN_2026_09_02.md`
-8. `subprojects/media_beta/68_M3B_AB_COMPLETE_OWNER_DECISION_CHECKPOINT_2026_09_01.md`
-9. `subprojects/media_beta/53_RELEASE_HOLD_OWNER_TESTING_CHECKPOINT.md`
+3. `subprojects/media_beta/72_M4_OWNER_CANARY_ACCEPTED_ROLLBACK_COMPLETE_CHECKPOINT_2026_09_02.md`
+4. `subprojects/media_beta/00_INDEX.md`
+5. `subprojects/media_beta/02_ROADMAP.md`
+6. `subprojects/media_beta/03_CURRENT_STATE.md`
+7. `subprojects/media_beta/06_DECISION_LOG.md`
+8. `subprojects/media_beta/69_POST_ASSEMBLYAI_FREE_CREDITS_HYBRID_STT_PLAN_2026_09_02.md`
 
-VoiceBridge technical safety plan:
+VoiceBridge technical cross-reference:
+
+`docs/history/2026-09-04_KRC_MEDIA_VOICEBRIDGE_CROSS_SYSTEM_TRANSITION_CHECKPOINT.md`
+
+VoiceBridge public-integration technical plan:
 
 `docs/planning/2026-09-04_KRC_PUBLIC_GPT_MEDIA_INTEGRATION_SAFETY_PREFLIGHT.md`
 
-Verify current GitHub heads/CI, current OpenAI Builder/update capabilities, and current external infrastructure before any write, provider-consuming operation, merge, permanent deployment, or live GPT update.
+## Frozen cross-system state
 
-## Product reality
-
-```text
-public KRC GPT:                    already published / user-accessible
-private KRC MEDIA BETA GPT:        owner-only / not separately published
-integration target:                existing published KRC identity
-new GPT publication dependency:    FORBIDDEN
-```
-
-MEDIA must remain additive and failure-isolated:
+Owner-confirmed product reality:
 
 ```text
-MEDIA failure/unavailability -> MEDIA unavailable/fails closed
-Core KRC                   -> remains user-accessible and functional
+public KRC GPT:             already published / user-accessible
+private KRC MEDIA BETA GPT: owner-only / not separately published
+future public identity:     same existing published KRC
 ```
 
-## Current provider decision
+Repository/runtime evidence:
+
+```text
+KRC main observed head:                39629886e9f1f3841661c759f75279f779a937c8
+KRC MEDIA pre-checkpoint head:         5241c36460f7dfe4222ab1b4f0b933cb4da0281c
+KRC MEDIA Tests:                      33870130947 / SUCCESS
+KRC PR #8:                            OPEN / DRAFT / UNMERGED / DIRTY
+KRC MEDIA divergence:                 ahead 568 / behind 78
+
+VoiceBridge pre-reference head:        0252751ca3f4e04b60423cb506de630680fd83a7
+VoiceBridge Validate:                 33860807242 / SUCCESS
+VoiceBridge PR #45:                   OPEN / DRAFT / UNMERGED / mergeable=true
+```
+
+## Accepted MEDIA/VoiceBridge state
 
 ```text
 M3: CLOSED
-current KRC prerecorded provider: AssemblyAI universal-2
+AssemblyAI universal-2: ACTIVE for current KRC prerecorded jobs
 Gemini prerecorded normal activation: FALSE
-provider cutover now: FALSE
-Hybrid C/D: PLANNED / NOT_IMPLEMENTED until AssemblyAI free-credit trigger plus fresh owner approval
+Hybrid C/D: PLANNED / NOT IMPLEMENTED / DEFERRED
+
+M4 image parity: PASS
+M4 bounded owner canary: PASS
+real Telegram -> AssemblyAI STT: PASS
+Neon durability/idempotency: PASS
+provider cleanup: PASS
+mandatory rollback: PASS
+permanent backend promotion: NOT AUTHORIZED
 ```
 
-## M4 accepted state
+Canary run: `33580592224` / SUCCESS.
+
+## Canonical relationships
 
 ```text
-M4_IMAGE_PARITY: PASS
-M4_OWNER_CANARY: PASS
-real Telegram -> AssemblyAI job: PASS
-STT seconds: 53
-retrieval credits: 0
-provider cleanup: PASS
-Neon durable readback: PASS
-duplicate reuse / one STT reservation: PASS
-mandatory rollback: PASS
-M4_PERMANENT_BACKEND_PROMOTION: NOT_AUTHORIZED
+KRC public Core
+  -> product/roadmap authority
+  -> existing published GPT identity to preserve
+
+KRC MEDIA BETA
+  -> private closed-beta module
+  -> future additive capability inside same public KRC
+
+VoiceBridge
+  -> media/backend implementation + validation
+  -> no independent authority to publish/update KRC
 ```
 
-VoiceBridge canary run: `33580592224` / SUCCESS.
+Critical invariant:
 
-The isolated Render service was restored to exact pre-canary commit `2f0f02769dbdf2e8240e6b08867ecef2faaede16`.
+```text
+MEDIA failure/unavailability -> MEDIA unavailable/fails closed
+Core KRC                   -> remains usable and accessible
+```
 
-## New independent gate sequence
+## Approved gate plan
 
 ```text
 R0  Public KRC Update Safety Preflight
@@ -90,34 +107,36 @@ R4  Post-update public-access + Core regression verification
 Current gate state:
 
 ```text
-R0: PLANNED / REQUIRED NEXT / NO LIVE CHANGE
+R0: NEXT / NO LIVE CHANGE
 R1: HOLD
 R2: HOLD
 R3: HOLD
 R4: HOLD
 ```
 
-R0 must verify the same existing public KRC can still be edited and updated without requiring a new GPT publication event; record sharing/publication state; revalidate current public Action/Privacy requirements; preserve the current KRC URL/identity; and capture the current GPT configuration sufficiently for rollback/reconstruction.
+R0 must verify safe edit/update of the same existing public KRC, current sharing state, Action/Privacy requirements, public URL/identity preservation, and a rollback/reconstruction snapshot.
 
-If safe update of the existing published GPT cannot be verified, STOP before merge/promotion/live GPT changes.
+R1 must not direct-merge PR #8 as-is; it is currently dirty/diverged and requires a dedicated integration/conflict strategy after R0 PASS.
 
-## Critical policy recovery
+## Critical retained policies
 
 - Facebook: Cobalt fail -> unavailable; no automatic paid fallback.
-- ScrapeCreators: reserve only / inactive.
-- Telegram: public-only, zero retrieval credits.
-- Local attachment: max 32 MiB, zero retrieval credits.
-- AssemblyAI remains active while current free-credit plan remains in effect.
-- Hybrid C/D remains dormant until its trigger and fresh approval.
+- ScrapeCreators: inactive/reserve only.
+- Telegram: public-only / zero retrieval credits.
+- Local attachment: max 32 MiB / zero retrieval credits.
+- AssemblyAI remains active under current free-credit operating choice.
+- Hybrid C/D remains dormant until AssemblyAI free-credit exhaustion + fresh approval.
 - CriticProfile gate remains before Research.
 - per-claim independent cross-check accounting remains mandatory.
 - A10 copy-safe summary remains mandatory.
-- public KRC identity must be preserved through future MEDIA integration.
+- new GPT publication must not be required for future MEDIA integration.
 
 ## Exact continuation point
 
 `R0 PUBLIC KRC UPDATE SAFETY PREFLIGHT / NO LIVE GPT CHANGE`
 
+Before any state-changing action, reverify current GitHub heads/CI, current OpenAI Builder/update capabilities, and current external infrastructure.
+
 ## Terminal marker
 
-`MEDIA_BETA_HANDOFF_V4_8_R0_PUBLIC_KRC_UPDATE_SAFETY_PREFLIGHT_NEXT`
+`MEDIA_BETA_HANDOFF_V4_9_CROSS_SYSTEM_CHECKPOINT_73_R0_NEXT`
