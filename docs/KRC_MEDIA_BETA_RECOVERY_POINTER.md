@@ -1,10 +1,10 @@
 # K-Research & Critic - MEDIA BETA Recovery Pointer
-Канонічний покажчик на поточний стан інтеграції MEDIA BETA з публічним K-Research & Critic після завершення R1.
+Канонічний покажчик на поточний стан MEDIA BETA після завершення read-only R2 backend readiness preflight.
 
-Status: ACTIVE POINTER / R1 COMPLETE / R2 NOT AUTHORIZED
+Status: ACTIVE POINTER / R2 PREFLIGHT COMPLETE / R2 NOT READY / NO DEPLOYMENT
 Updated: 2026-09-04
 
-`K-Research & Critic - MEDIA BETA` remains the media module intended for additive integration into the already-published `K-Research & Critic` product.
+`K-Research & Critic - MEDIA BETA` remains an additive MEDIA capability planned for the existing published `K-Research & Critic` identity.
 
 ## Current canonical checkpoint
 
@@ -18,35 +18,47 @@ Branch:
 
 Path:
 
-`subprojects/media_beta/75_R1_REPOSITORY_INTEGRATION_COMPLETE_CHECKPOINT_2026_09_04.md`
+`subprojects/media_beta/76_R2_BACKEND_READINESS_PREFLIGHT_2026_09_04.md`
 
 ## Current gate state
 
 ```text
 R0  PASS
 R1  COMPLETE
-R2  HOLD / NOT AUTHORIZED
-R3  HOLD / NOT AUTHORIZED
-R4  HOLD / NOT AUTHORIZED
+R2  PREFLIGHT COMPLETE / NOT READY
+R3  HOLD
+R4  HOLD
 ```
 
-## R1 result
+## R2 preflight result
 
-R1 used a clean additive forward-port instead of directly merging dirty/divergent PR #8.
+Verified current evidence:
 
 ```text
-R1 integration PR: #10
-merged main commit: b606c962515d21461823203aee5be43a31d50dce
-candidate CI: 33875441137 / SUCCESS
-active public Core files changed by R1 PR: NO
-live ChatGPT GPT changed: NO
-Render/Neon changed: NO
-VoiceBridge deployed/merged: NO
+KRC main before R2 audit: bf38b3ef433907b54e881906837a61a6a4470bca
+VoiceBridge branch: agent/krc-media-gemini-migration
+VoiceBridge head: f4296fcc92899a175c1a198ca58063b4a4b502b4
+VoiceBridge Validate: 33870923362 / SUCCESS
+PR #45: OPEN / DRAFT / UNMERGED
+Neon project: krc-media-beta-neon / plain-snow-71973546
+Neon production branch: ready
+Neon database: krc_media_beta
+Neon tables: krc_managed_media_jobs, krc_media_client_jobs, krc_media_stt_charges
+Durable M4 STT reservation still present: 53 seconds / 2026-09-02
 ```
 
-MEDIA package resources now exist in `main` as repository staging/integration material. They are not active in the published GPT.
+No Render deployment, Neon write/schema change, provider call/cutover, VoiceBridge merge, or ChatGPT Builder Update was performed.
 
-The active repository-side public Core remains `actions:false` and independent of the MEDIA backend.
+## Blocking items before permanent backend promotion
+
+- current authenticated Render deployed commit/config/rollback state is not freshly verified;
+- current backend admission remains owner/private-beta oriented;
+- public-user authentication/admission/quota/abuse/load design is not implemented/validated;
+- full public MEDIA failure -> Core unaffected runtime regression matrix is not validated;
+- current AssemblyAI balance/quota/privacy state is not directly revalidated;
+- current MEDIA privacy policy remains private-owner scope and needs public-user release review.
+
+Therefore permanent R2 promotion is not authorized and must not run.
 
 ## Retained invariant
 
@@ -55,41 +67,12 @@ MEDIA unavailable/fails -> MEDIA unavailable/fails closed
 Core KRC              -> remains usable
 ```
 
-## Current public GPT
+## Safe continuation
 
-```text
-name: K-Research & Critic
-public URL: https://chatgpt.com/g/g-6a7ed4905f5c81918190d12ec5f27e9b-k-research-critic
-same-GPT Edit/Update path: VERIFIED at R0
-Version history/restore: VERIFIED at R0
-```
+Next safe work item:
 
-No Builder Update occurred during R1.
+`R2-A Public admission/auth/quota + failure-isolation design and tests`
 
-## VoiceBridge boundary
+This is repository-only remediation/design. Any Render deployment, provider-consuming validation, permanent backend promotion, or ChatGPT Builder Update requires a separate explicit owner decision.
 
-VoiceBridge remains a separate R2 dependency and must be revalidated before any backend readiness/promotion work.
-
-Last pre-R1 verified state:
-
-```text
-repo: kolemasakar/VoiceBridge
-branch: agent/krc-media-gemini-migration
-head: f4296fcc92899a175c1a198ca58063b4a4b502b4
-Validate: 33870923362 / SUCCESS
-PR #45: OPEN / DRAFT / UNMERGED / mergeable=true
-```
-
-## Next permitted action
-
-No R2 action is authorized by R1 completion.
-
-A fresh explicit owner decision is required before:
-
-- permanent MEDIA backend promotion/readiness work;
-- VoiceBridge merge/deployment;
-- Render/Neon mutation;
-- public-user admission/auth changes;
-- any ChatGPT Builder Update.
-
-Recovery must start from checkpoint 75.
+Recovery must start from checkpoint 76.
