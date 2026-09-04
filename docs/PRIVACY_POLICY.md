@@ -1,151 +1,164 @@
 # PRIVACY_POLICY
-Політика конфіденційності поточного приватного K-Research & Critic MEDIA BETA.
+Політика конфіденційності для майбутньої публічної MEDIA-функції K-Research & Critic; до окремого R3 оновлення GPT ця редакція є підготовленим кандидатом і не активує публічний MEDIA-доступ.
 
-Version: 1.0
-Status: PRIVATE_OWNER_ONLY / RELEASE_HOLD_OWNER_TESTING
-Updated: 2026-08-27
+Version: 2.0-candidate
+Status: PUBLIC_MEDIA_CANDIDATE / NOT_YET_ACTIVATED / FREE_TIER_ONLY
+Updated: 2026-09-04
 
 ## 1. Scope
 
-This policy describes the isolated `K-Research & Critic - MEDIA BETA` media-ingestion Action. It does not change the normal public text-research Core.
+This policy describes the external MEDIA Action planned for the existing public `K-Research & Critic` GPT.
 
-Current media beta is owner-only. External tester onboarding and public/Store rollout are paused.
+The initial public MEDIA scope is limited to supported public video/media URLs from:
 
-## 2. Supported Input Classes
+- YouTube;
+- Telegram;
+- Instagram;
+- Facebook.
 
-The private beta may process:
-- a supported public YouTube URL;
-- a supported public Instagram Reel URL;
-- a supported public Facebook Video/Reel URL;
-- a supported public Telegram post containing video;
-- one local audio/video file attached in the current ChatGPT conversation.
+Private, login-gated, friends-only, cookie/session-dependent, or otherwise non-public platform content is not supported. Public local-file upload is not part of the initial public rollout unless separately reviewed and activated later.
 
-Remote platform adapters do not support private, account-gated, friends-only, or session-dependent content. Users are not asked for platform credentials, cookies, or sessions.
+The normal text-research Core remains separate from MEDIA. A MEDIA failure must not prevent the user from continuing to use Core K-Research & Critic functions.
 
-## 3. Data Flow
+## 2. Data Processed
 
-### YouTube / Instagram
+Depending on the selected route, the MEDIA backend may process:
 
-The private Action may send the public source URL and language/options required by the managed transcript provider. Billable provider operations are consent-gated.
+- the public source URL supplied by the user;
+- temporary retrieved media bytes or normalized audio derived from the public media;
+- transcript text and timestamped segments where available;
+- source/detected language information;
+- media duration and technical validation metadata;
+- provider, retrieval mode, quota, rate-limit, and failure-state metadata;
+- internal request/job identifiers needed for idempotency and diagnostics.
+
+Unrelated ChatGPT conversation content must not be sent to the MEDIA backend.
+
+The service is designed for anonymous/shared public GPT access and does not require a KRC user account.
+
+## 3. Authentication and Credentials
+
+The GPT Action authenticates to the backend with a server-to-server bearer credential configured by the GPT owner.
+
+Public users are not asked to provide or reveal:
+
+```text
+Action bearer token
+provider API keys
+owner beta codes
+platform usernames/passwords
+cookies or session tokens
+Telegram bot tokens
+payment credentials
+internal KRCM job identifiers
+```
+
+Reusable secrets must not be written to reports, checkpoints, public logs, or normal user-facing responses.
+
+## 4. Platform Routing
+
+### YouTube and Instagram
+
+The service may use Supadata to obtain a managed transcript for supported public URLs. The public configuration is restricted to the provider Free tier. If the Free allowance is unavailable or exhausted, the operation fails closed rather than purchasing or automatically continuing with paid retrieval.
 
 ### Facebook
 
-The backend attempts free Cobalt retrieval. AssemblyAI STT is invoked only after successful media retrieval. If Cobalt cannot retrieve the public media, processing stops as unavailable. ScrapeCreators is not active or offerable in the current flow.
+The service uses the self-hosted Cobalt retrieval path for supported public Facebook video/reel media. Retrieved audio may then be sent to the active free-only speech-to-text provider.
+
+If Cobalt cannot retrieve the public media, processing stops as unavailable. ScrapeCreators and automatic paid Facebook retrieval are not permitted in the public free-only configuration.
 
 ### Telegram
 
-The backend uses the public Telegram web/embed surface and follows only accepted trusted Telegram media delivery. Retrieved media may be sent to AssemblyAI for STT. No Telegram account/session/cookies/bot token or paid retrieval fallback is used.
+The service uses the public Telegram web surface and only accepted trusted Telegram media delivery for supported public posts. Retrieved audio may then be sent to the active free-only speech-to-text provider.
 
-### Local attachment
+The service does not require Telegram login credentials, cookies, sessions, or a bot token, and it does not use a paid Telegram retrieval fallback.
 
-ChatGPT supplies a temporary `openaiFileIdRefs` runtime object for the current-conversation attachment. The backend accepts only trusted OpenAI HTTPS media delivery, validates type/size/duration, downloads/normalizes media within bounded limits, and sends the normalized speech content to AssemblyAI when required. File IDs and signed URLs are not exposed to the normal user response.
+## 5. Speech-to-Text Providers
 
-## 4. Data Categories
+### AssemblyAI
 
-Depending on route, processing may include:
-- public source URL;
-- temporary media bytes;
-- attachment metadata required for safe validation;
-- transcript text and timestamped segments;
-- detected/source language and confidence metadata;
-- provider/retrieval mode metadata;
-- duration, segment count, quota, and credit accounting metadata;
-- internal technical job identifiers.
+AssemblyAI `universal-2` remains the currently accepted prerecorded KRC MEDIA STT provider while the project operates within its available Free-plan credit balance.
 
-Unrelated ChatGPT conversation content must not be sent to the media backend.
+The public free-only policy does not authorize automatic paid AssemblyAI continuation. If the free allowance is exhausted or the provider becomes unavailable, MEDIA must stop or use a separately validated free Gemini route as described below.
 
-## 5. Authentication and Credentials
+Where implemented, the backend attempts provider-side transcript deletion after processing and records whether deletion was confirmed. Deletion must not be claimed when it cannot be confirmed.
 
-The private GPT Action uses a server-to-server bearer secret. Owner admission and provider credentials are server-side.
+### Google Gemini - post-AssemblyAI free-credit route
 
-The owner must not be asked for:
+The project owner has selected Google Gemini as the intended free-only replacement after AssemblyAI Free credits are exhausted.
 
-```text
-Action bearer
-owner beta admission code
-provider API key
-platform login/password
-cookies/session tokens
-OpenAI file ID
-signed attachment URL
-KRCM Job ID
-```
+The current candidate contains a prerecorded Gemini transcription adapter, but normal KRC MEDIA traffic is not yet routed to Gemini. Gemini activation requires a separately validated release step.
 
-Reusable credentials must not be stored in reports or KRC checkpoints.
+If the Gemini Free route is activated, the MEDIA backend may send normalized public-media audio to the Google Gemini API for transcription. Google currently states that content submitted under the Gemini API Free Tier may be used to improve Google products. Because this is materially different from a paid data-use boundary, public Gemini activation must include a clear user-facing disclosure and explicit consent before the first Gemini Free processing request. If that consent is not obtained, the operation must fail closed.
 
-## 6. Data Minimization
+No paid Gemini fallback is authorized by this policy.
 
-Only data required to acquire a transcript and preserve source traceability should be processed.
+## 6. Free-Tier-Only Resource Policy
 
-Current controls include:
-- public-only remote adapters;
-- one local attachment per current request;
-- local attachment maximum 32 MiB;
-- bounded media processing;
-- temporary source-media handling rather than intentional durable source-file retention;
-- no full transcript in KRC checkpoint artifacts.
+The public MEDIA feature is designed to operate only within free provider/service allowances configured for this project.
 
-## 7. Durable Backend State
-
-Managed `KRCM_` job state and transcript segments are stored in the isolated durable backend store so accepted jobs can survive process replacement and duplicate requests can be handled safely where defined.
-
-Operational metadata needed for quota/credit/idempotency control may also be retained according to the isolated beta implementation.
-
-The private GPT does not expose internal KRCM Job IDs in normal user-facing output.
-
-## 8. Speech-to-Text Provider Handling
-
-AssemblyAI is used on accepted routes that require STT after successful/safe media acquisition. The accepted beta package validates the EU API endpoint `https://api.eu.assemblyai.com`. Provider-side delete requests are performed where implemented by the accepted backend path, and deletion must not be claimed when it cannot be confirmed.
-
-Existing beta validation history recorded the provider statement `files submitted through its European servers are not used for model training`. That wording is retained here as a compatibility/audit assertion for the accepted private package, not as a permanent guarantee for a future public release.
-
-Provider privacy, retention, data-use, regional-routing, and model-training terms can change. They must be re-verified before any future external/public release. This document does not treat an older provider statement as a permanent public-release waiver.
-
-## 9. Managed Transcript Provider Handling
-
-YouTube/Instagram managed transcript operations may use Supadata under the current private package. Billable operations remain explicit-consent gated. User credentials for the provider are not required.
-
-## 10. Browser Helper Boundary
-
-The A8 browser Helper is historical accepted fallback evidence only and is not normal owner UX in the current zero-client MEDIA BETA. The current Builder must not ask the owner to install/use the Helper for normal supported inputs.
-
-## 11. Evidence Boundary
-
-Transcript text is evidence of what the media said. It is not independent evidence that a factual claim is true. Independent web/source verification starts only after CriticProfile approval.
-
-## 12. Current Resource Controls
-
-Current accepted controls include:
-- maximum media duration governed by the private media package;
-- local attachment maximum 32 MiB;
-- bounded STT/quota accounting in the isolated backend;
-- zero retrieval credits for Telegram public retrieval and local attachment transport;
-- no active paid Facebook or Telegram retrieval fallback;
-- no automatic retry of uncertain-charge provider operations.
-
-## 13. Security
-
-- developer/provider secrets must not be committed or shown to users;
-- Action authentication is checked before protected media operations;
-- arbitrary external attachment URLs are rejected;
-- trusted-host and redirect boundaries are enforced by the backend;
-- remote source authentication/session import is not supported;
-- source-media failures must not be converted into fabricated transcripts.
-
-## 14. Release Hold
-
-Current decision:
+Current safety rules include:
 
 ```text
-private owner testing continues
-merge to main = HOLD
-production promotion = HOLD
-external testers = HOLD
-public/Store rollout = HOLD
+Supadata Free plan only
+no Supadata Auto Recharge path used by KRC
+AssemblyAI Free-plan use only
+no automatic paid AssemblyAI continuation
+Facebook Cobalt free retrieval only
+no ScrapeCreators credential in public free-only mode
+no automatic paid retrieval fallback
+Gemini Free route only after separate validation/activation
+provider/resource exhaustion -> MEDIA unavailable / fail closed
 ```
 
-Before any later external/public transition, re-review this policy against the then-current implementation, provider terms, retention behavior, access controls, resource limits, monitoring, and applicable OpenAI Action/Store requirements.
+Users are not charged by K-Research & Critic for MEDIA processing.
 
-## 15. Contact
+## 7. Project-Side Retention
+
+The isolated durable MEDIA store preserves accepted job state and transcript segments only for the bounded operational window needed for continuation/idempotency.
+
+The current implementation defaults managed job/transcript expiry to approximately one hour (`MEDIA_JOB_TTL_SECONDS=3600`). Expired managed-job rows are purged by the backend cleanup path. Daily STT quota-accounting rows older than two days are also removed by the current implementation.
+
+These values are implementation defaults and may be reduced or otherwise changed only with corresponding documentation and privacy review before public activation.
+
+The project does not intentionally retain raw downloaded source-media files after processing. Temporary local media artifacts are cleaned up by the accepted provider pipelines.
+
+## 8. Provider-Side Data Handling
+
+Third-party providers process only the data required for the selected MEDIA operation. Their own privacy, retention, regional-routing, and model-improvement rules also apply and may change independently of this project.
+
+Before any public provider activation, the project must re-check the then-current provider terms. In particular:
+
+- AssemblyAI provider-side deletion is attempted where supported and must be reported accurately;
+- Google Gemini Free Tier data-use terms must be disclosed before the Gemini route is enabled for public users;
+- Supadata receives only the supported public URL and operation parameters needed for its route;
+- Cobalt is operated as the project's free retrieval component for Facebook and is not a paid fallback service.
+
+## 9. Data Minimization and Security
+
+Controls include:
+
+- public-only remote source adapters;
+- bounded media duration and request size;
+- rate and concurrency limits;
+- durable quota checks before provider work where determinable;
+- HTTPS provider and retrieval endpoints;
+- no platform-session import;
+- no credential echoing;
+- no automatic uncertain-charge retry that could create hidden paid usage;
+- log redaction for credentials and private transport URLs;
+- explicit fail-closed behavior when retrieval, provider, quota, or durable-state requirements cannot be satisfied.
+
+Transcript text is evidence of what the media said, not independent proof that factual claims are true. K-Research & Critic may separately verify claims using independent sources.
+
+## 10. Public GPT Action Requirement
+
+OpenAI currently requires a valid Privacy Policy URL for a public GPT that uses Actions. This document is the repository-side candidate policy intended for that Action configuration.
+
+Updating this file does not itself publish or activate the MEDIA Action. The existing public GPT must be updated separately through the ChatGPT Builder only after the R2 release gates pass.
+
+## 11. Changes and Contact
+
+This policy may be revised when providers, retention behavior, supported platforms, or the public release state changes. The current repository version and update date should be used when reviewing changes.
 
 Project/privacy questions may be raised with the repository owner through `kolemasakar/K_Research_Critic`.
