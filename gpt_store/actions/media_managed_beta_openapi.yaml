@@ -1,0 +1,1003 @@
+openapi: 3.1.0
+info:
+  title: K-Research & Critic Managed Media Beta API
+  version: 0.6.0-a9.10
+  description: >-
+    Owner-only zero-client managed transcript beta for public YouTube, Instagram,
+    Facebook and supported public Telegram video posts, plus owner-only local
+    audio/video attachments. Existing Supadata native and consent-gated AI
+    paths remain available. Facebook retrieval/STT uses the free Cobalt path. If
+    Cobalt cannot retrieve the public media, Facebook retrieval is unavailable and
+    media intake stops. ScrapeCreators is reserved compatibility surface only and is
+    not active or offerable. AssemblyAI STT runs only after successful media retrieval.
+    Action bearer and owner admission credentials remain server-side.
+x-krc-compatibility:
+  previous_schema_marker: "version: 0.3.0-a9.6"
+  previous_native_cap_marker: "maximum: 1"
+servers:
+  - url: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
+paths:
+  /api/v1/media/managed:
+    get:
+      operationId: getManagedMediaCapability
+      summary: Read managed-media beta capabilities and configured media adapters
+      x-openai-isConsequential: false
+      responses:
+        "200":
+          description: Current managed-media capability state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagedCapability"
+        "401":
+          description: Private GPT Action authentication failed.
+  /api/v1/media/managed/preflight:
+    post:
+      operationId: preflightManagedMediaCredits
+      summary: Read managed native transcript credit balance and cost estimate
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PreflightRequest"
+      responses:
+        "200":
+          description: Native credit quote. This does not authorize transcript processing.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreditPreflight"
+        "400":
+          description: Invalid or unsupported media URL or language hint.
+        "401":
+          description: Private GPT Action authentication failed.
+        "503":
+          description: Managed transcript provider is not configured or unavailable.
+  /api/v1/media/managed/transcriptions:
+    post:
+      operationId: startManagedMediaNativeTranscription
+      summary: Spend at most one approved credit on a native managed transcript
+      description: >-
+        Call only after native credit preflight and explicit user approval. The
+        request is capped at one Supadata native credit. If native captions are
+        unavailable, return AWAITING_AI_CONSENT. Never start AI automatically.
+      x-openai-isConsequential: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NativeTranscriptRequest"
+      responses:
+        "200":
+          description: Native request completed, processing, failed, or stopped awaiting separate AI consent.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagedJob"
+        "400":
+          description: Invalid request.
+        "401":
+          description: Private GPT Action authentication failed.
+        "409":
+          description: Explicit one-credit native consent is missing or invalid.
+        "429":
+          description: Provider credits are exhausted or provider rate limit reached.
+        "503":
+          description: Managed transcript provider is not configured or unavailable.
+  /api/v1/media/managed/facebook-fallback:
+    post:
+      operationId: startManagedFacebookFallback
+      summary: Try free public Facebook media retrieval and AssemblyAI STT
+      description: >-
+        Try configured Cobalt for a public Facebook URL. Never call ScrapeCreators
+        here. If free retrieval fails, treat Facebook retrieval as terminal unavailable
+        and stop media intake. If it succeeds, run AssemblyAI STT and persist durable
+        KRCM transcript segments.
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FacebookFallbackRequest"
+      responses:
+        "200":
+          description: Facebook Cobalt path completed or stopped terminally unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagedJob"
+        "400":
+          description: Invalid Facebook fallback request.
+        "401":
+          description: Private GPT Action authentication failed.
+        "422":
+          description: Source is not a supported public Facebook media URL.
+        "429":
+          description: Closed-beta STT quota is exhausted.
+        "503":
+          description: Facebook retrieval/STT pipeline is not configured.
+  /api/v1/media/managed/telegram:
+    post:
+      operationId: startManagedTelegramPublicTranscription
+      summary: Retrieve one public Telegram video and transcribe it with AssemblyAI
+      description: >-
+        Use only for a supported public Telegram post URL. Retrieval uses the public
+        Telegram embed surface with zero retrieval credits and no Telegram account, cookies,
+        session, bot token or paid fallback. AssemblyAI STT may use isolated beta quota.
+        Terminal unavailable jobs are not retried automatically.
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TelegramPublicRequest"
+      responses:
+        "200":
+          description: Telegram public-video job completed, failed, or reused from durable state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagedJob"
+        "400":
+          description: Invalid or unsupported Telegram request.
+        "401":
+          description: Private GPT Action authentication failed.
+        "422":
+          description: Public Telegram post or browser-playable video is unavailable.
+        "429":
+          description: Closed-beta STT quota is exhausted.
+        "503":
+          description: Telegram retrieval/STT pipeline is not configured.
+  /api/v1/media/managed/attachment:
+    post:
+      operationId: startManagedAttachmentTranscription
+      summary: Transcribe one local audio or video attachment with AssemblyAI
+      description: >-
+        Transcribe one current-conversation audio/video attachment. ChatGPT supplies
+        openaiFileIdRefs; the isolated backend accepts only trusted OpenAI media,
+        enforces type/size/duration, runs AssemblyAI, and persists KRCM segments.
+        Retrieval credits are zero; no Helper, cookies, session, or user code.
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AttachmentTranscriptRequest"
+      responses:
+        "200":
+          description: Local attachment job completed, failed, or reused from durable state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagedJob"
+        "400":
+          description: Missing, malformed, multiple, or untrusted runtime file reference.
+        "401":
+          description: Private GPT Action bearer authentication failed.
+        "413":
+          description: Attachment exceeds the isolated media size or duration limit.
+        "415":
+          description: Attachment type, extension, or downloaded MIME is unsupported or inconsistent.
+        "422":
+          description: Attachment media or resulting transcript is unusable.
+        "429":
+          description: Closed-beta STT quota is exhausted.
+        "502":
+          description: Temporary OpenAI download or STT provider could not be reached safely.
+        "503":
+          description: Managed local attachment transcription is not configured.
+  /api/v1/media/managed/attachment-probe:
+    post:
+      operationId: probeManagedAttachmentTransport
+      summary: Verify zero-client transport for one attached audio or video file
+      description: >-
+        Use only when the owner explicitly asks to test local attachment transport.
+        Pass exactly one audio/video file from the current conversation through the
+        special openaiFileIdRefs parameter. This operation is non-billable and must
+        not be presented as transcription or analysis success.
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AttachmentProbeRequest"
+      responses:
+        "200":
+          description: The isolated backend received and safely probed the temporary file reference.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AttachmentProbeResult"
+        "400":
+          description: Missing, malformed, multiple, or untrusted runtime file reference.
+        "401":
+          description: Private GPT Action bearer authentication failed.
+        "405":
+          description: POST is required.
+        "413":
+          description: Probe request body exceeded the isolated request limit.
+        "415":
+          description: Attachment type, extension, or downloaded MIME did not satisfy the audio/video probe boundary.
+        "422":
+          description: The temporary file response was empty or otherwise unusable.
+        "502":
+          description: The temporary OpenAI download URL could not be reached safely by the isolated backend.
+        "503":
+          description: Owner-only MEDIA BETA admission or Action authentication is not configured.
+  /api/v1/media/managed/transcriptions/{job_id}:
+    get:
+      operationId: getManagedMediaTranscriptionStatus
+      summary: Read managed media job status and actual cumulative charge
+      x-openai-isConsequential: false
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCM_[A-Za-z0-9-]+$
+      responses:
+        "200":
+          description: Current managed media job state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagedJob"
+        "404":
+          description: Job not found.
+  /api/v1/media/managed/transcriptions/{job_id}/segments:
+    get:
+      operationId: getManagedMediaTranscriptSegments
+      summary: Read timestamped managed transcript segments
+      x-openai-isConsequential: false
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCM_[A-Za-z0-9-]+$
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 50
+      responses:
+        "200":
+          description: Transcript segment page. Follow next_cursor until null.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SegmentPage"
+        "404":
+          description: Job not found.
+  /api/v1/media/managed/transcriptions/{job_id}/facebook-retrieval-preflight:
+    get:
+      operationId: preflightManagedFacebookRetrievalCredit
+      summary: "Reserved compatibility: inspect legacy Facebook paid-retrieval ceiling"
+      description: >-
+        Reserved compatibility only for historical durable jobs. Active MEDIA BETA
+        Builder must not call or offer this operation after Cobalt failure. This local
+        quote does not call ScrapeCreators and does not authorize paid retrieval.
+      x-openai-isConsequential: false
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCM_[A-Za-z0-9-]+$
+      responses:
+        "200":
+          description: Local exact one-credit paid-retrieval consent contract.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FacebookRetrievalCreditPreflight"
+        "401":
+          description: Private GPT Action authentication failed.
+        "404":
+          description: Job not found.
+        "409":
+          description: Job is not awaiting paid Facebook retrieval consent.
+        "503":
+          description: Facebook retrieval/STT pipeline is not configured.
+  /api/v1/media/managed/transcriptions/{job_id}/facebook-retrieval:
+    post:
+      operationId: continueManagedFacebookPaidRetrieval
+      summary: "Reserved compatibility: legacy explicitly approved Facebook retrieval"
+      description: >-
+        Reserved compatibility only for historical durable jobs. Active MEDIA BETA
+        Builder must not call this operation after Cobalt failure. If legacy use is ever
+        separately authorized, the hard maximum remains one ScrapeCreators credit and
+        uncertain-charge operations must never be replayed automatically.
+      x-openai-isConsequential: true
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCM_[A-Za-z0-9-]+$
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FacebookRetrievalConsentRequest"
+      responses:
+        "200":
+          description: Paid retrieval and STT completed, failed, or reused from durable state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagedJob"
+        "401":
+          description: Private GPT Action authentication failed.
+        "404":
+          description: Job not found.
+        "409":
+          description: Exact separate one-credit retrieval consent is missing or not applicable.
+        "429":
+          description: Closed-beta STT quota is exhausted after a known paid retrieval charge.
+        "503":
+          description: Facebook retrieval/STT pipeline is not configured.
+  /api/v1/media/managed/transcriptions/{job_id}/ai-preflight:
+    get:
+      operationId: preflightManagedMediaAiCredits
+      summary: Read a separate managed AI credit ceiling before AI consent
+      description: >-
+        Call only after a native job returns AWAITING_AI_CONSENT. This endpoint does
+        not authorize AI generation. Existing Instagram Reel beta behavior remains
+        capped conservatively; supported Facebook AI paths may use a duration-derived
+        maximum when separately available in backend state.
+      x-openai-isConsequential: false
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCM_[A-Za-z0-9-]+$
+      responses:
+        "200":
+          description: Separate AI credit quote. This does not authorize AI processing.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiCreditPreflight"
+        "401":
+          description: Private GPT Action authentication failed.
+        "404":
+          description: Job not found.
+        "409":
+          description: Job is not awaiting separate AI consent or requires another estimate stage.
+        "422":
+          description: Current AI fallback does not support this source type.
+        "503":
+          description: Managed AI transcript provider is unavailable.
+  /api/v1/media/managed/transcriptions/{job_id}/ai:
+    post:
+      operationId: startManagedMediaAiTranscription
+      summary: Start separately consented managed AI transcription
+      description: >-
+        Call only after the matching AI preflight and a new explicit user approval.
+        Never run automatically and never exceed the maximum returned by the latest
+        preflight. The current owner Action request schema retains the accepted
+        Instagram Reel hard maximum of 40 credits.
+      x-openai-isConsequential: true
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCM_[A-Za-z0-9-]+$
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiTranscriptRequest"
+      responses:
+        "200":
+          description: AI transcript request completed, processing, failed, or reused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagedJob"
+        "401":
+          description: Private GPT Action authentication failed.
+        "404":
+          description: Job not found.
+        "409":
+          description: Separate AI credit consent is missing, invalid, or not applicable.
+        "422":
+          description: Current AI fallback does not support this source type.
+        "429":
+          description: Balance is below the approved AI credit ceiling.
+        "503":
+          description: Managed AI transcript provider is unavailable.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    ManagedCapability:
+      type: object
+      properties:
+        request_id:
+          type: string
+        mode:
+          type: string
+          const: zero_client_managed_beta
+        configured:
+          type: boolean
+        platforms:
+          type: array
+          items:
+            type: string
+            enum: [youtube, instagram, facebook, telegram]
+        facebook_retrieval_stt_fallback:
+          type: boolean
+        facebook_free_retrieval_provider:
+          type: string
+          const: cobalt
+        facebook_free_retrieval_configured:
+          type: boolean
+        facebook_paid_retrieval_provider:
+          type: string
+          const: scrapecreators
+        facebook_paid_retrieval_configured:
+          type: boolean
+        facebook_paid_retrieval_max_credits:
+          type: integer
+          const: 1
+        facebook_paid_retrieval_requires_separate_consent:
+          type: boolean
+        facebook_automatic_paid_retrieval:
+          type: boolean
+        facebook_stt_provider:
+          type: string
+          const: assemblyai
+        facebook_stt_configured:
+          type: boolean
+        telegram_public_retrieval:
+          type: boolean
+        telegram_retrieval_provider:
+          type: string
+          const: telegram_public_web
+        telegram_retrieval_credits:
+          type: integer
+          const: 0
+        telegram_stt_provider:
+          type: string
+          const: assemblyai
+        telegram_stt_configured:
+          type: boolean
+        local_attachment_transport:
+          type: boolean
+        local_attachment_transcription:
+          type: boolean
+        local_attachment_provider:
+          type: string
+          const: assemblyai
+        local_attachment_retrieval_provider:
+          type: string
+          const: openai_attachment
+        local_attachment_max_bytes:
+          type: integer
+          const: 33554432
+        local_attachment_max_duration_seconds:
+          type: integer
+          minimum: 60
+        automatic_ai_fallback:
+          type: boolean
+        owner_access_injected_server_side:
+          type: boolean
+        durable_store:
+          type: string
+        restart_resilient_jobs:
+          type: boolean
+        duplicate_start_reuses_job:
+          type: boolean
+    PreflightRequest:
+      type: object
+      additionalProperties: false
+      required: [url]
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Public HTTPS YouTube, Instagram, or Facebook media URL.
+        language_hint:
+          type: string
+          enum: [auto, uk, ru, en]
+          default: auto
+    FacebookFallbackRequest:
+      type: object
+      additionalProperties: false
+      required: [url]
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Public HTTPS Facebook Reel/video URL.
+        language_hint:
+          type: string
+          enum: [auto, uk, ru, en]
+          default: auto
+    TelegramPublicRequest:
+      type: object
+      additionalProperties: false
+      required: [url]
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Public HTTPS Telegram post URL with a numeric post id.
+        language_hint:
+          type: string
+          enum: [auto, uk, ru, en]
+          default: auto
+    AttachmentTranscriptRequest:
+      type: object
+      additionalProperties: false
+      required: [openaiFileIdRefs]
+      properties:
+        openaiFileIdRefs:
+          type: array
+          minItems: 1
+          maxItems: 1
+          items:
+            type: string
+          description: >-
+            Exactly one user-uploaded audio or video file from the current ChatGPT
+            conversation. ChatGPT replaces this string-array schema with the runtime
+            file-reference object containing name, id, mime_type and temporary
+            download_link. The backend never exposes those identifiers or URL.
+        language_hint:
+          type: string
+          enum: [auto, uk, ru, en]
+          default: auto
+    AttachmentProbeRequest:
+      type: object
+      additionalProperties: false
+      required: [openaiFileIdRefs]
+      properties:
+        openaiFileIdRefs:
+          type: array
+          minItems: 1
+          maxItems: 1
+          items:
+            type: string
+          description: >-
+            Exactly one user-uploaded audio or video file from the current ChatGPT
+            conversation. ChatGPT replaces this string-array schema with runtime file
+            reference objects containing name, id, mime_type, and a temporary
+            download_link as defined by the GPT Actions file-transfer contract.
+    AttachmentProbeResult:
+      type: object
+      required:
+        - transport_available
+        - file_class
+        - declared_mime_type
+        - response_mime_type
+        - mime_consistent
+        - probe_bytes_received
+        - probe_byte_limit
+        - range_requested
+        - range_supported
+        - response_truncated_at_probe_limit
+        - retrieval_credits_charged
+        - stt_seconds_charged
+      properties:
+        request_id:
+          type: string
+        transport_available:
+          type: boolean
+          const: true
+        file_class:
+          type: string
+          enum: [audio, video]
+        declared_mime_type:
+          type: string
+        response_mime_type:
+          type: string
+        mime_consistent:
+          type: boolean
+          const: true
+        probe_bytes_received:
+          type: integer
+          minimum: 1
+          maximum: 65536
+        probe_byte_limit:
+          type: integer
+          const: 65536
+        range_requested:
+          type: boolean
+          const: true
+        range_supported:
+          type: boolean
+        response_truncated_at_probe_limit:
+          type: boolean
+        retrieval_credits_charged:
+          type: integer
+          const: 0
+        stt_seconds_charged:
+          type: integer
+          const: 0
+    NativeTranscriptRequest:
+      type: object
+      additionalProperties: false
+      required: [url, credit_consent]
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Public HTTPS YouTube, Instagram, or Facebook media URL.
+        language_hint:
+          type: string
+          enum: [auto, uk, ru, en]
+          default: auto
+        credit_consent:
+          type: object
+          additionalProperties: false
+          required: [provider, mode, max_credits]
+          properties:
+            provider:
+              type: string
+              const: supadata
+            mode:
+              type: string
+              const: native
+            max_credits:
+              type: integer
+              minimum: 1
+              maximum: 1
+              description: Hard user-approved maximum for this native operation.
+    FacebookRetrievalConsentRequest:
+      type: object
+      additionalProperties: false
+      required: [credit_consent]
+      properties:
+        credit_consent:
+          type: object
+          additionalProperties: false
+          required: [provider, mode, max_credits]
+          properties:
+            provider:
+              type: string
+              const: scrapecreators
+            mode:
+              type: string
+              const: facebook_post
+            max_credits:
+              type: integer
+              minimum: 1
+              maximum: 1
+              description: Exact hard user-approved maximum for this one paid retrieval attempt.
+    AiTranscriptRequest:
+      type: object
+      additionalProperties: false
+      required: [credit_consent]
+      properties:
+        credit_consent:
+          type: object
+          additionalProperties: false
+          required: [provider, mode, max_credits]
+          properties:
+            provider:
+              type: string
+              const: supadata
+            mode:
+              type: string
+              const: generate
+            max_credits:
+              type: integer
+              const: 40
+              description: Current accepted Instagram Reel conservative maximum.
+    CreditPreflight:
+      type: object
+      required:
+        - provider
+        - mode
+        - credits_available
+        - estimated_credits
+        - credits_after_estimate
+        - can_continue
+        - consent_required
+        - consent_options
+      properties:
+        request_id:
+          type: string
+        source_url:
+          type: string
+        language_hint:
+          type: string
+          enum: [auto, uk, ru, en]
+        provider:
+          type: string
+          const: supadata
+        mode:
+          type: string
+          const: native
+        plan:
+          type: string
+        credits_available:
+          type: number
+          minimum: 0
+        estimated_credits:
+          type: integer
+          const: 1
+        credits_after_estimate:
+          type: number
+          minimum: 0
+        can_continue:
+          type: boolean
+        consent_required:
+          type: boolean
+          const: true
+        consent_options:
+          $ref: "#/components/schemas/ConsentOptions"
+    FacebookRetrievalCreditPreflight:
+      type: object
+      required:
+        - job_id
+        - source_url
+        - provider
+        - mode
+        - estimated_credits
+        - maximum_credits
+        - provider_balance_lookup_performed
+        - consent_required
+        - consent_options
+      properties:
+        request_id:
+          type: string
+        job_id:
+          type: string
+          pattern: ^KRCM_[A-Za-z0-9-]+$
+        source_url:
+          type: string
+        provider:
+          type: string
+          const: scrapecreators
+        mode:
+          type: string
+          const: facebook_post
+        estimated_credits:
+          type: integer
+          const: 1
+        maximum_credits:
+          type: integer
+          const: 1
+        provider_balance_lookup_performed:
+          type: boolean
+          const: false
+        can_continue:
+          type: boolean
+          const: true
+        consent_required:
+          type: boolean
+          const: true
+        consent_options:
+          $ref: "#/components/schemas/ConsentOptions"
+    AiCreditPreflight:
+      type: object
+      required:
+        - job_id
+        - source_url
+        - provider
+        - mode
+        - credits_available
+        - estimated_credits
+        - maximum_credits
+        - credits_after_estimate
+        - can_continue
+        - consent_required
+        - consent_options
+      properties:
+        request_id:
+          type: string
+        job_id:
+          type: string
+          pattern: ^KRCM_[A-Za-z0-9-]+$
+        source_url:
+          type: string
+        provider:
+          type: string
+          const: supadata
+        mode:
+          type: string
+          const: generate
+        plan:
+          type: string
+        credits_available:
+          type: number
+          minimum: 0
+        estimated_credits:
+          type: integer
+          minimum: 1
+        maximum_credits:
+          type: integer
+          minimum: 1
+        credits_per_minute:
+          type: number
+          minimum: 0
+        maximum_duration_minutes:
+          type: number
+          minimum: 0
+        credits_after_estimate:
+          type: number
+          minimum: 0
+        conservative_maximum:
+          type: boolean
+        estimate_basis:
+          type: string
+        media_duration_seconds:
+          anyOf:
+            - type: number
+            - type: "null"
+        can_continue:
+          type: boolean
+        consent_required:
+          type: boolean
+          const: true
+        consent_options:
+          $ref: "#/components/schemas/ConsentOptions"
+    ConsentOptions:
+      type: object
+      required: [approve, reject]
+      properties:
+        approve:
+          type: integer
+          const: 1
+        reject:
+          type: integer
+          const: 2
+    ManagedJob:
+      type: object
+      properties:
+        request_id:
+          type: string
+        job_id:
+          type: string
+          pattern: ^KRCM_[A-Za-z0-9-]+$
+        status:
+          type: string
+          enum: [PROCESSING, COMPLETED, AWAITING_AI_CONSENT, AWAITING_RETRIEVAL_CONSENT, FAILED]
+        created_at:
+          type: string
+        updated_at:
+          type: string
+        source_url:
+          type: string
+        language_hint:
+          type: string
+          enum: [auto, uk, ru, en]
+        provider:
+          type: string
+          enum: [supadata, assemblyai]
+        provider_mode:
+          type: string
+          enum: [native, generate, facebook_retrieval_stt, telegram_public_retrieval_stt, attachment_upload_stt]
+        detected_language:
+          anyOf:
+            - type: string
+            - type: "null"
+        available_languages:
+          type: array
+          items:
+            type: string
+        credits_charged:
+          type: number
+          minimum: 0
+          description: Cumulative managed provider credits recorded for this durable job.
+        credits_remaining_estimate:
+          type: number
+          minimum: 0
+        credit_charge_uncertain:
+          type: boolean
+        reused:
+          type: boolean
+        segment_count:
+          type: integer
+          minimum: 0
+        transcript_characters:
+          type: integer
+          minimum: 0
+        ai_fallback_requires_new_consent:
+          type: boolean
+        retrieval_provider:
+          anyOf:
+            - type: string
+              enum: [cobalt, scrapecreators, telegram_public_web, openai_attachment]
+            - type: "null"
+        retrieval_credits_charged:
+          type: number
+          minimum: 0
+        stt_seconds_charged:
+          type: number
+          minimum: 0
+        provider_data_deleted:
+          anyOf:
+            - type: boolean
+            - type: "null"
+        language_confidence:
+          anyOf:
+            - type: number
+            - type: "null"
+        error:
+          anyOf:
+            - type: object
+              properties:
+                code:
+                  type: string
+                message:
+                  type: string
+                retryable:
+                  type: boolean
+            - type: "null"
+    SegmentPage:
+      type: object
+      required: [job_id, status, cursor, next_cursor, segments]
+      properties:
+        request_id:
+          type: string
+        job_id:
+          type: string
+          pattern: ^KRCM_[A-Za-z0-9-]+$
+        status:
+          type: string
+          enum: [PROCESSING, COMPLETED, AWAITING_AI_CONSENT, AWAITING_RETRIEVAL_CONSENT, FAILED]
+        cursor:
+          type: integer
+        next_cursor:
+          anyOf:
+            - type: integer
+            - type: "null"
+        segments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Segment"
+    Segment:
+      type: object
+      required: [index, start_ms, end_ms, text, confidence]
+      properties:
+        index:
+          type: integer
+        start_ms:
+          anyOf:
+            - type: integer
+            - type: "null"
+        end_ms:
+          anyOf:
+            - type: integer
+            - type: "null"
+        text:
+          type: string
+        confidence:
+          anyOf:
+            - type: number
+            - type: "null"
+security:
+  - bearerAuth: []
