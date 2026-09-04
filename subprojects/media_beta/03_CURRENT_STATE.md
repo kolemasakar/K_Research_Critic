@@ -1,43 +1,111 @@
 # MEDIA BETA Current State
 Поточний канонічний стан приватного MEDIA BETA для відновлення без реконструкції історії.
 
-Version: 8.0
-Status: RELEASE_HOLD_OWNER_TESTING / M3_CLOSED / M4_OWNER_CANARY_ACCEPTED
-Updated: 2026-09-02
+Version: 8.1
+Status: CROSS_SYSTEM_CHECKPOINT_73 / R0_PUBLIC_KRC_UPDATE_PREFLIGHT_NEXT
+Updated: 2026-09-04
 
 ## Executive state
 
+Owner-confirmed product state plus repository/runtime evidence:
+
 ```text
-PUBLIC CORE                               PUBLISHED / MAINTENANCE
-MEDIA BETA                                CLOSED BETA / OWNER TESTING
+PUBLIC KRC GPT                            PUBLISHED / USER-ACCESSIBLE
+MEDIA BETA GPT                            OWNER-ONLY / NOT SEPARATELY PUBLISHED
 A9 / A9.10 / A10                          ACCEPTED
-M3 PROVIDER EVIDENCE                      COMPLETE
 M3                                        CLOSED
 M4 IMAGE PARITY                           PASS
 M4 OWNER-ONLY CANARY                      PASS
 M4 PERMANENT BACKEND PROMOTION            NOT AUTHORIZED
+KRC PR #8                                 OPEN / DRAFT / DIRTY / UNMERGED
+VOICEBRIDGE PR #45                        OPEN / DRAFT / UNMERGED
+R0                                        NEXT / NO LIVE CHANGE
 R1 / R2 / R3 / R4                         HOLD
 ```
 
 Current recovery authority:
 
-`72_M4_OWNER_CANARY_ACCEPTED_ROLLBACK_COMPLETE_CHECKPOINT_2026_09_02.md`
-
-Earlier full operational baseline remains available in checkpoint 62 and Git history; this file intentionally summarizes the current state rather than duplicating the full historical audit trail.
+`73_PUBLIC_KRC_MEDIA_VOICEBRIDGE_CROSS_SYSTEM_TRANSITION_CHECKPOINT_2026_09_04.md`
 
 ## Product and repository boundary
 
 ```text
 product: K-Research & Critic
+public product identity: existing published KRC GPT
 public Core repo: kolemasakar/K_Research_Critic
 public Core branch: main
-MEDIA BETA branch: agent/video-url-research
+MEDIA BETA product branch: agent/video-url-research
+MEDIA BETA GPT: private / owner-only
 VoiceBridge repo: kolemasakar/VoiceBridge
 VoiceBridge KRC migration branch: agent/krc-media-gemini-migration
-VoiceBridge PR: #45 / draft / unmerged unless reverified otherwise
 ```
 
-VoiceBridge is the technology/backend source. `K_Research_Critic` remains product and roadmap authority.
+`K_Research_Critic` is product/roadmap authority. VoiceBridge is the media/backend implementation and validation source only.
+
+Future public MEDIA capability must be integrated into the **same existing public KRC identity**, not through a new GPT publication dependency.
+
+## Critical availability invariant
+
+```text
+MEDIA backend/action/source unavailable
+        -> MEDIA unavailable / fail closed
+
+Core KRC
+        -> remains accessible and functional
+```
+
+The private MEDIA BETA GPT must never become required for public KRC users.
+
+## Current repository evidence
+
+KRC public `main` observed head before checkpoint 73:
+
+`39629886e9f1f3841661c759f75279f779a937c8`
+
+KRC MEDIA branch pre-checkpoint head:
+
+`5241c36460f7dfe4222ab1b4f0b933cb4da0281c`
+
+KRC MEDIA Tests:
+
+`33870130947` — SUCCESS.
+
+PR #8:
+
+```text
+OPEN
+DRAFT
+UNMERGED
+mergeable: false
+mergeable_state: dirty
+```
+
+Branch divergence versus current `main` at audit time:
+
+```text
+status: diverged
+ahead_by: 568
+behind_by: 78
+```
+
+Therefore direct merge of PR #8 as-is is not the next safe action.
+
+VoiceBridge pre-transition-reference head:
+
+`0252751ca3f4e04b60423cb506de630680fd83a7`
+
+VoiceBridge Validate:
+
+`33860807242` — SUCCESS.
+
+PR #45:
+
+```text
+OPEN
+DRAFT
+UNMERGED
+mergeable: true
+```
 
 ## Current STT provider boundary
 
@@ -53,27 +121,31 @@ VoiceBridge live streaming remains a separate provider domain and does not chang
 
 ## Deferred free-first plan
 
-Hybrid C/D is recorded as a future plan only:
+Hybrid C/D remains future-only:
 
 ```text
 state: PLANNED / NOT IMPLEMENTED
 trigger: AssemblyAI free credits exhausted
-additional gate: fresh owner authorization and mutable-assumption revalidation
+additional gate: fresh owner authorization + mutable-assumption revalidation
 ```
 
 Planned future roles:
 
 ```text
 Gemini Transcribe Live -> preferred free eligible route
-Gemini unary Transcribe -> timestamps/diarization feature route when free quota permits
-AssemblyAI universal-2 -> rollback/fallback technology; paid use disabled by default
+Gemini unary Transcribe -> timestamps/diarization route when free quota permits
+AssemblyAI universal-2 -> rollback/fallback; billable use disabled by default
 ```
-
-No implementation or automatic paid fallback is currently authorized.
 
 Product plan:
 
 `69_POST_ASSEMBLYAI_FREE_CREDITS_HYBRID_STT_PLAN_2026_09_02.md`
+
+Technical plan:
+
+`kolemasakar/VoiceBridge/docs/planning/2026-09-02_KRC_POST_ASSEMBLYAI_FREE_CREDITS_HYBRID_STT_IMPLEMENTATION_PLAN.md`
+
+No Hybrid implementation or automatic paid fallback is currently authorized.
 
 ## Active accepted media routes
 
@@ -99,7 +171,7 @@ local attachment max size -> 32 MiB
 
 Active durable store remains Neon PostgreSQL for the isolated MEDIA BETA contour.
 
-Accepted runtime contract:
+Accepted contract:
 
 ```text
 durable_store: postgres
@@ -108,11 +180,9 @@ duplicate start reuses existing job: true
 durable STT quota ledger: active
 ```
 
-The M4 owner canary directly verified Neon connectivity, required KRC tables, durable job readback, segment readback, and idempotent duplicate reuse.
-
 ## M3 closure
 
-Seven reviewed cases across the first and expanded A/B tranches did not establish a global STT quality winner.
+Seven reviewed cases did not establish a global STT quality winner:
 
 ```text
 AssemblyAI lexical WER: 13.68%
@@ -120,19 +190,19 @@ Gemini lexical WER: 14.53%
 SEVEN_CASE_GLOBAL_WINNER: NOT_ESTABLISHED
 ```
 
-M3 was closed retaining AssemblyAI `universal-2` as the current KRC prerecorded provider.
+M3 closed retaining AssemblyAI `universal-2` as current KRC prerecorded provider.
 
-## M4 image parity
+## M4 accepted evidence
 
-VoiceBridge M4 target:
+VoiceBridge exact tested target:
 
 `6a9491359795840ec9e79c9edc0ea82f595e9784`
 
-Validate run:
+Image-parity Validate:
 
-`33577022166` - SUCCESS.
+`33577022166` — SUCCESS.
 
-Accepted final-image requirements:
+Final image requirements:
 
 ```text
 ffmpeg: PASS
@@ -142,48 +212,20 @@ final Docker image build: PASS
 no-provider KRC startup smoke: PASS
 ```
 
-Authority:
+Owner-only canary:
 
-`docs/history/2026-09-02_KRC_MEDIA_M4_IMAGE_PARITY_REMEDIATION_ACCEPTANCE.md`
+`33580592224` — SUCCESS.
 
-## M4 bounded owner-only canary
-
-Owner-authorized live canary workflow run:
-
-`33580592224` - SUCCESS.
-
-Isolated service:
-
-`voicebridge-krc-media-beta-kolemasakar`
-
-Temporarily tested exact target:
-
-`6a9491359795840ec9e79c9edc0ea82f595e9784`
-
-One real accepted Telegram fixture was processed through AssemblyAI:
+Real canary path:
 
 ```text
-KRCM job: KRCM_8c0f6a9e-b3c9-4c9a-8978-69d6c5acc535
-status: COMPLETED
-provider: assemblyai
+public Telegram -> AssemblyAI universal-2 -> durable KRCM / Neon
 STT seconds: 53
 retrieval credits: 0
-segment count: 1
 provider cleanup: PASS
-```
-
-Canary additionally proved:
-
-```text
-owner bearer boundary: PASS
-Cobalt configured/reachable: PASS
-ScrapeCreators inactive: PASS
-Neon connectivity/schema: PASS
-no-provider durable mutation: NONE
 durable readback: PASS
 duplicate reuse: PASS
-one durable job row: PASS
-one STT reservation row: PASS
+single STT reservation: PASS
 invalid/private Telegram boundary: PASS
 ```
 
@@ -191,28 +233,56 @@ Mandatory rollback restored exact pre-canary Render commit:
 
 `2f0f02769dbdf2e8240e6b08867ecef2faaede16`
 
-Post-rollback health passed. The one-shot canary workflow was removed after execution.
+Permanent backend promotion was not performed.
 
-Authority:
+VoiceBridge authorities:
+
+`docs/history/2026-09-02_KRC_MEDIA_M4_IMAGE_PARITY_REMEDIATION_ACCEPTANCE.md`
 
 `docs/history/2026-09-02_KRC_MEDIA_M4_OWNER_CANARY_ACCEPTANCE.md`
 
-## Current release boundary
+## Public KRC + MEDIA integration plan
+
+Product plan:
+
+`planning/PUBLIC_KRC_MEDIA_INTEGRATION_UPDATE_SAFETY_PLAN_2026_09_04.md`
+
+VoiceBridge technical plan:
+
+`docs/planning/2026-09-04_KRC_PUBLIC_GPT_MEDIA_INTEGRATION_SAFETY_PREFLIGHT.md`
+
+Independent gates:
 
 ```text
-R1 merge selected MEDIA BETA work toward main   HOLD
-R2 permanent backend promotion                  HOLD
-R3 external testers                             HOLD
-R4 public rollout                               HOLD
+R0  Public KRC Update Safety Preflight
+R1  Repository integration
+R2  Permanent MEDIA backend promotion/readiness
+R3  Update existing published KRC GPT
+R4  Post-update public-access + Core regression verification
 ```
 
-M4 canary acceptance does not imply any of these gates.
+Current state:
+
+```text
+R0: NEXT / NO LIVE GPT CHANGE
+R1: HOLD
+R2: HOLD
+R3: HOLD
+R4: HOLD
+```
+
+R0 must establish safe edit/update of the same existing public KRC, current sharing/publication state, public Action/Privacy requirements, public KRC URL/identity preservation, and a rollback/reconstruction snapshot of the current GPT configuration.
+
+R1 must not direct-merge current PR #8 as-is; after R0 PASS it requires a dedicated integration/conflict strategy plus Core and MEDIA regressions.
 
 ## Exact continuation point
 
 ```text
-OWNER POST-CANARY DECISION
-R1 MERGE AND R2 PERMANENT BACKEND PROMOTION REMAIN SEPARATE GATES
+R0 PUBLIC KRC UPDATE SAFETY PREFLIGHT
+NO LIVE GPT CHANGE
+NO DIRECT MERGE OF CURRENT DIRTY PR #8
 ```
 
-Before either R1 or R2, reverify current repository heads/CI, exact scope/diff, current Render live baseline and rollback target, environment presence without exposing secrets, Neon connectivity, provider state, and release-hold invariants.
+Recovery command:
+
+`recover KRC MEDIA BETA cross-system checkpoint 73 public KRC MEDIA VoiceBridge 2026-09-04`
