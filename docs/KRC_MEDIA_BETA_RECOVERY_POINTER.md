@@ -1,4 +1,5 @@
 # K-Research & Critic - MEDIA BETA Recovery Pointer
+Канонічний покажчик на поточний стан інтеграції MEDIA BETA з публічним K-Research & Critic після завершення R1.
 
 Status: ACTIVE POINTER / R1 COMPLETE / R2 NOT AUTHORIZED
 Updated: 2026-09-04
