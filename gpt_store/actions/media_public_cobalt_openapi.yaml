@@ -1,0 +1,610 @@
+openapi: 3.1.0
+info:
+  title: K-Research & Critic Public MEDIA API
+  version: 0.7.0-r2-cobalt
+  description: >-
+    Candidate public MEDIA Action contract for supported public YouTube, Instagram,
+    Facebook, and Telegram video URLs. Public YouTube and Instagram retrieval use the
+    self-hosted Cobalt route followed by AssemblyAI universal-2 STT. Facebook uses the
+    accepted Cobalt retrieval/STT route and Telegram uses the accepted public-web
+    retrieval/STT route. Public paid retrieval fallback is not available. Supadata,
+    ScrapeCreators, local attachments, and consent-gated legacy AI credit operations
+    are intentionally not exposed by this public Action schema. MEDIA failures are
+    fail-closed and do not block normal K-Research & Critic Core use.
+x-krc-release-state: R2_REPOSITORY_CANDIDATE_NOT_PUBLICLY_ACTIVATED
+x-krc-free-tier-policy:
+  paid_retrieval_fallback: false
+  paid_stt_fallback: false
+  supadata_public_active: false
+  scrapecreators_public_active: false
+servers:
+  - url: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
+paths:
+  /api/v1/media/managed:
+    get:
+      operationId: getPublicMediaCapability
+      summary: Read current public MEDIA capability and routing state
+      x-openai-isConsequential: false
+      responses:
+        "200":
+          description: Current public MEDIA capability state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagedCapability"
+        "401":
+          description: Action bearer authentication failed.
+        "503":
+          description: Public MEDIA is not configured.
+
+  /api/v1/media/managed/preflight:
+    post:
+      operationId: preflightPublicCobaltMedia
+      summary: Check public YouTube or Instagram Cobalt route before transcription
+      description: >-
+        Validate a supported public YouTube or Instagram URL and report the zero-credit
+        retrieval route. This operation does not start retrieval or STT and does not
+        require Supadata credit consent.
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublicCobaltRequest"
+      responses:
+        "200":
+          description: Cobalt retrieval/STT route preflight.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicCobaltPreflight"
+        "400":
+          description: Invalid request.
+        "401":
+          description: Action bearer authentication failed.
+        "422":
+          description: URL is not a supported public YouTube or Instagram media URL.
+        "503":
+          description: Public Cobalt retrieval/STT route is not configured.
+
+  /api/v1/media/managed/lookup:
+    post:
+      operationId: lookupPublicCobaltMediaJob
+      summary: Reuse an existing public YouTube or Instagram MEDIA job when available
+      description: >-
+        Look up the durable idempotent job for the same public URL and language hint.
+        This operation does not start a new retrieval or STT request.
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublicCobaltRequest"
+      responses:
+        "200":
+          description: Existing durable MEDIA job.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagedJob"
+        "400":
+          description: Invalid request.
+        "401":
+          description: Action bearer authentication failed.
+        "404":
+          description: Matching durable MEDIA job was not found.
+        "422":
+          description: URL is not a supported public YouTube or Instagram media URL.
+        "503":
+          description: Public MEDIA durable state or Cobalt route is unavailable.
+
+  /api/v1/media/managed/transcriptions:
+    post:
+      operationId: startPublicCobaltMediaTranscription
+      summary: Retrieve and transcribe a public YouTube or Instagram video
+      description: >-
+        Use the self-hosted Cobalt audio retrieval path and AssemblyAI universal-2 STT.
+        Retrieval credits charged by KRC are zero. No Supadata or paid retrieval fallback
+        is attempted. Duplicate requests reuse durable state instead of repeating provider work.
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublicCobaltRequest"
+      responses:
+        "200":
+          description: MEDIA job completed, failed closed, processing, or reused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagedJob"
+        "400":
+          description: Invalid request.
+        "401":
+          description: Action bearer authentication failed.
+        "422":
+          description: Unsupported URL, unusable media, or unsupported multi-asset Instagram response.
+        "429":
+          description: Project STT safety quota is exhausted.
+        "502":
+          description: Cobalt retrieval or STT provider could not be reached safely.
+        "503":
+          description: Public MEDIA durable state or provider route is unavailable.
+
+  /api/v1/media/managed/facebook-fallback:
+    post:
+      operationId: startPublicFacebookCobaltTranscription
+      summary: Retrieve a public Facebook video with Cobalt and transcribe it
+      description: >-
+        Use only for a supported public Facebook Reel/video URL. Retrieval uses the
+        self-hosted Cobalt route with zero KRC retrieval-credit accounting, followed by
+        AssemblyAI STT. Cobalt failure is terminal for this request. ScrapeCreators and
+        automatic paid retrieval fallback are not available.
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FacebookRequest"
+      responses:
+        "200":
+          description: Facebook Cobalt MEDIA job completed, failed closed, or reused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagedJob"
+        "400":
+          description: Invalid request.
+        "401":
+          description: Action bearer authentication failed.
+        "422":
+          description: Source is not a supported public Facebook media URL or media is unavailable.
+        "429":
+          description: Project STT safety quota is exhausted.
+        "502":
+          description: Cobalt retrieval or STT provider could not be reached safely.
+        "503":
+          description: Facebook retrieval/STT route is not configured or durable state is unavailable.
+
+  /api/v1/media/managed/telegram:
+    post:
+      operationId: startPublicTelegramTranscription
+      summary: Retrieve a public Telegram video and transcribe it
+      description: >-
+        Use only for a supported public Telegram post URL. Retrieval uses the public
+        Telegram web/media route with zero retrieval credits and no Telegram account,
+        cookies, session, bot token, or paid fallback. AssemblyAI STT may use the bounded
+        project Free-plan safety quota.
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TelegramRequest"
+      responses:
+        "200":
+          description: Telegram MEDIA job completed, failed closed, or reused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagedJob"
+        "400":
+          description: Invalid request.
+        "401":
+          description: Action bearer authentication failed.
+        "422":
+          description: Public Telegram post or playable video is unavailable.
+        "429":
+          description: Project STT safety quota is exhausted.
+        "502":
+          description: Telegram retrieval or STT provider could not be reached safely.
+        "503":
+          description: Telegram retrieval/STT route is not configured or durable state is unavailable.
+
+  /api/v1/media/managed/transcriptions/{job_id}:
+    get:
+      operationId: getPublicMediaTranscriptionStatus
+      summary: Read durable public MEDIA job status
+      x-openai-isConsequential: false
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+      responses:
+        "200":
+          description: Current durable MEDIA job state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagedJob"
+        "401":
+          description: Action bearer authentication failed.
+        "404":
+          description: Job not found.
+        "503":
+          description: Durable MEDIA state is unavailable.
+
+  /api/v1/media/managed/transcriptions/{job_id}/segments:
+    get:
+      operationId: getPublicMediaTranscriptSegments
+      summary: Read timestamped transcript segments for a public MEDIA job
+      x-openai-isConsequential: false
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+      responses:
+        "200":
+          description: Transcript segment page. Follow next_cursor until null.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SegmentPage"
+        "400":
+          description: Invalid pagination.
+        "401":
+          description: Action bearer authentication failed.
+        "404":
+          description: Job not found.
+        "503":
+          description: Durable MEDIA state is unavailable.
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  parameters:
+    JobId:
+      name: job_id
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^KRCM_[A-Za-z0-9-]+$
+
+  schemas:
+    LanguageHint:
+      type: string
+      enum: [auto, uk, ru, en]
+      default: auto
+
+    PublicCobaltRequest:
+      type: object
+      additionalProperties: false
+      required: [url]
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Supported public HTTPS YouTube or Instagram video URL.
+        language_hint:
+          $ref: "#/components/schemas/LanguageHint"
+
+    FacebookRequest:
+      type: object
+      additionalProperties: false
+      required: [url]
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Supported public HTTPS Facebook Reel/video URL.
+        language_hint:
+          $ref: "#/components/schemas/LanguageHint"
+
+    TelegramRequest:
+      type: object
+      additionalProperties: false
+      required: [url]
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Supported public HTTPS Telegram post URL with a numeric post id.
+        language_hint:
+          $ref: "#/components/schemas/LanguageHint"
+
+    ManagedCapability:
+      type: object
+      properties:
+        request_id:
+          type: string
+        mode:
+          type: string
+          const: zero_client_managed_beta
+        provider:
+          type: string
+          const: cobalt_retrieval+assemblyai_stt
+        configured:
+          type: boolean
+        platforms:
+          type: array
+          items:
+            type: string
+            enum: [youtube, instagram, facebook, telegram]
+        supadata_public_active:
+          type: boolean
+          const: false
+        native_transcript_credits:
+          type: integer
+          const: 0
+        credit_preflight_required:
+          type: boolean
+          const: false
+        explicit_user_consent_required:
+          type: boolean
+          const: false
+        automatic_ai_fallback:
+          type: boolean
+          const: false
+        youtube_retrieval_provider:
+          type: string
+          const: cobalt
+        youtube_retrieval_configured:
+          type: boolean
+        youtube_retrieval_credits:
+          type: integer
+          const: 0
+        youtube_stt_provider:
+          type: string
+          const: assemblyai
+        youtube_stt_configured:
+          type: boolean
+        instagram_retrieval_provider:
+          type: string
+          const: cobalt
+        instagram_retrieval_configured:
+          type: boolean
+        instagram_retrieval_credits:
+          type: integer
+          const: 0
+        instagram_stt_provider:
+          type: string
+          const: assemblyai
+        instagram_stt_configured:
+          type: boolean
+        instagram_multi_asset_posts:
+          type: boolean
+          const: false
+        facebook_free_retrieval_provider:
+          type: string
+          const: cobalt
+        facebook_free_retrieval_configured:
+          type: boolean
+        facebook_paid_retrieval_configured:
+          type: boolean
+          const: false
+        facebook_automatic_paid_retrieval:
+          type: boolean
+          const: false
+        facebook_stt_provider:
+          type: string
+          const: assemblyai
+        facebook_stt_configured:
+          type: boolean
+        telegram_public_retrieval:
+          type: boolean
+          const: true
+        telegram_retrieval_provider:
+          type: string
+          const: telegram_public_web
+        telegram_retrieval_credits:
+          type: integer
+          const: 0
+        telegram_stt_provider:
+          type: string
+          const: assemblyai
+        telegram_stt_configured:
+          type: boolean
+        user_beta_access_code_required:
+          type: boolean
+          const: false
+        owner_access_injected_server_side:
+          type: boolean
+          const: true
+        durable_store:
+          type: string
+        restart_resilient_jobs:
+          type: boolean
+        duplicate_start_reuses_job:
+          type: boolean
+          const: true
+        paid_retrieval_fallback:
+          type: boolean
+          const: false
+        paid_stt_fallback:
+          type: boolean
+          const: false
+
+    PublicCobaltPreflight:
+      type: object
+      required:
+        - source_url
+        - language_hint
+        - provider
+        - mode
+        - platform
+        - estimated_retrieval_credits
+        - stt_provider
+        - can_continue
+        - consent_required
+        - automatic_paid_fallback
+      properties:
+        request_id:
+          type: string
+        source_url:
+          type: string
+        language_hint:
+          $ref: "#/components/schemas/LanguageHint"
+        provider:
+          type: string
+          const: cobalt
+        mode:
+          type: string
+          const: retrieval_stt
+        platform:
+          type: string
+          enum: [youtube, instagram]
+        retrieval_credits_available:
+          type: "null"
+        estimated_retrieval_credits:
+          type: integer
+          const: 0
+        retrieval_credits_after_estimate:
+          type: "null"
+        stt_provider:
+          type: string
+          const: assemblyai
+        can_continue:
+          type: boolean
+        consent_required:
+          type: boolean
+          const: false
+        automatic_paid_fallback:
+          type: boolean
+          const: false
+
+    ManagedJob:
+      type: object
+      properties:
+        request_id:
+          type: string
+        job_id:
+          type: string
+          pattern: ^KRCM_[A-Za-z0-9-]+$
+        status:
+          type: string
+          enum: [PROCESSING, COMPLETED, FAILED, AWAITING_AI_CONSENT, AWAITING_RETRIEVAL_CONSENT]
+        created_at:
+          type: string
+        updated_at:
+          type: string
+        source_url:
+          type: string
+        language_hint:
+          $ref: "#/components/schemas/LanguageHint"
+        provider:
+          type: string
+        provider_mode:
+          type: string
+          description: Public routes normally report cobalt_retrieval_stt, facebook_retrieval_stt, or telegram_public_retrieval_stt.
+        detected_language:
+          anyOf:
+            - type: string
+            - type: "null"
+        available_languages:
+          type: array
+          items:
+            type: string
+        credits_charged:
+          type: number
+          minimum: 0
+        credits_remaining_estimate:
+          type: number
+          minimum: 0
+        credit_charge_uncertain:
+          type: boolean
+        reused:
+          type: boolean
+        segment_count:
+          type: integer
+          minimum: 0
+        transcript_characters:
+          type: integer
+          minimum: 0
+        retrieval_provider:
+          anyOf:
+            - type: string
+              enum: [cobalt, telegram_public_web]
+            - type: "null"
+        retrieval_credits_charged:
+          type: number
+          minimum: 0
+        stt_seconds_charged:
+          type: number
+          minimum: 0
+        provider_data_deleted:
+          anyOf:
+            - type: boolean
+            - type: "null"
+        language_confidence:
+          anyOf:
+            - type: number
+            - type: "null"
+        error:
+          anyOf:
+            - type: object
+              properties:
+                code:
+                  type: string
+                message:
+                  type: string
+                retryable:
+                  type: boolean
+            - type: "null"
+
+    SegmentPage:
+      type: object
+      required: [job_id, status, cursor, next_cursor, segments]
+      properties:
+        request_id:
+          type: string
+        job_id:
+          type: string
+          pattern: ^KRCM_[A-Za-z0-9-]+$
+        status:
+          type: string
+        cursor:
+          type: integer
+          minimum: 0
+        next_cursor:
+          anyOf:
+            - type: integer
+            - type: "null"
+        segments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Segment"
+
+    Segment:
+      type: object
+      required: [index, start_ms, end_ms, text, confidence]
+      properties:
+        index:
+          type: integer
+        start_ms:
+          anyOf:
+            - type: integer
+            - type: "null"
+        end_ms:
+          anyOf:
+            - type: integer
+            - type: "null"
+        text:
+          type: string
+        confidence:
+          anyOf:
+            - type: number
+            - type: "null"
+
+security:
+  - bearerAuth: []
