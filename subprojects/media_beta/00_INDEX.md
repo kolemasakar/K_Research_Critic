@@ -2,9 +2,9 @@
 
 Канонічний індекс документації K-Research & Critic MEDIA BETA.
 
-Version: 6.1
-Status: ACTIVE / CHECKPOINT_82 / R2_PUBLIC_COBALT_REPOSITORY_PASS / DEPLOYMENT_AND_CANARY_PENDING / R3_HOLD
-Updated: 2026-09-04
+Version: 6.2
+Status: ACTIVE / CHECKPOINT_83 / R2_REPOSITORY_READY / LIVE_COBALT_DEPLOYMENT_AND_CANARY_PENDING / R3_HOLD
+Updated: 2026-09-05
 
 ## Product boundary
 
@@ -27,33 +27,48 @@ Core KRC               -> remains user-accessible and functional
 
 ## Canonical reading order
 
-1. `82_R2_PUBLIC_COBALT_RECONCILIATION_REPOSITORY_SYNC_2026_09_04.md` - current canonical recovery checkpoint.
-2. `81_R2_LIVE_PROMOTION_PARTIAL_CANARY_2026_09_04.md` - previous live promotion baseline and partial canary checkpoint.
-3. `80_R2C_PUBLIC_PRIVACY_RENDER_PROMOTION_READY_2026_09_04.md` - pre-promotion privacy/release plan.
-4. `79_R2B_FAILURE_ISOLATION_FREE_QUOTA_PASS_2026_09_04.md` - failure-isolation evidence.
-5. `78_R2A_PUBLIC_FREE_TIER_ADMISSION_PASS_2026_09_04.md` - public free-only admission policy.
-6. `75_R1_REPOSITORY_INTEGRATION_COMPLETE_CHECKPOINT_2026_09_04.md` - completed R1 repository integration.
-7. `planning/PUBLIC_KRC_MEDIA_INTEGRATION_UPDATE_SAFETY_PLAN_2026_09_04.md` - R0-R4 release safety plan.
+1. `83_R2_PUBLIC_ACTION_SCHEMA_REPOSITORY_READY_2026_09_05.md` - current canonical recovery checkpoint.
+2. `82_R2_PUBLIC_COBALT_RECONCILIATION_REPOSITORY_SYNC_2026_09_04.md` - Cobalt routing reconciliation checkpoint.
+3. `81_R2_LIVE_PROMOTION_PARTIAL_CANARY_2026_09_04.md` - live promotion baseline and partial Supadata canary checkpoint.
+4. `80_R2C_PUBLIC_PRIVACY_RENDER_PROMOTION_READY_2026_09_04.md` - pre-promotion privacy/release plan.
+5. `79_R2B_FAILURE_ISOLATION_FREE_QUOTA_PASS_2026_09_04.md` - failure-isolation evidence.
+6. `78_R2A_PUBLIC_FREE_TIER_ADMISSION_PASS_2026_09_04.md` - public free-only admission policy.
+7. `75_R1_REPOSITORY_INTEGRATION_COMPLETE_CHECKPOINT_2026_09_04.md` - completed R1 repository integration.
+8. `planning/PUBLIC_KRC_MEDIA_INTEGRATION_UPDATE_SAFETY_PLAN_2026_09_04.md` - R0-R4 release safety plan.
 
 Recovery pointer:
 
 `../../docs/KRC_MEDIA_BETA_RECOVERY_POINTER.md`
 
-VoiceBridge technical reconciliation:
+## Action contracts
 
-`docs/history/2026-09-04_KRC_MEDIA_PUBLIC_COBALT_ROUTING_RECONCILIATION.md`
-
-## Current repository state
-
-KRC canonical repository:
+Private MEDIA BETA contract preserved:
 
 ```text
-repository: kolemasakar/K_Research_Critic
-branch: main
-current recovery checkpoint: 82
+gpt_store/actions/media_managed_beta_openapi.yaml
+version: 0.6.0-a9.10
+purpose: private/historical MEDIA BETA compatibility
 ```
 
-VoiceBridge synchronized candidate:
+Initial public MEDIA candidate:
+
+```text
+gpt_store/actions/media_public_cobalt_openapi.yaml
+version: 0.7.0-r2-cobalt
+purpose: future public MEDIA Action for existing KRC GPT
+status: repository candidate / not activated in Builder
+```
+
+The public candidate intentionally excludes private attachment operations, Supadata credit-consent operations, and reserved paid Facebook retrieval operations.
+
+KRC schema regression:
+
+```text
+baseline commit: 24331dcd517c2a4b528b1e45bee7f9d835df613f
+Tests: 33931976922 / SUCCESS
+```
+
+## VoiceBridge repository state
 
 ```text
 repository: kolemasakar/VoiceBridge
@@ -88,9 +103,7 @@ Facebook  -> self-hosted Cobalt -> AssemblyAI universal-2 -> KRCM/Neon
 Telegram  -> public Telegram web -> AssemblyAI universal-2 -> KRCM/Neon
 ```
 
-Supadata remains only as historical/private compatibility code. It is not required by `KRC_MEDIA_PUBLIC_MODE` in the current VoiceBridge repository candidate.
-
-ScrapeCreators paid retrieval remains forbidden in public free-only mode. No automatic paid retrieval/STT fallback is authorized.
+Supadata remains historical/private compatibility code and is not part of the initial public Action contract. ScrapeCreators paid retrieval remains forbidden in public free-only mode. No automatic paid retrieval/STT fallback is authorized.
 
 ## STT provider state
 
@@ -103,12 +116,6 @@ Gemini automatic cutover: NOT IMPLEMENTED
 Gemini public Free activation: separate disclosure + explicit user consent gate
 ```
 
-## Known package gap before R3
-
-The recovery/checkpoint documentation, privacy candidate, VoiceBridge reconciliation note, and PR #45 are synchronized to the Cobalt architecture.
-
-`gpt_store/actions/media_managed_beta_openapi.yaml` still describes the older Supadata-native Action request contract. It must be revised and validated before R3. The public GPT remains unchanged and has no MEDIA Action attached, so this repository mismatch is not a live-public exposure.
-
 ## Gate sequence and current point
 
 ```text
@@ -117,12 +124,12 @@ R1   COMPLETE
 R2-A PASS
 R2-B PASS
 R2-C COMPLETE
-R2   LIVE BASELINE / COBALT REPOSITORY CANDIDATE PASS / DEPLOYMENT + CANARY PENDING
+R2   REPOSITORY READY / LIVE COBALT DEPLOYMENT + BOUNDED CANARY PENDING
 R3   HOLD
 R4   HOLD
 ```
 
-R2 is not complete. The next state-changing gate is exact deployment of the VoiceBridge Cobalt candidate followed by bounded authenticated canaries and Core-isolation verification.
+The repository-side public Action schema gap recorded in checkpoint 82 is closed. R2 is still not complete because the exact Cobalt backend candidate has not been deployed and validated by the bounded four-platform canary.
 
 ## Administrative state
 
@@ -130,6 +137,6 @@ The accidental temporary Render service `noop` has been deleted and its absence 
 
 ## Recovery command
 
-`recover KRC MEDIA BETA checkpoint 82 public Cobalt reconciliation 2026-09-04`
+`recover KRC MEDIA BETA checkpoint 83 public Action schema repository ready 2026-09-05`
 
 Before any state-changing action, reverify current GitHub heads and CI, current Render live deployment, current PR #45 state, and current public GPT Builder configuration.
