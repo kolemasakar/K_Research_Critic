@@ -3,14 +3,11 @@ info:
   title: K-Research & Critic Public MEDIA API
   version: 0.7.0-r2-cobalt
   description: >-
-    Candidate public MEDIA Action contract for supported public YouTube, Instagram,
-    Facebook, and Telegram video URLs. Public YouTube and Instagram retrieval use the
-    self-hosted Cobalt route followed by AssemblyAI universal-2 STT. Facebook uses the
-    accepted Cobalt retrieval/STT route and Telegram uses the accepted public-web
-    retrieval/STT route. Public paid retrieval fallback is not available. Supadata,
-    ScrapeCreators, local attachments, and consent-gated legacy AI credit operations
-    are intentionally not exposed by this public Action schema. MEDIA failures are
-    fail-closed and do not block normal K-Research & Critic Core use.
+    Candidate public MEDIA Action for supported public YouTube, Instagram,
+    Facebook, and Telegram video URLs. YouTube/Instagram/Facebook retrieval uses
+    self-hosted Cobalt where applicable; Telegram uses the accepted public-web
+    route. AssemblyAI universal-2 is the active prerecorded STT provider while
+    Free-plan balance remains. No paid retrieval or paid STT fallback is exposed.
 x-krc-release-state: R2_REPOSITORY_CANDIDATE_NOT_PUBLICLY_ACTIVATED
 x-krc-free-tier-policy:
   paid_retrieval_fallback: false
@@ -23,7 +20,7 @@ paths:
   /api/v1/media/managed:
     get:
       operationId: getPublicMediaCapability
-      summary: Read current public MEDIA capability and routing state
+      summary: Read public MEDIA capability and routing state
       x-openai-isConsequential: false
       responses:
         "200":
@@ -40,11 +37,10 @@ paths:
   /api/v1/media/managed/preflight:
     post:
       operationId: preflightPublicCobaltMedia
-      summary: Check public YouTube or Instagram Cobalt route before transcription
+      summary: Check YouTube or Instagram Cobalt route before transcription
       description: >-
-        Validate a supported public YouTube or Instagram URL and report the zero-credit
-        retrieval route. This operation does not start retrieval or STT and does not
-        require Supadata credit consent.
+        Validate a supported public YouTube or Instagram URL and report the
+        zero-credit Cobalt retrieval route. This does not start provider work.
       x-openai-isConsequential: false
       requestBody:
         required: true
@@ -64,17 +60,17 @@ paths:
         "401":
           description: Action bearer authentication failed.
         "422":
-          description: URL is not a supported public YouTube or Instagram media URL.
+          description: Unsupported public YouTube or Instagram URL.
         "503":
-          description: Public Cobalt retrieval/STT route is not configured.
+          description: Public Cobalt route is not configured.
 
   /api/v1/media/managed/lookup:
     post:
       operationId: lookupPublicCobaltMediaJob
-      summary: Reuse an existing public YouTube or Instagram MEDIA job when available
+      summary: Reuse an existing YouTube or Instagram MEDIA job
       description: >-
-        Look up the durable idempotent job for the same public URL and language hint.
-        This operation does not start a new retrieval or STT request.
+        Look up durable state for the same public URL and language hint without
+        starting another retrieval or STT request.
       x-openai-isConsequential: false
       requestBody:
         required: true
@@ -94,20 +90,19 @@ paths:
         "401":
           description: Action bearer authentication failed.
         "404":
-          description: Matching durable MEDIA job was not found.
+          description: Matching MEDIA job was not found.
         "422":
-          description: URL is not a supported public YouTube or Instagram media URL.
+          description: Unsupported public YouTube or Instagram URL.
         "503":
-          description: Public MEDIA durable state or Cobalt route is unavailable.
+          description: Durable state or Cobalt route is unavailable.
 
   /api/v1/media/managed/transcriptions:
     post:
       operationId: startPublicCobaltMediaTranscription
       summary: Retrieve and transcribe a public YouTube or Instagram video
       description: >-
-        Use the self-hosted Cobalt audio retrieval path and AssemblyAI universal-2 STT.
-        Retrieval credits charged by KRC are zero. No Supadata or paid retrieval fallback
-        is attempted. Duplicate requests reuse durable state instead of repeating provider work.
+        Use self-hosted Cobalt audio retrieval and AssemblyAI universal-2 STT.
+        Retrieval credits are zero and no Supadata or paid fallback is attempted.
       x-openai-isConsequential: false
       requestBody:
         required: true
@@ -127,23 +122,21 @@ paths:
         "401":
           description: Action bearer authentication failed.
         "422":
-          description: Unsupported URL, unusable media, or unsupported multi-asset Instagram response.
+          description: Unsupported URL or unusable media.
         "429":
           description: Project STT safety quota is exhausted.
         "502":
-          description: Cobalt retrieval or STT provider could not be reached safely.
+          description: Retrieval or STT provider could not be reached safely.
         "503":
-          description: Public MEDIA durable state or provider route is unavailable.
+          description: Durable state or provider route is unavailable.
 
   /api/v1/media/managed/facebook-fallback:
     post:
       operationId: startPublicFacebookCobaltTranscription
-      summary: Retrieve a public Facebook video with Cobalt and transcribe it
+      summary: Retrieve and transcribe a public Facebook video
       description: >-
-        Use only for a supported public Facebook Reel/video URL. Retrieval uses the
-        self-hosted Cobalt route with zero KRC retrieval-credit accounting, followed by
-        AssemblyAI STT. Cobalt failure is terminal for this request. ScrapeCreators and
-        automatic paid retrieval fallback are not available.
+        Use self-hosted Cobalt for supported public Facebook video/Reel media,
+        followed by AssemblyAI STT. Cobalt failure is terminal; no paid fallback.
       x-openai-isConsequential: false
       requestBody:
         required: true
@@ -153,7 +146,7 @@ paths:
               $ref: "#/components/schemas/FacebookRequest"
       responses:
         "200":
-          description: Facebook Cobalt MEDIA job completed, failed closed, or reused.
+          description: Facebook MEDIA job completed, failed closed, or reused.
           content:
             application/json:
               schema:
@@ -163,23 +156,21 @@ paths:
         "401":
           description: Action bearer authentication failed.
         "422":
-          description: Source is not a supported public Facebook media URL or media is unavailable.
+          description: Unsupported or unavailable public Facebook media.
         "429":
           description: Project STT safety quota is exhausted.
         "502":
-          description: Cobalt retrieval or STT provider could not be reached safely.
+          description: Retrieval or STT provider could not be reached safely.
         "503":
-          description: Facebook retrieval/STT route is not configured or durable state is unavailable.
+          description: Facebook route or durable state is unavailable.
 
   /api/v1/media/managed/telegram:
     post:
       operationId: startPublicTelegramTranscription
-      summary: Retrieve a public Telegram video and transcribe it
+      summary: Retrieve and transcribe a public Telegram video
       description: >-
-        Use only for a supported public Telegram post URL. Retrieval uses the public
-        Telegram web/media route with zero retrieval credits and no Telegram account,
-        cookies, session, bot token, or paid fallback. AssemblyAI STT may use the bounded
-        project Free-plan safety quota.
+        Use the public Telegram web/media route with zero retrieval credits and no
+        Telegram account, cookies, session, bot token, or paid fallback.
       x-openai-isConsequential: false
       requestBody:
         required: true
@@ -203,9 +194,9 @@ paths:
         "429":
           description: Project STT safety quota is exhausted.
         "502":
-          description: Telegram retrieval or STT provider could not be reached safely.
+          description: Retrieval or STT provider could not be reached safely.
         "503":
-          description: Telegram retrieval/STT route is not configured or durable state is unavailable.
+          description: Telegram route or durable state is unavailable.
 
   /api/v1/media/managed/transcriptions/{job_id}:
     get:
@@ -213,7 +204,12 @@ paths:
       summary: Read durable public MEDIA job status
       x-openai-isConsequential: false
       parameters:
-        - $ref: "#/components/parameters/JobId"
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCM_[A-Za-z0-9-]+$
       responses:
         "200":
           description: Current durable MEDIA job state.
@@ -234,7 +230,12 @@ paths:
       summary: Read timestamped transcript segments for a public MEDIA job
       x-openai-isConsequential: false
       parameters:
-        - $ref: "#/components/parameters/JobId"
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^KRCM_[A-Za-z0-9-]+$
         - name: cursor
           in: query
           required: false
@@ -271,15 +272,6 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
-
-  parameters:
-    JobId:
-      name: job_id
-      in: path
-      required: true
-      schema:
-        type: string
-        pattern: ^KRCM_[A-Za-z0-9-]+$
 
   schemas:
     LanguageHint:
@@ -319,7 +311,7 @@ components:
         url:
           type: string
           format: uri
-          description: Supported public HTTPS Telegram post URL with a numeric post id.
+          description: Supported public HTTPS Telegram post URL with numeric post id.
         language_hint:
           $ref: "#/components/schemas/LanguageHint"
 
@@ -506,7 +498,7 @@ components:
           type: string
         provider_mode:
           type: string
-          description: Public routes normally report cobalt_retrieval_stt, facebook_retrieval_stt, or telegram_public_retrieval_stt.
+          description: Public routes normally use Cobalt, Facebook Cobalt, or Telegram public-web STT modes.
         detected_language:
           anyOf:
             - type: string
