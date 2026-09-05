@@ -4,7 +4,7 @@ import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCHEMA_PATH = ROOT / "gpt_store" / "actions" / "media_managed_beta_openapi.yaml"
+SCHEMA_PATH = ROOT / "gpt_store" / "actions" / "media_public_cobalt_openapi.yaml"
 
 
 def load_schema() -> dict:
@@ -81,3 +81,21 @@ def test_public_capability_declares_free_only_cobalt_routing() -> None:
     assert capability["telegram_retrieval_credits"]["const"] == 0
     assert capability["paid_retrieval_fallback"]["const"] is False
     assert capability["paid_stt_fallback"]["const"] is False
+
+
+def test_public_builder_job_id_parameters_are_inline() -> None:
+    text = SCHEMA_PATH.read_text(encoding="utf-8")
+    schema = load_schema()
+    assert "#/components/parameters/JobId" not in text
+    for path in (
+        "/api/v1/media/managed/transcriptions/{job_id}",
+        "/api/v1/media/managed/transcriptions/{job_id}/segments",
+    ):
+        operation = schema["paths"][path]["get"]
+        job = next((item for item in operation["parameters"] if item.get("name") == "job_id"), None)
+        assert job is not None
+        assert "$ref" not in job
+        assert job["in"] == "path"
+        assert job["required"] is True
+        assert job["schema"]["type"] == "string"
+        assert job["schema"]["pattern"] == "^KRCM_[A-Za-z0-9-]+$"
