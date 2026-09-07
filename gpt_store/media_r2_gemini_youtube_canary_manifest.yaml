@@ -32,6 +32,7 @@ policy:
   paid_retrieval_fallback: false
   paid_stt_fallback: false
   paid_proxy_fallback: false
+  paid_cobalt_hosting_considered: false
   user_cookies_forbidden: true
   user_login_forbidden: true
   youtube_gemini_free_tier_only: true
@@ -53,12 +54,26 @@ live_backend:
   service: voicebridge-krc-media-beta-kolemasakar
   branch: agent/krc-media-gemini-migration
   auto_deploy: false
-  deploy_id: dep-dafgkjm7bikc738hmi20
+  deploy_id: dep-dafhul0n74is73a3nncg
   commit: 68a39d9109455c3e9e69ffeb3a7456998f0620db
   status: LIVE
   repository_pivot_deployed: true
   immediate_rollback_baseline: 52499e4959aa2673f07239c73054cdbeaec0eeac
   historical_rollback: 7c8806713ea75b0809b638f102e31d8d3af86150
+
+cobalt_infrastructure:
+  current_host: render_free
+  service: krc-cobalt-media-beta-kolemasakar
+  service_id: srv-da5ggq6k1f9s738j8d8g
+  deploy_id: dep-dafeelf40ujc73av801g
+  image: ghcr.io/imputnet/cobalt@sha256:63186dd68afd57ce3bb1f62cc4c139f5fa95b9c3e87a3cf5c6e4c7a570523f62
+  acceptance_state: EDGE_429_BLOCKED
+  blocker: edge_http_429_non_json
+  instagram_probe_reproduced: true
+  youtube_control_reproduced: true
+  paid_hosting_remediation: excluded
+  approved_migration_target: oci_always_free
+  endpoint_change_pending: true
 
 acceptance:
   capability_read: PASS
@@ -73,7 +88,11 @@ acceptance:
   youtube_retrieval_provider: gemini_youtube_url
   youtube_retrieval_credits_charged: 0
   youtube_stt_seconds_charged: 0
-  instagram_live_canary: PENDING
+  instagram_live_canary: FAIL_CLOSED_BLOCKED
+  instagram_retrieval_provider: cobalt
+  instagram_retrieval_credits_charged: 0
+  instagram_stt_seconds_charged: 0
+  instagram_assemblyai_started: false
   facebook_live_canary: PENDING
   telegram_live_canary: PENDING
   core_isolation_regression: PENDING
@@ -83,6 +102,7 @@ release:
   r2_gemini_live_deployment_pending: false
   r2_authenticated_youtube_canary_pending: false
   r2_youtube_live_acceptance_pass: true
+  r2_instagram_infrastructure_remediation_pending: true
   r2_non_youtube_canaries_pending: true
   r2_core_isolation_pending: true
   r2_full_pass: false
