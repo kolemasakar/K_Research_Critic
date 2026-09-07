@@ -49,7 +49,7 @@ def test_canary_instructions_encode_consent_payload_and_forbid_old_supadata_cred
     assert '"tier": "free"' in text
     assert '"data_use_acknowledged": true' in text
     assert "may be used" in lower or "можуть використовуватися" in lower
-    assert "Do NOT add a generic MEDIA-start confirmation" in text
-    assert "Do NOT call `startPublicGeminiYoutubeTranscription`" in text
-    assert "No Cobalt, AssemblyAI, paid Gemini" in text
-    assert "Supadata-style credit balances" in text
+    assert "do not add a generic media-start confirmation" in lower
+    assert "do not call `startpublicgeminiyoutubetranscription`" in lower
+    assert "no cobalt, assemblyai, paid gemini" in lower
+    assert "supadata-style credit balances" in lower
