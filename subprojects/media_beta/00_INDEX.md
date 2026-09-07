@@ -2,8 +2,8 @@
 
 Канонічний індекс документації K-Research & Critic MEDIA BETA.
 
-Version: 6.3
-Status: ACTIVE / CHECKPOINT_84 / R2_REPOSITORY_PIVOT_READY / LIVE_GEMINI_DEPLOYMENT_AND_CANARY_PENDING / R3_HOLD
+Version: 6.4
+Status: ACTIVE / CHECKPOINT_85 / HANDOFF_READY / R2_REPOSITORY_PIVOT_READY / LIVE_GEMINI_DEPLOYMENT_AND_CANARY_PENDING / R3_HOLD
 Updated: 2026-09-07
 
 ## Product boundary
@@ -14,7 +14,7 @@ Current product reality:
 
 ```text
 public KRC: already published / user-accessible / unchanged
-private KRC MEDIA BETA: Action-enabled test surface with stale pre-pivot Builder package
+private KRC MEDIA BETA: Action-enabled test surface; checkpoint-85 Builder package not applied
 future public MEDIA target: same existing public KRC identity
 ```
 
@@ -27,21 +27,22 @@ Core KRC               -> remains user-accessible and functional
 
 ## Canonical reading order
 
-1. `84_R2_YOUTUBE_GEMINI_DIRECT_REPOSITORY_READY_2026_09_07.md` - current canonical recovery checkpoint.
-2. `83_R2_PUBLIC_ACTION_SCHEMA_REPOSITORY_READY_2026_09_05.md` - previous Cobalt public Action repository checkpoint.
-3. `82_R2_PUBLIC_COBALT_RECONCILIATION_REPOSITORY_SYNC_2026_09_04.md` - Cobalt routing reconciliation checkpoint.
-4. `81_R2_LIVE_PROMOTION_PARTIAL_CANARY_2026_09_04.md` - earlier live promotion/partial canary baseline.
-5. `80_R2C_PUBLIC_PRIVACY_RENDER_PROMOTION_READY_2026_09_04.md` - pre-promotion privacy/release plan.
-6. `79_R2B_FAILURE_ISOLATION_FREE_QUOTA_PASS_2026_09_04.md` - failure-isolation evidence.
-7. `78_R2A_PUBLIC_FREE_TIER_ADMISSION_PASS_2026_09_04.md` - public free-only admission policy.
-8. `75_R1_REPOSITORY_INTEGRATION_COMPLETE_CHECKPOINT_2026_09_04.md` - completed R1 repository integration.
-9. `planning/PUBLIC_KRC_MEDIA_INTEGRATION_UPDATE_SAFETY_PLAN_2026_09_04.md` - R0-R4 release safety plan.
+1. `85_R2_GEMINI_DIRECT_HANDOFF_REPOSITORY_SYNC_2026_09_07.md` - current canonical handoff/recovery checkpoint.
+2. `84_R2_YOUTUBE_GEMINI_DIRECT_REPOSITORY_READY_2026_09_07.md` - accepted Gemini-direct YouTube repository pivot.
+3. `83_R2_PUBLIC_ACTION_SCHEMA_REPOSITORY_READY_2026_09_05.md` - previous Cobalt public Action repository checkpoint.
+4. `82_R2_PUBLIC_COBALT_RECONCILIATION_REPOSITORY_SYNC_2026_09_04.md` - Cobalt routing reconciliation checkpoint.
+5. `81_R2_LIVE_PROMOTION_PARTIAL_CANARY_2026_09_04.md` - earlier live promotion/partial canary baseline.
+6. `80_R2C_PUBLIC_PRIVACY_RENDER_PROMOTION_READY_2026_09_04.md` - pre-promotion privacy/release plan.
+7. `79_R2B_FAILURE_ISOLATION_FREE_QUOTA_PASS_2026_09_04.md` - failure-isolation evidence.
+8. `78_R2A_PUBLIC_FREE_TIER_ADMISSION_PASS_2026_09_04.md` - public free-only admission policy.
+9. `75_R1_REPOSITORY_INTEGRATION_COMPLETE_CHECKPOINT_2026_09_04.md` - completed R1 repository integration.
+10. `planning/PUBLIC_KRC_MEDIA_INTEGRATION_UPDATE_SAFETY_PLAN_2026_09_04.md` - R0-R4 release safety plan.
 
 Recovery pointer:
 
 `../../docs/KRC_MEDIA_BETA_RECOVERY_POINTER.md`
 
-## Action contracts
+## Current Action contracts
 
 Current mixed free-only public candidate:
 
@@ -89,16 +90,18 @@ The Cobalt API key was initially Facebook-only and returned `error.api.service.d
 error.api.youtube.login
 ```
 
-The post-change job was fresh, failed before STT, and charged zero retrieval credits / zero STT seconds. This established a YouTube datacenter anti-bot/login boundary incompatible with the accepted no-cookie/no-login/no-paid-proxy public policy.
+The post-change job failed before STT and charged zero retrieval credits / zero STT seconds. This established a YouTube datacenter anti-bot/login boundary incompatible with the accepted no-cookie/no-login/no-paid-proxy public policy.
 
 ## VoiceBridge repository state
+
+Checkpoint-85 handoff baseline:
 
 ```text
 repository: kolemasakar/VoiceBridge
 branch: agent/krc-media-gemini-migration
-current head: bae3db8e646baf003689c1d8a8e502d9d2ad832d
+head: bae3db8e646baf003689c1d8a8e502d9d2ad832d
 Validate: 34146243530 / SUCCESS
-PR #45: OPEN / DRAFT / UNMERGED
+PR #45: OPEN / DRAFT / UNMERGED / mergeable=true
 ```
 
 Dedicated Gemini YouTube implementation:
@@ -108,20 +111,24 @@ src/cloud/src/public_gemini_youtube.ts
 src/cloud/tests/public_gemini_youtube.test.ts
 ```
 
-The final candidate no longer contains the temporary Cobalt startup diagnostic used during blocker isolation.
+The accepted candidate no longer contains the temporary Cobalt startup diagnostic used during blocker isolation.
 
 ## Current live backend versus repository candidate
+
+Read-only verification on 2026-09-07:
 
 ```text
 LIVE Render commit:       52499e4959aa2673f07239c73054cdbeaec0eeac
 LIVE normal-mode deploy:  dep-dafekmid0e5s73c3sg10
+configured branch:        agent/krc-media-transcript
+autoDeploy:               no
 REPOSITORY CANDIDATE:     bae3db8e646baf003689c1d8a8e502d9d2ad832d
 IMMEDIATE LIVE BASELINE:  52499e4959aa2673f07239c73054cdbeaec0eeac
 EARLIER ROLLBACK:         7c8806713ea75b0809b638f102e31d8d3af86150
 HISTORICAL R2 ROLLBACK:   2f0f02769dbdf2e8240e6b08867ecef2faaede16
 ```
 
-The Gemini-direct repository candidate is NOT deployed yet. Render and Neon were not changed by checkpoint 84 implementation.
+The Gemini-direct repository candidate is NOT deployed. No Render or Neon mutation is part of checkpoint 85.
 
 ## Private R2 canary package
 
@@ -167,8 +174,20 @@ R4   HOLD
 
 R2 is not complete until the exact accepted VoiceBridge candidate is deployed, the private canary Builder package is applied, bounded authenticated canaries pass for all four platforms, and Core isolation is reverified.
 
+## Next handoff sequence
+
+```text
+1. recover checkpoint 85
+2. reverify GitHub heads/CI and Render live state
+3. exact Gemini-direct VoiceBridge deploy
+4. private MEDIA BETA Builder canary package switch
+5. bounded four-platform authenticated canary
+6. Render + Neon + Core isolation verification
+7. only after R2 PASS: separate R3 owner gate
+```
+
 ## Recovery command
 
-`recover KRC MEDIA BETA checkpoint 84 YouTube Gemini direct repository ready 2026-09-07`
+`recover KRC MEDIA BETA checkpoint 85 Gemini direct handoff repository sync 2026-09-07`
 
 Before any state-changing action, reverify GitHub heads/CI, Render live deployment, PR #45 state, and private/public GPT Builder configuration.
