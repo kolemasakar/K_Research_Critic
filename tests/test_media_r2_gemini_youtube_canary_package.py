@@ -14,14 +14,39 @@ def test_canary_manifest_points_to_mixed_free_public_schema() -> None:
     assert manifest["instructions"]["file"].endswith(
         "GPT_STORE_MEDIA_R2_GEMINI_YOUTUBE_CANARY_INSTRUCTIONS.md"
     )
-    assert manifest["instructions"]["builder_runtime_applied"] is False
+    assert manifest["instructions"]["builder_runtime_applied"] is True
+    assert manifest["instructions"]["builder_update_required"] is False
     assert manifest["actions"]["media_transcript"]["schema"] == (
         "gpt_store/actions/media_public_free_openapi.yaml"
     )
+    assert manifest["actions"]["media_transcript"]["builder_runtime_applied"] is True
     assert manifest["routing"]["youtube"] == "gemini_free_direct_public_url"
     assert manifest["routing"]["instagram"] == "cobalt_to_assemblyai_free"
     assert manifest["routing"]["facebook"] == "cobalt_to_assemblyai_free"
     assert manifest["routing"]["telegram"] == "telegram_public_web_to_assemblyai_free"
+
+
+def test_canary_manifest_records_youtube_live_acceptance_without_r3_release() -> None:
+    manifest = yaml.safe_load(MANIFEST.read_text(encoding="utf-8"))
+    acceptance = manifest["acceptance"]
+    release = manifest["release"]
+
+    assert acceptance["capability_read"] == "PASS"
+    assert acceptance["youtube_consent_gate"] == "PASS"
+    assert acceptance["youtube_provider_execution"] == "PASS"
+    assert acceptance["youtube_durable_neon_completion"] == "PASS"
+    assert acceptance["youtube_duplicate_reuse"] == "PASS"
+    assert acceptance["youtube_new_provider_call_on_reuse"] is False
+    assert acceptance["youtube_retrieval_credits_charged"] == 0
+    assert acceptance["youtube_stt_seconds_charged"] == 0
+    assert acceptance["instagram_live_canary"] == "PENDING"
+    assert acceptance["facebook_live_canary"] == "PENDING"
+    assert acceptance["telegram_live_canary"] == "PENDING"
+    assert acceptance["core_isolation_regression"] == "PENDING"
+    assert release["r2_youtube_live_acceptance_pass"] is True
+    assert release["r2_full_pass"] is False
+    assert release["r3_ready"] is False
+    assert release["r3_public_gpt_hold"] is True
 
 
 def test_canary_policy_requires_one_gemini_data_use_consent_and_no_generic_media_confirmation() -> None:
