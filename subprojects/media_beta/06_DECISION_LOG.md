@@ -1,9 +1,9 @@
 # MEDIA BETA Decision Log
 Реєстр чинних і історичних рішень MEDIA BETA з актуальними release-hold рішеннями.
 
-Version: 2.5
+Version: 2.6
 Status: ACTIVE
-Updated: 2026-09-04
+Updated: 2026-09-07
 
 This file is the compact current decision index. Detailed historical rationale remains available in Git history and the numbered phase/acceptance records.
 
@@ -356,3 +356,46 @@ VoiceBridge technical plan:
 `kolemasakar/VoiceBridge` -> `docs/planning/2026-09-04_KRC_PUBLIC_GPT_MEDIA_INTEGRATION_SAFETY_PREFLIGHT.md`
 
 This decision changes planning/governance only. It does not authorize or perform repository merge, permanent Render promotion, live GPT Update, new GPT publication, external tester expansion, public MEDIA rollout, Gemini prerecorded activation, Hybrid C/D implementation, or automatic paid fallback.
+
+## D034 - Paid Cobalt Hosting Is Excluded; Migrate the Self-Hosted Cobalt Route to OCI Always Free
+
+Decision: APPROVED / R2_REMEDIATION / R3_HOLD
+Date: 2026-09-07
+
+The R2 bounded Instagram canary correctly failed closed before STT, with zero retrieval credits and zero STT charges. Two Instagram retrieval-only diagnostics and an independent YouTube control reproduced an `HTTP 429` non-JSON response from the current Render Cobalt endpoint. The control response was `text/plain; charset=utf-8` with `server=cloudflare`, so the accepted blocker description is an edge-level non-JSON response before a usable Cobalt application JSON response.
+
+The owner explicitly rejected paid hosting as a remediation path:
+
+```text
+Render paid instance: NOT CONSIDERED
+paid Cobalt hosting: NOT CONSIDERED
+paid retrieval fallback: FORBIDDEN
+paid STT fallback: FORBIDDEN
+paid proxy fallback: FORBIDDEN
+FREE_TIER_ONLY: RETAINED
+```
+
+Approved remediation:
+
+```text
+self-hosted Cobalt -> migrate from Render Free path to OCI Always Free VM
+VoiceBridge        -> remain on Render Free
+Neon               -> unchanged
+private MEDIA BETA -> unchanged
+public KRC         -> unchanged
+```
+
+Execution constraints:
+
+- OCI preflight must confirm an Always Free eligible resource before creation;
+- no paid OCI resource may be created as part of this decision;
+- Cobalt must remain API-key protected and exposed through HTTPS;
+- no provider secret is placed in GPT instructions, Action schema, or chat;
+- after OCI retrieval-only preflight PASS, only `KRC_MEDIA_COBALT_ENDPOINT` should change in VoiceBridge;
+- Instagram must be re-canary-tested before Facebook;
+- full R2 still requires Instagram, Facebook, Telegram, no-paid-fallback delta verification, and Core KRC isolation regression;
+- R3 and R4 remain HOLD.
+
+Canonical checkpoint:
+
+`87_R2_INSTAGRAM_COBALT_EDGE_BLOCKER_OCI_FREE_MIGRATION_CHECKPOINT_2026_09_07.md`
