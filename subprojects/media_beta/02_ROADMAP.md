@@ -1,243 +1,172 @@
 # MEDIA BETA Roadmap
-Поточний roadmap приватного K-Research & Critic MEDIA BETA.
 
-Version: 4.6
-Status: RELEASE_HOLD_OWNER_TESTING / CROSS_SYSTEM_CHECKPOINT_73 / R0_PUBLIC_KRC_UPDATE_SAFETY_PREFLIGHT_NEXT
-Updated: 2026-09-04
+Поточний roadmap K-Research & Critic MEDIA BETA після live YouTube Gemini acceptance.
+
+Version: 4.7
+Status: R2_PARTIAL_PASS / YOUTUBE_LIVE_ACCEPTED / NON_YOUTUBE_AND_CORE_ISOLATION_PENDING / R3_HOLD
+Updated: 2026-09-07
 
 ## Product position
 
-`K-Research & Critic - MEDIA BETA` is a closed-beta module of the already-published `K-Research & Critic` product.
+`K-Research & Critic - MEDIA BETA` is a private owner-only validation surface for an additive MEDIA capability planned for the already-published `K-Research & Critic` GPT.
 
 ```text
-product/roadmap authority: kolemasakar/K_Research_Critic
-public Core: main / already published GPT / owner-confirmed user-accessible
-closed-beta product branch: agent/video-url-research
-private MEDIA BETA GPT: owner-only / not separately published
-technology/backend implementation source: kolemasakar/VoiceBridge
-KRC media migration branch: agent/krc-media-gemini-migration
+product/release authority: kolemasakar/K_Research_Critic
+public KRC: existing published GPT / unchanged
+private MEDIA BETA GPT: owner-only
+backend implementation: kolemasakar/VoiceBridge
+VoiceBridge branch: agent/krc-media-gemini-migration
 ```
 
-The future integration target is the **same existing published KRC identity**. MEDIA must remain additive and failure-isolated; a MEDIA backend/action failure must never make Core KRC unavailable.
-
-## Current cross-system recovery authority
-
-`73_PUBLIC_KRC_MEDIA_VOICEBRIDGE_CROSS_SYSTEM_TRANSITION_CHECKPOINT_2026_09_04.md`
-
-This checkpoint freezes public KRC, private MEDIA BETA, VoiceBridge, their relationships, current repository/CI state, and the R0-R4 continuation plan. It does not itself change any live runtime.
-
-## Accepted runtime baseline
+Critical invariant:
 
 ```text
-A9 / A9.10 / A10                           ACCEPTED
-Builder package                            0.9.1-beta-a10
-Action schema                              0.6.0-a9.10
-release state                              RELEASE_HOLD_OWNER_TESTING
-KRC prerecorded provider                   AssemblyAI universal-2
-Gemini prerecorded normal activation       FALSE
+MEDIA unavailable/fails -> MEDIA unavailable/fails closed
+Core KRC               -> remains usable and accessible
 ```
 
-Policy remains:
+## Canonical recovery authority
+
+`86_R2_YOUTUBE_GEMINI_LIVE_ACCEPTANCE_R3_READINESS_HOLD_2026_09_07.md`
+
+Recovery command:
+
+`recover KRC MEDIA BETA checkpoint 86 YouTube Gemini live acceptance R3 readiness hold 2026-09-07`
+
+## Current provider routing
 
 ```text
-Facebook Cobalt failure -> unavailable
-NO automatic paid fallback
-ScrapeCreators reserve only / inactive
-Telegram public-only / zero retrieval credits
-local attachment max 32 MiB / zero retrieval credits
+YouTube   -> Gemini Developer API Free Tier direct public URL -> durable KRCM/Neon
+Instagram -> self-hosted Cobalt -> AssemblyAI universal-2 Free -> durable KRCM/Neon
+Facebook  -> self-hosted Cobalt -> AssemblyAI universal-2 Free -> durable KRCM/Neon
+Telegram  -> public Telegram web -> AssemblyAI universal-2 Free -> durable KRCM/Neon
 ```
 
-## M3 - Provider evidence
-
-Status: CLOSED.
+Policy:
 
 ```text
-first A/B tranche: COMPLETE
-expanded M3B A/B: COMPLETE
-manual factual/hallucination review: COMPLETE
-seven-case global winner: NOT_ESTABLISHED
-current provider retained: AssemblyAI universal-2
-provider cutover now: FALSE
+Supadata public: inactive
+ScrapeCreators public paid retrieval: forbidden
+paid retrieval fallback: false
+paid STT fallback: false
+paid proxy fallback: false
+YouTube Cobalt fallback: none
+YouTube AssemblyAI fallback: none
+user cookies/login: forbidden
 ```
 
-## Deferred Hybrid C/D
+## R0 - Public KRC Update Safety Preflight
 
-Status: PLANNED / NOT_IMPLEMENTED.
+Status: PASS.
 
-Implementation trigger remains AssemblyAI free-credit exhaustion, followed by fresh owner authorization and revalidation of mutable Gemini quota/model/privacy assumptions.
+The existing public KRC identity was confirmed accessible/editable and its public Builder boundary remained unchanged during R2 recovery. No MEDIA Action is attached to public KRC.
 
-Product plan:
+## R1 - Repository integration
 
-`69_POST_ASSEMBLYAI_FREE_CREDITS_HYBRID_STT_PLAN_2026_09_02.md`
+Status: COMPLETE.
 
-## M4 - New-infrastructure readiness
+KRC repository now contains the public MEDIA candidate Action, private canary package, privacy candidate, regression tests, and recovery documentation.
 
-### M4.0 preflight - COMPLETE
+## R2 - Permanent MEDIA backend promotion/readiness
 
-Initial repository preflight found missing `ffmpeg`/`ffprobe` and `psql` in the final VoiceBridge runtime image.
+Status: PARTIAL PASS.
 
-### M4.1 image parity remediation - COMPLETE / ACCEPTED
-
-Exact accepted evidence:
+Completed:
 
 ```text
-VoiceBridge target commit: 6a9491359795840ec9e79c9edc0ea82f595e9784
-Validate run: 33577022166
-final image build: PASS
-ffmpeg/ffprobe: PASS
-psql: PASS
-no-provider startup smoke: PASS
+R2-A public free-tier admission: PASS
+R2-B failure isolation/free quota: PASS
+R2-C privacy/promotion preparation: COMPLETE
+exact VoiceBridge Gemini-direct deployment: PASS
+Render health/startup: PASS
+private MEDIA BETA Builder activation: PASS
+Action bearer auth: PASS
+capability read: PASS
+YouTube Gemini consent canary: PASS
+YouTube durable completion: PASS
+YouTube transcript retrieval: PASS
+YouTube duplicate reuse/idempotency: PASS
+YouTube no-paid/no-fallback boundary: PASS
 ```
 
-### M4.2 bounded owner-only canary - COMPLETE / ACCEPTED
+Exact live backend:
 
 ```text
-workflow run: 33580592224
-result: SUCCESS
-exact target temporarily live: 6a9491359795840ec9e79c9edc0ea82f595e9784
-real STT fixture: public Telegram techcrimes/12107
-provider: AssemblyAI universal-2
-STT seconds: 53
-retrieval credits: 0
-provider cleanup: PASS
-durable Neon readback: PASS
-duplicate reuse: PASS
-STT reservation rows for job: 1
-invalid/private Telegram boundary: PASS
-mandatory rollback: PASS
+Render service: voicebridge-krc-media-beta-kolemasakar
+branch: agent/krc-media-gemini-migration
+autoDeploy: no
+live commit: 68a39d9109455c3e9e69ffeb3a7456998f0620db
+live deploy: dep-dafgkjm7bikc738hmi20
+rollback baseline: 52499e4959aa2673f07239c73054cdbeaec0eeac
 ```
 
-The isolated Render service was restored to exact pre-canary commit:
-
-`2f0f02769dbdf2e8240e6b08867ecef2faaede16`
-
-VoiceBridge authority:
-
-`docs/history/2026-09-02_KRC_MEDIA_M4_OWNER_CANARY_ACCEPTANCE.md`
-
-### M4 post-canary state
+Still required before full R2 PASS:
 
 ```text
-M4_IMAGE_PARITY: PASS
-M4_OWNER_CANARY: PASS
-M4_PERMANENT_BACKEND_PROMOTION: NOT_AUTHORIZED
+1. bounded Instagram canary on current deployment
+2. bounded Facebook canary on current deployment
+3. bounded Telegram canary on current deployment
+4. Render + Neon delta/no-paid-fallback verification for remaining routes
+5. Core KRC isolation regression including forced MEDIA failure
 ```
 
-## Current repository integration risk
+## R3 - Update existing published KRC GPT
 
-Checkpoint 73 records the current KRC MEDIA branch as:
+Status: HOLD / NOT READY.
 
-```text
-PR #8: OPEN / DRAFT / UNMERGED / mergeable=false / dirty
-branch vs main: diverged
-ahead_by: 568
-behind_by: 78
-```
+R3 cannot start until full R2 PASS is recorded.
 
-Therefore direct merge of PR #8 as-is is not the next action. R1 requires a dedicated integration/conflict strategy after R0 passes.
-
-VoiceBridge PR #45 remains:
-
-```text
-OPEN / DRAFT / UNMERGED / mergeable=true
-```
-
-## Public KRC + MEDIA integration safety plan
-
-Product plan:
-
-`planning/PUBLIC_KRC_MEDIA_INTEGRATION_UPDATE_SAFETY_PLAN_2026_09_04.md`
-
-VoiceBridge technical plan:
-
-`docs/planning/2026-09-04_KRC_PUBLIC_GPT_MEDIA_INTEGRATION_SAFETY_PREFLIGHT.md`
-
-### R0 - Public KRC Update Safety Preflight
-
-Status: REQUIRED NEXT / NO LIVE CHANGE.
-
-Required evidence includes:
-
-- current public KRC URL/identity and sharing/publication state;
-- same existing GPT can still be edited by owner;
-- a safe `Update` path exists without creating/publishing a new GPT;
-- current OpenAI update/public-Action requirements are revalidated;
-- Privacy Policy requirements/URL are satisfied;
-- current GPT configuration is captured sufficiently for rollback/reconstruction;
-- current Actions/knowledge/capabilities/instructions baseline is recorded;
-- public KRC identity remains preserved.
-
-If safe update of the existing published GPT cannot be verified without a new publication event, STOP.
-
-### R1 - Repository integration
-
-Status: HOLD until R0 PASS + explicit owner authorization.
-
-Purpose: integrate selected MEDIA code/docs into the KRC repository while leaving the live published GPT untouched.
-
-Required invariant:
-
-```text
-MEDIA failure/unavailability -> MEDIA unavailable
-Core KRC -> remains usable
-```
-
-R1 must resolve current branch divergence/conflicts explicitly and pass Core + MEDIA regression tests. R1 does not authorize R2 or R3.
-
-### R2 - Permanent MEDIA backend promotion/readiness
-
-Status: HOLD / separate owner decision.
-
-Before promotion, verify exact Render target/rollback, Neon durability, public-user admission/auth design, provider/quota policies, Cobalt-only Facebook behavior, no automatic paid fallback, and failure isolation from Core.
-
-R2 does not authorize live GPT update.
-
-### R3 - Update existing published KRC GPT
-
-Status: HOLD / critical live-product gate.
+When R2 is complete, R3 remains a separate critical owner gate:
 
 ```text
 existing published KRC
   -> Edit
-  -> Draft changes only
+  -> draft changes only
   -> add MEDIA additively
   -> Preview Core regression
   -> Preview MEDIA regression
+  -> forced MEDIA failure / Core remains usable
   -> explicit owner authorization
   -> Update existing GPT
 ```
 
-Do not create or depend on a new GPT publication event.
+No current authorization exists to modify or update the public GPT.
 
-### R4 - Post-update public-access verification
+## R4 - Post-update public verification
 
 Status: HOLD until R3.
 
-Verify same public KRC URL, Core without MEDIA, MEDIA operation, MEDIA failure isolation, preserved sharing state, and rollback availability.
+Required after any future R3 update:
 
-## Gate model
+- same public KRC identity/URL remains accessible;
+- Core tasks work without MEDIA;
+- MEDIA works only as intended;
+- MEDIA failure does not degrade Core;
+- sharing state remains intact;
+- rollback remains available.
+
+## Current gate model
 
 ```text
-R0  Public KRC Update Safety Preflight
-R1  Repository integration
-R2  Permanent MEDIA backend promotion/readiness
-R3  Update existing published KRC GPT
-R4  Post-update public-access + Core regression verification
+R0  PASS
+R1  COMPLETE
+R2  PARTIAL PASS / remaining non-YouTube canaries + Core isolation
+R3  HOLD / NOT READY
+R4  HOLD
 ```
 
-Every gate is independent. Approval of one must never imply approval of the next.
-
-## M5 - Provider/new-infrastructure cutover
-
-Status: NOT_AUTHORIZED.
-
-Gemini prerecorded remains inactive and Hybrid C/D remains deferred.
+Every gate remains independent. Approval of one does not imply approval of the next.
 
 ## Exact continuation point
 
 ```text
-R0 PUBLIC KRC UPDATE SAFETY PREFLIGHT
-NO LIVE GPT CHANGE
-NO DIRECT MERGE OF CURRENT DIRTY PR #8
-NO PERMANENT BACKEND PROMOTION / GPT UPDATE WITHOUT SEPARATE AUTHORIZATION
+R2 REMAINING ACCEPTANCE
+- Instagram
+- Facebook
+- Telegram
+- Render/Neon delta + no-paid-fallback checks
+- Core isolation regression
+
+NO PUBLIC GPT CHANGE
+NO PR #45 MERGE
 ```
