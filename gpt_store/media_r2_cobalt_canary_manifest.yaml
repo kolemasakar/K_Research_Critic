@@ -1,0 +1,49 @@
+schema_version: "0.1-r2-canary"
+
+product:
+  name: K-Research & Critic - MEDIA BETA
+  publication_state: private_owner_only
+  purpose: authenticated_r2_public_media_canary
+
+instructions:
+  file: prompts/GPT_STORE_MEDIA_R2_COBALT_CANARY_INSTRUCTIONS.md
+  version: "0.1.0-r2-cobalt-canary"
+  builder_runtime_applied: false
+  builder_update_required: true
+
+actions:
+  media_transcript:
+    enabled: true
+    schema: gpt_store/actions/media_public_cobalt_openapi.yaml
+    schema_version: "0.7.0-r2-cobalt"
+    authentication: bearer_api_key
+    server: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
+
+routing:
+  youtube: cobalt_to_assemblyai
+  instagram: cobalt_to_assemblyai
+  facebook: cobalt_to_assemblyai
+  telegram: telegram_public_web_to_assemblyai
+
+policy:
+  retrieval_credits: 0
+  supadata_active: false
+  scrapecreators_active: false
+  paid_retrieval_fallback: false
+  paid_stt_fallback: false
+  gemini_prerecorded_active: false
+  media_start_confirmation_for_zero_credit_routes: false
+  duplicate_media_confirmation_forbidden: true
+  criticprofile_confirmation_remains_separate: true
+
+live_backend:
+  service: voicebridge-krc-media-beta-kolemasakar
+  deploy: dep-dafbqf8n74is739aqvt0
+  commit: 5003689ad2fe4c850d47dc7777c50470820b0bff
+  immediate_rollback: 7c8806713ea75b0809b638f102e31d8d3af86150
+
+release:
+  r2_backend_live: true
+  r2_authenticated_canary_pending: true
+  r3_public_gpt_hold: true
+  r4_public_regression_hold: true
