@@ -1,4 +1,4 @@
-schema_version: "0.2-r2-canary"
+schema_version: "0.3-r2-live-canary"
 
 product:
   name: K-Research & Critic - MEDIA BETA
@@ -8,8 +8,8 @@ product:
 instructions:
   file: prompts/GPT_STORE_MEDIA_R2_GEMINI_YOUTUBE_CANARY_INSTRUCTIONS.md
   version: "0.2.0-r2-gemini-youtube-canary"
-  builder_runtime_applied: false
-  builder_update_required: true
+  builder_runtime_applied: true
+  builder_update_required: false
 
 actions:
   media_transcript:
@@ -18,6 +18,7 @@ actions:
     schema_version: "0.8.0-r2-gemini-youtube"
     authentication: bearer_api_key
     server: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
+    builder_runtime_applied: true
 
 routing:
   youtube: gemini_free_direct_public_url
@@ -42,20 +43,49 @@ policy:
 
 repository_candidate:
   voicebridge_branch: agent/krc-media-gemini-migration
-  voicebridge_commit: bae3db8e646baf003689c1d8a8e502d9d2ad832d
-  voicebridge_validate: 34146243530
+  voicebridge_commit: 68a39d9109455c3e9e69ffeb3a7456998f0620db
+  voicebridge_validate: 34147736126
   voicebridge_validate_conclusion: SUCCESS
+  voicebridge_pr: 45
+  voicebridge_pr_state: open_draft_unmerged
 
 live_backend:
   service: voicebridge-krc-media-beta-kolemasakar
-  commit: 52499e4959aa2673f07239c73054cdbeaec0eeac
-  repository_pivot_deployed: false
+  branch: agent/krc-media-gemini-migration
+  auto_deploy: false
+  deploy_id: dep-dafgkjm7bikc738hmi20
+  commit: 68a39d9109455c3e9e69ffeb3a7456998f0620db
+  status: LIVE
+  repository_pivot_deployed: true
   immediate_rollback_baseline: 52499e4959aa2673f07239c73054cdbeaec0eeac
   historical_rollback: 7c8806713ea75b0809b638f102e31d8d3af86150
 
+acceptance:
+  capability_read: PASS
+  youtube_consent_gate: PASS
+  youtube_provider_execution: PASS
+  youtube_durable_neon_completion: PASS
+  youtube_segment_retrieval: PASS
+  youtube_duplicate_reuse: PASS
+  youtube_new_provider_call_on_reuse: false
+  youtube_provider_mode: youtube_gemini_direct
+  youtube_provider_model: gemini-3.7-flash
+  youtube_retrieval_provider: gemini_youtube_url
+  youtube_retrieval_credits_charged: 0
+  youtube_stt_seconds_charged: 0
+  instagram_live_canary: PENDING
+  facebook_live_canary: PENDING
+  telegram_live_canary: PENDING
+  core_isolation_regression: PENDING
+
 release:
   r2_repository_pivot_ready: true
-  r2_gemini_live_deployment_pending: true
-  r2_authenticated_canary_pending: true
+  r2_gemini_live_deployment_pending: false
+  r2_authenticated_youtube_canary_pending: false
+  r2_youtube_live_acceptance_pass: true
+  r2_non_youtube_canaries_pending: true
+  r2_core_isolation_pending: true
+  r2_full_pass: false
+  r3_ready: false
   r3_public_gpt_hold: true
   r4_public_regression_hold: true
