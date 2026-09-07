@@ -1,5 +1,4 @@
 # K-Research & Critic - MEDIA BETA Recovery Pointer
-
 Канонічний покажчик поточного стану MEDIA BETA після exact Gemini-direct deployment, private Builder activation, YouTube live acceptance і durable reuse validation.
 
 Status: ACTIVE POINTER / CHECKPOINT 86 / R2 YOUTUBE LIVE ACCEPTED / NON-YOUTUBE + CORE ISOLATION PENDING / R3 HOLD
