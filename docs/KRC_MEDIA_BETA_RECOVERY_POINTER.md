@@ -1,8 +1,8 @@
 # K-Research & Critic - MEDIA BETA Recovery Pointer
-Канонічний покажчик поточного стану MEDIA BETA після розділення приватного та публічного Action-контрактів і підготовки public Cobalt schema.
+Канонічний покажчик поточного стану MEDIA BETA після R2 pivot на consent-gated Gemini Free direct YouTube processing.
 
-Status: ACTIVE POINTER / CHECKPOINT 83 / R2 REPOSITORY READY / LIVE COBALT DEPLOYMENT + CANARY PENDING / R3 HOLD
-Updated: 2026-09-05
+Status: ACTIVE POINTER / CHECKPOINT 84 / R2 REPOSITORY PIVOT READY / LIVE GEMINI DEPLOYMENT + CANARY PENDING / R3 HOLD
+Updated: 2026-09-07
 
 `K-Research & Critic - MEDIA BETA` remains an additive MEDIA capability planned for the existing published `K-Research & Critic` identity.
 
@@ -18,7 +18,7 @@ Branch:
 
 Path:
 
-`subprojects/media_beta/83_R2_PUBLIC_ACTION_SCHEMA_REPOSITORY_READY_2026_09_05.md`
+`subprojects/media_beta/84_R2_YOUTUBE_GEMINI_DIRECT_REPOSITORY_READY_2026_09_07.md`
 
 ## Current gate state
 
@@ -28,109 +28,114 @@ R1   COMPLETE
 R2-A PASS
 R2-B PASS
 R2-C COMPLETE
-R2   REPOSITORY READY / LIVE COBALT DEPLOYMENT + BOUNDED CANARY PENDING
+R2   REPOSITORY PIVOT READY / LIVE GEMINI DEPLOYMENT + AUTHENTICATED CANARY PENDING
 R3   HOLD
 R4   HOLD
 ```
 
-## Action contract split
-
-Private MEDIA BETA compatibility contract:
+## Current public candidate contract
 
 ```text
-gpt_store/actions/media_managed_beta_openapi.yaml
-version: 0.6.0-a9.10
-status: preserved for private/historical beta compatibility
-```
-
-Initial public MEDIA candidate contract:
-
-```text
-gpt_store/actions/media_public_cobalt_openapi.yaml
-version: 0.7.0-r2-cobalt
+gpt_store/actions/media_public_free_openapi.yaml
+version: 0.8.0-r2-gemini-youtube
 status: repository candidate / not publicly activated
 ```
 
-The public contract exposes only the accepted initial URL routes. It does not expose Supadata credit operations, ScrapeCreators paid retrieval operations, local attachment transcription, or attachment probe operations.
-
-KRC schema validation baseline:
+Historical repository contracts remain preserved:
 
 ```text
-commit: 24331dcd517c2a4b528b1e45bee7f9d835df613f
-Tests: 33931976922 / SUCCESS
+gpt_store/actions/media_public_cobalt_openapi.yaml  version 0.7.0-r2-cobalt
+gpt_store/actions/media_managed_beta_openapi.yaml   version 0.6.0-a9.10
 ```
 
-## Current live backend
+The new public candidate routes YouTube only through the dedicated consent-gated Gemini Free direct-URL operations. It does not expose Supadata credit operations, ScrapeCreators paid retrieval, local attachments, paid proxy fallback, or paid STT fallback.
 
-Last confirmed live MEDIA baseline:
+## Current free-only routing target
 
 ```text
-Render MEDIA service: voicebridge-krc-media-beta-kolemasakar
-service id: srv-da1kic5bedkc73d6fk60
-live deploy: dep-dadfu1mq1p3s73dgv5m0
-live commit: 7c8806713ea75b0809b638f102e31d8d3af86150
-autoDeploy: no
+YouTube   -> Gemini Developer API Free Tier direct public URL -> durable KRCM/Neon
+Instagram -> self-hosted Cobalt -> AssemblyAI universal-2 Free -> durable KRCM/Neon
+Facebook  -> self-hosted Cobalt -> AssemblyAI universal-2 Free -> durable KRCM/Neon
+Telegram  -> public Telegram web -> AssemblyAI universal-2 Free -> durable KRCM/Neon
 ```
 
-The current live backend still contains the Supadata public path. The Cobalt public candidate has not been deployed.
+YouTube requires explicit disclosure/consent before a new Gemini Free provider request because Free Tier content may be used by Google to improve Google products. No consent -> no provider call / fail closed.
 
-Immediate rollback target for the next Cobalt deployment:
+YouTube automatic fallback is forbidden:
 
-`7c8806713ea75b0809b638f102e31d8d3af86150`
-
-Historical original R2 rollback baseline:
-
-`2f0f02769dbdf2e8240e6b08867ecef2faaede16`
+```text
+Cobalt: none
+AssemblyAI: none
+Supadata: none
+cookies/login: none
+paid proxy: none
+paid Gemini: none
+```
 
 ## Current VoiceBridge candidate
 
 ```text
 repository: kolemasakar/VoiceBridge
 branch: agent/krc-media-gemini-migration
-current synchronized head: 5003689ad2fe4c850d47dc7777c50470820b0bff
-Cobalt implementation commit: 4384b8dc8ef949ded7859495808b7f138eb8244d
-current-head Validate: 33917780763 / SUCCESS
-implementation Validate: 33916332270 / SUCCESS
-implementation cloud tests: 239 passed / 0 failed
-PR #45: OPEN / DRAFT / UNMERGED / mergeable=true
+head: bae3db8e646baf003689c1d8a8e502d9d2ad832d
+Validate: 34146243530 / SUCCESS
+PR #45: OPEN / DRAFT / UNMERGED
 ```
 
-## Public free-only routing target
+The candidate contains dedicated Gemini YouTube routes and has removed the temporary Cobalt startup diagnostic code used during blocker isolation.
+
+## Current live backend
+
+Last confirmed normal-mode live backend:
 
 ```text
-YouTube   -> self-hosted Cobalt -> AssemblyAI universal-2 -> durable KRCM/Neon
-Instagram -> self-hosted Cobalt -> AssemblyAI universal-2 -> durable KRCM/Neon
-Facebook  -> self-hosted Cobalt -> AssemblyAI universal-2 -> durable KRCM/Neon
-Telegram  -> public Telegram web -> AssemblyAI universal-2 -> durable KRCM/Neon
+Render MEDIA service: voicebridge-krc-media-beta-kolemasakar
+service id: srv-da1kic5bedkc73d6fk60
+live commit: 52499e4959aa2673f07239c73054cdbeaec0eeac
+live deploy: dep-dafekmid0e5s73c3sg10
+status: LIVE
+Cobalt diagnostic flag: false
 ```
 
-Public Action rules:
+The repository Gemini-direct pivot has NOT been deployed to Render yet. The current live YouTube route still uses the prior Cobalt path and is blocked by YouTube datacenter anti-bot/login behavior.
+
+Immediate live baseline/rollback:
+
+`52499e4959aa2673f07239c73054cdbeaec0eeac`
+
+Earlier rollback points:
 
 ```text
-Supadata public route: inactive
-ScrapeCreators public paid route: forbidden
-paid retrieval fallback: none
-paid STT fallback: none
-user beta access code: not exposed
-Action bearer: server-side
+7c8806713ea75b0809b638f102e31d8d3af86150
+2f0f02769dbdf2e8240e6b08867ecef2faaede16
 ```
 
-## Active STT policy
+## Cobalt YouTube blocker evidence
+
+After the Cobalt API key was expanded from Facebook-only to `facebook/youtube/instagram`, a fresh post-change YouTube canary still failed before STT. Sanitized diagnostic result:
 
 ```text
-KRC_MEDIA_STT_PROVIDER=assemblyai
-AssemblyAI model=universal-2
-AssemblyAI continuation=Free balance only
-paid AssemblyAI continuation=forbidden
-post-AssemblyAI target=Gemini prerecorded
-Gemini automatic cutover=not implemented
-Gemini Free public activation=separate disclosure + explicit consent gate
-paid Gemini fallback=none
+HTTP 400
+provider_error_code: error.api.youtube.login
+retrieval credits: 0
+STT seconds: 0
 ```
 
-## Public KRC boundary
+This is the reason the public YouTube target pivoted away from Cobalt rather than adding cookies/login or a paid proxy.
 
-The existing published `K-Research & Critic` GPT remains unchanged. No public MEDIA Action has been attached in Builder. The current Core manifest therefore continues to record Actions as disabled and still matches the live public Builder state.
+## Private R2 canary package
+
+```text
+instructions: prompts/GPT_STORE_MEDIA_R2_GEMINI_YOUTUBE_CANARY_INSTRUCTIONS.md
+manifest: gpt_store/media_r2_gemini_youtube_canary_manifest.yaml
+builder_runtime_applied: false
+```
+
+The private MEDIA BETA GPT still needs a separately authorized Builder switch before the new authenticated YouTube canary can run. The existing public KRC GPT remains unchanged and R3 remains HOLD.
+
+## Privacy candidate
+
+`docs/PRIVACY_POLICY.md` is version `2.2-candidate` and records the Gemini Free disclosure/consent boundary and the mixed provider routing.
 
 ## Retained invariant
 
@@ -139,6 +144,6 @@ MEDIA unavailable/fails -> MEDIA unavailable/fails closed
 Core KRC               -> remains user-accessible and functional
 ```
 
-Recovery must start from checkpoint 83.
+Recovery must start from checkpoint 84.
 
-Before any state-changing action, re-read exact GitHub heads/CI, current Render live deploy, PR #45 state, and the current KRC public Builder state. Do not deploy, mutate Render/Neon, merge PR #45, activate Gemini, or update the public GPT without fresh explicit owner authorization.
+Before any state-changing action, re-read exact GitHub heads/CI, current Render live deploy, PR #45 state, and current private/public GPT Builder state. Do not deploy/mutate Render or Neon, merge PR #45, apply the private Builder package, or update the public GPT without the applicable explicit owner authorization.
