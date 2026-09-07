@@ -26,10 +26,11 @@ def test_canary_manifest_points_to_mixed_free_public_schema() -> None:
     assert manifest["routing"]["telegram"] == "telegram_public_web_to_assemblyai_free"
 
 
-def test_canary_manifest_records_youtube_live_acceptance_without_r3_release() -> None:
+def test_canary_manifest_records_checkpoint_87_without_r3_release() -> None:
     manifest = yaml.safe_load(MANIFEST.read_text(encoding="utf-8"))
     acceptance = manifest["acceptance"]
     release = manifest["release"]
+    cobalt = manifest["cobalt_infrastructure"]
 
     assert acceptance["capability_read"] == "PASS"
     assert acceptance["youtube_consent_gate"] == "PASS"
@@ -39,11 +40,26 @@ def test_canary_manifest_records_youtube_live_acceptance_without_r3_release() ->
     assert acceptance["youtube_new_provider_call_on_reuse"] is False
     assert acceptance["youtube_retrieval_credits_charged"] == 0
     assert acceptance["youtube_stt_seconds_charged"] == 0
-    assert acceptance["instagram_live_canary"] == "PENDING"
+    assert acceptance["instagram_live_canary"] == "FAIL_CLOSED_BLOCKED"
+    assert acceptance["instagram_retrieval_provider"] == "cobalt"
+    assert acceptance["instagram_retrieval_credits_charged"] == 0
+    assert acceptance["instagram_stt_seconds_charged"] == 0
+    assert acceptance["instagram_assemblyai_started"] is False
     assert acceptance["facebook_live_canary"] == "PENDING"
     assert acceptance["telegram_live_canary"] == "PENDING"
     assert acceptance["core_isolation_regression"] == "PENDING"
+
+    assert cobalt["current_host"] == "render_free"
+    assert cobalt["acceptance_state"] == "EDGE_429_BLOCKED"
+    assert cobalt["blocker"] == "edge_http_429_non_json"
+    assert cobalt["instagram_probe_reproduced"] is True
+    assert cobalt["youtube_control_reproduced"] is True
+    assert cobalt["paid_hosting_remediation"] == "excluded"
+    assert cobalt["approved_migration_target"] == "oci_always_free"
+    assert cobalt["endpoint_change_pending"] is True
+
     assert release["r2_youtube_live_acceptance_pass"] is True
+    assert release["r2_instagram_infrastructure_remediation_pending"] is True
     assert release["r2_full_pass"] is False
     assert release["r3_ready"] is False
     assert release["r3_public_gpt_hold"] is True
@@ -60,6 +76,7 @@ def test_canary_policy_requires_one_gemini_data_use_consent_and_no_generic_media
     assert policy["paid_retrieval_fallback"] is False
     assert policy["paid_stt_fallback"] is False
     assert policy["paid_proxy_fallback"] is False
+    assert policy["paid_cobalt_hosting_considered"] is False
     assert policy["user_cookies_forbidden"] is True
     assert policy["user_login_forbidden"] is True
 
