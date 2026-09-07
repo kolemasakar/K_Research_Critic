@@ -1,7 +1,7 @@
 # K-Research & Critic - MEDIA BETA Recovery Pointer
-Канонічний покажчик поточного стану MEDIA BETA після R2 pivot на consent-gated Gemini Free direct YouTube processing.
+Канонічний покажчик поточного стану MEDIA BETA після R2 pivot на consent-gated Gemini Free direct YouTube processing і handoff-синхронізації перед переходом у новий чат.
 
-Status: ACTIVE POINTER / CHECKPOINT 84 / R2 REPOSITORY PIVOT READY / LIVE GEMINI DEPLOYMENT + CANARY PENDING / R3 HOLD
+Status: ACTIVE POINTER / CHECKPOINT 85 / HANDOFF READY / R2 REPOSITORY PIVOT READY / LIVE GEMINI DEPLOYMENT + CANARY PENDING / R3 HOLD
 Updated: 2026-09-07
 
 `K-Research & Critic - MEDIA BETA` remains an additive MEDIA capability planned for the existing published `K-Research & Critic` identity.
@@ -18,7 +18,7 @@ Branch:
 
 Path:
 
-`subprojects/media_beta/84_R2_YOUTUBE_GEMINI_DIRECT_REPOSITORY_READY_2026_09_07.md`
+`subprojects/media_beta/85_R2_GEMINI_DIRECT_HANDOFF_REPOSITORY_SYNC_2026_09_07.md`
 
 ## Current gate state
 
@@ -48,7 +48,7 @@ gpt_store/actions/media_public_cobalt_openapi.yaml  version 0.7.0-r2-cobalt
 gpt_store/actions/media_managed_beta_openapi.yaml   version 0.6.0-a9.10
 ```
 
-The new public candidate routes YouTube only through the dedicated consent-gated Gemini Free direct-URL operations. It does not expose Supadata credit operations, ScrapeCreators paid retrieval, local attachments, paid proxy fallback, or paid STT fallback.
+The current public candidate routes YouTube only through dedicated consent-gated Gemini Free direct-URL operations. It does not expose Supadata credit operations, ScrapeCreators paid retrieval, local attachments, paid proxy fallback, or paid STT fallback.
 
 ## Current free-only routing target
 
@@ -72,32 +72,33 @@ paid proxy: none
 paid Gemini: none
 ```
 
-## Current VoiceBridge candidate
+## Current VoiceBridge repository candidate
 
 ```text
 repository: kolemasakar/VoiceBridge
 branch: agent/krc-media-gemini-migration
-head: bae3db8e646baf003689c1d8a8e502d9d2ad832d
+checkpoint-85 handoff baseline head: bae3db8e646baf003689c1d8a8e502d9d2ad832d
 Validate: 34146243530 / SUCCESS
-PR #45: OPEN / DRAFT / UNMERGED
+PR #45: OPEN / DRAFT / UNMERGED / mergeable=true
 ```
 
-The candidate contains dedicated Gemini YouTube routes and has removed the temporary Cobalt startup diagnostic code used during blocker isolation.
+The candidate contains dedicated Gemini YouTube routes and no longer contains the temporary Cobalt startup diagnostic used during blocker isolation.
 
 ## Current live backend
 
-Last confirmed normal-mode live backend:
+Read-only verification on 2026-09-07 confirmed:
 
 ```text
 Render MEDIA service: voicebridge-krc-media-beta-kolemasakar
 service id: srv-da1kic5bedkc73d6fk60
+configured branch: agent/krc-media-transcript
+autoDeploy: no
 live commit: 52499e4959aa2673f07239c73054cdbeaec0eeac
 live deploy: dep-dafekmid0e5s73c3sg10
 status: LIVE
-Cobalt diagnostic flag: false
 ```
 
-The repository Gemini-direct pivot has NOT been deployed to Render yet. The current live YouTube route still uses the prior Cobalt path and is blocked by YouTube datacenter anti-bot/login behavior.
+The repository Gemini-direct pivot has NOT been deployed to Render. The live YouTube route is still the prior Cobalt path and is not the accepted target for the next canary.
 
 Immediate live baseline/rollback:
 
@@ -112,7 +113,7 @@ Earlier rollback points:
 
 ## Cobalt YouTube blocker evidence
 
-After the Cobalt API key was expanded from Facebook-only to `facebook/youtube/instagram`, a fresh post-change YouTube canary still failed before STT. Sanitized diagnostic result:
+The Cobalt API key was initially Facebook-only and returned `error.api.service.disabled`. After the owner expanded it to `facebook/youtube/instagram`, a fresh canary progressed past that policy gate but returned:
 
 ```text
 HTTP 400
@@ -121,7 +122,7 @@ retrieval credits: 0
 STT seconds: 0
 ```
 
-This is the reason the public YouTube target pivoted away from Cobalt rather than adding cookies/login or a paid proxy.
+This is the accepted reason the public YouTube target pivoted away from Cobalt instead of adding cookies/login or a paid proxy.
 
 ## Private R2 canary package
 
@@ -135,7 +136,7 @@ The private MEDIA BETA GPT still needs a separately authorized Builder switch be
 
 ## Privacy candidate
 
-`docs/PRIVACY_POLICY.md` is version `2.2-candidate` and records the Gemini Free disclosure/consent boundary and the mixed provider routing.
+`docs/PRIVACY_POLICY.md` is version `2.2-candidate` and records the Gemini Free disclosure/consent boundary and mixed provider routing.
 
 ## Retained invariant
 
@@ -144,6 +145,10 @@ MEDIA unavailable/fails -> MEDIA unavailable/fails closed
 Core KRC               -> remains user-accessible and functional
 ```
 
-Recovery must start from checkpoint 84.
+Recovery must start from checkpoint 85.
+
+Recovery command:
+
+`recover KRC MEDIA BETA checkpoint 85 Gemini direct handoff repository sync 2026-09-07`
 
 Before any state-changing action, re-read exact GitHub heads/CI, current Render live deploy, PR #45 state, and current private/public GPT Builder state. Do not deploy/mutate Render or Neon, merge PR #45, apply the private Builder package, or update the public GPT without the applicable explicit owner authorization.
