@@ -1,0 +1,61 @@
+schema_version: "0.2-r2-canary"
+
+product:
+  name: K-Research & Critic - MEDIA BETA
+  publication_state: private_owner_only
+  purpose: authenticated_r2_mixed_free_media_canary
+
+instructions:
+  file: prompts/GPT_STORE_MEDIA_R2_GEMINI_YOUTUBE_CANARY_INSTRUCTIONS.md
+  version: "0.2.0-r2-gemini-youtube-canary"
+  builder_runtime_applied: false
+  builder_update_required: true
+
+actions:
+  media_transcript:
+    enabled: true
+    schema: gpt_store/actions/media_public_free_openapi.yaml
+    schema_version: "0.8.0-r2-gemini-youtube"
+    authentication: bearer_api_key
+    server: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
+
+routing:
+  youtube: gemini_free_direct_public_url
+  instagram: cobalt_to_assemblyai_free
+  facebook: cobalt_to_assemblyai_free
+  telegram: telegram_public_web_to_assemblyai_free
+
+policy:
+  supadata_active: false
+  scrapecreators_active: false
+  paid_retrieval_fallback: false
+  paid_stt_fallback: false
+  paid_proxy_fallback: false
+  user_cookies_forbidden: true
+  user_login_forbidden: true
+  youtube_gemini_free_tier_only: true
+  youtube_gemini_data_use_consent_required: true
+  youtube_generic_media_start_confirmation: false
+  youtube_duplicate_confirmation_forbidden: true
+  non_youtube_zero_credit_media_confirmation: false
+  criticprofile_confirmation_remains_separate: true
+
+repository_candidate:
+  voicebridge_branch: agent/krc-media-gemini-migration
+  voicebridge_commit: bae3db8e646baf003689c1d8a8e502d9d2ad832d
+  voicebridge_validate: 34146243530
+  voicebridge_validate_conclusion: SUCCESS
+
+live_backend:
+  service: voicebridge-krc-media-beta-kolemasakar
+  commit: 52499e4959aa2673f07239c73054cdbeaec0eeac
+  repository_pivot_deployed: false
+  immediate_rollback_baseline: 52499e4959aa2673f07239c73054cdbeaec0eeac
+  historical_rollback: 7c8806713ea75b0809b638f102e31d8d3af86150
+
+release:
+  r2_repository_pivot_ready: true
+  r2_gemini_live_deployment_pending: true
+  r2_authenticated_canary_pending: true
+  r3_public_gpt_hold: true
+  r4_public_regression_hold: true
