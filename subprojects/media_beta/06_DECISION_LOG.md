@@ -1,9 +1,9 @@
 # MEDIA BETA Decision Log
 Реєстр чинних і історичних рішень MEDIA BETA з актуальними release-hold рішеннями.
 
-Version: 2.6
+Version: 2.7
 Status: ACTIVE
-Updated: 2026-09-07
+Updated: 2026-09-08
 
 This file is the compact current decision index. Detailed historical rationale remains available in Git history and the numbered phase/acceptance records.
 
@@ -399,3 +399,92 @@ Execution constraints:
 Canonical checkpoint:
 
 `87_R2_INSTAGRAM_COBALT_EDGE_BLOCKER_OCI_FREE_MIGRATION_CHECKPOINT_2026_09_07.md`
+
+## D035 - OCI Cobalt Local Secure Runtime and Instagram Retrieval Are Accepted; Public Cutover Remains Held
+
+Decision: ACCEPTED_LOCAL_PREFLIGHT / PUBLIC_HTTPS_PENDING / LIVE_ENDPOINT_CUTOVER_NOT_AUTHORIZED / R3_HOLD
+Date: 2026-09-08
+
+The owner-approved free-only OCI remediation reached a working local runtime on a dedicated `VM.Standard.E2.1.Micro` instance selected as Always Free-eligible in the OCI console.
+
+Accepted OCI runtime evidence:
+
+```text
+instance: krc-cobalt-media-beta
+region: eu-frankfurt-1
+public IPv4: 89.168.65.88
+private IPv4: 10.0.0.26
+Docker: 29.1.3
+Docker Compose: 2.40.3
+Cobalt image: ghcr.io/imputnet/cobalt@sha256:63186dd68afd57ce3bb1f62cc4c139f5fa95b9c3e87a3cf5c6e4c7a570523f62
+Cobalt version: 11.7.1
+Cobalt commit: a636575b09de1fc55d9b8cd98cac88f5f2f16b42
+binding: 127.0.0.1:9000 only
+```
+
+The host was hardened for the current owner access path:
+
+```text
+SSH source 91.199.188.209/32 -> locally allowed
+iptables persistence -> enabled
+swap -> 2 GiB
+```
+
+Cobalt API-key protection is accepted:
+
+```text
+API_AUTH_REQUIRED=1
+missing key -> error.api.auth.key.missing
+valid key -> auth passes to normal URL validation
+```
+
+Authenticated local Instagram retrieval-only preflight against:
+
+`https://www.instagram.com/reel/DEAyVa4SF3E/`
+
+passed:
+
+```text
+POST -> HTTP 200
+status -> tunnel
+fresh tunnel download -> curl rc 0
+retrieved bytes -> 214560
+paid retrieval provider -> none
+```
+
+Therefore:
+
+```text
+OCI_COBALT_SECURE_LOCAL_RUNTIME: PASS
+OCI_COBALT_INSTAGRAM_LOCAL_RETRIEVAL: PASS
+```
+
+A diagnostic OCI Cobalt YouTube control returned `error.api.youtube.login`. This does not revoke the accepted YouTube R2 route because YouTube remains Gemini direct. Before changing the Cobalt endpoint, regression evidence must confirm the Gemini-direct YouTube path is unaffected and no Cobalt fallback is introduced.
+
+Public cutover remains held because the OCI Cobalt service is still local-only and `API_URL` still points to `http://127.0.0.1:9000/`.
+
+DNS preparation passed:
+
+```text
+89-168-65-88.sslip.io -> 89.168.65.88
+```
+
+Required before live cutover:
+
+```text
+dedicated OCI NSG attached to krc-cobalt-vnic
+required 80/443 OCI + local firewall ingress
+HTTPS reverse proxy + public TLS
+Cobalt API_URL -> public HTTPS base URL
+external authenticated Instagram POST + tunnel verification
+```
+
+Port 9000 must remain loopback-only.
+
+A local OCI API key was generated for preflight. The existing VoiceBridge `KRC_MEDIA_COBALT_API_KEY` value was not exposed and has not been proven identical. To preserve D034's intended single-variable live change, OCI should be aligned server-side to the existing VoiceBridge secret before cutover rather than exposing or rotating the secret through chat/GPT/repository documentation.
+
+No live Render environment variable was changed. PR #45 remains open/draft/unmerged. Public KRC remains unchanged.
+
+Canonical checkpoint:
+
+`88_R2_OCI_COBALT_LOCAL_INSTAGRAM_RETRIEVAL_PASS_PUBLIC_HTTPS_PENDING_CHECKPOINT_2026_09_08.md`
