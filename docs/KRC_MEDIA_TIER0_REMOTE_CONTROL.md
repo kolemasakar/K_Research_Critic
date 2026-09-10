@@ -1,4 +1,5 @@
 # KRC MEDIA — Project-Isolated Tier-0 Remote Control
+Безпечний проектно-ізольований канал віддаленого Tier-0/read-only керування KRC MEDIA через GitHub OIDC, Tailscale та окрему системну ідентичність `krcops`.
 
 Status: **PHASE 6 AUTHORIZED / REPOSITORY IMPLEMENTATION PREPARED / LIVE TRUST SETUP PENDING**
 
@@ -24,8 +25,8 @@ Phase 6 adds only the remote transport/control identity around that existing bou
 The workflow:
 
 - is `workflow_dispatch` only;
-- runs only from `refs/heads/main` in `kolemasakar/K_Research_Critic`;
-- requests only `contents: read` and `id-token: write` GitHub permissions;
+- fails closed unless executed from `refs/heads/main` in `kolemasakar/K_Research_Critic`;
+- requests only `id-token: write`; no repository contents permission or checkout is used;
 - uses a dedicated KRC workload identity, never the KGM identity;
 - requests only `tag:krc-media-github-actions`;
 - resolves exactly `krc-media-node1` at `100.118.132.8`;
@@ -49,7 +50,7 @@ The secret values themselves must never be committed or recorded in documentatio
 
 ## Required Tailscale trust boundary
 
-The owner must create a dedicated Tailscale workload-identity/OAuth trust for the KRC repository/workflow and authorize only the source tag:
+The owner must create a dedicated Tailscale workload-identity/federated trust for the KRC repository/workflow and authorize only the source tag:
 
 ```text
 tag:krc-media-github-actions
