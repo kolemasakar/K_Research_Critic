@@ -2,30 +2,37 @@ from pathlib import Path
 
 
 WORKFLOW = Path(".github/workflows/krc-media-tier0-control.yml")
+PINNED_TAILSCALE_ACTION = (
+    "tailscale/github-action@306e68a486fd2350f2bfc3b19fcd143891a4a2d8"
+)
 
 
 def _text() -> str:
     return WORKFLOW.read_text(encoding="utf-8")
 
 
-def test_krc_tier0_workflow_is_manual_main_only() -> None:
+def test_krc_tier0_workflow_is_manual_main_only_and_fails_closed() -> None:
     text = _text()
     assert "on:\n  workflow_dispatch:\n" in text
     assert "push:" not in text
     assert "pull_request:" not in text
     assert "schedule:" not in text
-    assert "github.repository == 'kolemasakar/K_Research_Critic'" in text
-    assert "github.ref == 'refs/heads/main'" in text
+    assert "test \"$GITHUB_REPOSITORY\" = 'kolemasakar/K_Research_Critic'" in text
+    assert "test \"$GITHUB_REF\" = 'refs/heads/main'" in text
+    assert "if: github.repository" not in text
 
 
-def test_krc_tier0_workflow_uses_dedicated_oidc_identity() -> None:
+def test_krc_tier0_workflow_uses_minimal_dedicated_oidc_identity() -> None:
     text = _text()
-    assert "contents: read" in text
-    assert "id-token: write" in text
+    assert "permissions:\n  id-token: write\n" in text
+    assert "contents: read" not in text
+    assert "actions/checkout" not in text
     assert "TS_KRC_OAUTH_CLIENT_ID" in text
     assert "TS_KRC_AUDIENCE" in text
     assert "tags: tag:krc-media-github-actions" in text
     assert "tags: tag:github-actions" not in text
+    assert PINNED_TAILSCALE_ACTION in text
+    assert "tailscale/github-action@v4" not in text
 
 
 def test_krc_tier0_workflow_targets_exact_node_and_helper() -> None:
@@ -37,6 +44,31 @@ def test_krc_tier0_workflow_targets_exact_node_and_helper() -> None:
     assert "KRC_TIER0_STATUS_VERSION=1" in text
     assert "hostname=krc-cobalt" in text
     assert "tailscale_ipv4=100.118.132.8" in text
+
+
+def test_krc_tier0_workflow_strictly_allows_sanitized_output_keys() -> None:
+    text = _text()
+    assert "Unexpected Tier-0 output key(s)" in text
+    for key in (
+        "KRC_TIER0_STATUS_VERSION",
+        "timestamp_utc",
+        "hostname",
+        "kernel",
+        "architecture",
+        "cpu_count",
+        "loadavg",
+        "mem_total_kib",
+        "mem_available_kib",
+        "swap_total_kib",
+        "root_fs",
+        "tailscaled",
+        "ssh",
+        "docker",
+        "rpcbind",
+        "tailscale_ipv4",
+        "tcp_listeners",
+    ):
+        assert key in text
 
 
 def test_krc_tier0_workflow_contains_required_negative_boundaries() -> None:
