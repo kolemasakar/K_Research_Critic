@@ -1,7 +1,11 @@
 # KRC MEDIA — Project-Isolated Tier-0 Remote Control
 Безпечний проектно-ізольований канал віддаленого Tier-0/read-only керування KRC MEDIA через GitHub OIDC, Tailscale та окрему системну ідентичність `krcops`.
 
-Status: **PHASE 6 AUTHORIZED / REPOSITORY IMPLEMENTATION PREPARED / LIVE TRUST SETUP PENDING**
+Status: **PHASE 6 COMPLETE / LIVE ACCEPTANCE PASS**
+
+Canonical live acceptance record: `docs/KRC_MEDIA_TIER0_REMOTE_CONTROL_ACCEPTANCE_2026-09-10.md`.
+
+Canonical acceptance run: `34435755146` on repository SHA `094f5b7297e1534a8654cbd471f511e7db50d42b`.
 
 ## Purpose
 
@@ -35,41 +39,34 @@ The workflow:
 - negative-tests arbitrary root, helper arguments, Docker, `ubuntu`, `root`, and KGM TCP/22 access;
 - performs no service restart, deploy, package installation, Docker mutation, secret read, firewall change, or backend operation.
 
-## Dedicated GitHub repository secrets required
+## Dedicated GitHub repository secrets
 
-The KRC repository must receive separate values:
+The KRC repository uses separate values:
 
 ```text
 TS_KRC_OAUTH_CLIENT_ID
 TS_KRC_AUDIENCE
 ```
 
-Do not copy or reuse KGM's `TS_OAUTH_CLIENT_ID` / `TS_AUDIENCE` values.
+These belong to the dedicated KRC federated identity. KGM's `TS_OAUTH_CLIENT_ID` / `TS_AUDIENCE` values are not reused.
 
 The secret values themselves must never be committed or recorded in documentation.
 
-## Required Tailscale trust boundary
+## Accepted Tailscale trust boundary
 
-The owner must create a dedicated Tailscale workload-identity/federated trust for the KRC repository/workflow and authorize only the source tag:
+The dedicated KRC workload-identity/federated trust authorizes only the source tag:
 
 ```text
 tag:krc-media-github-actions
 ```
 
-The trust must be constrained to the exact KRC GitHub repository and, where supported by the Tailscale trust configuration, the exact workflow/ref/event:
+The trust is constrained to the KRC GitHub workload, including the canonical main-branch workflow identity and manual dispatch event.
 
-```text
-repository: kolemasakar/K_Research_Critic
-workflow: .github/workflows/krc-media-tier0-control.yml
-ref: refs/heads/main
-event: workflow_dispatch
-```
+No KGM repository/workflow identity is accepted by the KRC trust.
 
-No KGM repository/workflow claim may be accepted by the KRC trust.
+## Accepted tailnet network/SSH policy outcome
 
-## Required tailnet network/SSH policy outcome
-
-The final global tailnet policy must produce exactly this effective authority for the KRC automation source:
+The effective authority for the KRC automation source is:
 
 ```text
 source: tag:krc-media-github-actions
@@ -78,7 +75,7 @@ network port: tcp:22 only
 Tailscale SSH destination user: krcops only
 ```
 
-And it must deny:
+The accepted negative boundaries deny:
 
 ```text
 KGM destination tag: tag:kgm
@@ -88,17 +85,25 @@ KRC SSH user root
 any other KRC port
 ```
 
-Because the tailnet policy is global and already contains accepted owner and KGM rules, Phase 6 must be added as a narrow delta. Do not replace the whole ACL/grants/SSH document with a standalone snippet.
+Owner access remains a separate `kolemasakar@github -> tag:krc-media-node1 -> ubuntu` path.
 
 ## Repository-side fail-closed behavior
 
-Until both dedicated repository secrets and the exact Tailscale trust exist, manual workflow execution must fail before any KRC SSH command is accepted.
+The workflow fails closed on repository/ref mismatch or missing dedicated KRC OIDC inputs. A failed token exchange is not a reason to broaden or reuse the KGM trust credential.
 
-This is intentional. A failed token exchange or missing secret is not a reason to broaden an existing KGM trust credential.
+## Live acceptance
 
-## Acceptance gates
+Canonical successful manual run:
 
-Live Phase-6 acceptance requires one successful manual run from canonical `main` with all of these terminal markers:
+```text
+run_id=34435755146
+event=workflow_dispatch
+branch=main
+repository_sha=094f5b7297e1534a8654cbd471f511e7db50d42b
+conclusion=success
+```
+
+All required terminal markers were observed:
 
 ```text
 KRC_PHASE_6_REPOSITORY_BOUNDARY=PASS
@@ -113,8 +118,6 @@ KRC_PHASE_6_KGM_TCP22_ISOLATION=PASS
 KRC_PHASE_6_PROJECT_ISOLATED_OIDC_CONTROL=PASS
 KRC_PHASE_6_OPERATION=TIER0_READ_ONLY
 ```
-
-A single failed negative test means Phase 6 remains unaccepted.
 
 ## Explicitly not authorized by Phase 6
 
@@ -138,3 +141,12 @@ KRC      -> dedicated KRC OIDC/Tailscale/Tier-0 identity
 ```
 
 No project may inherit another project's automation tag or trust credential.
+
+## Current terminal state
+
+```text
+KRC_PHASE_6_LIVE_ACCEPTANCE=PASS
+KRC_PHASE_6_PROJECT_ISOLATED_OIDC_CONTROL=PASS
+KRC_PHASE_6_OPERATION=TIER0_READ_ONLY
+PHASE_7_PLUS=NOT_AUTHORIZED
+```
