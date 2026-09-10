@@ -4,7 +4,6 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
   id-token: write
 
 concurrency:
@@ -13,17 +12,11 @@ concurrency:
 
 jobs:
   tier0:
-    if: github.repository == 'kolemasakar/K_Research_Critic' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 8
 
     steps:
-      - name: Checkout exact repository revision
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-
-      - name: Validate exact repository and dedicated workload identity inputs
+      - name: Validate exact repository, branch, and dedicated workload identity inputs
         env:
           TS_KRC_OAUTH_CLIENT_ID: ${{ secrets.TS_KRC_OAUTH_CLIENT_ID }}
           TS_KRC_AUDIENCE: ${{ secrets.TS_KRC_AUDIENCE }}
@@ -37,7 +30,7 @@ jobs:
           echo 'KRC_PHASE_6_REPOSITORY_BOUNDARY=PASS'
 
       - name: Connect ephemeral KRC-only GitHub runner to tailnet
-        uses: tailscale/github-action@v4
+        uses: tailscale/github-action@306e68a486fd2350f2bfc3b19fcd143891a4a2d8 # v4
         with:
           oauth-client-id: ${{ secrets.TS_KRC_OAUTH_CLIENT_ID }}
           audience: ${{ secrets.TS_KRC_AUDIENCE }}
