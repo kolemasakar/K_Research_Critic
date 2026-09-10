@@ -1,0 +1,144 @@
+name: KRC MEDIA Tier-0 Tailscale Control
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: krc-media-tier0-control
+  cancel-in-progress: false
+
+jobs:
+  tier0:
+    if: github.repository == 'kolemasakar/K_Research_Critic' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Checkout exact repository revision
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Validate exact repository and dedicated workload identity inputs
+        env:
+          TS_KRC_OAUTH_CLIENT_ID: ${{ secrets.TS_KRC_OAUTH_CLIENT_ID }}
+          TS_KRC_AUDIENCE: ${{ secrets.TS_KRC_AUDIENCE }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test "$GITHUB_REPOSITORY" = 'kolemasakar/K_Research_Critic'
+          test "$GITHUB_REF" = 'refs/heads/main'
+          test -n "$TS_KRC_OAUTH_CLIENT_ID"
+          test -n "$TS_KRC_AUDIENCE"
+          echo 'KRC_PHASE_6_REPOSITORY_BOUNDARY=PASS'
+
+      - name: Connect ephemeral KRC-only GitHub runner to tailnet
+        uses: tailscale/github-action@v4
+        with:
+          oauth-client-id: ${{ secrets.TS_KRC_OAUTH_CLIENT_ID }}
+          audience: ${{ secrets.TS_KRC_AUDIENCE }}
+          tags: tag:krc-media-github-actions
+
+      - name: Resolve and verify exact KRC MEDIA node
+        id: krc
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          expected_host='krc-media-node1'
+          expected_ip='100.118.132.8'
+
+          for attempt in $(seq 1 20); do
+            status="$(tailscale status --json)"
+            host_count="$(printf '%s' "$status" | jq -r --arg h "$expected_host" '[.Peer[] | select(.HostName == $h)] | length')"
+            ip="$(printf '%s' "$status" | jq -r --arg h "$expected_host" '[.Peer[] | select(.HostName == $h) | .TailscaleIPs[] | select(test("^[0-9.]+$"))][0] // empty')"
+            online="$(printf '%s' "$status" | jq -r --arg h "$expected_host" '[.Peer[] | select(.HostName == $h) | .Online][0] // false')"
+
+            if [ "$host_count" = '1' ] && [ "$ip" = "$expected_ip" ] && [ "$online" = 'true' ]; then
+              echo "ip=$ip" >> "$GITHUB_OUTPUT"
+              tailscale ping --timeout=3s "$ip"
+              echo 'KRC_PHASE_6_NODE_IDENTITY=PASS'
+              exit 0
+            fi
+            sleep 2
+          done
+
+          echo 'Exact KRC MEDIA node did not satisfy host/IP/online contract' >&2
+          exit 41
+
+      - name: Execute accepted Tier-0 helper and validate sanitized output
+        env:
+          KRC_TS_IP: ${{ steps.krc.outputs.ip }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test "$KRC_TS_IP" = '100.118.132.8'
+          ssh_opts=(-o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10)
+
+          out="$(ssh "${ssh_opts[@]}" "krcops@$KRC_TS_IP" 'sudo -n /usr/local/sbin/krc-tier0-status')"
+          printf '%s\n' "$out"
+
+          grep -Fxq 'KRC_TIER0_STATUS_VERSION=1' <<<"$out"
+          grep -Fxq 'hostname=krc-cobalt' <<<"$out"
+          grep -Fxq 'tailscale_ipv4=100.118.132.8' <<<"$out"
+
+          allowed='^(KRC_TIER0_STATUS_VERSION|timestamp_utc|hostname|kernel|architecture|cpu_count|loadavg|mem_total_kib|mem_available_kib|swap_total_kib|root_fs|tailscaled|ssh|docker|rpcbind|tailscale_ipv4|tcp_listeners)='
+          unexpected="$(grep -Ev "$allowed" <<<"$out" || true)"
+          test -z "$unexpected" || { echo "Unexpected Tier-0 output key(s):" >&2; printf '%s\n' "$unexpected" >&2; exit 42; }
+
+          echo 'KRC_PHASE_6_TIER0_OBSERVATION=PASS'
+
+      - name: Prove remote privilege and cross-project isolation
+        env:
+          KRC_TS_IP: ${{ steps.krc.outputs.ip }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          ssh_opts=(-o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=7)
+
+          if ssh "${ssh_opts[@]}" "krcops@$KRC_TS_IP" 'sudo -n /usr/bin/id -u' >/dev/null 2>&1; then
+            echo 'Arbitrary root unexpectedly allowed' >&2
+            exit 51
+          fi
+          echo 'KRC_PHASE_6_ARBITRARY_ROOT=DENIED'
+
+          if ssh "${ssh_opts[@]}" "krcops@$KRC_TS_IP" 'sudo -n /usr/local/sbin/krc-tier0-status unexpected-argument' >/dev/null 2>&1; then
+            echo 'Tier-0 helper argument injection unexpectedly allowed' >&2
+            exit 52
+          fi
+          echo 'KRC_PHASE_6_HELPER_ARGUMENT_INJECTION=DENIED'
+
+          if ssh "${ssh_opts[@]}" "krcops@$KRC_TS_IP" 'docker ps' >/dev/null 2>&1; then
+            echo 'Docker unexpectedly accessible to krcops' >&2
+            exit 53
+          fi
+          echo 'KRC_PHASE_6_DOCKER_ACCESS=DENIED'
+
+          if ssh "${ssh_opts[@]}" "ubuntu@$KRC_TS_IP" true >/dev/null 2>&1; then
+            echo 'Automation source unexpectedly mapped to owner ubuntu' >&2
+            exit 54
+          fi
+          echo 'KRC_PHASE_6_OWNER_USER=DENIED'
+
+          if ssh "${ssh_opts[@]}" "root@$KRC_TS_IP" true >/dev/null 2>&1; then
+            echo 'Automation source unexpectedly mapped to root' >&2
+            exit 55
+          fi
+          echo 'KRC_PHASE_6_ROOT_USER=DENIED'
+
+          if timeout 5 bash -c 'cat < /dev/null > /dev/tcp/100.102.136.23/22' 2>/dev/null; then
+            echo 'KRC automation source unexpectedly reached KGM TCP/22' >&2
+            exit 56
+          fi
+          echo 'KRC_PHASE_6_KGM_TCP22_ISOLATION=PASS'
+
+      - name: Record Phase-6 control-plane result
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          echo 'KRC_PHASE_6_PROJECT_ISOLATED_OIDC_CONTROL=PASS'
+          echo 'KRC_PHASE_6_OPERATION=TIER0_READ_ONLY'
+          echo "repository_sha=$GITHUB_SHA"
