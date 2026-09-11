@@ -1,0 +1,1 @@
+krcops ALL=(root) NOPASSWD: sha256:9ef17650c6eb0e94a55e80cac77b03c0eb0c98f37a913d1a9f38702c47acf27f /usr/local/sbin/krc-tier2-cobalt-restart ""
