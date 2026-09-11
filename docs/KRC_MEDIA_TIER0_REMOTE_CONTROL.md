@@ -68,7 +68,7 @@ other KRC ports outside accepted policy
 
 Owner access remains a separate recovery/admin path.
 
-## Tier-0 — host observation
+## Tier-0 - host observation
 
 Helper:
 
@@ -86,7 +86,7 @@ conclusion=success
 
 Accepted Phase-6 terminal markers included repository and node identity PASS, sanitized Tier-0 observation PASS, arbitrary root denied, helper argument injection denied, Docker denied, owner/root automation denied, and KGM TCP/22 isolation PASS.
 
-## Tier-1 — backend observation
+## Tier-1 - backend observation
 
 Helper:
 
@@ -113,7 +113,7 @@ conclusion=success
 
 Tier-1 exposes only bounded sanitized backend state and does not expose environment values, secrets, key contents, logs, compose contents, or arbitrary Docker output.
 
-## Tier-2 — restart-only
+## Tier-2 - restart-only
 
 Helper:
 
