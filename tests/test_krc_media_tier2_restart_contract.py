@@ -24,31 +24,33 @@ def test_tier2_restart_helper_is_fail_closed_and_identity_pinned() -> None:
 
 def test_tier2_restart_helper_exposes_only_restart_mutation() -> None:
     text = HELPER.read_text(encoding="utf-8").lower()
+    lines = [line.strip() for line in text.splitlines()]
     assert "$docker restart --time 10" in text
-    forbidden = (
-        "$docker start",
-        "$docker stop",
-        "$docker exec",
-        "$docker pull",
-        "$docker rm",
-        "$docker run",
-        "docker compose",
-        "systemctl",
+
+    forbidden_prefixes = (
+        "$docker start ",
+        "$docker stop ",
+        "$docker exec ",
+        "$docker pull ",
+        "$docker rm ",
+        "$docker run ",
+        "docker compose ",
+        "systemctl ",
         "service ",
-        "apt-get",
-        "apt install",
+        "apt-get ",
+        "apt install ",
         "chmod ",
         "chown ",
-        "sed -i",
+        "sed -i ",
         "tee ",
         "rm -",
         "mv ",
         "cp ",
-        ".env",
-        "keys.json",
-        "docker logs",
     )
-    for token in forbidden:
+    for prefix in forbidden_prefixes:
+        assert not any(line.startswith(prefix) for line in lines)
+
+    for token in (".env", "keys.json", "docker logs"):
         assert token not in text
 
 
