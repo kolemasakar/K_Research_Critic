@@ -72,24 +72,68 @@ jobs:
           ssh_opts=(-o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10)
 
           out="$(ssh "${ssh_opts[@]}" "krcops@$KRC_TS_IP" 'sudo -n /usr/local/sbin/krc-tier1-media-status')"
+
+          expected_keys=(
+            backend_type
+            backend_present
+            backend_running
+            backend_status
+            backend_image_digest
+            backend_restart_count
+            backend_loopback_only
+            backend_port
+            backend_user
+            backend_read_only_rootfs
+            backend_privileged
+            backend_healthcheck_configured
+            backend_health_status
+            backend_memory_limit_configured
+            backend_pids_limit_configured
+            backend_cap_drop_configured
+            backend_security_opt_configured
+            tier1_backend_status
+          )
+
+          declare -A allowed=()
+          declare -A seen=()
+          for key in "${expected_keys[@]}"; do
+            allowed["$key"]=1
+          done
+
+          while IFS= read -r line; do
+            [[ "$line" == *=* ]] || { echo 'Malformed Tier-1 output' >&2; exit 42; }
+            key="${line%%=*}"
+            value="${line#*=}"
+            [[ -n "${allowed[$key]+x}" ]] || { echo 'Unexpected Tier-1 output key' >&2; exit 42; }
+            [[ -z "${seen[$key]+x}" ]] || { echo 'Duplicate Tier-1 output key' >&2; exit 43; }
+            seen["$key"]="$value"
+          done <<<"$out"
+
+          for key in "${expected_keys[@]}"; do
+            [[ -n "${seen[$key]+x}" ]] || { echo 'Missing Tier-1 output key' >&2; exit 44; }
+          done
+          test "${#seen[@]}" -eq "${#expected_keys[@]}"
+
+          test "${seen[backend_type]}" = 'cobalt'
+          test "${seen[backend_present]}" = 'yes'
+          test "${seen[backend_running]}" = 'true'
+          test "${seen[backend_status]}" = 'running'
+          test "${seen[backend_image_digest]}" = 'sha256:63186dd68afd57ce3bb1f62cc4c139f5fa95b9c3e87a3cf5c6e4c7a570523f62'
+          [[ "${seen[backend_restart_count]}" =~ ^[0-9]+$ ]]
+          test "${seen[backend_loopback_only]}" = 'yes'
+          test "${seen[backend_port]}" = '9000'
+          test "${seen[backend_user]}" = 'node'
+          test "${seen[backend_read_only_rootfs]}" = 'true'
+          test "${seen[backend_privileged]}" = 'false'
+          [[ "${seen[backend_healthcheck_configured]}" =~ ^(yes|no)$ ]]
+          [[ "${seen[backend_health_status]}" =~ ^(none|starting|healthy|unhealthy)$ ]]
+          [[ "${seen[backend_memory_limit_configured]}" =~ ^(yes|no)$ ]]
+          [[ "${seen[backend_pids_limit_configured]}" =~ ^(yes|no)$ ]]
+          [[ "${seen[backend_cap_drop_configured]}" =~ ^(yes|no)$ ]]
+          [[ "${seen[backend_security_opt_configured]}" =~ ^(yes|no)$ ]]
+          test "${seen[tier1_backend_status]}" = 'PASS'
+
           printf '%s\n' "$out"
-
-          grep -Fxq 'backend_type=cobalt' <<<"$out"
-          grep -Fxq 'backend_present=yes' <<<"$out"
-          grep -Fxq 'backend_running=true' <<<"$out"
-          grep -Fxq 'backend_status=running' <<<"$out"
-          grep -Fxq 'backend_image_digest=sha256:63186dd68afd57ce3bb1f62cc4c139f5fa95b9c3e87a3cf5c6e4c7a570523f62' <<<"$out"
-          grep -Fxq 'backend_loopback_only=yes' <<<"$out"
-          grep -Fxq 'backend_port=9000' <<<"$out"
-          grep -Fxq 'backend_user=node' <<<"$out"
-          grep -Fxq 'backend_read_only_rootfs=true' <<<"$out"
-          grep -Fxq 'backend_privileged=false' <<<"$out"
-          grep -Fxq 'tier1_backend_status=PASS' <<<"$out"
-
-          allowed='^(backend_type|backend_present|backend_running|backend_status|backend_image_digest|backend_restart_count|backend_loopback_only|backend_port|backend_user|backend_read_only_rootfs|backend_privileged|backend_healthcheck_configured|backend_health_status|backend_memory_limit_configured|backend_pids_limit_configured|backend_cap_drop_configured|backend_security_opt_configured|tier1_backend_status)='
-          unexpected="$(grep -Ev "$allowed" <<<"$out" || true)"
-          test -z "$unexpected" || { echo "Unexpected Tier-1 output key(s):" >&2; printf '%s\n' "$unexpected" >&2; exit 42; }
-
           echo 'P8_B_TIER1_STATUS=PASS'
           echo 'P8_B_SECRET_VALUES=NOT_EXPOSED'
 
