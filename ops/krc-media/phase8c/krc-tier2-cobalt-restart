@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+if [[ "$#" -ne 0 ]]; then
+  echo "ERROR: arguments are not accepted" >&2
+  exit 64
+fi
+
+DOCKER=/usr/bin/docker
+CONTAINER='krc-cobalt'
+EXPECTED_IMAGE_REF='ghcr.io/imputnet/cobalt@sha256:63186dd68afd57ce3bb1f62cc4c139f5fa95b9c3e87a3cf5c6e4c7a570523f62'
+EXPECTED_DIGEST='sha256:63186dd68afd57ce3bb1f62cc4c139f5fa95b9c3e87a3cf5c6e4c7a570523f62'
+
+fail() {
+  echo "ERROR: Phase 8C pre/postcondition failed" >&2
+  exit 70
+}
+
+inspect_value() {
+  "$DOCKER" inspect --format "$1" "$CONTAINER" 2>/dev/null
+}
+
+check_invariants() {
+  local name image running binding user readonly privileged
+  name="$(inspect_value '{{.Name}}')" || return 1
+  image="$(inspect_value '{{.Config.Image}}')" || return 1
+  running="$(inspect_value '{{.State.Running}}')" || return 1
+  binding="$("$DOCKER" port "$CONTAINER" 9000/tcp 2>/dev/null)" || return 1
+  user="$(inspect_value '{{.Config.User}}')" || return 1
+  readonly="$(inspect_value '{{.HostConfig.ReadonlyRootfs}}')" || return 1
+  privileged="$(inspect_value '{{.HostConfig.Privileged}}')" || return 1
+
+  [[ "$name" == "/$CONTAINER" ]] || return 1
+  [[ "$image" == "$EXPECTED_IMAGE_REF" ]] || return 1
+  [[ "$running" == 'true' ]] || return 1
+  [[ "$binding" == '127.0.0.1:9000' ]] || return 1
+  [[ "$user" == 'node' ]] || return 1
+  [[ "$readonly" == 'true' ]] || return 1
+  [[ "$privileged" == 'false' ]] || return 1
+}
+
+matches="$("$DOCKER" ps -a --filter "name=^/${CONTAINER}$" --format '{{.Names}}' 2>/dev/null)" || fail
+[[ "$matches" == "$CONTAINER" ]] || fail
+
+check_invariants || fail
+before="$(inspect_value '{{.RestartCount}}')" || fail
+[[ "$before" =~ ^[0-9]+$ ]] || fail
+
+"$DOCKER" restart --time 10 "$CONTAINER" >/dev/null
+
+ready='no'
+for _ in $(seq 1 30); do
+  if check_invariants; then
+    ready='yes'
+    break
+  fi
+  sleep 1
+done
+[[ "$ready" == 'yes' ]] || fail
+
+after="$(inspect_value '{{.RestartCount}}')" || fail
+[[ "$after" =~ ^[0-9]+$ ]] || fail
+
+printf '%s\n' \
+  'P8_C_TIER2_RESTART_VERSION=1' \
+  'backend_type=cobalt' \
+  "backend_name=$CONTAINER" \
+  "backend_image_digest=$EXPECTED_DIGEST" \
+  "restart_count_before=$before" \
+  "restart_count_after=$after" \
+  'backend_running_after=true' \
+  'backend_loopback_only_after=yes' \
+  'backend_port_after=9000' \
+  'backend_user_after=node' \
+  'backend_read_only_rootfs_after=true' \
+  'backend_privileged_after=false' \
+  'tier2_restart_status=PASS'
