@@ -1,5 +1,4 @@
 # KRC MEDIA — Project-Isolated Remote Control
-
 Безпечний проектно-ізольований канал віддаленого керування KRC MEDIA через GitHub OIDC, Tailscale, Tailscale SSH та окрему системну ідентичність `krcops`.
 
 Status: **PHASE 8C COMPLETE / LIVE ACCEPTANCE PASS / RESTART-ONLY CEILING**
