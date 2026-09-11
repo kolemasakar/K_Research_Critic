@@ -1,4 +1,5 @@
 # KRC MEDIA — Tier-2 Restart-Only Acceptance — 2026-09-11
+Фіксація прийнятого та замороженого Phase 8C restart-only контролю для KRC MEDIA.
 
 Status: **COMPLETE / LIVE ACCEPTANCE PASS / FROZEN**
 
