@@ -1,0 +1,203 @@
+name: KRC MEDIA Tier-1 Observation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+
+concurrency:
+  group: krc-media-tier1-observation
+  cancel-in-progress: false
+
+jobs:
+  tier1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Validate exact repository, branch, and dedicated workload identity inputs
+        env:
+          TS_KRC_OAUTH_CLIENT_ID: ${{ secrets.TS_KRC_OAUTH_CLIENT_ID }}
+          TS_KRC_AUDIENCE: ${{ secrets.TS_KRC_AUDIENCE }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test "$GITHUB_REPOSITORY" = 'kolemasakar/K_Research_Critic'
+          test "$GITHUB_REF" = 'refs/heads/main'
+          test -n "$TS_KRC_OAUTH_CLIENT_ID"
+          test -n "$TS_KRC_AUDIENCE"
+          echo 'P8_B_REPOSITORY_BOUNDARY=PASS'
+
+      - name: Connect ephemeral KRC-only GitHub runner to tailnet
+        uses: tailscale/github-action@306e68a486fd2350f2bfc3b19fcd143891a4a2d8 # v4
+        with:
+          oauth-client-id: ${{ secrets.TS_KRC_OAUTH_CLIENT_ID }}
+          audience: ${{ secrets.TS_KRC_AUDIENCE }}
+          tags: tag:krc-media-github-actions
+
+      - name: Resolve and verify exact KRC MEDIA node
+        id: krc
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          expected_host='krc-media-node1'
+          expected_ip='100.118.132.8'
+
+          for attempt in $(seq 1 20); do
+            status="$(tailscale status --json)"
+            host_count="$(printf '%s' "$status" | jq -r --arg h "$expected_host" '[.Peer[] | select(.HostName == $h)] | length')"
+            ip="$(printf '%s' "$status" | jq -r --arg h "$expected_host" '[.Peer[] | select(.HostName == $h) | .TailscaleIPs[] | select(test("^[0-9.]+$"))][0] // empty')"
+            online="$(printf '%s' "$status" | jq -r --arg h "$expected_host" '[.Peer[] | select(.HostName == $h) | .Online][0] // false')"
+
+            if [ "$host_count" = '1' ] && [ "$ip" = "$expected_ip" ] && [ "$online" = 'true' ]; then
+              echo "ip=$ip" >> "$GITHUB_OUTPUT"
+              tailscale ping --timeout=3s "$ip"
+              echo 'P8_B_NODE_IDENTITY=PASS'
+              exit 0
+            fi
+            sleep 2
+          done
+
+          echo 'Exact KRC MEDIA node did not satisfy host/IP/online contract' >&2
+          exit 41
+
+      - name: Execute bounded Tier-1 helper and validate sanitized output
+        env:
+          KRC_TS_IP: ${{ steps.krc.outputs.ip }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test "$KRC_TS_IP" = '100.118.132.8'
+          ssh_opts=(-o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10)
+
+          out="$(ssh "${ssh_opts[@]}" "krcops@$KRC_TS_IP" 'sudo -n /usr/local/sbin/krc-tier1-media-status')"
+
+          expected_keys=(
+            backend_type
+            backend_present
+            backend_running
+            backend_status
+            backend_image_digest
+            backend_restart_count
+            backend_loopback_only
+            backend_port
+            backend_user
+            backend_read_only_rootfs
+            backend_privileged
+            backend_healthcheck_configured
+            backend_health_status
+            backend_memory_limit_configured
+            backend_pids_limit_configured
+            backend_cap_drop_configured
+            backend_security_opt_configured
+            tier1_backend_status
+          )
+
+          declare -A allowed=()
+          declare -A seen=()
+          for key in "${expected_keys[@]}"; do
+            allowed["$key"]=1
+          done
+
+          while IFS= read -r line; do
+            [[ "$line" == *=* ]] || { echo 'Malformed Tier-1 output' >&2; exit 42; }
+            key="${line%%=*}"
+            value="${line#*=}"
+            [[ -n "${allowed[$key]+x}" ]] || { echo 'Unexpected Tier-1 output key' >&2; exit 42; }
+            [[ -z "${seen[$key]+x}" ]] || { echo 'Duplicate Tier-1 output key' >&2; exit 43; }
+            seen["$key"]="$value"
+          done <<<"$out"
+
+          for key in "${expected_keys[@]}"; do
+            [[ -n "${seen[$key]+x}" ]] || { echo 'Missing Tier-1 output key' >&2; exit 44; }
+          done
+          test "${#seen[@]}" -eq "${#expected_keys[@]}"
+
+          test "${seen[backend_type]}" = 'cobalt'
+          test "${seen[backend_present]}" = 'yes'
+          test "${seen[backend_running]}" = 'true'
+          test "${seen[backend_status]}" = 'running'
+          test "${seen[backend_image_digest]}" = 'sha256:63186dd68afd57ce3bb1f62cc4c139f5fa95b9c3e87a3cf5c6e4c7a570523f62'
+          [[ "${seen[backend_restart_count]}" =~ ^[0-9]+$ ]]
+          test "${seen[backend_loopback_only]}" = 'yes'
+          test "${seen[backend_port]}" = '9000'
+          test "${seen[backend_user]}" = 'node'
+          test "${seen[backend_read_only_rootfs]}" = 'true'
+          test "${seen[backend_privileged]}" = 'false'
+          [[ "${seen[backend_healthcheck_configured]}" =~ ^(yes|no)$ ]]
+          [[ "${seen[backend_health_status]}" =~ ^(none|starting|healthy|unhealthy)$ ]]
+          [[ "${seen[backend_memory_limit_configured]}" =~ ^(yes|no)$ ]]
+          [[ "${seen[backend_pids_limit_configured]}" =~ ^(yes|no)$ ]]
+          [[ "${seen[backend_cap_drop_configured]}" =~ ^(yes|no)$ ]]
+          [[ "${seen[backend_security_opt_configured]}" =~ ^(yes|no)$ ]]
+          test "${seen[tier1_backend_status]}" = 'PASS'
+
+          printf '%s\n' "$out"
+          echo 'P8_B_TIER1_STATUS=PASS'
+          echo 'P8_B_SECRET_VALUES=NOT_EXPOSED'
+
+      - name: Prove retained privilege and cross-project boundaries
+        env:
+          KRC_TS_IP: ${{ steps.krc.outputs.ip }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          ssh_opts=(-o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=7)
+
+          if ssh "${ssh_opts[@]}" "krcops@$KRC_TS_IP" 'sudo -n /usr/bin/id -u' >/dev/null 2>&1; then
+            echo 'Arbitrary root unexpectedly allowed' >&2
+            exit 51
+          fi
+          echo 'P8_B_ARBITRARY_ROOT=DENIED'
+
+          if ssh "${ssh_opts[@]}" "krcops@$KRC_TS_IP" 'sudo -n /usr/local/sbin/krc-tier1-media-status unexpected-argument' >/dev/null 2>&1; then
+            echo 'Tier-1 helper arguments unexpectedly allowed' >&2
+            exit 52
+          fi
+          echo 'P8_B_TIER1_ARGUMENTS=DENIED'
+
+          if ssh "${ssh_opts[@]}" "krcops@$KRC_TS_IP" 'docker ps' >/dev/null 2>&1; then
+            echo 'Docker unexpectedly accessible to krcops' >&2
+            exit 53
+          fi
+          echo 'P8_B_DIRECT_DOCKER_ACCESS=DENIED'
+
+          if ssh "${ssh_opts[@]}" "ubuntu@$KRC_TS_IP" true >/dev/null 2>&1; then
+            echo 'Automation source unexpectedly mapped to owner ubuntu' >&2
+            exit 54
+          fi
+          echo 'P8_B_OWNER_USER=DENIED'
+
+          if ssh "${ssh_opts[@]}" "root@$KRC_TS_IP" true >/dev/null 2>&1; then
+            echo 'Automation source unexpectedly mapped to root' >&2
+            exit 55
+          fi
+          echo 'P8_B_ROOT_USER=DENIED'
+
+          if timeout 5 bash -c 'cat < /dev/null > /dev/tcp/100.102.136.23/22' 2>/dev/null; then
+            echo 'KRC automation source unexpectedly reached KGM TCP/22' >&2
+            exit 56
+          fi
+          echo 'P8_B_KGM_ISOLATION=PASS'
+
+      - name: Verify retained Tier-0 observation
+        env:
+          KRC_TS_IP: ${{ steps.krc.outputs.ip }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          ssh_opts=(-o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10)
+          out="$(ssh "${ssh_opts[@]}" "krcops@$KRC_TS_IP" 'sudo -n /usr/local/sbin/krc-tier0-status')"
+          grep -Fxq 'KRC_TIER0_STATUS_VERSION=1' <<<"$out"
+          grep -Fxq 'hostname=krc-cobalt' <<<"$out"
+          echo 'P8_B_TIER0_REGRESSION=PASS'
+
+      - name: Record Phase-8B observation result
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          echo 'P8_B_BACKEND_MUTATION=DENIED'
+          echo 'KRC_PHASE_8_P8_B_TIER1_OBSERVATION=PASS'
+          echo 'KRC_PHASE_8_OPERATION=TIER1_READ_ONLY'
+          echo "repository_sha=$GITHUB_SHA"
