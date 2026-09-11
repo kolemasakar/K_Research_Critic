@@ -2,6 +2,15 @@ name: KRC MEDIA Tier-0 Tailscale Control
 
 on:
   workflow_dispatch:
+    inputs:
+      operation:
+        description: Authorized read-only KRC MEDIA operation
+        required: true
+        default: tier0
+        type: choice
+        options:
+          - tier0
+          - tier1
 
 permissions:
   id-token: write
@@ -16,10 +25,11 @@ jobs:
     timeout-minutes: 8
 
     steps:
-      - name: Validate exact repository, branch, and dedicated workload identity inputs
+      - name: Validate exact repository, branch, operation, and dedicated workload identity inputs
         env:
           TS_KRC_OAUTH_CLIENT_ID: ${{ secrets.TS_KRC_OAUTH_CLIENT_ID }}
           TS_KRC_AUDIENCE: ${{ secrets.TS_KRC_AUDIENCE }}
+          KRC_OPERATION: ${{ inputs.operation }}
         shell: bash
         run: |
           set -Eeuo pipefail
@@ -27,7 +37,18 @@ jobs:
           test "$GITHUB_REF" = 'refs/heads/main'
           test -n "$TS_KRC_OAUTH_CLIENT_ID"
           test -n "$TS_KRC_AUDIENCE"
-          echo 'KRC_PHASE_6_REPOSITORY_BOUNDARY=PASS'
+          case "$KRC_OPERATION" in
+            tier0)
+              echo 'KRC_PHASE_6_REPOSITORY_BOUNDARY=PASS'
+              ;;
+            tier1)
+              echo 'P8_B_REPOSITORY_BOUNDARY=PASS'
+              ;;
+            *)
+              echo 'Unauthorized operation' >&2
+              exit 40
+              ;;
+          esac
 
       - name: Connect ephemeral KRC-only GitHub runner to tailnet
         uses: tailscale/github-action@306e68a486fd2350f2bfc3b19fcd143891a4a2d8 # v4
@@ -38,6 +59,8 @@ jobs:
 
       - name: Resolve and verify exact KRC MEDIA node
         id: krc
+        env:
+          KRC_OPERATION: ${{ inputs.operation }}
         shell: bash
         run: |
           set -Eeuo pipefail
@@ -53,7 +76,11 @@ jobs:
             if [ "$host_count" = '1' ] && [ "$ip" = "$expected_ip" ] && [ "$online" = 'true' ]; then
               echo "ip=$ip" >> "$GITHUB_OUTPUT"
               tailscale ping --timeout=3s "$ip"
-              echo 'KRC_PHASE_6_NODE_IDENTITY=PASS'
+              if [ "$KRC_OPERATION" = 'tier0' ]; then
+                echo 'KRC_PHASE_6_NODE_IDENTITY=PASS'
+              else
+                echo 'P8_B_NODE_IDENTITY=PASS'
+              fi
               exit 0
             fi
             sleep 2
@@ -63,6 +90,7 @@ jobs:
           exit 41
 
       - name: Execute accepted Tier-0 helper and validate sanitized output
+        if: ${{ inputs.operation == 'tier0' }}
         env:
           KRC_TS_IP: ${{ steps.krc.outputs.ip }}
         shell: bash
@@ -80,13 +108,90 @@ jobs:
 
           allowed='^(KRC_TIER0_STATUS_VERSION|timestamp_utc|hostname|kernel|architecture|cpu_count|loadavg|mem_total_kib|mem_available_kib|swap_total_kib|root_fs|tailscaled|ssh|docker|rpcbind|tailscale_ipv4|tcp_listeners)='
           unexpected="$(grep -Ev "$allowed" <<<"$out" || true)"
-          test -z "$unexpected" || { echo "Unexpected Tier-0 output key(s):" >&2; printf '%s\n' "$unexpected" >&2; exit 42; }
+          test -z "$unexpected" || { echo 'Unexpected Tier-0 output key(s)' >&2; exit 42; }
 
           echo 'KRC_PHASE_6_TIER0_OBSERVATION=PASS'
 
-      - name: Prove remote privilege and cross-project isolation
+      - name: Execute bounded Tier-1 helper and validate sanitized output
+        if: ${{ inputs.operation == 'tier1' }}
         env:
           KRC_TS_IP: ${{ steps.krc.outputs.ip }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test "$KRC_TS_IP" = '100.118.132.8'
+          ssh_opts=(-o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10)
+
+          out="$(ssh "${ssh_opts[@]}" "krcops@$KRC_TS_IP" 'sudo -n /usr/local/sbin/krc-tier1-media-status')"
+
+          expected_keys=(
+            backend_type
+            backend_present
+            backend_running
+            backend_status
+            backend_image_digest
+            backend_restart_count
+            backend_loopback_only
+            backend_port
+            backend_user
+            backend_read_only_rootfs
+            backend_privileged
+            backend_healthcheck_configured
+            backend_health_status
+            backend_memory_limit_configured
+            backend_pids_limit_configured
+            backend_cap_drop_configured
+            backend_security_opt_configured
+            tier1_backend_status
+          )
+
+          declare -A allowed=()
+          declare -A seen=()
+          for key in "${expected_keys[@]}"; do
+            allowed["$key"]=1
+          done
+
+          while IFS= read -r line; do
+            [[ "$line" == *=* ]] || { echo 'Malformed Tier-1 output' >&2; exit 42; }
+            key="${line%%=*}"
+            value="${line#*=}"
+            [[ -n "${allowed[$key]+x}" ]] || { echo 'Unexpected Tier-1 output key' >&2; exit 42; }
+            [[ -z "${seen[$key]+x}" ]] || { echo 'Duplicate Tier-1 output key' >&2; exit 43; }
+            seen["$key"]="$value"
+          done <<<"$out"
+
+          for key in "${expected_keys[@]}"; do
+            [[ -n "${seen[$key]+x}" ]] || { echo 'Missing Tier-1 output key' >&2; exit 44; }
+          done
+          test "${#seen[@]}" -eq "${#expected_keys[@]}"
+
+          test "${seen[backend_type]}" = 'cobalt'
+          test "${seen[backend_present]}" = 'yes'
+          test "${seen[backend_running]}" = 'true'
+          test "${seen[backend_status]}" = 'running'
+          test "${seen[backend_image_digest]}" = 'sha256:63186dd68afd57ce3bb1f62cc4c139f5fa95b9c3e87a3cf5c6e4c7a570523f62'
+          [[ "${seen[backend_restart_count]}" =~ ^[0-9]+$ ]]
+          test "${seen[backend_loopback_only]}" = 'yes'
+          test "${seen[backend_port]}" = '9000'
+          test "${seen[backend_user]}" = 'node'
+          test "${seen[backend_read_only_rootfs]}" = 'true'
+          test "${seen[backend_privileged]}" = 'false'
+          [[ "${seen[backend_healthcheck_configured]}" =~ ^(yes|no)$ ]]
+          [[ "${seen[backend_health_status]}" =~ ^(none|starting|healthy|unhealthy)$ ]]
+          [[ "${seen[backend_memory_limit_configured]}" =~ ^(yes|no)$ ]]
+          [[ "${seen[backend_pids_limit_configured]}" =~ ^(yes|no)$ ]]
+          [[ "${seen[backend_cap_drop_configured]}" =~ ^(yes|no)$ ]]
+          [[ "${seen[backend_security_opt_configured]}" =~ ^(yes|no)$ ]]
+          test "${seen[tier1_backend_status]}" = 'PASS'
+
+          printf '%s\n' "$out"
+          echo 'P8_B_TIER1_STATUS=PASS'
+          echo 'P8_B_SECRET_VALUES=NOT_EXPOSED'
+
+      - name: Prove retained privilege and cross-project isolation
+        env:
+          KRC_TS_IP: ${{ steps.krc.outputs.ip }}
+          KRC_OPERATION: ${{ inputs.operation }}
         shell: bash
         run: |
           set -Eeuo pipefail
@@ -96,42 +201,80 @@ jobs:
             echo 'Arbitrary root unexpectedly allowed' >&2
             exit 51
           fi
-          echo 'KRC_PHASE_6_ARBITRARY_ROOT=DENIED'
 
-          if ssh "${ssh_opts[@]}" "krcops@$KRC_TS_IP" 'sudo -n /usr/local/sbin/krc-tier0-status unexpected-argument' >/dev/null 2>&1; then
-            echo 'Tier-0 helper argument injection unexpectedly allowed' >&2
-            exit 52
+          if [ "$KRC_OPERATION" = 'tier0' ]; then
+            if ssh "${ssh_opts[@]}" "krcops@$KRC_TS_IP" 'sudo -n /usr/local/sbin/krc-tier0-status unexpected-argument' >/dev/null 2>&1; then
+              echo 'Tier-0 helper argument injection unexpectedly allowed' >&2
+              exit 52
+            fi
+          else
+            if ssh "${ssh_opts[@]}" "krcops@$KRC_TS_IP" 'sudo -n /usr/local/sbin/krc-tier1-media-status unexpected-argument' >/dev/null 2>&1; then
+              echo 'Tier-1 helper arguments unexpectedly allowed' >&2
+              exit 52
+            fi
           fi
-          echo 'KRC_PHASE_6_HELPER_ARGUMENT_INJECTION=DENIED'
 
           if ssh "${ssh_opts[@]}" "krcops@$KRC_TS_IP" 'docker ps' >/dev/null 2>&1; then
             echo 'Docker unexpectedly accessible to krcops' >&2
             exit 53
           fi
-          echo 'KRC_PHASE_6_DOCKER_ACCESS=DENIED'
 
           if ssh "${ssh_opts[@]}" "ubuntu@$KRC_TS_IP" true >/dev/null 2>&1; then
             echo 'Automation source unexpectedly mapped to owner ubuntu' >&2
             exit 54
           fi
-          echo 'KRC_PHASE_6_OWNER_USER=DENIED'
 
           if ssh "${ssh_opts[@]}" "root@$KRC_TS_IP" true >/dev/null 2>&1; then
             echo 'Automation source unexpectedly mapped to root' >&2
             exit 55
           fi
-          echo 'KRC_PHASE_6_ROOT_USER=DENIED'
 
           if timeout 5 bash -c 'cat < /dev/null > /dev/tcp/100.102.136.23/22' 2>/dev/null; then
             echo 'KRC automation source unexpectedly reached KGM TCP/22' >&2
             exit 56
           fi
-          echo 'KRC_PHASE_6_KGM_TCP22_ISOLATION=PASS'
 
-      - name: Record Phase-6 control-plane result
+          if [ "$KRC_OPERATION" = 'tier0' ]; then
+            echo 'KRC_PHASE_6_ARBITRARY_ROOT=DENIED'
+            echo 'KRC_PHASE_6_HELPER_ARGUMENT_INJECTION=DENIED'
+            echo 'KRC_PHASE_6_DOCKER_ACCESS=DENIED'
+            echo 'KRC_PHASE_6_OWNER_USER=DENIED'
+            echo 'KRC_PHASE_6_ROOT_USER=DENIED'
+            echo 'KRC_PHASE_6_KGM_TCP22_ISOLATION=PASS'
+          else
+            echo 'P8_B_ARBITRARY_ROOT=DENIED'
+            echo 'P8_B_TIER1_ARGUMENTS=DENIED'
+            echo 'P8_B_DIRECT_DOCKER_ACCESS=DENIED'
+            echo 'P8_B_OWNER_USER=DENIED'
+            echo 'P8_B_ROOT_USER=DENIED'
+            echo 'P8_B_KGM_ISOLATION=PASS'
+          fi
+
+      - name: Verify retained Tier-0 observation under Tier-1 mode
+        if: ${{ inputs.operation == 'tier1' }}
+        env:
+          KRC_TS_IP: ${{ steps.krc.outputs.ip }}
         shell: bash
         run: |
           set -Eeuo pipefail
-          echo 'KRC_PHASE_6_PROJECT_ISOLATED_OIDC_CONTROL=PASS'
-          echo 'KRC_PHASE_6_OPERATION=TIER0_READ_ONLY'
+          ssh_opts=(-o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10)
+          out="$(ssh "${ssh_opts[@]}" "krcops@$KRC_TS_IP" 'sudo -n /usr/local/sbin/krc-tier0-status')"
+          grep -Fxq 'KRC_TIER0_STATUS_VERSION=1' <<<"$out"
+          grep -Fxq 'hostname=krc-cobalt' <<<"$out"
+          echo 'P8_B_TIER0_REGRESSION=PASS'
+
+      - name: Record authorized control-plane result
+        env:
+          KRC_OPERATION: ${{ inputs.operation }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          if [ "$KRC_OPERATION" = 'tier0' ]; then
+            echo 'KRC_PHASE_6_PROJECT_ISOLATED_OIDC_CONTROL=PASS'
+            echo 'KRC_PHASE_6_OPERATION=TIER0_READ_ONLY'
+          else
+            echo 'P8_B_BACKEND_MUTATION=DENIED'
+            echo 'KRC_PHASE_8_P8_B_TIER1_OBSERVATION=PASS'
+            echo 'KRC_PHASE_8_OPERATION=TIER1_READ_ONLY'
+          fi
           echo "repository_sha=$GITHUB_SHA"
