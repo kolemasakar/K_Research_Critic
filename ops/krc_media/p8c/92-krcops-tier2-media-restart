@@ -1,0 +1,1 @@
+krcops ALL=(root) NOPASSWD: /usr/local/sbin/krc-tier2-media-restart ""

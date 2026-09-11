@@ -22,13 +22,14 @@ def test_krc_control_workflow_is_manual_main_only_and_fails_closed() -> None:
     assert "if: github.repository" not in text
 
 
-def test_krc_control_workflow_exposes_only_tier0_and_tier1_read_only_modes() -> None:
+def test_krc_control_workflow_exposes_only_bounded_authorized_modes() -> None:
     text = _text()
     assert "operation:" in text
     assert "default: tier0" in text
     assert "type: choice" in text
     assert "- tier0" in text
     assert "- tier1" in text
+    assert "- tier2_restart" in text
     assert "Unauthorized operation" in text
 
 
@@ -54,9 +55,12 @@ def test_krc_control_workflow_targets_exact_node_and_bounded_helpers() -> None:
     assert '"krcops@$KRC_TS_IP"' in text
     assert "sudo -n /usr/local/sbin/krc-tier0-status" in text
     assert "sudo -n /usr/local/sbin/krc-tier1-media-status" in text
+    assert "sudo -n /usr/local/sbin/krc-tier2-media-restart" in text
     assert "KRC_TIER0_STATUS_VERSION=1" in text
     assert "backend_type" in text
     assert "tier1_backend_status" in text
+    assert "P8_C_RESTART_VERSION" in text
+    assert "tier2_restart_status" in text
 
 
 def test_krc_tier0_path_retains_sanitized_allowlist_and_phase6_markers() -> None:
@@ -146,7 +150,41 @@ def test_krc_tier1_path_pins_current_backend_identity_and_boundaries() -> None:
         assert marker in text
 
 
-def test_krc_control_workflow_has_no_mutation_surface() -> None:
+def test_krc_tier2_restart_is_exact_bounded_and_regression_checked() -> None:
+    text = _text()
+    required = (
+        "P8_C_REPOSITORY_BOUNDARY=PASS",
+        "P8_C_NODE_IDENTITY=PASS",
+        "P8_C_PRECHECK=PASS",
+        "P8_C_BACKEND_IDENTITY=PASS",
+        "P8_C_RESTART=PASS",
+        "P8_C_SECRET_VALUES=NOT_EXPOSED",
+        "P8_C_POSTCHECK=PASS",
+        "P8_C_TIER1_REGRESSION=PASS",
+        "P8_C_ARBITRARY_ROOT=DENIED",
+        "P8_C_ARGUMENTS=DENIED",
+        "P8_C_DIRECT_DOCKER_ACCESS=DENIED",
+        "P8_C_OWNER_USER=DENIED",
+        "P8_C_ROOT_USER=DENIED",
+        "P8_C_KGM_ISOLATION=PASS",
+        "P8_C_TIER0_REGRESSION=PASS",
+        "KRC_PHASE_8_P8_C_RESTART_ONLY=PASS",
+        "KRC_PHASE_8_OPERATION=TIER2_RESTART_ONLY",
+    )
+    for marker in required:
+        assert marker in text
+
+    assert "expected_restart_keys=(" in text
+    assert "Duplicate Tier-2 restart output key" in text
+    assert "Missing Tier-2 restart output key" in text
+    assert "backend_identity_verified" in text
+    assert "pre_restart_running" in text
+    assert "post_restart_running" in text
+    assert "post_restart_identity_verified" in text
+    assert "restart_requested" in text
+
+
+def test_krc_workflow_has_no_direct_mutation_surface() -> None:
     text = _text().lower()
     forbidden = (
         "systemctl restart",

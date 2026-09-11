@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+if [ "$#" -ne 0 ]; then
+  echo 'ERROR: arguments are not permitted' >&2
+  exit 64
+fi
+
+DOCKER=/usr/bin/docker
+EXPECTED_IMAGE='ghcr.io/imputnet/cobalt@sha256:63186dd68afd57ce3bb1f62cc4c139f5fa95b9c3e87a3cf5c6e4c7a570523f62'
+EXPECTED_PORT='9000/tcp -> 127.0.0.1:9000'
+EXPECTED_USER='node'
+
+[ -x "$DOCKER" ] || { echo 'ERROR: docker binary unavailable' >&2; exit 65; }
+
+matches=()
+while IFS= read -r cid; do
+  [ -n "$cid" ] || continue
+
+  image="$($DOCKER inspect --format '{{.Config.Image}}' "$cid" 2>/dev/null || true)"
+  [ "$image" = "$EXPECTED_IMAGE" ] || continue
+
+  running="$($DOCKER inspect --format '{{.State.Running}}' "$cid" 2>/dev/null || true)"
+  [ "$running" = 'true' ] || continue
+
+  user="$($DOCKER inspect --format '{{.Config.User}}' "$cid" 2>/dev/null || true)"
+  [ "$user" = "$EXPECTED_USER" ] || continue
+
+  readonly="$($DOCKER inspect --format '{{.HostConfig.ReadonlyRootfs}}' "$cid" 2>/dev/null || true)"
+  [ "$readonly" = 'true' ] || continue
+
+  privileged="$($DOCKER inspect --format '{{.HostConfig.Privileged}}' "$cid" 2>/dev/null || true)"
+  [ "$privileged" = 'false' ] || continue
+
+  ports="$($DOCKER port "$cid" 2>/dev/null || true)"
+  [ "$ports" = "$EXPECTED_PORT" ] || continue
+
+  matches+=("$cid")
+done < <($DOCKER ps --no-trunc --format '{{.ID}}')
+
+[ "${#matches[@]}" -eq 1 ] || {
+  echo 'ERROR: exact accepted Cobalt backend identity not uniquely resolved' >&2
+  exit 66
+}
+
+cid="${matches[0]}"
+
+pre_running="$($DOCKER inspect --format '{{.State.Running}}' "$cid")"
+[ "$pre_running" = 'true' ] || { echo 'ERROR: accepted backend is not running' >&2; exit 67; }
+
+$DOCKER restart --time 10 "$cid" >/dev/null
+
+post_running='false'
+for _ in $(seq 1 30); do
+  post_running="$($DOCKER inspect --format '{{.State.Running}}' "$cid" 2>/dev/null || true)"
+  [ "$post_running" = 'true' ] && break
+  sleep 1
+done
+[ "$post_running" = 'true' ] || { echo 'ERROR: backend did not return to running state' >&2; exit 68; }
+
+image="$($DOCKER inspect --format '{{.Config.Image}}' "$cid")"
+user="$($DOCKER inspect --format '{{.Config.User}}' "$cid")"
+readonly="$($DOCKER inspect --format '{{.HostConfig.ReadonlyRootfs}}' "$cid")"
+privileged="$($DOCKER inspect --format '{{.HostConfig.Privileged}}' "$cid")"
+ports="$($DOCKER port "$cid")"
+
+[ "$image" = "$EXPECTED_IMAGE" ] || { echo 'ERROR: image identity changed after restart' >&2; exit 69; }
+[ "$user" = "$EXPECTED_USER" ] || { echo 'ERROR: runtime user changed after restart' >&2; exit 70; }
+[ "$readonly" = 'true' ] || { echo 'ERROR: read-only rootfs changed after restart' >&2; exit 71; }
+[ "$privileged" = 'false' ] || { echo 'ERROR: privileged state changed after restart' >&2; exit 72; }
+[ "$ports" = "$EXPECTED_PORT" ] || { echo 'ERROR: loopback binding changed after restart' >&2; exit 73; }
+
+printf '%s\n' \
+  'P8_C_RESTART_VERSION=1' \
+  'backend_type=cobalt' \
+  'backend_identity_verified=yes' \
+  'pre_restart_running=true' \
+  'restart_requested=yes' \
+  'post_restart_running=true' \
+  'post_restart_identity_verified=yes' \
+  'tier2_restart_status=PASS'
