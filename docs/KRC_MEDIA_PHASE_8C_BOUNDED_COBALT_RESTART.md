@@ -1,4 +1,5 @@
 # KRC MEDIA Phase 8C — Bounded Cobalt Restart
+Обмежений контрольований перезапуск Cobalt для KRC MEDIA без розширення інших повноважень.
 
 Status: **REPOSITORY IMPLEMENTATION CANDIDATE / HOST BOOTSTRAP PENDING / LIVE ACCEPTANCE PENDING**
 
