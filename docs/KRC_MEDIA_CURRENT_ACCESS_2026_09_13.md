@@ -1,7 +1,7 @@
 # KRC MEDIA — Current Access Paths
 
 Date: 2026-09-13
-Status: CURRENT
+Status: CURRENT / VERIFIED
 
 ## Primary project automation
 
@@ -24,6 +24,8 @@ RDC under `krcops` remains available as supplemental development access. It does
 ## OCI infrastructure observation
 
 OCI instance-principal authentication is available for read-only infrastructure observation from the KRC Cobalt host.
+
+Required recovery reads are now fully verified, including NSG security-rule listing. OCI mutation through this path remains denied.
 
 Persistent OCI authority is read-only. No reusable OCI user credential is stored in the repository.
 
