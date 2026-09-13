@@ -2,6 +2,8 @@
 
 - Added OCI instance-principal access for live infrastructure observation.
 - Persistent OCI permission is read-only.
+- Required read verification is complete.
+- Earlier read-scope consistency warning is closed.
 - Existing KRC bounded automation remains tier0, tier1, and tier2_restart.
 - RDC remains supplemental development access.
 - No reusable OCI user credential is stored in the repository.
