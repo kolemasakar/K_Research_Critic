@@ -6,6 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+sys.dont_write_bytecode = True
 
 from plugins.krc_migration_candidate.mcp_canary.http_server import HttpConfig, handle_http_request
 from plugins.krc_migration_candidate.mcp_canary.server import CANARY_TOOL_NAME
