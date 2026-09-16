@@ -1,15 +1,16 @@
 # KRC MEDIA — R3 Sentinel Delegation Ready Checkpoint — 2026-09-16
 Зафіксовано готовність repository-side R3 пакета до делегованого Builder Preview через private Sentinel Remote без публікації.
 
-Status: R3_SENTINEL_DELEGATION_READY / BUILDER_ENTRY_STALLED / PUBLICATION_HOLD
+Status: R3_SENTINEL_DELEGATION_READY / VALIDATED / BUILDER_ENTRY_STALLED / PUBLICATION_HOLD
 
 ## Repository state
 
 Branch: `agent/krc-public-media-r3-integration`
 Validated head before this checkpoint: `89a81e14942f78d17ad983928246dfd521d6f16d`
+Checkpoint commit validated by CI: `a2d11a143d84090d4662571a17802d3a453ce982`
 Draft PR: `#22` — OPEN / DRAFT / UNMERGED / mergeable.
 
-Workflow run `35101406500`:
+Workflow run `35101577221` for checkpoint commit `a2d11a143d84090d4662571a17802d3a453ce982`:
 - Python 3.13: PASS
 - Python 3.14: PASS
 - Quality gates: PASS
