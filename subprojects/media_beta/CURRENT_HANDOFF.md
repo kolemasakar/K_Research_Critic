@@ -1,23 +1,22 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 10.0
-Status: ACTIVE_HANDOFF / LIVE_REMOTE_MCP_CANARY_PASS / CHATGPT_CONNECTION_PASS / ONE_TOOL_DISCOVERY_PASS / CHATGPT_INVOCATION_PASS / BOUNDED_CANARY_GATE_CLOSED / PUBLICATION_HOLD
+Version: 11.0
+Status: **ACTIVE_HANDOFF / BOUNDED_CANARY_CLOSED_PASS / POST_CANARY_ROADMAP_APPROVED / R3-A_READY / PUBLICATION_HOLD**
 Date: 2026-09-16
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md. Bounded Remote MCP canary gate закрито PASS; почни з наступного roadmap/owner decision, не розширюй surface автоматично.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md і продовжуй з R3-A contract freeze / secure adapter baseline.`
 
 ## Canonical recovery files
 
 1. `subprojects/media_beta/CURRENT_HANDOFF.md`
-2. `subprojects/media_beta/110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md`
-3. `subprojects/media_beta/109_CHATGPT_CUSTOM_MCP_CONNECTION_DISCOVERY_PASS_2026_09_16.md`
-4. `subprojects/media_beta/108_SENTINEL_REMOTE_MCP_CANARY_LIVE_DEPLOYMENT_CONNECTION_BLOCKED_2026_09_16.md`
-5. `subprojects/media_beta/107_KRC_DEPLOYABLE_REMOTE_MCP_CANARY_REPO_ACCEPTANCE_2026_09_16.md`
-6. current PR #22 head/CI and current non-secret account/control-plane evidence
+2. `subprojects/media_beta/111_POST_CANARY_PLUGIN_MEDIA_ROADMAP_DECISION_2026_09_16.md`
+3. `subprojects/media_beta/02_ROADMAP.md` — v5.0
+4. `subprojects/media_beta/110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md`
+5. current PR #22 head/CI and current non-secret account/control-plane evidence
 
-Older handoffs remain historical recovery evidence only and are superseded for current phase selection.
+Older handoffs/checkpoints remain historical evidence only.
 
 ## Repository / PR
 
@@ -29,128 +28,130 @@ base=main
 state=OPEN / DRAFT / UNMERGED
 ```
 
-Validated implementation evidence:
+Final bounded-canary documentation state before roadmap planning:
 
 ```text
-implementation_head=4a75f53d6da956d9b2eb7acc1b6f788824bb6e03
-implementation_workflow=35126692392
-implementation_conclusion=SUCCESS
-live_gate_documentation_head=16acbb81cb46d4da672ad79e8eb18105e1ab5269
-live_gate_workflow=35129121125
-live_gate_conclusion=SUCCESS
+head=75a4b30e9f478fad892fafc017fea069ce949aec
+workflow=35131580138
+conclusion=SUCCESS
+Tests / Python 3.13=PASS
+Tests / Python 3.14=PASS
+Quality gates=PASS
 ```
 
-At recovery always refetch current PR metadata and latest CI because documentation commits advance the branch.
+At recovery always refetch current PR metadata and CI because documentation commits advance the branch.
 
-## Accepted current state
+## Proven baseline
 
 ```text
-PROJECT=ACTIVE
 PLUGIN_FIRST_STRATEGY=ACCEPTED
 SURFACE_CLASSIFICATION=REMOTE_CUSTOM_MCP_CANDIDATE
 MCP_CANARY_DEPLOYABLE=PASS
 LIVE_MCP_DEPLOYMENT=PASS
-REMOTE_ENDPOINT_READY_FOR_CONNECTION_TEST=YES
-EXTERNAL_HEALTH=PASS
-EXTERNAL_SERVER_DISCOVER=PASS
-EXTERNAL_TOOLS_LIST=PASS
-EXTERNAL_TOOLS_CALL=PASS
-CANARY_TOOL_COUNT=1
-CANARY_MUTATION=false
-CANARY_PROVIDER_WORK=false
-CANARY_VOICEBRIDGE_BINDING=false
-CANARY_EXECUTION_TOOLS=false
+EXTERNAL_PROTOCOL_VALIDATION=PASS
 CHATGPT_MCP_CONNECTION=PASS
-SCAN_TOOLS_EQUIVALENT_DISCOVERY=PASS
 CHATGPT_DISCOVERED_TOOL_COUNT=1
 CHATGPT_DISCOVERED_TOOL_NAME=krc_media_capabilities_canary
 CHATGPT_CANARY_INVOCATION=PASS
-CHATGPT_CANARY_STATUS=ok
-CHATGPT_CANARY_MUTATION=false
-CHATGPT_CANARY_PROVIDER_WORK=false
-CHATGPT_CANARY_VOICEBRIDGE_BINDING=not_enabled
-CHATGPT_CANARY_EXECUTION_TOOLS=not_enabled
 BOUNDED_CANARY_GATE=CLOSED_PASS
 ```
 
-## Live bounded canary
+Canary result:
 
 ```text
-DEPLOYMENT_TARGET=render/krc-mcp-canary-sentinel
-SOURCE_BRANCH=agent/krc-public-media-r3-integration
-SOURCE_COMMIT=2a91c6c4a982909717fb5b4e1dda7a04af1b388c
-AUTO_DEPLOY=off
-LIVE_ENDPOINT=https://krc-mcp-canary-sentinel.onrender.com
-MCP_PATH=/mcp
-HEALTH_PATH=/healthz
-AUTH_MODE=none
+status=ok
+mutation=false
+provider_work=false
+voicebridge_binding=not_enabled
+execution_tools=not_enabled
+media_operation_target_count=13
 ```
 
-`AUTH_MODE=none` is authorized only for this bounded one-tool canary validation. The endpoint contains no provider credential, VoiceBridge binding, mutation tool, execution tool, or user-controlled arguments.
-
-No existing VoiceBridge, Cobalt, KGM or other Render service was modified.
-
-## ChatGPT owner-account evidence
-
-The private custom MCP/plugin `KRC MCP Canary Sentinel` is connected in the normal owner-account ChatGPT surface. The authenticated settings page displayed exactly one action:
+## Live canary boundary
 
 ```text
-TOOL_COUNT=1
-TOOL=krc_media_capabilities_canary
-DESCRIPTION=Returns deterministic KRC MEDIA canary metadata. It does not call providers, VoiceBridge, or mutate external state.
+service=krc-mcp-canary-sentinel
+endpoint=https://krc-mcp-canary-sentinel.onrender.com/mcp
+autoDeploy=off
+auth=none  # bounded canary only
+VoiceBridge credential=none
+provider work=none
 ```
 
-A normal ChatGPT chat invoked only this tool once and returned:
+The canary is evidence only. It must not receive VoiceBridge credentials or become the production MEDIA endpoint.
 
-```json
-{
-  "execution_tools": "not_enabled",
-  "media_operation_target_count": 13,
-  "mutation": false,
-  "provider_work": false,
-  "service": "krc-media-mcp-canary",
-  "status": "ok",
-  "voicebridge_binding": "not_enabled"
-}
-```
-
-## Gate closure
-
-The bounded Remote MCP canary path is fully proven end-to-end:
+## Approved roadmap
 
 ```text
-repository implementation
--> deployable package
--> isolated Render deployment
--> external HTTPS protocol validation
--> owner-account ChatGPT connection
--> exactly one discovered tool
--> one read-only ChatGPT-side invocation
--> PASS
+R3-A contract freeze / secure adapter baseline
+R3-B inbound auth + secret-boundary hardening
+R3-C 9-tool non-execution VoiceBridge binding
+R3-D consequential-action confirmation semantics
+R3-E staged 4 execution routes: YouTube -> Instagram -> Facebook -> Telegram
+R3-F full 13-operation parity regression
+R3-G private operational hardening
+R3-H migration/publication readiness
+R4   separate owner-approved cutover/migration/publication
 ```
 
-Do not automatically expand scope from this result.
+No phase auto-authorizes the next state-changing phase.
 
-## Next decision point
+## Current executable gate
 
-The next block requires explicit owner/roadmap selection before implementation. Candidate topics include broader MEDIA parity, authentication hardening, action/execution confirmation semantics, staged VoiceBridge binding, and eventual Plugin migration/publication readiness. None is authorized by this checkpoint alone.
+**R3-A only** is approved as the next engineering block.
+
+R3-A must:
+
+- reconcile/freeze the 13-tool contract against the proven Remote MCP surface;
+- freeze exact schemas, annotations, consent, retry/idempotency, audit, error, and secret boundaries;
+- preserve Core skill parity;
+- remain repository-only;
+- pass CI.
+
+R3-A must not:
+
+```text
+deploy a new live endpoint
+change the live canary
+bind VoiceBridge credentials
+call providers
+expose real execution/start tools
+change the public GPT
+publish/share/migrate the Plugin
+merge PR #22
+merge VoiceBridge PR #45
+```
+
+## Architecture target
+
+```text
+ChatGPT Plugin/App
+-> authenticated remote MCP adapter
+-> server-side VoiceBridge credential injection
+-> existing VoiceBridge MEDIA API
+-> existing free-only provider routes + durable state
+```
 
 ## Core / MEDIA invariants
 
 ```text
 CURRENT_PUBLIC_GPT=UNCHANGED
 MEDIA_OPERATION_PARITY_COUNT=13
-FULL_13_MEDIA_BINDING=NOT_STARTED
-MEDIA_PROVIDER_WORK=DENIED_FOR_CANARY
-VOICEBRIDGE_SECRET_BINDING=DENIED
-CORE_SKILL_PARITY=PASS
-MEDIA_FREE_ONLY_FAIL_CLOSED=UNCHANGED
-MEDIA_FAILURE_CORE_ISOLATION=UNCHANGED
+MODEL_VISIBLE_SECRET=false
+REPOSITORY_SECRET=false
+VOICEBRIDGE_BEARER_SERVER_SIDE_ONLY=true
+PAID_RETRIEVAL_FALLBACK=false
+PAID_STT_FALLBACK=false
+PAID_PROXY_FALLBACK=false
+AUTOMATIC_RETRY_LOOP=false
+YOUTUBE_START_REQUIRES_EXPLICIT_CONSENT=true
+MEDIA_FAILURE_CORE_ISOLATION=REQUIRED
 ```
 
 ## Hard boundary
 
 ```text
+R3_B_AND_LATER_EXECUTION=NOT_AUTHORIZED_BY_R3_A
 FULL_MEDIA_13_TOOL_DEPLOYMENT=DENIED
 VOICEBRIDGE_SECRET_BINDING=DENIED
 MEDIA_PROVIDER_WORK=DENIED
@@ -166,4 +167,4 @@ PR45_MERGE=DENIED
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V10_0_BOUNDED_REMOTE_MCP_CANARY_GATE_CLOSED_PASS_2026_09_16`
+`KRC_MEDIA_CURRENT_HANDOFF_V11_0_POST_CANARY_ROADMAP_APPROVED_R3_A_READY_2026_09_16`
