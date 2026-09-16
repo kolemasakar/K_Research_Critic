@@ -1,14 +1,27 @@
-schema_version: "0.1"
-status: PREPARED_MIGRATION_ACCEPTANCE_CONTRACT
+schema_version: "0.2"
+status: R3A_RECONCILED_MIGRATION_ACCEPTANCE_CONTRACT
 as_of: "2026-09-16"
 source_research: kolemasakar/AI_general/docs/openai-custom-gpts-retirement-to-plugins-2026-09-16.md
 source_surface_matrix: plugins/krc_migration_candidate/contracts/surface_decision_matrix.yaml
+source_canary_acceptance: subprojects/media_beta/110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md
 
 purpose: >-
   Define product-level acceptance gates for moving K-Research & Critic from the
-  current published Custom GPT to a replacement Plugin without assuming 1:1
-  portability of GPT-specific UX, distribution, model selection, chat history,
-  reference assets, sharing, or Custom Actions.
+  current published Custom GPT to a replacement Plugin while using the proven
+  custom Remote MCP path for rebuilt MEDIA capabilities. This does not assume
+  1:1 portability of GPT-specific UX, distribution, model selection, chat
+  history, reference assets, sharing, or Custom Actions.
+
+selected_replacement_surface:
+  media_binding: custom_remote_mcp
+  transport: remote_mcp_http
+  protocol_version: "2026-07-28"
+  bounded_read_only_canary_proven: true
+  full_media_binding_started: false
+  inbound_auth_hardening_phase: R3_B
+  non_execution_binding_phase: R3_C
+  execution_confirmation_phase: R3_D
+  execution_binding_phase: R3_E
 
 source_gpt:
   identity: K-Research & Critic
@@ -59,10 +72,15 @@ portability:
     acceptance:
       legacy_action_creation_default: HOLD
       media_rebuilt_through_supported_app_connector_or_mcp: true
+      selected_media_binding: CUSTOM_REMOTE_MCP
       media_operation_parity_required: 13
+      non_execution_operation_count: 9
+      execution_operation_count: 4
+      no_auth_canary_is_not_full_binding_auth: true
 
 access_and_distribution:
   replacement_plugin_initial_access: PRIVATE
+  bounded_private_canary_connection_proven: true
   public_gpt_sharing_auto_inherited: false
   sharing_must_be_reconfigured_and_validated: true
   intended_user_access_must_be_tested_before_cutover: true
@@ -87,6 +105,17 @@ migration_state_change:
   migration_is_not_preview: true
   read_only_inspection_must_stop_before_migrate: true
 
+media_pre_cutover_requirements:
+  inbound_authenticated_remote_mcp_required: true
+  voicebridge_secret_server_side_only: true
+  all_13_operation_semantic_parity_required: true
+  execution_confirmation_semantics_required: true
+  explicit_youtube_consent_required: true
+  no_paid_unapproved_fallback_required: true
+  retry_idempotency_regression_required: true
+  secret_error_sanitization_required: true
+  core_failure_isolation_required: true
+
 post_migration_regression:
   required:
     - core_skill_semantic_parity
@@ -106,6 +135,8 @@ post_migration_regression:
 
 cutover_gate:
   replacement_private_baseline_verified: true
+  bounded_remote_mcp_canary_verified: true
+  full_media_private_baseline_required: true
   core_regression_pass_required: true
   media_regression_pass_required: true
   sharing_access_validation_required: true
@@ -118,10 +149,10 @@ cutover_gate:
 release_boundary:
   public_gpt_mutation: DENIED
   migration_execution: DENIED
-  plugin_installation: DENIED
-  app_connection: DENIED
-  custom_mcp_upload: DENIED
   plugin_publication: DENIED
+  plugin_sharing: DENIED
+  full_media_mcp_deployment: DENIED
+  voicebridge_credential_binding: DENIED
   render_change: DENIED
   main_mutation: DENIED
   pr22_merge: DENIED
