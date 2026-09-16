@@ -1,14 +1,15 @@
-schema_version: "0.1"
-status: PREPARED_NOT_BOUND
+schema_version: "0.2"
+status: R3A_FROZEN_AUTH_TRANSPORT_REQUIREMENTS
 as_of: "2026-09-16"
 source_media_contract: plugins/krc_migration_candidate/contracts/media_tools.yaml
 source_adapter_contract: plugins/krc_migration_candidate/contracts/media_adapter.yaml
 source_surface_matrix: plugins/krc_migration_candidate/contracts/surface_decision_matrix.yaml
+source_canary_acceptance: subprojects/media_beta/110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md
 
 objective: >-
-  Define the stable authentication and transport requirements that any future
-  supported Plugin/App/MCP binding must satisfy without changing the accepted
-  VoiceBridge MEDIA API semantics.
+  Freeze the selected Remote MCP transport and the secret/authentication boundary
+  that future MEDIA binding must satisfy. R3-A does not choose or activate live
+  inbound authentication and does not bind VoiceBridge credentials.
 
 backend:
   logical_service: VoiceBridge MEDIA API
@@ -19,10 +20,14 @@ backend:
   operation_count: 13
 
 transport_contract:
-  final_transport: TBD_AFTER_SURFACE_INSPECTION
-  allowed_candidate_families:
-    - supported_connected_app
-    - remote_mcp_http
+  final_transport: remote_mcp_http
+  protocol_version: "2026-07-28"
+  selected_surface: custom_remote_mcp
+  account_surface_proven: true
+  web_surface_proven: true
+  live_read_only_canary_proven: true
+  current_canary_auth_mode: none
+  current_canary_reusable_for_voicebridge_binding: false
   local_mcp_direct_dependency: false
   client_desktop_dependency_allowed_by_default: false
   preserve_http_semantics: true
@@ -50,14 +55,20 @@ execution_boundary:
   preflight_operations:
     - preflightPublicGeminiYoutube
     - preflightPublicInstagramCobalt
+  non_execution_operation_count: 9
+  execution_operation_count: 4
   read_fetch_only_surface_accepted_for_full_binding: false
+  execution_tools_exposed_in_r3a: false
+  confirmation_semantics_validation_phase: R3_D
 
 credentials:
-  final_auth_method: TBD_AFTER_SURFACE_INSPECTION
+  final_auth_method: R3_B_REQUIRED_BEFORE_VOICEBRIDGE_BINDING
+  inbound_no_auth_allowed_for_full_binding: false
+  canary_no_auth_is_evidence_only: true
   acceptable_patterns:
-    - supported_server_side_static_bearer
     - supported_oauth_or_managed_credential_store
-    - backend_to_backend_credential_injection_not_visible_to_model
+    - supported_authenticated_remote_mcp_mode
+  outbound_voicebridge_pattern: backend_to_backend_credential_injection_not_visible_to_model
   forbidden_patterns:
     - secret_in_skill_text
     - secret_in_repository
@@ -65,10 +76,12 @@ credentials:
     - secret_in_model_visible_arguments
     - secret_in_user_visible_output
     - secret_in_non_secret_sentinel_evidence
+    - reuse_public_no_auth_canary_for_voicebridge_secret
   model_visible_secret: false
   repository_secret: false
   browser_profile_or_cookie_auth_for_media_backend: false
   credential_rotation_requires_backend_contract_change: false
+  voicebridge_bearer_server_side_only: true
 
 consent:
   youtube_preflight_must_not_call_provider: true
@@ -78,6 +91,7 @@ consent:
     tier: free
     data_use_acknowledged: true
   consent_must_not_be_inferred_from_plugin_installation: true
+  consent_must_not_be_inferred_from_plugin_connection: true
   consent_must_not_be_inferred_from_prior_unrelated_request: true
 
 retry_idempotency:
@@ -94,6 +108,7 @@ errors:
   provider_secret_sanitization_required: true
   internal_header_sanitization_required: true
   credential_sanitization_required: true
+  raw_voicebridge_authorization_header_exposed: false
   public_error_must_distinguish:
     - invalid_request
     - unsupported_url_or_media
@@ -102,24 +117,27 @@ errors:
     - provider_unavailable
     - durable_state_unavailable
     - authentication_or_binding_failure_without_secret_detail
+    - charge_uncertain_replay_blocked
   media_failure_blocks_core: false
 
 permissions:
-  inspect_and_record_before_binding:
-    - plugin_or_app_type
-    - account_plan_or_workspace_surface
-    - read_vs_execution_tool_support
+  proven_at_canary_stage:
+    - custom_remote_mcp_available
+    - remote_mcp_connection_available_on_web
+    - private_plugin_connection_available
+    - one_read_only_tool_discovery_and_invocation_pass
+  still_requires_validation_before_execution_binding:
+    - authenticated_remote_mcp_mode
+    - execution_action_support
     - per_action_confirmation_behavior
-    - credential_modes
-    - web_vs_desktop_availability
-    - plugin_install_permissions
-    - plugin_share_permissions
-    - custom_mcp_upload_or_enable_permissions_if_applicable
+    - cancellation_no_backend_work
+    - replay_duplicate_protection_at_chatgpt_surface
+    - intended_share_publish_permissions
   minimum_required:
-    - execution/action capability for four start operations
-    - read capability for capability/lookup/status/segments
-    - no secret exposure
-    - explicit user consent boundary preserved
+    - execution_action_capability_for_four_start_operations
+    - read_capability_for_nine_non_execution_operations
+    - no_secret_exposure
+    - explicit_user_consent_boundary_preserved
   unknown_permission_behavior: FAIL_CLOSED
 
 validation_before_activation:
@@ -135,11 +153,16 @@ validation_before_activation:
   - verify original public GPT remains available until owner-approved switch
 
 release_boundary:
-  binding_implementation: NOT_AUTHORIZED_BY_THIS_SPEC
+  r3a_contract_changes: AUTHORIZED
+  inbound_auth_implementation: DENIED
+  voicebridge_binding_implementation: DENIED
   live_credentials: DENIED
-  live_mcp: DENIED
-  plugin_installation: DENIED
-  migration_execution: DENIED
+  live_mcp_mutation: DENIED
   plugin_publication: DENIED
+  plugin_sharing: DENIED
+  migration_execution: DENIED
   render_change: DENIED
   public_gpt_change: DENIED
+  main_mutation: DENIED
+  pr22_merge: DENIED
+  pr45_merge: DENIED
