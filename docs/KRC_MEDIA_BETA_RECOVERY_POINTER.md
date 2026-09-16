@@ -1,4 +1,5 @@
 # K-Research & Critic - MEDIA BETA Recovery Pointer
+Активний покажчик відновлення KRC MEDIA BETA для checkpoint 89.
 
 Status: ACTIVE POINTER / CHECKPOINT 89 / R2 COMPLETE / RETRY LIVE PASS / R3 READY FOR INTEGRATION / PUBLIC ACTIVATION HOLD
 Updated: 2026-09-16
