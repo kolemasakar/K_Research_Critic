@@ -1,21 +1,20 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 12.0
-Status: **ACTIVE_HANDOFF / BOUNDED_CANARY_CLOSED_PASS / R3-A_PASS / R3-B_PLANNED_NOT_STARTED / OWNER_EXECUTION_APPROVAL_REQUIRED / PUBLICATION_HOLD**
+Version: 12.1
+Status: **ACTIVE_HANDOFF / R3-A_PASS / R3-B_IN_PROGRESS / OAUTH_ENDPOINT_LIVE / PRESECRET_PASS / OWNER_SECRET_ACTION_REQUIRED / PUBLICATION_HOLD**
 Date: 2026-09-16
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md. R3-A contract freeze PASS. R3-B auth hardening planned but not started; require separate owner execution approval.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md. R3-B OAuth endpoint live and pre-secret validation PASS. Continue only after owner manually provisions KRC_MCP_OWNER_CODE in Render without revealing it in chat.`
 
 ## Canonical recovery files
 
 1. `subprojects/media_beta/CURRENT_HANDOFF.md`
-2. `subprojects/media_beta/113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md`
-3. `subprojects/media_beta/02_ROADMAP.md` — v5.2
-4. `subprojects/media_beta/111_POST_CANARY_PLUGIN_MEDIA_ROADMAP_DECISION_2026_09_16.md`
-5. `subprojects/media_beta/110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md`
-6. current PR #22 head/CI and current non-secret account/control-plane evidence
+2. `subprojects/media_beta/114_R3B_OAUTH_ENDPOINT_PRESECRET_PASS_OWNER_SECRET_ACTION_REQUIRED_2026_09_16.md`
+3. `subprojects/media_beta/113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md`
+4. `subprojects/media_beta/02_ROADMAP.md` — v5.2
+5. current PR #22 head/CI and current non-secret account/control-plane evidence
 
 ## Repository / PR
 
@@ -27,49 +26,18 @@ base=main
 state=OPEN / DRAFT / UNMERGED
 ```
 
-## Proven bounded canary baseline
+## R3-A baseline
 
 ```text
-PLUGIN_FIRST_STRATEGY=ACCEPTED
-SURFACE_CLASSIFICATION=REMOTE_CUSTOM_MCP_CANDIDATE
-LIVE_MCP_DEPLOYMENT=PASS
-EXTERNAL_PROTOCOL_VALIDATION=PASS
-CHATGPT_MCP_CONNECTION=PASS
-CHATGPT_DISCOVERED_TOOL_COUNT=1
-CHATGPT_DISCOVERED_TOOL_NAME=krc_media_capabilities_canary
-CHATGPT_CANARY_INVOCATION=PASS
-BOUNDED_CANARY_GATE=CLOSED_PASS
-```
-
-Live canary remains evidence-only:
-
-```text
-endpoint=https://krc-mcp-canary-sentinel.onrender.com/mcp
-autoDeploy=off
-auth=none
-VoiceBridge binding=not enabled
-execution tools=not enabled
-```
-
-The live canary was not modified by R3-A.
-
-## R3-A acceptance
-
-R3-A owner approval was executed as repository-only contract work.
-
-Implementation evidence:
-
-```text
+R3_A=PASS
 implementation_head=2c6dd94527997507c4e77844a4d36383e1d281ef
 workflow=35133705040
-conclusion=SUCCESS
-Tests / Python 3.13=PASS
-Tests / Python 3.14=PASS
-Quality gates=PASS
-coverage=PASS
+Python_3_13=PASS
+Python_3_14=PASS
+Quality_Gates=PASS
 ```
 
-Frozen contract state:
+Frozen MEDIA contract remains:
 
 ```text
 selected_surface=custom_remote_mcp
@@ -78,80 +46,108 @@ protocol_version=2026-07-28
 MEDIA_OPERATION_COUNT=13
 NON_EXECUTION_COUNT=9
 EXECUTION_COUNT=4
-R3_A_CONTRACT_FREEZE=PASS
-R3_A_SECURE_ADAPTER_BASELINE=PASS
-```
-
-Canonical frozen contracts:
-
-```text
-plugins/krc_migration_candidate/contracts/media_tools.yaml              v0.2
-plugins/krc_migration_candidate/contracts/media_adapter.yaml            v0.2
-plugins/krc_migration_candidate/contracts/auth_transport_binding.yaml   v0.2
-plugins/krc_migration_candidate/contracts/migration_acceptance.yaml     v0.2
-plugins/krc_migration_candidate/contracts/surface_decision_matrix.yaml  v0.2
-```
-
-Regression coverage includes `tests/test_krc_r3a_contract_freeze.py` plus updated existing migration/surface candidate tests.
-
-## Frozen tool boundary
-
-Nine non-execution tools are classified read-only/idempotent at the MCP layer. Four start operations are classified execution, non-read-only, non-idempotent at the tool annotation layer, and require later confirmation-semantics validation.
-
-```text
-execution tools:
-media_youtube_start
-media_instagram_start
-media_facebook_start
-media_telegram_start
-```
-
-R3-A did **not** expose those execution tools on a live endpoint.
-
-## Frozen auth / secret boundary
-
-```text
-INBOUND_AUTH=R3_B_REQUIRED_BEFORE_VOICEBRIDGE_BINDING
-CANARY_NO_AUTH_ALLOWED_FOR_FULL_BINDING=false
 VOICEBRIDGE_BEARER_SERVER_SIDE_ONLY=true
-MODEL_VISIBLE_SECRET=false
-REPOSITORY_SECRET=false
-TOOL_ARGUMENT_SECRET=false
 ```
 
-The existing no-auth canary cannot be reused as the future VoiceBridge credential-bearing MEDIA endpoint.
+## R3-B implementation state
 
-## Preserved product invariants
+R3-B owner execution approval has been received and implementation is in progress.
+
+Accepted auth implementation:
 
 ```text
-CURRENT_PUBLIC_GPT=UNCHANGED
-MEDIA_OPERATION_PARITY_COUNT=13
-PAID_RETRIEVAL_FALLBACK=false
-PAID_STT_FALLBACK=false
-PAID_PROXY_FALLBACK=false
-AUTOMATIC_RETRY_LOOP=false
-YOUTUBE_START_REQUIRES_EXPLICIT_CONSENT=true
-PLUGIN_INSTALL_OR_CONNECTION_IS_NOT_YOUTUBE_CONSENT=true
-MEDIA_FAILURE_CORE_ISOLATION=REQUIRED
+implementation_head=057f748a204f8ad0878090a85a8adc8e49de73ed
+workflow=35135397654
+Python_3_13=PASS
+Python_3_14=PASS
+Quality_Gates=PASS
+coverage=PASS
+AUTH_PROTOCOL=OAuth authorization-code + PKCE S256
+DYNAMIC_CLIENT_REGISTRATION=YES
+REFRESH_TOKEN_ROTATION=YES
+MCP_SCOPE=krc.mcp.read
+LIVE_TOOL_COUNT=1
+LIVE_TOOL=krc_media_capabilities_canary
 ```
 
-Retry rules remain:
+The one-tool MCP remains read-only and provider-free. No MEDIA backend operation is bound.
+
+## Isolated R3-B service
 
 ```text
-COMPLETED -> REUSE
-PROCESSING -> REUSE_INFLIGHT / concurrency protect
-FAILED_FREE_ONLY -> fresh deterministic job only after a new explicit retry request
-FAILED_PAID_OR_CHARGE_UNCERTAIN -> BLOCK_REPLAY
+service=krc-mcp-auth-sentinel
+service_id=srv-dale3r942hec73c5t9hg
+region=frankfurt
+plan=free
+autoDeploy=off
+deployed_commit=057f748a204f8ad0878090a85a8adc8e49de73ed
+base_url=https://krc-mcp-auth-sentinel.onrender.com
+mcp_url=https://krc-mcp-auth-sentinel.onrender.com/mcp
+auth_mode=oauth
+owner_secret_configured=NO
 ```
 
-## Runtime actions not performed in R3-A
+The earlier no-auth evidence canary `krc-mcp-canary-sentinel` remains unchanged and separate.
+
+## R3-B pre-secret acceptance
+
+External checks passed:
 
 ```text
-NEW_LIVE_ENDPOINT=NO
-LIVE_CANARY_MUTATION=NO
+healthz=200
+mutation=false
+provider_work=false
+protected_resource_metadata=200
+authorization_server_metadata=200
+PKCE_S256=advertised
+dynamic_registration=201
+unauthenticated_mcp=401
+WWW_AUTHENTICATE_RESOURCE_METADATA=present
+OWNER_AUTH_UNCONFIGURED_UI=PASS
+OWNER_AUTH_POST_WITHOUT_SECRET=503_FAIL_CLOSED
+TEST_VALUE_REFLECTION=NO
+```
+
+## Current owner action
+
+The only current manual action is to provision `KRC_MCP_OWNER_CODE` directly in the Render environment UI for `krc-mcp-auth-sentinel`.
+
+Secret rules:
+
+```text
+never paste value into ChatGPT
+never commit value to Git
+never pass value in connector/tool arguments
+never record value in evidence/checkpoints
+never log or return value
+never reuse as VoiceBridge bearer
+```
+
+Use a strong locally generated value and store it in the owner's password manager.
+
+After provisioning, the owner should report only `готово` / `done`, never the secret value.
+
+## Next R3-B sequence after owner confirms
+
+```text
+verify service remains live and OAuth fail-closed externally
+create/connect private custom MCP in ChatGPT with Authentication=OAuth
+URL=https://krc-mcp-auth-sentinel.onrender.com/mcp
+complete authorization in browser using owner secret directly there
+Scan Tools / discovery -> exactly one krc_media_capabilities_canary
+invoke the read-only canary once
+record non-secret evidence
+close R3-B PASS
+STOP before R3-C
+```
+
+## Hard boundary
+
+```text
 VOICEBRIDGE_CREDENTIAL_BINDING=NO
 VOICEBRIDGE_RUNTIME_CHANGE=NO
 PROVIDER_CALL=NO
+NINE_TOOL_BACKEND_BINDING=NO
 REAL_EXECUTION_TOOL_EXPOSURE=NO
 PUBLIC_GPT_MUTATION=NO
 PLUGIN_PUBLICATION=NO
@@ -160,47 +156,9 @@ GPT_MIGRATION=NO
 MAIN_MUTATION=NO
 PR22_MERGE=NO
 PR45_MERGE=NO
-```
-
-## Approved roadmap state
-
-```text
-R3-A contract freeze / secure adapter baseline                 PASS
-R3-B inbound auth + secret-boundary hardening                  PLANNED / NOT STARTED
-R3-C 9-tool non-execution VoiceBridge binding                  HOLD
-R3-D consequential-action confirmation semantics               HOLD
-R3-E staged execution: YouTube -> Instagram -> Facebook -> Telegram HOLD
-R3-F full 13-operation parity regression                       HOLD
-R3-G private operational hardening                             HOLD
-R3-H migration/publication readiness                           HOLD
-R4 owner-approved cutover/migration/publication                HOLD
-```
-
-No phase automatically authorizes the next state-changing phase.
-
-## Current decision gate
-
-**R3-B requires separate owner execution approval.**
-
-If approved, R3-B scope is limited to inbound authentication and secret-boundary hardening on an isolated Remote MCP endpoint:
-
-```text
-revalidate current account auth options
-select supported authenticated Remote MCP mode
-implement isolated authenticated endpoint
-prove auth failure fail-closed
-prove secret sanitization
-connect/test authenticated private MCP
-NO VoiceBridge credential binding
-NO provider calls
-NO 9-tool backend binding
-NO execution tools
-NO live canary mutation
-NO public GPT mutation
-NO publish/share/migrate
-NO PR merge
+R3_C=HOLD
 ```
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V12_0_R3A_PASS_R3B_AWAITING_OWNER_EXECUTION_APPROVAL_2026_09_16`
+`KRC_MEDIA_CURRENT_HANDOFF_V12_1_R3B_PRESECRET_PASS_OWNER_SECRET_ACTION_REQUIRED_2026_09_16`
