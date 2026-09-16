@@ -1,9 +1,9 @@
 # MEDIA BETA Roadmap
 
-Current roadmap for K-Research & Critic MEDIA after successful Remote Custom MCP canary deployment, ChatGPT connection, one-tool discovery, and real ChatGPT-side invocation.
+Current roadmap for K-Research & Critic MEDIA after successful Remote Custom MCP canary validation and completion of the R3-A repository contract freeze.
 
-Version: 5.1
-Status: **PLUGIN_FIRST / BOUNDED_CANARY_CLOSED_PASS / R3-A_PLANNED_NOT_STARTED / PUBLICATION_HOLD**
+Version: 5.2
+Status: **PLUGIN_FIRST / BOUNDED_CANARY_CLOSED_PASS / R3-A_PASS / R3-B_AWAITING_OWNER_APPROVAL / PUBLICATION_HOLD**
 Updated: 2026-09-16
 
 ## Product position
@@ -26,45 +26,24 @@ Core KRC               -> remains usable
 ## Canonical current authority
 
 1. `CURRENT_HANDOFF.md`
-2. `111_POST_CANARY_PLUGIN_MEDIA_ROADMAP_DECISION_2026_09_16.md`
-3. `110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md`
-4. current PR #22 head/CI
+2. `113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md`
+3. `111_POST_CANARY_PLUGIN_MEDIA_ROADMAP_DECISION_2026_09_16.md`
+4. `110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md`
+5. current PR #22 head/CI
 
 Historical checkpoints remain evidence, not the current continuation point.
 
-## Proven canary baseline
+## Proven baseline
 
 ```text
-MCP_CANARY_DEPLOYABLE=PASS
-LIVE_MCP_DEPLOYMENT=PASS
-EXTERNAL_PROTOCOL_VALIDATION=PASS
-CHATGPT_MCP_CONNECTION=PASS
-DISCOVERED_TOOL_COUNT=1
-CHATGPT_CANARY_INVOCATION=PASS
 BOUNDED_CANARY_GATE=CLOSED_PASS
-```
-
-Live evidence-only canary:
-
-```text
-service: krc-mcp-canary-sentinel
-endpoint: https://krc-mcp-canary-sentinel.onrender.com/mcp
-autoDeploy: off
-auth: none, bounded canary only
-tool: krc_media_capabilities_canary
-VoiceBridge binding: not enabled
-execution tools: not enabled
-```
-
-Final canary documentation baseline:
-
-```text
-75a4b30e9f478fad892fafc017fea069ce949aec
-workflow=35131580138
-conclusion=SUCCESS
-Python 3.13=PASS
-Python 3.14=PASS
-Quality gates=PASS
+CHATGPT_MCP_CONNECTION=PASS
+CHATGPT_CANARY_INVOCATION=PASS
+R3_A_CONTRACT_FREEZE=PASS
+R3_A_SECURE_ADAPTER_BASELINE=PASS
+R3_A_IMPLEMENTATION_HEAD=2c6dd94527997507c4e77844a4d36383e1d281ef
+R3_A_WORKFLOW=35133705040
+R3_A_CI=PASS
 ```
 
 ## Target architecture
@@ -77,7 +56,7 @@ ChatGPT Plugin/App
 -> existing free-only provider routes + durable state
 ```
 
-The current no-auth canary must never receive VoiceBridge credentials or become the production MEDIA surface.
+The current no-auth canary remains evidence only and must never receive VoiceBridge credentials or become the production MEDIA surface.
 
 ## Canonical MEDIA operation target
 
@@ -97,43 +76,68 @@ media_facebook_start
 media_telegram_start
 ```
 
-Canonical contracts:
+Canonical frozen contracts:
 
 ```text
-plugins/krc_migration_candidate/contracts/media_tools.yaml
-plugins/krc_migration_candidate/contracts/media_adapter.yaml
-plugins/krc_migration_candidate/contracts/auth_transport_binding.yaml
-plugins/krc_migration_candidate/contracts/migration_acceptance.yaml
+plugins/krc_migration_candidate/contracts/media_tools.yaml              v0.2
+plugins/krc_migration_candidate/contracts/media_adapter.yaml            v0.2
+plugins/krc_migration_candidate/contracts/auth_transport_binding.yaml   v0.2
+plugins/krc_migration_candidate/contracts/migration_acceptance.yaml     v0.2
+plugins/krc_migration_candidate/contracts/surface_decision_matrix.yaml  v0.2
 ```
 
 ## R3-A — Contract freeze and secure adapter baseline
 
-Status: **PLANNED / READY FOR SEPARATE EXECUTION APPROVAL / NOT STARTED**.
+Status: **PASS / COMPLETE**.
 
-Repository-only scope when separately approved:
+Accepted evidence:
 
-- freeze exact 13-tool names and schemas;
-- reconcile the contracts with the proven Remote MCP surface;
-- classify tool annotations and action semantics;
-- freeze structured error, retry/idempotency, consent, audit, and secret boundaries;
-- preserve exact Core skill parity;
-- no deployment, provider call, VoiceBridge credential, or public surface mutation.
+```text
+selected_surface=custom_remote_mcp
+transport=remote_mcp_http
+protocol_version=2026-07-28
+operation_count=13
+non_execution_count=9
+execution_count=4
+inbound_auth=R3_B_REQUIRED_BEFORE_VOICEBRIDGE_BINDING
+voicebridge_bearer=SERVER_SIDE_ONLY
+execution_tools_exposed=NO
+provider_work=NO
+runtime_mutation=NO
+```
 
-Exit: repository/CI PASS.
+R3-A froze:
+
+- exact 13 tool identities and OpenAPI operation/path/method mappings;
+- MCP classification and annotations;
+- request/response schema mapping;
+- YouTube explicit consent boundary;
+- retry/idempotency semantics;
+- audit fields;
+- structured error and secret-sanitization boundaries;
+- Core failure isolation;
+- Remote MCP selection based on the proven owner-account canary.
+
+Exit evidence: implementation head `2c6dd94527997507c4e77844a4d36383e1d281ef`, workflow `35133705040`, Python 3.13/3.14 and Quality Gates PASS.
 
 ## R3-B — Inbound authentication and secret-boundary hardening
 
-Status: HOLD until R3-A PASS and separate owner authorization.
+Status: **PLANNED / NOT STARTED / SEPARATE OWNER EXECUTION APPROVAL REQUIRED**.
 
-Before any real VoiceBridge binding:
+Goal: replace the canary-only `No authentication` model before any VoiceBridge binding.
 
-- revalidate current account authentication options;
-- move away from canary-only `No authentication`;
-- require authenticated access to any MCP that can reach VoiceBridge;
-- keep VoiceBridge bearer server-side only;
-- prove no secret leakage through args/descriptions/repo/logs/evidence/errors.
+Required:
 
-Exit: authenticated isolated MCP connection PASS with no provider/backend binding yet.
+- revalidate current owner-account Plugin authentication options at execution time;
+- select and implement an authenticated isolated Remote MCP mode supported by the actual account surface;
+- require authenticated access for any future endpoint that can reach VoiceBridge;
+- preserve server-side-only VoiceBridge bearer boundary;
+- prove no secret leakage through args, descriptions, repository, logs, evidence, or errors;
+- prove auth failure fails closed without secret detail;
+- keep the existing public no-auth canary separate and unchanged;
+- do not bind VoiceBridge or call providers during R3-B.
+
+Exit: authenticated isolated MCP endpoint/connection PASS + secret-sanitization PASS, with no VoiceBridge/provider binding.
 
 ## R3-C — 9-tool non-execution VoiceBridge binding
 
@@ -278,10 +282,9 @@ VoiceBridge merge/promotion
 ## Current gate model
 
 ```text
-Historical backend/product work: preserved as evidence
 Bounded Remote MCP canary: CLOSED PASS
-R3-A: PLANNED / NOT STARTED
-R3-B: HOLD
+R3-A: PASS / COMPLETE
+R3-B: PLANNED / NOT STARTED / OWNER APPROVAL REQUIRED
 R3-C: HOLD
 R3-D: HOLD
 R3-E: HOLD
@@ -293,17 +296,17 @@ R4: HOLD
 
 ## Immediate decision point
 
-Roadmap planning is complete. No implementation starts automatically.
+R3-A is closed. No subsequent state-changing phase starts automatically.
 
-If separately approved, the next executable block is **R3-A only**:
+The next executable block, only if separately approved, is **R3-B**:
 
 ```text
-repository-only contract freeze
-secure adapter baseline
-no deployment
-no VoiceBridge secret binding
+authenticated isolated Remote MCP hardening
+no VoiceBridge credential binding
 no provider work
+no 9-tool backend binding yet
 no execution tools
+no live canary mutation
 no public GPT change
 no Plugin publish/share/migrate
 no PR #22 merge
@@ -312,4 +315,4 @@ no PR #45 merge
 
 Recovery command:
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md. Roadmap approved; R3-A planned but not started.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md. R3-A PASS; continue only after owner approval for R3-B.`
