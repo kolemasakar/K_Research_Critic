@@ -1,9 +1,9 @@
 # MEDIA BETA Roadmap
 
-Current roadmap for K-Research & Critic MEDIA after successful Remote Custom MCP canary validation and completion of the R3-A repository contract freeze.
+Current roadmap for K-Research & Critic MEDIA after successful Remote Custom MCP canary validation, R3-A contract freeze, and R3-B authenticated Remote MCP hardening.
 
-Version: 5.2
-Status: **PLUGIN_FIRST / BOUNDED_CANARY_CLOSED_PASS / R3-A_PASS / R3-B_AWAITING_OWNER_APPROVAL / PUBLICATION_HOLD**
+Version: 5.3
+Status: **PLUGIN_FIRST / BOUNDED_CANARY_CLOSED_PASS / R3-A_PASS / R3-B_PASS / R3-C_AWAITING_OWNER_APPROVAL / PUBLICATION_HOLD**
 Updated: 2026-09-16
 
 ## Product position
@@ -13,7 +13,7 @@ public KRC Custom GPT: published / unchanged / protected
 private MEDIA migration candidate: Remote Custom MCP / Plugin surface
 backend: existing VoiceBridge MEDIA API
 MEDIA semantic parity target: 13 operations
-current live canary: evidence-only / one tool / no auth / no VoiceBridge binding
+current authenticated MCP: isolated / one read-only canary tool / OAuth / no VoiceBridge binding
 ```
 
 Critical invariant:
@@ -26,9 +26,9 @@ Core KRC               -> remains usable
 ## Canonical current authority
 
 1. `CURRENT_HANDOFF.md`
-2. `113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md`
-3. `111_POST_CANARY_PLUGIN_MEDIA_ROADMAP_DECISION_2026_09_16.md`
-4. `110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md`
+2. `117_R3B_AUTHENTICATED_REMOTE_MCP_HARDENING_PASS_2026_09_16.md`
+3. `113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md`
+4. `111_POST_CANARY_PLUGIN_MEDIA_ROADMAP_DECISION_2026_09_16.md`
 5. current PR #22 head/CI
 
 Historical checkpoints remain evidence, not the current continuation point.
@@ -37,13 +37,14 @@ Historical checkpoints remain evidence, not the current continuation point.
 
 ```text
 BOUNDED_CANARY_GATE=CLOSED_PASS
-CHATGPT_MCP_CONNECTION=PASS
-CHATGPT_CANARY_INVOCATION=PASS
-R3_A_CONTRACT_FREEZE=PASS
-R3_A_SECURE_ADAPTER_BASELINE=PASS
-R3_A_IMPLEMENTATION_HEAD=2c6dd94527997507c4e77844a4d36383e1d281ef
-R3_A_WORKFLOW=35133705040
-R3_A_CI=PASS
+R3_A=PASS
+R3_B=PASS
+CHATGPT_OAUTH_CONNECTION=PASS
+DISCOVERED_TOOL_COUNT=1
+AUTHENTICATED_CANARY_INVOCATION=PASS
+AUTH_LIVE_COMMIT=4b8d172a23b88415839ada0da84357c1538614db
+AUTH_WORKFLOW=35138526850
+AUTH_CI=PASS
 ```
 
 ## Target architecture
@@ -56,7 +57,7 @@ ChatGPT Plugin/App
 -> existing free-only provider routes + durable state
 ```
 
-The current no-auth canary remains evidence only and must never receive VoiceBridge credentials or become the production MEDIA surface.
+The no-auth canary remains evidence only and must never receive VoiceBridge credentials or become the production MEDIA surface.
 
 ## Canonical MEDIA operation target
 
@@ -90,58 +91,50 @@ plugins/krc_migration_candidate/contracts/surface_decision_matrix.yaml  v0.2
 
 Status: **PASS / COMPLETE**.
 
-Accepted evidence:
-
-```text
-selected_surface=custom_remote_mcp
-transport=remote_mcp_http
-protocol_version=2026-07-28
-operation_count=13
-non_execution_count=9
-execution_count=4
-inbound_auth=R3_B_REQUIRED_BEFORE_VOICEBRIDGE_BINDING
-voicebridge_bearer=SERVER_SIDE_ONLY
-execution_tools_exposed=NO
-provider_work=NO
-runtime_mutation=NO
-```
-
-R3-A froze:
+Accepted:
 
 - exact 13 tool identities and OpenAPI operation/path/method mappings;
-- MCP classification and annotations;
+- MCP classifications and annotations;
 - request/response schema mapping;
-- YouTube explicit consent boundary;
-- retry/idempotency semantics;
-- audit fields;
-- structured error and secret-sanitization boundaries;
+- consent/retry/idempotency/audit/error/secret boundaries;
 - Core failure isolation;
-- Remote MCP selection based on the proven owner-account canary.
+- execution tools contractually defined but not live-exposed.
 
-Exit evidence: implementation head `2c6dd94527997507c4e77844a4d36383e1d281ef`, workflow `35133705040`, Python 3.13/3.14 and Quality Gates PASS.
+Evidence: implementation head `2c6dd94527997507c4e77844a4d36383e1d281ef`, workflow `35133705040`, Python 3.13/3.14 and Quality Gates PASS.
 
 ## R3-B — Inbound authentication and secret-boundary hardening
 
-Status: **PLANNED / NOT STARTED / SEPARATE OWNER EXECUTION APPROVAL REQUIRED**.
+Status: **PASS / COMPLETE**.
 
-Goal: replace the canary-only `No authentication` model before any VoiceBridge binding.
+Accepted authenticated contour:
 
-Required:
+```text
+service=krc-mcp-auth-sentinel
+auth=OAuth authorization-code + PKCE S256
+DCR=YES
+scope=krc.mcp.read
+owner secret=server-side only
+ChatGPT OAuth connection=PASS
+one-tool discovery=PASS
+authenticated canary invocation=PASS
+VoiceBridge binding=NO
+provider work=NO
+execution tools=NO
+```
 
-- revalidate current owner-account Plugin authentication options at execution time;
-- select and implement an authenticated isolated Remote MCP mode supported by the actual account surface;
-- require authenticated access for any future endpoint that can reach VoiceBridge;
-- preserve server-side-only VoiceBridge bearer boundary;
-- prove no secret leakage through args, descriptions, repository, logs, evidence, or errors;
-- prove auth failure fails closed without secret detail;
-- keep the existing public no-auth canary separate and unchanged;
-- do not bind VoiceBridge or call providers during R3-B.
+The authorization callback CSP defect found during live owner flow was corrected with bounded callback-origin allowlisting; regression coverage and workflow `35138526850` PASS.
 
-Exit: authenticated isolated MCP endpoint/connection PASS + secret-sanitization PASS, with no VoiceBridge/provider binding.
+Known debt carried forward to R3-G:
+
+```text
+OAuth client/code/token persistence=in-memory only
+restart/redeploy reconnect required
+production readiness=NO
+```
 
 ## R3-C — 9-tool non-execution VoiceBridge binding
 
-Status: HOLD until R3-B PASS and separate owner authorization.
+Status: **PLANNED / NOT STARTED / SEPARATE OWNER EXECUTION APPROVAL REQUIRED**.
 
 Target operations:
 
@@ -159,28 +152,32 @@ media_non_youtube_segments
 
 Requirements:
 
-- server-side VoiceBridge bearer injection;
-- exact schema/error mapping;
-- bounded timeout;
-- no automatic retry;
-- no start operation exposed;
-- real ChatGPT discovery/invocation validation.
+- use the authenticated MCP boundary proven in R3-B;
+- inject the VoiceBridge bearer only server-side;
+- never expose the bearer in model context, repo, schemas, tool arguments, errors, logs or evidence;
+- exact schema/error mapping to the frozen R3-A contract;
+- bounded timeout and fail-closed backend behavior;
+- no automatic retry where contract forbids it;
+- no start/execution operation exposed;
+- no provider action beyond what the nine non-execution VoiceBridge operations inherently perform;
+- real ChatGPT discovery/invocation validation of the 9-tool surface;
+- preserve Core KRC availability if MEDIA backend fails.
 
-Exit: 9-tool parity PASS with zero execution-tool exposure.
+Exit:
+
+```text
+AUTHENTICATED_9_TOOL_SURFACE=PASS
+VOICEBRIDGE_SERVER_SIDE_BINDING=PASS
+EXECUTION_TOOL_COUNT=0
+SECRET_LEAKAGE=NO
+CORE_ISOLATION=PASS
+```
 
 ## R3-D — Consequential-action confirmation semantics
 
 Status: HOLD until R3-C PASS and separate owner authorization.
 
-Use a no-provider/no-charge execution probe or equivalent isolated mechanism to verify:
-
-- execution is not classified as read-only;
-- ChatGPT asks/reviews where required;
-- cancellation produces no provider work;
-- replay does not duplicate execution;
-- permission behavior is recorded as account-specific evidence.
-
-Exit: action-confirmation semantics PASS without provider work.
+Use a no-provider/no-charge execution probe or equivalent isolated mechanism to verify execution classification, confirmation/review, cancellation, replay behavior, and account-specific permissions without provider work.
 
 ## R3-E — Staged 4-route execution binding
 
@@ -195,41 +192,13 @@ E3 Facebook
 E4 Telegram
 ```
 
-Each route must preserve:
-
-- authenticated MCP boundary;
-- server-side-only VoiceBridge secret;
-- explicit confirmation/action review;
-- durable job/idempotency behavior;
-- free-only/fail-closed provider policy;
-- no automatic paid fallback;
-- audit/charge evidence;
-- Core isolation.
-
-YouTube additionally requires explicit Gemini Free data-use consent before start.
-
-Exit: all four start routes independently PASS.
+Each route must preserve authenticated MCP, server-side-only VoiceBridge secret, explicit confirmation/action review, durable idempotency, free-only/fail-closed provider policy, no automatic paid fallback, audit/charge evidence, and Core isolation.
 
 ## R3-F — Full 13-operation parity regression
 
 Status: HOLD until R3-E PASS.
 
-Required:
-
-- exact 13-tool discovery/schema parity;
-- positive flow regression;
-- invalid input/platform/job/pagination;
-- consent missing;
-- free quota/provider unavailable;
-- durable-state unavailable;
-- charge-uncertain replay block;
-- retry/idempotency;
-- secret/error sanitization;
-- no paid/unapproved fallback;
-- Core regression and forced MEDIA failure isolation;
-- model-agnostic behavior and representative entry points.
-
-Exit: private full-parity Plugin PASS.
+Required: exact 13-tool discovery/schema parity, positive/negative flows, consent, quota/provider unavailable, durable-state unavailable, replay/idempotency, error/secret sanitization, no paid fallback, Core regression and forced MEDIA-failure isolation.
 
 ## R3-G — Private operational hardening
 
@@ -237,55 +206,34 @@ Status: HOLD until R3-F PASS.
 
 Required:
 
-- production-like authenticated endpoint separate from canary;
+- durable OAuth client/token state or a production-grade external authorization service;
+- restart/redeploy/reconnect validation;
 - observability without secret leakage;
 - rate/timeout/concurrency controls;
 - rollback and credential-rotation procedure;
 - deployment provenance/pinning;
-- reconnect/recovery validation;
 - multi-session/web validation;
 - permission behavior re-check.
-
-Exit: private operational readiness PASS.
 
 ## R3-H — Migration/publication readiness
 
 Status: HOLD until R3-G PASS.
 
-While public KRC remains unchanged:
-
-- validate exact Core semantic parity;
-- enumerate/validate reference assets;
-- validate intended sharing/audience model;
-- prepare Plugin metadata/privacy/distribution state;
-- document old-link behavior;
-- revalidate current migration consequences and account notice/UI;
-- prepare rollback/reconstruction package.
-
-Exit: `READY_FOR_OWNER_CUTOVER_DECISION` only.
+Validate Core semantic parity, assets, sharing/audience model, metadata/privacy/distribution, old-link behavior, migration consequences and rollback/reconstruction package. Exit is only `READY_FOR_OWNER_CUTOVER_DECISION`.
 
 ## R4 — Owner-approved cutover / migration / publication
 
 Status: HOLD.
 
-Separate consequential gate. Only explicit owner approval after R3-H PASS may authorize any of:
-
-```text
-Plugin publication/share
-Custom GPT migration
-public user switch
-main merge
-PR #22 merge
-VoiceBridge merge/promotion
-```
+Separate consequential gate. Only explicit owner approval after R3-H PASS may authorize Plugin publication/share, Custom GPT migration, public user switch, main merge, PR #22 merge, or VoiceBridge merge/promotion.
 
 ## Current gate model
 
 ```text
 Bounded Remote MCP canary: CLOSED PASS
 R3-A: PASS / COMPLETE
-R3-B: PLANNED / NOT STARTED / OWNER APPROVAL REQUIRED
-R3-C: HOLD
+R3-B: PASS / COMPLETE
+R3-C: PLANNED / NOT STARTED / OWNER APPROVAL REQUIRED
 R3-D: HOLD
 R3-E: HOLD
 R3-F: HOLD
@@ -296,23 +244,20 @@ R4: HOLD
 
 ## Immediate decision point
 
-R3-A is closed. No subsequent state-changing phase starts automatically.
+No subsequent state-changing phase starts automatically.
 
-The next executable block, only if separately approved, is **R3-B**:
+The next executable block, only if separately approved, is **R3-C**:
 
 ```text
-authenticated isolated Remote MCP hardening
-no VoiceBridge credential binding
-no provider work
-no 9-tool backend binding yet
-no execution tools
-no live canary mutation
-no public GPT change
+bind only 9 non-execution VoiceBridge operations
+server-side bearer only
+0 execution/start tools
 no Plugin publish/share/migrate
+no public GPT mutation
 no PR #22 merge
 no PR #45 merge
 ```
 
 Recovery command:
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md. R3-A PASS; continue only after owner approval for R3-B.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md. R3-A PASS, R3-B PASS; continue only after owner approval for R3-C.`
