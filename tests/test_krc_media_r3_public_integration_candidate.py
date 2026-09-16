@@ -78,4 +78,6 @@ def test_core_plus_media_addendum_fits_builder_limit_and_keeps_isolation() -> No
     assert "MEDIA failure never blocks Core" in addendum
     assert "YouTube=Gemini Free direct" in addendum
     assert "FAILED free-only may be freshly retried" in addendum
+    assert "new explicit retry request" in addendum
+    assert "once only" not in addendum
     assert "CriticProfile gate" in addendum
