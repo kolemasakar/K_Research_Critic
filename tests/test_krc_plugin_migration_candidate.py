@@ -58,6 +58,71 @@ def test_media_candidate_has_exact_13_operation_parity() -> None:
     assert len({tool["candidate_name"] for tool in tools}) == 13
 
 
+def test_r3a_freezes_nine_non_execution_and_four_execution_tools() -> None:
+    contract = load_yaml(CONTRACT)
+    tools = contract["tools"]
+    non_execution = [tool for tool in tools if tool["classification"] == "non_execution"]
+    execution = [tool for tool in tools if tool["classification"] == "execution"]
+
+    assert contract["status"] == "R3A_FROZEN_REMOTE_MCP_CONTRACT"
+    assert contract["non_execution_count"] == 9
+    assert contract["execution_count"] == 4
+    assert len(non_execution) == 9
+    assert len(execution) == 4
+    assert {tool["source_operation_id"] for tool in execution} == {
+        "startPublicGeminiYoutubeTranscription",
+        "startPublicInstagramCobaltTranscription",
+        "startPublicFacebookCobaltTranscription",
+        "startPublicTelegramTranscription",
+    }
+
+
+def test_r3a_freezes_mcp_annotations_by_semantic_class() -> None:
+    tools = load_yaml(CONTRACT)["tools"]
+    for tool in tools:
+        annotations = tool["annotations"]
+        assert annotations["destructiveHint"] is False
+        if tool["classification"] == "non_execution":
+            assert annotations == {
+                "readOnlyHint": True,
+                "destructiveHint": False,
+                "idempotentHint": True,
+                "openWorldHint": False,
+            }
+        else:
+            assert annotations == {
+                "readOnlyHint": False,
+                "destructiveHint": False,
+                "idempotentHint": False,
+                "openWorldHint": True,
+            }
+            assert tool["requires_confirmation_semantics_validation"] is True
+
+
+def test_r3a_schema_mapping_is_frozen_to_openapi_or_explicit_inline_schema() -> None:
+    contract = load_yaml(CONTRACT)
+    components = load_yaml(OPENAPI)["components"]["schemas"]
+    tools = contract["tools"]
+
+    for tool in tools:
+        if "input_schema_ref" in tool:
+            prefix = "#/components/schemas/"
+            assert tool["input_schema_ref"].startswith(prefix)
+            assert tool["input_schema_ref"][len(prefix):] in components
+        else:
+            assert tool["input_schema"]["type"] == "object"
+            assert tool["input_schema"]["additionalProperties"] is False
+
+        if "output_schema_ref" in tool:
+            prefix = "#/components/schemas/"
+            assert tool["output_schema_ref"].startswith(prefix)
+            assert tool["output_schema_ref"][len(prefix):] in components
+        else:
+            assert tool["candidate_name"] == "media_instagram_preflight"
+            assert tool["source_openapi_output_schema_present"] is False
+            assert tool["output_schema"] == {"type": "object", "additionalProperties": True}
+
+
 def test_media_candidate_preserves_free_only_fail_closed_policy() -> None:
     contract = load_yaml(CONTRACT)
     policy = contract["policy"]
@@ -75,13 +140,12 @@ def test_media_candidate_preserves_free_only_fail_closed_policy() -> None:
 def test_youtube_consent_and_provider_boundary_are_preserved() -> None:
     contract = load_yaml(CONTRACT)
     consent = contract["youtube_consent"]
-    assert consent == {
-        "preflight_calls_provider": False,
-        "provider": "google_gemini",
-        "tier": "free",
-        "data_use_acknowledged": True,
-        "required_before_start": True,
-    }
+    assert consent["preflight_calls_provider"] is False
+    assert consent["provider"] == "google_gemini"
+    assert consent["tier"] == "free"
+    assert consent["data_use_acknowledged"] is True
+    assert consent["required_before_start"] is True
+    assert consent["installation_or_connection_is_not_consent"] is True
 
     tools = {tool["source_operation_id"]: tool for tool in contract["tools"]}
     assert tools["startPublicGeminiYoutubeTranscription"]["requires_explicit_user_consent"] is True
@@ -198,9 +262,14 @@ def test_adapter_has_exact_operation_binding_parity() -> None:
     adapter = load_yaml(ADAPTER)
     expected = set(openapi_operations())
     bindings = adapter["operation_bindings"]
+    contract_names = {
+        tool["source_operation_id"]: tool["candidate_name"]
+        for tool in load_yaml(CONTRACT)["tools"]
+    }
     assert len(bindings) == 13
     assert set(bindings) == expected
     assert len({binding["adapter_method"] for binding in bindings.values()}) == 13
+    assert {op: binding["mcp_tool_name"] for op, binding in bindings.items()} == contract_names
 
 
 def test_adapter_preserves_request_validation_and_pagination_bounds() -> None:
@@ -217,12 +286,11 @@ def test_adapter_preserves_request_validation_and_pagination_bounds() -> None:
 def test_adapter_preserves_consent_retry_and_core_isolation() -> None:
     adapter = load_yaml(ADAPTER)
     consent = adapter["consent_contract"]
-    assert consent["youtube_start"] == {
-        "required": True,
-        "provider": "google_gemini",
-        "tier": "free",
-        "data_use_acknowledged": True,
-    }
+    assert consent["youtube_start"]["required"] is True
+    assert consent["youtube_start"]["provider"] == "google_gemini"
+    assert consent["youtube_start"]["tier"] == "free"
+    assert consent["youtube_start"]["data_use_acknowledged"] is True
+    assert consent["youtube_start"]["plugin_installation_is_not_consent"] is True
     assert consent["youtube_preflight"]["provider_work_allowed"] is False
 
     retry = adapter["retry_contract"]
@@ -241,12 +309,14 @@ def test_adapter_preserves_consent_retry_and_core_isolation() -> None:
 def test_adapter_auth_and_error_boundary_are_fail_closed() -> None:
     adapter = load_yaml(ADAPTER)
     auth = adapter["authentication"]
-    assert auth["final_strategy"] == "TBD_AFTER_ACCOUNT_MIGRATION_SURFACE_INSPECTION"
-    assert auth["secret_placement"] == "SERVER_SIDE_ONLY"
+    assert auth["final_strategy"] == "R3_B_REQUIRED_BEFORE_VOICEBRIDGE_BINDING"
+    assert auth["inbound_no_auth_allowed_for_full_binding"] is False
+    assert auth["outbound_voicebridge_secret_placement"] == "SERVER_SIDE_ONLY"
     assert auth["model_receives_secret"] is False
     assert auth["repository_contains_secret"] is False
     assert auth["skill_contains_secret"] is False
     assert auth["evidence_contains_secret"] is False
+    assert auth["tool_arguments_contain_secret"] is False
 
     errors = adapter["error_taxonomy"]
     assert errors["CONSENT_REQUIRED"]["provider_call_allowed_before_resolution"] is False
@@ -254,20 +324,23 @@ def test_adapter_auth_and_error_boundary_are_fail_closed() -> None:
     assert errors["FREE_PROVIDER_UNAVAILABLE"]["paid_fallback_allowed"] is False
     assert errors["CHARGE_UNCERTAIN"]["replay_allowed"] is False
     assert errors["SECRET_SANITIZATION"]["expose_raw_backend_error"] is False
+    assert errors["AUTHENTICATION_OR_BINDING_FAILURE"]["secret_detail_exposed"] is False
 
 
-def test_adapter_is_transport_neutral_and_requires_no_backend_mutation() -> None:
+def test_adapter_selects_proven_remote_mcp_without_live_binding() -> None:
     adapter = load_yaml(ADAPTER)
     transport = adapter["transport"]
     backend = adapter["backend"]
-    assert transport["final_surface"] == "TBD_AFTER_ACCOUNT_MIGRATION_SURFACE_INSPECTION"
-    assert transport["protocol_binding"] == "TBD"
+    assert transport["final_surface"] == "custom_remote_mcp"
+    assert transport["protocol_binding"] == "remote_mcp_http_2026_07_28"
+    assert transport["proven_canary_transport"] is True
+    assert transport["canary_no_auth_reusable_for_full_media_binding"] is False
     assert transport["installable"] is False
     assert transport["deployed"] is False
     assert transport["live_mcp_server"] is False
     assert transport["backend_mutation_required"] is False
     assert backend["preserve_existing_api"] is True
-    assert backend["render_change_required_for_design_candidate"] is False
+    assert backend["render_change_required_for_r3a"] is False
 
 
 def test_candidate_does_not_guess_final_plugin_or_mcp_packaging() -> None:
@@ -291,9 +364,16 @@ def test_candidate_contains_no_concrete_browser_profile_or_common_secret_prefix(
     assert "bearer eyj" not in lowered
 
 
-def test_authentication_is_explicitly_unfinalized_and_server_side_only() -> None:
+def test_authentication_requires_r3b_and_server_side_voicebridge_secret() -> None:
     auth = load_yaml(CONTRACT)["authentication"]
-    assert auth["final_strategy"] == "TBD_AFTER_ACCOUNT_MIGRATION_SURFACE_INSPECTION"
+    assert auth["inbound_strategy"] == "R3_B_REQUIRED_BEFORE_VOICEBRIDGE_BINDING"
+    assert auth["canary_no_auth_allowed_for_full_binding"] is False
+    assert auth["outbound_voicebridge_credential"] == "SERVER_SIDE_ONLY"
     assert auth["secret_visibility"] == "SERVER_SIDE_ONLY"
     assert auth["model_visible_secret"] is False
     assert auth["repository_secret"] is False
+
+
+def test_r3a_release_boundary_denies_runtime_expansion() -> None:
+    boundary = load_yaml(CONTRACT)["release_boundary"]
+    assert set(boundary.values()) == {"DENIED"}
