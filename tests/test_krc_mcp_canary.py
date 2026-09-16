@@ -14,13 +14,13 @@ MEDIA_CONTRACT = ROOT / "plugins" / "krc_migration_candidate" / "contracts" / "m
 CORE = ROOT / "prompts" / "GPT_STORE_INSTRUCTIONS.md"
 SKILL = ROOT / "plugins" / "krc_migration_candidate" / "skills" / "krc_core" / "SKILL.md"
 
-# Load the repository-only protocol core directly from source instead of importing
-# the candidate package. This intentionally avoids generating __pycache__ binary
-# artifacts inside the directory that repository secret-scans inspect as text.
+# Load the protocol core directly from source instead of importing the candidate
+# package. This avoids generating candidate __pycache__ artifacts during source scans.
 _NAMESPACE: dict[str, object] = {"__name__": "krc_mcp_canary_test_module"}
 exec(compile(SERVER.read_text(encoding="utf-8"), str(SERVER), "exec"), _NAMESPACE)
 CANARY_TOOL_NAME = _NAMESPACE["CANARY_TOOL_NAME"]
 MCP_PROTOCOL_VERSION = _NAMESPACE["MCP_PROTOCOL_VERSION"]
+LEGACY_PROTOCOL_VERSION = _NAMESPACE["LEGACY_PROTOCOL_VERSION"]
 canary_result = _NAMESPACE["canary_result"]
 dispatch_mcp = _NAMESPACE["dispatch_mcp"]
 
@@ -69,6 +69,7 @@ def test_canary_result_is_deterministic_sanitized_and_non_mutating() -> None:
         "execution_tools": "not_enabled",
     }
     assert first["result"]["isError"] is False
+    assert first["result"]["resultType"] == "complete"
     assert json.loads(first["result"]["content"][0]["text"]) == result
 
     copy_one = canary_result()
@@ -76,24 +77,31 @@ def test_canary_result_is_deterministic_sanitized_and_non_mutating() -> None:
     assert canary_result()["status"] == "ok"
 
 
-def test_canary_protocol_core_supports_discovery_call_and_legacy_initialize() -> None:
+def test_canary_protocol_core_supports_modern_discovery_and_legacy_initialize() -> None:
+    discover = dispatch_mcp(_request("server/discover", params={"_meta": {}}))
+    assert discover is not None
+    assert discover["result"]["supportedVersions"] == [MCP_PROTOCOL_VERSION]
+    assert discover["result"]["capabilities"] == {"tools": {}}
+    assert discover["result"]["resultType"] == "complete"
+    assert discover["result"]["cacheScope"] == "public"
+
     initialize = dispatch_mcp(
         _request(
             "initialize",
             params={
-                "protocolVersion": "2025-11-25",
+                "protocolVersion": LEGACY_PROTOCOL_VERSION,
                 "capabilities": {},
                 "clientInfo": {"name": "test-client", "version": "1"},
             },
         )
     )
     assert initialize is not None
-    assert initialize["result"]["protocolVersion"] == "2025-11-25"
+    assert initialize["result"]["protocolVersion"] == LEGACY_PROTOCOL_VERSION
     assert initialize["result"]["capabilities"] == {"tools": {}}
 
-    fallback = dispatch_mcp(_request("initialize", params={"protocolVersion": "unsupported"}))
+    fallback = dispatch_mcp(_request("initialize", params={"protocolVersion": MCP_PROTOCOL_VERSION}))
     assert fallback is not None
-    assert fallback["result"]["protocolVersion"] == MCP_PROTOCOL_VERSION
+    assert fallback["result"]["protocolVersion"] == LEGACY_PROTOCOL_VERSION
 
     assert dispatch_mcp({"jsonrpc": "2.0", "method": "notifications/initialized"}) is None
 
@@ -145,9 +153,12 @@ def test_canary_contains_no_live_endpoint_or_secret_material() -> None:
     assert "prof_" not in text
 
 
-def test_canary_introduces_no_deployment_packaging() -> None:
+def test_canary_deployment_packaging_is_bounded() -> None:
+    assert (CANARY_DIR / "http_server.py").is_file()
+    assert (CANARY_DIR / "Dockerfile").is_file()
+    assert (CANARY_DIR / "README.md").is_file()
+
     forbidden_names = {
-        "Dockerfile",
         "render.yaml",
         "render.yml",
         "mcp.json",
@@ -157,6 +168,12 @@ def test_canary_introduces_no_deployment_packaging() -> None:
         "docker-compose.yaml",
     }
     assert not any(path.name in forbidden_names for path in CANARY_DIR.rglob("*"))
+
+    dockerfile = (CANARY_DIR / "Dockerfile").read_text(encoding="utf-8")
+    assert "mcp_canary.http_server" in dockerfile
+    assert "VOICEBRIDGE" not in dockerfile.upper()
+    assert "GEMINI" not in dockerfile.upper()
+    assert "ASSEMBLYAI" not in dockerfile.upper()
 
 
 def test_existing_media_13_operation_contract_is_unchanged() -> None:
