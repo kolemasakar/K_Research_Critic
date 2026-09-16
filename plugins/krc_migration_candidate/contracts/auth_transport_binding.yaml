@@ -1,0 +1,145 @@
+schema_version: "0.1"
+status: PREPARED_NOT_BOUND
+as_of: "2026-09-16"
+source_media_contract: plugins/krc_migration_candidate/contracts/media_tools.yaml
+source_adapter_contract: plugins/krc_migration_candidate/contracts/media_adapter.yaml
+source_surface_matrix: plugins/krc_migration_candidate/contracts/surface_decision_matrix.yaml
+
+objective: >-
+  Define the stable authentication and transport requirements that any future
+  supported Plugin/App/MCP binding must satisfy without changing the accepted
+  VoiceBridge MEDIA API semantics.
+
+backend:
+  logical_service: VoiceBridge MEDIA API
+  current_base_url: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
+  backend_api_change_required_for_design: false
+  render_change_required_for_design: false
+  existing_openapi_source: gpt_store/actions/media_public_r3_openapi.yaml
+  operation_count: 13
+
+transport_contract:
+  final_transport: TBD_AFTER_SURFACE_INSPECTION
+  allowed_candidate_families:
+    - supported_connected_app
+    - remote_mcp_http
+  local_mcp_direct_dependency: false
+  client_desktop_dependency_allowed_by_default: false
+  preserve_http_semantics: true
+  preserve_operation_identity_or_auditable_equivalent_mapping: true
+  request_timeout_strategy: TARGET_SURFACE_SPECIFIC_BUT_BOUNDED
+  automatic_transport_retry: false
+  backend_job_polling: EXPLICIT_STATUS_READS_ONLY
+  duplicate_execution_protection: BACKEND_DURABLE_JOB_AND_LOOKUP_SEMANTICS
+
+execution_boundary:
+  execution_required: true
+  execution_operations:
+    - startPublicGeminiYoutubeTranscription
+    - startPublicInstagramCobaltTranscription
+    - startPublicFacebookCobaltTranscription
+    - startPublicTelegramTranscription
+  read_only_operations:
+    - getPublicMediaCapabilities
+    - lookupPublicGeminiYoutubeJob
+    - getPublicGeminiYoutubeJob
+    - getPublicGeminiYoutubeSegments
+    - lookupPublicInstagramCobaltJob
+    - getPublicNonYoutubeMediaJob
+    - getPublicNonYoutubeMediaSegments
+  preflight_operations:
+    - preflightPublicGeminiYoutube
+    - preflightPublicInstagramCobalt
+  read_fetch_only_surface_accepted_for_full_binding: false
+
+credentials:
+  final_auth_method: TBD_AFTER_SURFACE_INSPECTION
+  acceptable_patterns:
+    - supported_server_side_static_bearer
+    - supported_oauth_or_managed_credential_store
+    - backend_to_backend_credential_injection_not_visible_to_model
+  forbidden_patterns:
+    - secret_in_skill_text
+    - secret_in_repository
+    - secret_in_tool_description
+    - secret_in_model_visible_arguments
+    - secret_in_user_visible_output
+    - secret_in_non_secret_sentinel_evidence
+  model_visible_secret: false
+  repository_secret: false
+  browser_profile_or_cookie_auth_for_media_backend: false
+  credential_rotation_requires_backend_contract_change: false
+
+consent:
+  youtube_preflight_must_not_call_provider: true
+  youtube_execution_requires_explicit_user_acknowledgement: true
+  consent_payload:
+    provider: google_gemini
+    tier: free
+    data_use_acknowledged: true
+  consent_must_not_be_inferred_from_plugin_installation: true
+  consent_must_not_be_inferred_from_prior_unrelated_request: true
+
+retry_idempotency:
+  completed: REUSE
+  processing: REUSE_AND_CONCURRENCY_PROTECT
+  failed_free_only: FRESH_DETERMINISTIC_JOB_ON_NEW_EXPLICIT_RETRY_REQUEST
+  failed_paid_or_charge_uncertain: BLOCK
+  automatic_retry_loop: false
+  transport_retry_must_not_duplicate_execution: true
+  execution_retry_requires_backend_state_check_when_surface_may_replay_calls: true
+
+errors:
+  structured_error_required: true
+  provider_secret_sanitization_required: true
+  internal_header_sanitization_required: true
+  credential_sanitization_required: true
+  public_error_must_distinguish:
+    - invalid_request
+    - unsupported_url_or_media
+    - consent_missing
+    - free_quota_or_admission_limit
+    - provider_unavailable
+    - durable_state_unavailable
+    - authentication_or_binding_failure_without_secret_detail
+  media_failure_blocks_core: false
+
+permissions:
+  inspect_and_record_before_binding:
+    - plugin_or_app_type
+    - account_plan_or_workspace_surface
+    - read_vs_execution_tool_support
+    - per_action_confirmation_behavior
+    - credential_modes
+    - web_vs_desktop_availability
+    - plugin_install_permissions
+    - plugin_share_permissions
+    - custom_mcp_upload_or_enable_permissions_if_applicable
+  minimum_required:
+    - execution/action capability for four start operations
+    - read capability for capability/lookup/status/segments
+    - no secret exposure
+    - explicit user consent boundary preserved
+  unknown_permission_behavior: FAIL_CLOSED
+
+validation_before_activation:
+  - bind all 13 operations or documented semantic equivalents
+  - run Core regression pack
+  - run MEDIA positive parity regression
+  - run MEDIA negative/boundary regression
+  - verify no paid/unapproved fallback
+  - verify consent behavior
+  - verify retry/idempotency behavior
+  - verify error sanitization
+  - verify intended audience/sharing
+  - verify original public GPT remains available until owner-approved switch
+
+release_boundary:
+  binding_implementation: NOT_AUTHORIZED_BY_THIS_SPEC
+  live_credentials: DENIED
+  live_mcp: DENIED
+  plugin_installation: DENIED
+  migration_execution: DENIED
+  plugin_publication: DENIED
+  render_change: DENIED
+  public_gpt_change: DENIED
