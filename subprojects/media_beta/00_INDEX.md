@@ -2,8 +2,8 @@
 
 Canonical documentation index for K-Research & Critic MEDIA BETA / Plugin migration work.
 
-Version: 7.0
-Status: **ACTIVE / PLUGIN_FIRST / BOUNDED_CANARY_CLOSED_PASS / R3-A_READY / PUBLICATION_HOLD**
+Version: 7.1
+Status: **ACTIVE / PLUGIN_FIRST / BOUNDED_CANARY_CLOSED_PASS / R3-A_PLANNED_NOT_STARTED / PUBLICATION_HOLD**
 Updated: 2026-09-16
 
 ## Product boundary
@@ -24,18 +24,17 @@ Core KRC               -> remains usable and accessible
 
 ## Canonical current reading order
 
-1. `CURRENT_HANDOFF.md` — v11.0; current recovery authority.
+1. `CURRENT_HANDOFF.md` — v11.1; current recovery authority.
 2. `111_POST_CANARY_PLUGIN_MEDIA_ROADMAP_DECISION_2026_09_16.md` — approved post-canary roadmap.
-3. `02_ROADMAP.md` — v5.0; active gate sequence R3-A through R4.
+3. `02_ROADMAP.md` — v5.1; active gate sequence R3-A through R4.
 4. `110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md` — completed ChatGPT-side invocation PASS.
 5. `109_CHATGPT_CUSTOM_MCP_CONNECTION_DISCOVERY_PASS_2026_09_16.md` — owner-account connection and one-tool discovery PASS.
 6. `108_SENTINEL_REMOTE_MCP_CANARY_LIVE_DEPLOYMENT_CONNECTION_BLOCKED_2026_09_16.md` — live endpoint validation and historical auth-context blocker.
 7. `107_KRC_DEPLOYABLE_REMOTE_MCP_CANARY_REPO_ACCEPTANCE_2026_09_16.md` — deployable package acceptance.
-8. `106_SENTINEL_TO_KRC_MCP_CANARY_HANDOFF_2026_09_16.md` — ownership handoff into deployable canary work.
-9. `102_KRC_P100_ACCOUNT_SURFACE_INSPECTION_RESULT_2026_09_16.md` — account-specific Plugin/custom MCP surface evidence.
-10. `102_OPENAI_RETIREMENT_RESEARCH_INTEGRATION_ACCEPTANCE_HARDENING_2026_09_16.md` — migration acceptance hardening.
+8. `102_KRC_P100_ACCOUNT_SURFACE_INSPECTION_RESULT_2026_09_16.md` — account-specific Plugin/custom MCP surface evidence.
+9. `102_OPENAI_RETIREMENT_RESEARCH_INTEGRATION_ACCEPTANCE_HARDENING_2026_09_16.md` — migration acceptance hardening.
 
-Older numbered checkpoints remain historical evidence and are not the current continuation point.
+Older checkpoints remain historical evidence and are not the current continuation point.
 
 ## Current repository / PR
 
@@ -47,7 +46,7 @@ base: main
 state: OPEN / DRAFT / UNMERGED
 ```
 
-Final bounded-canary documentation baseline before roadmap planning:
+Final bounded-canary baseline before roadmap planning:
 
 ```text
 head: 75a4b30e9f478fad892fafc017fea069ce949aec
@@ -116,7 +115,7 @@ Current semantic target:
 ## Active roadmap gates
 
 ```text
-R3-A  Contract freeze / secure adapter baseline            READY
+R3-A  Contract freeze / secure adapter baseline            PLANNED / NOT STARTED
 R3-B  Inbound auth + secret-boundary hardening             HOLD
 R3-C  9-tool non-execution VoiceBridge binding             HOLD
 R3-D  Consequential-action confirmation semantics          HOLD
@@ -127,11 +126,11 @@ R3-H  Migration/publication readiness                      HOLD
 R4    Owner-approved cutover/migration/publication         HOLD
 ```
 
-No gate automatically authorizes the next state-changing gate.
+Roadmap planning approval does not automatically authorize R3-A implementation. A separate execution approval is required.
 
-## Immediate continuation point
+## Immediate decision point
 
-R3-A is repository-only.
+If separately approved, R3-A is repository-only.
 
 Required:
 
@@ -157,7 +156,7 @@ VoiceBridge PR #45 merge
 
 ## Historical backend/provider evidence
 
-Earlier R0-R2 checkpoints remain valid historical evidence for VoiceBridge, Cobalt, Gemini, Instagram/Facebook/Telegram routing, free-only policy, durable KRCM jobs, and Core isolation requirements. They do not override the current Plugin-first continuation point.
+Earlier backend/provider checkpoints remain valid historical evidence for VoiceBridge, Cobalt, Gemini, Instagram/Facebook/Telegram routing, free-only policy, durable KRCM jobs, and Core isolation requirements. They do not override the current Plugin-first continuation point.
 
 Current policy remains:
 
@@ -172,4 +171,4 @@ YouTube paid/Cobalt/AssemblyAI fallback: forbidden
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md і продовжуй з R3-A contract freeze / secure adapter baseline.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md. Roadmap approved; R3-A planned but not started.`
