@@ -1,7 +1,7 @@
-schema_version: "0.1"
-status: PREPARED_READ_ONLY_DECISION_MATRIX
+schema_version: "0.2"
+status: R3A_REMOTE_MCP_SURFACE_SELECTED
 as_of: "2026-09-16"
-source_checkpoint: subprojects/media_beta/99_KRC_CORE_MEDIA_MIGRATION_HARDENING_CHECKPOINT_2026_09_16.md
+source_checkpoint: subprojects/media_beta/110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md
 
 principles:
   inspect_before_binding: true
@@ -22,6 +22,17 @@ migration_observations:
   selected_model_transfer_guaranteed: false
   original_gpt_after_migration: READ_ONLY_UNTIL_RETIREMENT
   replacement_plugin_initial_access: PRIVATE_UNTIL_SHARED
+
+account_surface_evidence:
+  plugin_surface_present: true
+  custom_mcp_option: true
+  remote_mcp_supported: true
+  web_availability: true
+  private_custom_mcp_connection: PASS
+  discovered_tool_count: 1
+  read_only_canary_invocation: PASS
+  no_auth_canary_production_reuse: false
+  execution_write_actual: UNVERIFIED_R3_D
 
 required_krc_capabilities:
   core_skill: true
@@ -47,22 +58,18 @@ surfaces:
     detect:
       - migration control is visible on the published KRC GPT
       - account/workspace notice confirms migration availability
-    prerequisites_to_record:
-      - user is creator or otherwise authorized migrator
-      - plugins are enabled for the account/workspace
-      - KRC GPT is eligible/published for the available migration flow
     acceptable_for_core: true
     acceptable_for_media_custom_actions_without_rebuild: false
     owner_approval_required_before_action: true
+    binding_status: NOT_USED_FOR_MEDIA_BINDING
     forbidden_during_read_only_inspection:
       - click_migrate
       - confirm_migration
       - change_sharing
-      - install_replacement
       - publish_replacement
 
   - id: supported_connected_app
-    purpose: bind replacement Plugin to an app/connector that can expose VoiceBridge-backed MEDIA tools
+    purpose: alternative app/connector binding if Remote MCP later fails required parity
     inspect_first: true
     eligible_if_all:
       - supports required execution/action tools, not only search/read
@@ -70,13 +77,7 @@ surfaces:
       - supports server-side authentication without model-visible secrets
       - supports required user/account audience and intended ChatGPT surface
       - supports explicit consent before YouTube provider work
-    reject_if_any:
-      - search_or_read_only
-      - cannot represent execution/start operations
-      - requires secrets in skill text or model-visible arguments
-      - forces paid or unapproved provider fallback
-      - cannot preserve Core isolation
-    binding_status: NOT_SELECTED
+    binding_status: HOLD_FALLBACK_NOT_SELECTED
 
   - id: custom_remote_mcp
     purpose: expose MEDIA operations through a supported remote MCP app/server
@@ -94,27 +95,36 @@ surfaces:
       - local_only_server_without_supported_tunnel_or_remote_transport
       - secrets would be exposed to model/user/repository
       - permissions cannot enforce required safety boundary
-    binding_status: NOT_SELECTED
+    binding_status: SELECTED_CANDIDATE_CANARY_PROVEN
+    proven:
+      - remote_https_transport
+      - web_connection
+      - private_plugin_connection
+      - tool_discovery
+      - one_read_only_invocation
+    unproven_until_later_gates:
+      - authenticated_full_binding
+      - execution_confirmation_semantics
+      - four_start_operation_execution
+      - full_13_operation_parity
 
   - id: external_api_agent_fallback
-    purpose: non-Plugin architecture fallback only if no supported ChatGPT Plugin/App/MCP surface can deliver required parity
+    purpose: fallback only if supported ChatGPT Plugin/App/MCP surface cannot deliver required parity
     inspect_first: true
-    eligible_if_all:
-      - Plugin replacement cannot meet required MEDIA parity
-      - owner explicitly approves product-architecture change
     default_status: HOLD
     binding_status: NOT_SELECTED
 
-selection_order:
-  - inspect builtin migration output and available app surfaces read-only
-  - prefer a supported first-party Plugin/App binding when it preserves full semantics
-  - otherwise evaluate custom remote MCP if execution/write support is available
-  - use external architecture only after explicit owner decision
+selection:
+  selected_media_surface: custom_remote_mcp
+  selected_transport: remote_mcp_http
+  protocol_version: "2026-07-28"
+  selection_evidence: bounded_remote_mcp_canary_closed_pass
+  full_binding_authorized: false
 
 hard_stop_conditions:
   - migration action would make original GPT read-only before owner approval
   - available integration is read_fetch_only
-  - execution permissions are ambiguous
+  - execution permissions are ambiguous at the execution gate
   - sharing/audience would regress materially without explicit approval
   - secret handling cannot remain server-side
   - MEDIA operation parity cannot be proven
@@ -123,9 +133,10 @@ hard_stop_conditions:
 release_boundary:
   public_gpt_mutation: DENIED
   migration_execution: DENIED
-  plugin_installation: DENIED
   plugin_publication: DENIED
-  live_mcp_creation: DENIED
+  plugin_sharing: DENIED
+  full_media_mcp_creation: DENIED
+  voicebridge_credential_binding: DENIED
   render_change: DENIED
   main_mutation: DENIED
   pr22_merge: DENIED
