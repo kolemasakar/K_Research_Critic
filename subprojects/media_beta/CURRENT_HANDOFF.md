@@ -1,20 +1,21 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 9.0
-Status: ACTIVE_HANDOFF / LIVE_REMOTE_MCP_CANARY_PASS / CHATGPT_CONNECTION_PASS / ONE_TOOL_DISCOVERY_PASS / INVOCATION_PENDING / PUBLICATION_HOLD
+Version: 10.0
+Status: ACTIVE_HANDOFF / LIVE_REMOTE_MCP_CANARY_PASS / CHATGPT_CONNECTION_PASS / ONE_TOOL_DISCOVERY_PASS / CHATGPT_INVOCATION_PASS / BOUNDED_CANARY_GATE_CLOSED / PUBLICATION_HOLD
 Date: 2026-09-16
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md і продовжуй з one-tool owner-account ChatGPT canary invocation gate.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md. Bounded Remote MCP canary gate закрито PASS; почни з наступного roadmap/owner decision, не розширюй surface автоматично.`
 
 ## Canonical recovery files
 
 1. `subprojects/media_beta/CURRENT_HANDOFF.md`
-2. `subprojects/media_beta/109_CHATGPT_CUSTOM_MCP_CONNECTION_DISCOVERY_PASS_2026_09_16.md`
-3. `subprojects/media_beta/108_SENTINEL_REMOTE_MCP_CANARY_LIVE_DEPLOYMENT_CONNECTION_BLOCKED_2026_09_16.md`
-4. `subprojects/media_beta/107_KRC_DEPLOYABLE_REMOTE_MCP_CANARY_REPO_ACCEPTANCE_2026_09_16.md`
-5. current PR #22 head/CI and current non-secret account/control-plane evidence
+2. `subprojects/media_beta/110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md`
+3. `subprojects/media_beta/109_CHATGPT_CUSTOM_MCP_CONNECTION_DISCOVERY_PASS_2026_09_16.md`
+4. `subprojects/media_beta/108_SENTINEL_REMOTE_MCP_CANARY_LIVE_DEPLOYMENT_CONNECTION_BLOCKED_2026_09_16.md`
+5. `subprojects/media_beta/107_KRC_DEPLOYABLE_REMOTE_MCP_CANARY_REPO_ACCEPTANCE_2026_09_16.md`
+6. current PR #22 head/CI and current non-secret account/control-plane evidence
 
 Older handoffs remain historical recovery evidence only and are superseded for current phase selection.
 
@@ -28,15 +29,12 @@ base=main
 state=OPEN / DRAFT / UNMERGED
 ```
 
-Validated deployable implementation state:
+Validated implementation evidence:
 
 ```text
 implementation_head=4a75f53d6da956d9b2eb7acc1b6f788824bb6e03
 implementation_workflow=35126692392
 implementation_conclusion=SUCCESS
-pre_live_documentation_head=2a91c6c4a982909717fb5b4e1dda7a04af1b388c
-pre_live_documentation_workflow=35126878869
-pre_live_documentation_conclusion=SUCCESS
 live_gate_documentation_head=16acbb81cb46d4da672ad79e8eb18105e1ab5269
 live_gate_workflow=35129121125
 live_gate_conclusion=SUCCESS
@@ -66,7 +64,13 @@ CHATGPT_MCP_CONNECTION=PASS
 SCAN_TOOLS_EQUIVALENT_DISCOVERY=PASS
 CHATGPT_DISCOVERED_TOOL_COUNT=1
 CHATGPT_DISCOVERED_TOOL_NAME=krc_media_capabilities_canary
-CHATGPT_CANARY_INVOCATION=PENDING
+CHATGPT_CANARY_INVOCATION=PASS
+CHATGPT_CANARY_STATUS=ok
+CHATGPT_CANARY_MUTATION=false
+CHATGPT_CANARY_PROVIDER_WORK=false
+CHATGPT_CANARY_VOICEBRIDGE_BINDING=not_enabled
+CHATGPT_CANARY_EXECUTION_TOOLS=not_enabled
+BOUNDED_CANARY_GATE=CLOSED_PASS
 ```
 
 ## Live bounded canary
@@ -88,16 +92,7 @@ No existing VoiceBridge, Cobalt, KGM or other Render service was modified.
 
 ## ChatGPT owner-account evidence
 
-The owner created and connected the private custom MCP/plugin:
-
-```text
-NAME=KRC MCP Canary Sentinel
-SERVER_URL=https://krc-mcp-canary-sentinel.onrender.com/mcp
-AUTHENTICATION=No authentication
-CONNECTION=PASS
-```
-
-The authenticated ChatGPT settings page displayed exactly one action:
+The private custom MCP/plugin `KRC MCP Canary Sentinel` is connected in the normal owner-account ChatGPT surface. The authenticated settings page displayed exactly one action:
 
 ```text
 TOOL_COUNT=1
@@ -105,24 +100,40 @@ TOOL=krc_media_capabilities_canary
 DESCRIPTION=Returns deterministic KRC MEDIA canary metadata. It does not call providers, VoiceBridge, or mutate external state.
 ```
 
-No separate `Scan Tools` button was required by this UI flow; successful connection immediately surfaced the discovered action. This is accepted as the one-tool discovery evidence for this gate.
+A normal ChatGPT chat invoked only this tool once and returned:
 
-## Required next gate
-
-In a normal owner-account ChatGPT chat with the private plugin enabled/selected:
-
-```text
-invoke only krc_media_capabilities_canary once
--> require successful result
--> require mutation=false
--> require provider_work=false
--> require voicebridge_binding=not_enabled
--> require execution_tools=not_enabled
--> record non-secret evidence
--> STOP
+```json
+{
+  "execution_tools": "not_enabled",
+  "media_operation_target_count": 13,
+  "mutation": false,
+  "provider_work": false,
+  "service": "krc-media-mcp-canary",
+  "status": "ok",
+  "voicebridge_binding": "not_enabled"
+}
 ```
 
-Do not invoke any other action or expand scope during this gate.
+## Gate closure
+
+The bounded Remote MCP canary path is fully proven end-to-end:
+
+```text
+repository implementation
+-> deployable package
+-> isolated Render deployment
+-> external HTTPS protocol validation
+-> owner-account ChatGPT connection
+-> exactly one discovered tool
+-> one read-only ChatGPT-side invocation
+-> PASS
+```
+
+Do not automatically expand scope from this result.
+
+## Next decision point
+
+The next block requires explicit owner/roadmap selection before implementation. Candidate topics include broader MEDIA parity, authentication hardening, action/execution confirmation semantics, staged VoiceBridge binding, and eventual Plugin migration/publication readiness. None is authorized by this checkpoint alone.
 
 ## Core / MEDIA invariants
 
@@ -155,4 +166,4 @@ PR45_MERGE=DENIED
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V9_0_CHATGPT_MCP_CONNECTION_DISCOVERY_PASS_INVOCATION_PENDING_2026_09_16`
+`KRC_MEDIA_CURRENT_HANDOFF_V10_0_BOUNDED_REMOTE_MCP_CANARY_GATE_CLOSED_PASS_2026_09_16`
