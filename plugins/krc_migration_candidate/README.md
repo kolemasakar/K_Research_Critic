@@ -14,7 +14,10 @@ This candidate intentionally does **not** contain `mcp.json`, `.mcp.json`, `.app
 
 - `skills/krc_core/SKILL.md` — exact snapshot of the current accepted Core instructions, wrapped only with migration metadata.
 - `contracts/media_tools.yaml` — 1:1 parity contract for the 13 accepted R3 MEDIA Action operations.
-- `tests/test_krc_plugin_migration_candidate.py` — repository guards for Core parity, operation parity, free-only policy, consent, retry semantics, and secret/config boundaries.
+- `contracts/media_adapter.yaml` — transport-neutral request/response, auth, retry, error and platform-boundary contract between the future Plugin/App/MCP surface and the existing VoiceBridge MEDIA API.
+- `regression/core_cases.yaml` — machine-readable Core behavioral fixtures covering CriticProfile, cross-check, traceability, checkpoint recovery, language, final protocol and MEDIA failure isolation.
+- `regression/media_negative_cases.yaml` — negative/boundary MEDIA fixtures covering consent, wrong-platform routing, paid fallback prohibition, deterministic retry, charge uncertainty, reuse/concurrency, input validation, secret sanitization and platform-specific hard guards.
+- `tests/test_krc_plugin_migration_candidate.py` — repository guards for Core parity, exact 13-operation parity, transport-neutral adapter invariants, regression coverage, free-only policy, consent/retry semantics, and secret/config boundaries.
 
 Canonical sources remain authoritative:
 
@@ -24,10 +27,23 @@ Canonical sources remain authoritative:
 - `subprojects/media_beta/96_R3_MEDIA_ACTION_TO_PLUGIN_MCP_COMPATIBILITY_MAP_2026_09_16.md`
 - `subprojects/media_beta/97_KRC_GPT_TO_PLUGIN_MIGRATION_INVENTORY_2026_09_16.md`
 
+## P99 hardening result
+
+The design candidate now has three independent validation layers:
+
+1. **Source parity** — the Core skill snapshot must equal the canonical Core instructions and all 13 MEDIA operation IDs/methods/paths must equal the accepted OpenAPI.
+2. **Behavioral regression fixtures** — Core protocol and MEDIA negative/boundary cases are machine-readable and checked for required dimensions.
+3. **Transport boundary** — the adapter contract keeps VoiceBridge stable while deferring final Plugin/App/MCP packaging and authentication until the actual account-specific migration surface is inspected.
+
+The adapter deliberately requires no Render mutation and no backend API redesign. A future platform binding should therefore be a thin translation layer rather than a rewrite of MEDIA provider logic.
+
 ## Boundary
 
 ```text
 PLUGIN_CANDIDATE_DESIGN=ACTIVE
+CORE_REGRESSION_PACK=READY
+MEDIA_NEGATIVE_REGRESSION_PACK=READY
+MEDIA_ADAPTER_CONTRACT=READY
 PLUGIN_APP_IMPLEMENTATION=NOT_STARTED
 CUSTOM_MCP_IMPLEMENTATION=NOT_STARTED
 GPT_MIGRATION=NOT_STARTED
