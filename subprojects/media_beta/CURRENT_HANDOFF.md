@@ -1,12 +1,12 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 11.0
-Status: **ACTIVE_HANDOFF / BOUNDED_CANARY_CLOSED_PASS / POST_CANARY_ROADMAP_APPROVED / R3-A_READY / PUBLICATION_HOLD**
+Version: 11.1
+Status: **ACTIVE_HANDOFF / BOUNDED_CANARY_CLOSED_PASS / POST_CANARY_ROADMAP_APPROVED / R3-A_PLANNED_NOT_STARTED / PUBLICATION_HOLD**
 Date: 2026-09-16
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md і продовжуй з R3-A contract freeze / secure adapter baseline.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md. Post-canary roadmap approved; R3-A planned but not yet started. Ask for/confirm separate execution approval before repository implementation.`
 
 ## Canonical recovery files
 
@@ -15,8 +15,6 @@ Date: 2026-09-16
 3. `subprojects/media_beta/02_ROADMAP.md` — v5.0
 4. `subprojects/media_beta/110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md`
 5. current PR #22 head/CI and current non-secret account/control-plane evidence
-
-Older handoffs/checkpoints remain historical evidence only.
 
 ## Repository / PR
 
@@ -28,7 +26,7 @@ base=main
 state=OPEN / DRAFT / UNMERGED
 ```
 
-Final bounded-canary documentation state before roadmap planning:
+Final bounded-canary baseline:
 
 ```text
 head=75a4b30e9f478fad892fafc017fea069ce949aec
@@ -38,8 +36,6 @@ Tests / Python 3.13=PASS
 Tests / Python 3.14=PASS
 Quality gates=PASS
 ```
-
-At recovery always refetch current PR metadata and CI because documentation commits advance the branch.
 
 ## Proven baseline
 
@@ -67,19 +63,6 @@ execution_tools=not_enabled
 media_operation_target_count=13
 ```
 
-## Live canary boundary
-
-```text
-service=krc-mcp-canary-sentinel
-endpoint=https://krc-mcp-canary-sentinel.onrender.com/mcp
-autoDeploy=off
-auth=none  # bounded canary only
-VoiceBridge credential=none
-provider work=none
-```
-
-The canary is evidence only. It must not receive VoiceBridge credentials or become the production MEDIA endpoint.
-
 ## Approved roadmap
 
 ```text
@@ -96,16 +79,15 @@ R4   separate owner-approved cutover/migration/publication
 
 No phase auto-authorizes the next state-changing phase.
 
-## Current executable gate
+## Current authorization boundary
 
-**R3-A only** is approved as the next engineering block.
+The owner approved **roadmap planning**. R3-A is now defined and ready for a separate implementation approval, but implementation has not started under this handoff.
 
-R3-A must:
+When separately approved, R3-A is repository-only and must:
 
 - reconcile/freeze the 13-tool contract against the proven Remote MCP surface;
 - freeze exact schemas, annotations, consent, retry/idempotency, audit, error, and secret boundaries;
 - preserve Core skill parity;
-- remain repository-only;
 - pass CI.
 
 R3-A must not:
@@ -151,7 +133,8 @@ MEDIA_FAILURE_CORE_ISOLATION=REQUIRED
 ## Hard boundary
 
 ```text
-R3_B_AND_LATER_EXECUTION=NOT_AUTHORIZED_BY_R3_A
+R3_A_IMPLEMENTATION=NOT_STARTED
+R3_B_AND_LATER=HOLD
 FULL_MEDIA_13_TOOL_DEPLOYMENT=DENIED
 VOICEBRIDGE_SECRET_BINDING=DENIED
 MEDIA_PROVIDER_WORK=DENIED
@@ -167,4 +150,4 @@ PR45_MERGE=DENIED
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V11_0_POST_CANARY_ROADMAP_APPROVED_R3_A_READY_2026_09_16`
+`KRC_MEDIA_CURRENT_HANDOFF_V11_1_POST_CANARY_ROADMAP_APPROVED_R3_A_PLANNED_NOT_STARTED_2026_09_16`
