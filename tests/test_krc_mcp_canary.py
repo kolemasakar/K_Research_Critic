@@ -7,19 +7,22 @@ from pathlib import Path
 
 import yaml
 
-from plugins.krc_migration_candidate.mcp_canary.server import (
-    CANARY_TOOL_NAME,
-    MCP_PROTOCOL_VERSION,
-    canary_result,
-    dispatch_mcp,
-)
-
 ROOT = Path(__file__).resolve().parents[1]
 CANARY_DIR = ROOT / "plugins" / "krc_migration_candidate" / "mcp_canary"
 SERVER = CANARY_DIR / "server.py"
 MEDIA_CONTRACT = ROOT / "plugins" / "krc_migration_candidate" / "contracts" / "media_tools.yaml"
 CORE = ROOT / "prompts" / "GPT_STORE_INSTRUCTIONS.md"
 SKILL = ROOT / "plugins" / "krc_migration_candidate" / "skills" / "krc_core" / "SKILL.md"
+
+# Load the repository-only protocol core directly from source instead of importing
+# the candidate package. This intentionally avoids generating __pycache__ binary
+# artifacts inside the directory that repository secret-scans inspect as text.
+_NAMESPACE: dict[str, object] = {"__name__": "krc_mcp_canary_test_module"}
+exec(compile(SERVER.read_text(encoding="utf-8"), str(SERVER), "exec"), _NAMESPACE)
+CANARY_TOOL_NAME = _NAMESPACE["CANARY_TOOL_NAME"]
+MCP_PROTOCOL_VERSION = _NAMESPACE["MCP_PROTOCOL_VERSION"]
+canary_result = _NAMESPACE["canary_result"]
+dispatch_mcp = _NAMESPACE["dispatch_mcp"]
 
 
 def _request(method: str, *, params: dict | None = None, request_id: int = 1) -> dict:
@@ -129,7 +132,11 @@ def test_canary_core_contains_no_network_or_process_execution_imports() -> None:
 
 
 def test_canary_contains_no_live_endpoint_or_secret_material() -> None:
-    text = "\n".join(path.read_text(encoding="utf-8") for path in CANARY_DIR.rglob("*") if path.is_file())
+    text = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in CANARY_DIR.rglob("*")
+        if path.is_file() and path.suffix in {".py", ".md", ".yaml", ".yml", ".json", ".toml", ".txt"}
+    )
     lowered = text.lower()
     assert re.search(r"https?://", text) is None
     assert "sk-proj-" not in lowered
