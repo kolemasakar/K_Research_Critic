@@ -1,0 +1,156 @@
+schema_version: "0.1"
+status: DESIGN_ONLY
+installable: false
+source_openapi: gpt_store/actions/media_public_r3_openapi.yaml
+source_checkpoint: subprojects/media_beta/96_R3_MEDIA_ACTION_TO_PLUGIN_MCP_COMPATIBILITY_MAP_2026_09_16.md
+backend_url: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
+operation_count: 13
+
+authentication:
+  final_strategy: TBD_AFTER_ACCOUNT_MIGRATION_SURFACE_INSPECTION
+  secret_visibility: SERVER_SIDE_ONLY
+  model_visible_secret: false
+  repository_secret: false
+
+policy:
+  paid_retrieval_fallback: false
+  paid_stt_fallback: false
+  paid_proxy_fallback: false
+  supadata_public_active: false
+  scrapecreators_public_active: false
+  cookie_login_fallback: false
+  automatic_retry_loop: false
+  failed_free_only_retry: fresh_deterministic_job_on_new_explicit_retry_request
+  failed_paid_or_charge_uncertain_retry: blocked
+
+routes:
+  youtube: Gemini Developer API Free Tier direct URL
+  instagram: self-hosted Cobalt -> AssemblyAI universal-2
+  facebook: Cobalt video+audio -> server ffmpeg mono PCM WAV 16 kHz -> AssemblyAI universal-2
+  telegram: public Telegram web -> AssemblyAI universal-2
+
+youtube_consent:
+  preflight_calls_provider: false
+  provider: google_gemini
+  tier: free
+  data_use_acknowledged: true
+  required_before_start: true
+
+tools:
+  - candidate_name: media_get_capabilities
+    source_operation_id: getPublicMediaCapabilities
+    method: GET
+    path: /api/v1/media/public-capabilities
+    mode: read_only
+
+  - candidate_name: media_youtube_preflight
+    source_operation_id: preflightPublicGeminiYoutube
+    method: POST
+    path: /api/v1/media/youtube-gemini/preflight
+    mode: read_only_preflight
+
+  - candidate_name: media_youtube_lookup
+    source_operation_id: lookupPublicGeminiYoutubeJob
+    method: POST
+    path: /api/v1/media/youtube-gemini/lookup
+    mode: read_only_lookup
+
+  - candidate_name: media_youtube_start
+    source_operation_id: startPublicGeminiYoutubeTranscription
+    method: POST
+    path: /api/v1/media/youtube-gemini/transcriptions
+    mode: execution
+    requires_explicit_user_consent: true
+
+  - candidate_name: media_youtube_status
+    source_operation_id: getPublicGeminiYoutubeJob
+    method: GET
+    path: /api/v1/media/youtube-gemini/transcriptions/{job_id}
+    mode: read_only
+
+  - candidate_name: media_youtube_segments
+    source_operation_id: getPublicGeminiYoutubeSegments
+    method: GET
+    path: /api/v1/media/youtube-gemini/transcriptions/{job_id}/segments
+    mode: read_only
+
+  - candidate_name: media_instagram_preflight
+    source_operation_id: preflightPublicInstagramCobalt
+    method: POST
+    path: /api/v1/media/managed/preflight
+    mode: read_only_preflight
+
+  - candidate_name: media_instagram_lookup
+    source_operation_id: lookupPublicInstagramCobaltJob
+    method: POST
+    path: /api/v1/media/managed/lookup
+    mode: read_only_lookup
+
+  - candidate_name: media_instagram_start
+    source_operation_id: startPublicInstagramCobaltTranscription
+    method: POST
+    path: /api/v1/media/managed/transcriptions
+    mode: execution
+
+  - candidate_name: media_facebook_start
+    source_operation_id: startPublicFacebookCobaltTranscription
+    method: POST
+    path: /api/v1/media/managed/facebook-fallback
+    mode: execution
+
+  - candidate_name: media_telegram_start
+    source_operation_id: startPublicTelegramTranscription
+    method: POST
+    path: /api/v1/media/managed/telegram
+    mode: execution
+
+  - candidate_name: media_non_youtube_status
+    source_operation_id: getPublicNonYoutubeMediaJob
+    method: GET
+    path: /api/v1/media/managed/transcriptions/{job_id}
+    mode: read_only
+
+  - candidate_name: media_non_youtube_segments
+    source_operation_id: getPublicNonYoutubeMediaSegments
+    method: GET
+    path: /api/v1/media/managed/transcriptions/{job_id}/segments
+    mode: read_only
+
+audit_fields_required:
+  - status
+  - provider
+  - provider_mode
+  - retrieval_provider
+  - retrieval_credits_charged
+  - stt_seconds_charged
+  - segment_count
+  - transcript_characters
+  - reused
+  - credit_charge_uncertain
+  - error
+
+hard_guards:
+  youtube:
+    forbid:
+      - cobalt_fallback
+      - assemblyai_fallback
+      - paid_gemini
+      - paid_proxy
+      - supadata
+      - scrapecreators
+      - cookie_login
+  facebook:
+    canonical_retrieval: cobalt_video_plus_audio
+    normalization: mono_pcm_wav_16khz
+    forbid:
+      - cobalt_only_audio_canonical_route
+  telegram:
+    canonical_retrieval: telegram_public_web
+    forbid:
+      - telegram_login
+      - telegram_session
+      - telegram_bot_token
+  instagram:
+    canonical_retrieval: cobalt
+    forbid:
+      - youtube_on_generic_managed_route
