@@ -9,6 +9,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Mapping
 from urllib.parse import urlsplit
 
+from .oauth import GLOBAL_OAUTH_STATE, READ_SCOPE, OAuthState, handle_oauth_request
 from .server import (
     CANARY_TOOL_NAME,
     LEGACY_PROTOCOL_VERSION,
@@ -29,6 +30,8 @@ class HttpConfig:
     auth_mode: str = "none"
     bearer_token: str | None = None
     allowed_origins: frozenset[str] = frozenset()
+    public_base_url: str | None = None
+    owner_code: str | None = None
 
     @classmethod
     def from_env(cls) -> "HttpConfig":
@@ -38,10 +41,15 @@ class HttpConfig:
             for item in os.getenv("KRC_MCP_ALLOWED_ORIGINS", "").split(",")
             if item.strip()
         )
+        base_url = os.getenv("KRC_MCP_PUBLIC_BASE_URL")
+        if base_url:
+            base_url = base_url.rstrip("/")
         return cls(
             auth_mode=auth_mode,
             bearer_token=os.getenv("KRC_MCP_BEARER_TOKEN"),
             allowed_origins=allowed_origins,
+            public_base_url=base_url,
+            owner_code=os.getenv("KRC_MCP_OWNER_CODE"),
         )
 
 
@@ -80,24 +88,45 @@ def _rpc_error(request_id: object, code: int, message: str, *, data: object | No
     return {"jsonrpc": "2.0", "id": request_id, "error": error}
 
 
-def _authorize(headers: Mapping[str, str], config: HttpConfig) -> HttpResponse | None:
+def _authorize(
+    headers: Mapping[str, str],
+    config: HttpConfig,
+    *,
+    oauth_state: OAuthState | None = None,
+) -> HttpResponse | None:
     if config.auth_mode == "none":
         return None
-    if config.auth_mode != "bearer":
-        return _json_response(HTTPStatus.SERVICE_UNAVAILABLE, {"status": "misconfigured_auth_mode"})
-    if not config.bearer_token:
-        return _json_response(HTTPStatus.SERVICE_UNAVAILABLE, {"status": "missing_server_auth_secret"})
 
     authorization = headers.get("authorization", "")
     prefix = "Bearer "
     supplied = authorization[len(prefix) :] if authorization.startswith(prefix) else ""
-    if not supplied or not hmac.compare_digest(supplied, config.bearer_token):
+
+    if config.auth_mode == "bearer":
+        if not config.bearer_token:
+            return _json_response(HTTPStatus.SERVICE_UNAVAILABLE, {"status": "missing_server_auth_secret"})
+        if not supplied or not hmac.compare_digest(supplied, config.bearer_token):
+            return _json_response(
+                HTTPStatus.UNAUTHORIZED,
+                {"status": "unauthorized"},
+                extra_headers={"WWW-Authenticate": "Bearer"},
+            )
+        return None
+
+    if config.auth_mode == "oauth":
+        if not config.public_base_url:
+            return _json_response(HTTPStatus.SERVICE_UNAVAILABLE, {"status": "missing_oauth_public_base_url"})
+        state = oauth_state or GLOBAL_OAUTH_STATE
+        if supplied and state.access_allowed(supplied, READ_SCOPE):
+            return None
+        metadata_url = f"{config.public_base_url}/.well-known/oauth-protected-resource"
+        challenge = f'Bearer resource_metadata="{metadata_url}", scope="{READ_SCOPE}"'
         return _json_response(
             HTTPStatus.UNAUTHORIZED,
             {"status": "unauthorized"},
-            extra_headers={"WWW-Authenticate": "Bearer"},
+            extra_headers={"WWW-Authenticate": challenge},
         )
-    return None
+
+    return _json_response(HTTPStatus.SERVICE_UNAVAILABLE, {"status": "misconfigured_auth_mode"})
 
 
 def _validate_origin(headers: Mapping[str, str], config: HttpConfig) -> HttpResponse | None:
@@ -178,10 +207,28 @@ def handle_http_request(
     body: bytes = b"",
     *,
     config: HttpConfig | None = None,
+    oauth_state: OAuthState | None = None,
 ) -> HttpResponse:
     config = config or HttpConfig.from_env()
     normalized = _headers_lower(headers)
     clean_path = urlsplit(path).path
+
+    if config.auth_mode == "oauth" and config.public_base_url:
+        oauth_response = handle_oauth_request(
+            method,
+            path,
+            normalized,
+            body,
+            base_url=config.public_base_url,
+            owner_code=config.owner_code,
+            state=oauth_state or GLOBAL_OAUTH_STATE,
+        )
+        if oauth_response is not None:
+            return HttpResponse(
+                status=oauth_response.status,
+                headers=oauth_response.headers,
+                body=oauth_response.body,
+            )
 
     if clean_path == HEALTH_PATH and method == "GET":
         result = canary_result()
@@ -202,7 +249,7 @@ def handle_http_request(
     if origin_error:
         return origin_error
 
-    auth_error = _authorize(normalized, config)
+    auth_error = _authorize(normalized, config, oauth_state=oauth_state)
     if auth_error:
         return auth_error
 
@@ -293,8 +340,8 @@ class CanaryRequestHandler(BaseHTTPRequestHandler):
     do_DELETE = _handle
 
     def log_message(self, format: str, *args: object) -> None:
-        # Deliberately avoid request headers and bodies so credentials or payloads
-        # cannot be reflected into default HTTP logs.
+        # Request bodies and authorization headers are never logged. OAuth owner
+        # codes and tokens are accepted only in POST bodies / Authorization.
         super().log_message(format, *args)
 
 
