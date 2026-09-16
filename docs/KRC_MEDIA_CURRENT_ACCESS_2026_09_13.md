@@ -1,4 +1,5 @@
 # KRC MEDIA — Current Access Paths
+Поточні підтверджені шляхи доступу до KRC MEDIA.
 
 Date: 2026-09-13
 Status: CURRENT / VERIFIED
@@ -6,33 +7,39 @@ Status: CURRENT / VERIFIED
 ## Primary project automation
 
 ```text
-GitHub Actions OIDC -> Tailscale -> Tailscale SSH -> krcops -> bounded helpers
+GitHub Actions OIDC
+  -> OCI dynamic-group policy
+  -> OCI control-plane read-only access
 ```
 
-Accepted authority ceiling:
+Purpose:
+- inspect instance and network state;
+- verify KRC MEDIA infrastructure without reusable OCI user credentials.
+
+## Host operation
 
 ```text
-tier0
-tier1
-tier2_restart
+GitHub Actions OIDC
+  -> Tailscale
+  -> Tailscale SSH
+  -> krcops
+  -> bounded sudo helper
 ```
+
+Allowed tiers:
+- tier0: read-only observation;
+- tier1: bounded media-service status/diagnostics;
+- tier2_restart: bounded restart-only control.
+
+No general shell/root automation is granted.
 
 ## Supplemental development access
 
-RDC under `krcops` remains available as supplemental development access. It does not expand the bounded-helper authority ceiling.
+RDC remains available as a supplemental operator/development path. It is not the canonical project automation authority.
 
-## OCI infrastructure observation
+## Security boundary
 
-OCI instance-principal authentication is available for read-only infrastructure observation from the KRC Cobalt host.
-
-Required recovery reads are now fully verified, including NSG security-rule listing. OCI mutation through this path remains denied.
-
-Persistent OCI authority is read-only. No reusable OCI user credential is stored in the repository.
-
-Canonical detailed record:
-
-`docs/KRC_MEDIA_OCI_CONTROLPLANE_READONLY_ACCESS_2026_09_13.md`
-
-## Boundary
-
-These access paths do not grant arbitrary root, unrestricted container control, deployment authority, secret reads, or general cloud mutation.
+- OCI control-plane access is read-only.
+- Runtime mutations remain bounded by explicit helper/sudo policy.
+- Secrets are not stored in repository documentation.
+- Broad OCI user credentials are not part of the accepted path.
