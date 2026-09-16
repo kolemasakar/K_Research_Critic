@@ -1,0 +1,212 @@
+schema_version: "0.1"
+status: DESIGN_ONLY_TRANSPORT_NEUTRAL
+purpose: >-
+  Platform-neutral adapter contract between a future KRC Plugin/App/MCP surface
+  and the accepted VoiceBridge R3 MEDIA API. This document defines canonical
+  request/response and error boundaries without selecting a final OpenAI app,
+  connector, MCP packaging, authentication mechanism, or deployment.
+
+canonical_sources:
+  media_tools: plugins/krc_migration_candidate/contracts/media_tools.yaml
+  openapi: gpt_store/actions/media_public_r3_openapi.yaml
+  core: prompts/GPT_STORE_INSTRUCTIONS.md
+
+transport:
+  final_surface: TBD_AFTER_ACCOUNT_MIGRATION_SURFACE_INSPECTION
+  protocol_binding: TBD
+  installable: false
+  deployed: false
+  live_mcp_server: false
+  backend_mutation_required: false
+
+backend:
+  logical_name: VoiceBridge MEDIA API
+  existing_base_url: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
+  preserve_existing_api: true
+  render_change_required_for_design_candidate: false
+
+authentication:
+  final_strategy: TBD_AFTER_ACCOUNT_MIGRATION_SURFACE_INSPECTION
+  secret_placement: SERVER_SIDE_ONLY
+  model_receives_secret: false
+  repository_contains_secret: false
+  skill_contains_secret: false
+  evidence_contains_secret: false
+
+canonical_request_envelope:
+  fields:
+    operation: required
+    source_url: optional_by_operation
+    language_hint: optional
+    job_id: optional_by_operation
+    cursor: optional_by_operation
+    limit: optional_by_operation
+    consent: optional_except_youtube_start
+    explicit_retry: optional_except_failed_free_only_retry
+  language_hint_allowed:
+    - auto
+    - uk
+    - ru
+    - en
+  job_id_pattern: "^KRCM_[A-Za-z0-9-]+$"
+  pagination:
+    cursor_minimum: 0
+    limit_minimum: 1
+    limit_maximum: 50
+
+consent_contract:
+  youtube_start:
+    required: true
+    provider: google_gemini
+    tier: free
+    data_use_acknowledged: true
+  youtube_preflight:
+    provider_work_allowed: false
+    may_return_disclosure: true
+
+retry_contract:
+  COMPLETED: REUSE
+  PROCESSING: REUSE_INFLIGHT
+  FAILED_FREE_ONLY:
+    action: FRESH_DETERMINISTIC_JOB
+    requires_new_explicit_retry_request: true
+  FAILED_PAID_OR_CHARGE_UNCERTAIN:
+    action: BLOCK_REPLAY
+  automatic_retry_loop: false
+
+canonical_response_envelope:
+  required_audit_fields:
+    - status
+    - provider
+    - provider_mode
+    - retrieval_provider
+    - retrieval_credits_charged
+    - stt_seconds_charged
+    - segment_count
+    - transcript_characters
+    - reused
+    - credit_charge_uncertain
+    - error
+  job_status_allowed:
+    - PROCESSING
+    - COMPLETED
+    - FAILED
+  error_must_be_structured: true
+  secrets_must_be_sanitized: true
+
+error_taxonomy:
+  INVALID_INPUT:
+    retryable: false
+    examples:
+      - malformed_url
+      - platform_mismatch
+      - invalid_job_id
+      - invalid_pagination
+  CONSENT_REQUIRED:
+    retryable: true_after_user_action
+    provider_call_allowed_before_resolution: false
+  UNSUPPORTED_MEDIA:
+    retryable: false_or_new_user_request
+  FREE_PROVIDER_QUOTA:
+    retryable: later_explicit_request_only
+    paid_fallback_allowed: false
+  FREE_PROVIDER_UNAVAILABLE:
+    retryable: later_explicit_request_only
+    paid_fallback_allowed: false
+  DURABLE_STATE_UNAVAILABLE:
+    retryable: later
+  CHARGE_UNCERTAIN:
+    retryable: false
+    replay_allowed: false
+  SECRET_SANITIZATION:
+    retryable: false
+    expose_raw_backend_error: false
+
+operation_bindings:
+  getPublicMediaCapabilities:
+    adapter_method: get_capabilities
+    mode: read_only
+  preflightPublicGeminiYoutube:
+    adapter_method: youtube_preflight
+    mode: read_only_preflight
+  lookupPublicGeminiYoutubeJob:
+    adapter_method: youtube_lookup
+    mode: read_only_lookup
+  startPublicGeminiYoutubeTranscription:
+    adapter_method: youtube_start
+    mode: execution
+    consent_required: true
+  getPublicGeminiYoutubeJob:
+    adapter_method: youtube_status
+    mode: read_only
+  getPublicGeminiYoutubeSegments:
+    adapter_method: youtube_segments
+    mode: read_only
+  preflightPublicInstagramCobalt:
+    adapter_method: instagram_preflight
+    mode: read_only_preflight
+  lookupPublicInstagramCobaltJob:
+    adapter_method: instagram_lookup
+    mode: read_only_lookup
+  startPublicInstagramCobaltTranscription:
+    adapter_method: instagram_start
+    mode: execution
+  startPublicFacebookCobaltTranscription:
+    adapter_method: facebook_start
+    mode: execution
+  startPublicTelegramTranscription:
+    adapter_method: telegram_start
+    mode: execution
+  getPublicNonYoutubeMediaJob:
+    adapter_method: non_youtube_status
+    mode: read_only
+  getPublicNonYoutubeMediaSegments:
+    adapter_method: non_youtube_segments
+    mode: read_only
+
+platform_guards:
+  youtube:
+    canonical_provider_route: gemini_free_direct_url
+    forbid_fallback_to:
+      - cobalt
+      - assemblyai
+      - paid_gemini
+      - paid_proxy
+      - supadata
+      - scrapecreators
+      - cookies_or_login
+  instagram:
+    canonical_provider_route: cobalt_to_assemblyai
+    generic_managed_route_accepts_youtube: false
+  facebook:
+    canonical_provider_route: cobalt_video_plus_audio_to_ffmpeg_to_assemblyai
+    normalization: mono_pcm_wav_16khz
+    cobalt_only_audio_is_canonical: false
+  telegram:
+    canonical_provider_route: public_web_to_assemblyai
+    forbid_fallback_to:
+      - account_login
+      - session
+      - bot_token
+
+core_isolation:
+  media_failure_blocks_core: false
+  media_transcript_is_evidence_not_final_fact_verdict: true
+  fact_check_still_uses_criticprofile_gate: true
+
+future_binding_requirements:
+  - inspect_account_specific_openai_surface_read_only_first
+  - preserve_all_13_operation_semantics
+  - preserve_auth_secret_boundary
+  - preserve_explicit_consent_boundary
+  - preserve_retry_and_charge_uncertain_policy
+  - preserve_core_isolation
+  - rerun_core_and_media_regression_pack_before_activation
+
+forbidden_in_design_candidate:
+  - live_mcp_deployment
+  - plugin_installation
+  - plugin_publication
+  - render_mutation
+  - main_merge
+  - public_gpt_mutation
