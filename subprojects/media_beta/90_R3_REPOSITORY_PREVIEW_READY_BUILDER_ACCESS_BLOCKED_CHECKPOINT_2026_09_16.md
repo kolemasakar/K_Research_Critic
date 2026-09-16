@@ -6,7 +6,7 @@ Status: R3 REPOSITORY CANDIDATE / PREVIEW READY / BUILDER ACCESS BLOCKED / PUBLI
 ## Accepted repository candidate
 
 Branch: `agent/krc-public-media-r3-integration`
-Head: `445a6d59ac3365b31634ba957181a052ea88f2e4`
+Accepted pre-preview head: `445a6d59ac3365b31634ba957181a052ea88f2e4`
 Draft PR: `#22` — OPEN / DRAFT / UNMERGED
 
 CI run `35089649341`:
@@ -45,12 +45,17 @@ No Render mutation was performed.
 
 Owner explicitly approved `R3 BUILDER PREVIEW` on 2026-09-16.
 
-Available RDC devices at the time of execution:
-- `krc-cobalt` — online
-- `kgm-e4-owner-pilot` — online
-- `HP-OMEN` — offline
+KRC-relevant remote infrastructure:
+- `krc-cobalt` — KRC host / backend and runtime verification access.
 
-The available RDC capability provides server filesystem/terminal access, not interactive GPT Builder UI control. Therefore the public Builder was not modified through an unsupported or hidden path.
+Project-boundary correction:
+- `HP-OMEN` belongs to **K_AI Trading System**; it is not KRC infrastructure and is not a KRC Builder dependency.
+- `kgm-e4-owner-pilot` belongs to **KGM**; it is not a KRC Builder dependency.
+- Cross-project host availability must not be used to infer KRC Builder availability.
+
+The current KRC RDC capability provides server filesystem/terminal access, not interactive control of the authenticated ChatGPT Builder UI. The Builder blocker is therefore a **browser/UI-control capability gap**, not an offline-host condition.
+
+Therefore the public Builder was not modified through an unsupported or hidden path.
 
 ## Safety boundary
 
@@ -61,7 +66,7 @@ No Render deploy/runtime change occurred.
 
 ## Resume point
 
-When an authorized browser/Builder control path becomes available, resume with:
+When an authorized browser-capable ChatGPT Builder control path becomes available, resume with:
 1. read-only snapshot of the current public KRC Builder instructions/actions;
 2. import `gpt_store/actions/media_public_r3_openapi.yaml` as preview Action;
 3. append `prompts/GPT_STORE_MEDIA_R3_PUBLIC_ADDENDUM.md` without replacing Core instructions;
