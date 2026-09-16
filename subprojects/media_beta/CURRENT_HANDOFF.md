@@ -1,21 +1,22 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 13.1
-Status: **ACTIVE_HANDOFF / R3-A_PASS / R3-B_PASS / R3-C_DISCOVERY_PASS_INVOCATION_PENDING / PUBLICATION_HOLD**
+Version: 13.2
+Status: **ACTIVE_HANDOFF / R3-A_PASS / R3-B_PASS / R3-C_DISCOVERY_PASS_CAPABILITIES_PASS_REMAINING_INVOCATIONS_PENDING / PUBLICATION_HOLD**
 Date: 2026-09-16
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md. R3-A and R3-B PASS. R3-C live nine-tool discovery PASS; continue only with bounded read-only invocation validation.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md. R3-A and R3-B PASS. R3-C discovery and media_get_capabilities live invocation PASS; continue only with bounded read-only preflight/lookup validation.`
 
 ## Canonical recovery files
 
 1. `subprojects/media_beta/CURRENT_HANDOFF.md`
-2. `subprojects/media_beta/118_R3C_CHATGPT_NINE_TOOL_DISCOVERY_PASS_2026_09_16.md`
-3. `subprojects/media_beta/117_R3B_AUTHENTICATED_REMOTE_MCP_HARDENING_PASS_2026_09_16.md`
-4. `subprojects/media_beta/113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md`
-5. `subprojects/media_beta/02_ROADMAP.md` — v5.3
-6. current PR #22 head/CI and non-secret Render/ChatGPT evidence
+2. `subprojects/media_beta/119_R3C_CAPABILITIES_LIVE_INVOCATION_PASS_2026_09_16.md`
+3. `subprojects/media_beta/118_R3C_CHATGPT_NINE_TOOL_DISCOVERY_PASS_2026_09_16.md`
+4. `subprojects/media_beta/117_R3B_AUTHENTICATED_REMOTE_MCP_HARDENING_PASS_2026_09_16.md`
+5. `subprojects/media_beta/113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md`
+6. `subprojects/media_beta/02_ROADMAP.md` — v5.3
+7. current PR #22 head/CI and non-secret Render/ChatGPT evidence
 
 ## Repository / PR
 
@@ -60,7 +61,6 @@ service_id=srv-dale3r942hec73c5t9hg
 region=frankfurt
 plan=free
 autoDeploy=off
-live_deploy=dep-dalfdbijnfac739cu5sg
 live_commit=a67b269222a8c1475d78c801e28893ddef59586d
 base_url=https://krc-mcp-auth-sentinel.onrender.com
 mcp_url=https://krc-mcp-auth-sentinel.onrender.com/mcp
@@ -113,16 +113,36 @@ media_facebook_start
 media_telegram_start
 ```
 
-## R3-C remaining gate
+## R3-C capabilities invocation acceptance
 
-R3-C is not yet closed. Bounded live read-only invocation evidence remains:
+A real ChatGPT invocation of only `media_get_capabilities` completed through OAuth MCP and server-side VoiceBridge bearer.
+
+The first attempt returned a sanitized retryable backend `429` while the Render free VoiceBridge service was cold/asleep. The adapter performed no automatic retry. After a read-only health wake, the owner repeated the same tool once as a controlled manual retry and received the full capabilities object successfully.
+
+Accepted markers:
 
 ```text
-media_get_capabilities -> pending
-preflight without provider start -> pending
-durable lookup without provider start -> pending
-sanitized error behavior -> pending
-start/execution surface remains absent -> already PASS at discovery
+MEDIA_GET_CAPABILITIES_LIVE=PASS
+configured=true
+owner_access_injected_server_side=true
+durable_store=postgres
+restart_resilient_jobs=true
+automatic_paid_fallback=false
+paid_retrieval_fallback=false
+paid_stt_fallback=false
+provider_work_started=false
+automatic_retry=false
+manual_retry_after_cold_wake=PASS
+```
+
+## R3-C remaining gate
+
+```text
+media_get_capabilities=PASS
+preflight_without_provider_start=PENDING
+durable_lookup_without_provider_start=PENDING
+sanitized_error_behavior=PARTIAL_PASS
+start/execution surface absent=PASS
 ```
 
 ## Known operational debt
@@ -135,12 +155,15 @@ PRODUCTION_READY=NO
 R3_G_DEBT=YES
 ```
 
+Render free-service cold/wake behavior can surface transient retryable errors before VoiceBridge application startup. R3-C keeps automatic retries disabled; bounded manual retry evidence is recorded in checkpoint 119.
+
 ## Hard boundary
 
 ```text
 R3_C=IN_PROGRESS
 R3_C_DISCOVERY=PASS
-R3_C_INVOCATION_VALIDATION=PENDING
+R3_C_CAPABILITIES_INVOCATION=PASS
+R3_C_PREFLIGHT_LOOKUP_VALIDATION=PENDING
 START_OPERATIONS_EXPOSED=NO
 EXECUTION_TOOL_COUNT=0
 PROVIDER_START_WORK=NO
@@ -157,4 +180,4 @@ R4=HOLD
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V13_1_R3C_DISCOVERY_PASS_INVOCATION_PENDING_2026_09_16`
+`KRC_MEDIA_CURRENT_HANDOFF_V13_2_R3C_CAPABILITIES_PASS_PREFLIGHT_LOOKUP_PENDING_2026_09_16`
