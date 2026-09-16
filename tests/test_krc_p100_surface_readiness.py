@@ -53,19 +53,34 @@ def test_surface_matrix_requires_execution_capability_for_full_media_parity() ->
     assert "account only permits read_fetch MCP" in mcp["reject_if_any"]
 
 
+def test_surface_matrix_records_selected_canary_proven_remote_mcp() -> None:
+    matrix = load_yaml(MATRIX)
+    selection = matrix["selection"]
+    assert selection == {
+        "selected_media_surface": "custom_remote_mcp",
+        "selected_transport": "remote_mcp_http",
+        "protocol_version": "2026-07-28",
+        "selection_evidence": "bounded_remote_mcp_canary_closed_pass",
+        "full_binding_authorized": False,
+    }
+    mcp = next(surface for surface in matrix["surfaces"] if surface["id"] == "custom_remote_mcp")
+    assert mcp["binding_status"] == "SELECTED_CANDIDATE_CANARY_PROVEN"
+    assert "one_read_only_invocation" in mcp["proven"]
+    assert "execution_confirmation_semantics" in mcp["unproven_until_later_gates"]
+
+
 def test_surface_matrix_has_fail_closed_release_boundary() -> None:
     boundary = load_yaml(MATRIX)["release_boundary"]
-    assert boundary == {
-        "public_gpt_mutation": "DENIED",
-        "migration_execution": "DENIED",
-        "plugin_installation": "DENIED",
-        "plugin_publication": "DENIED",
-        "live_mcp_creation": "DENIED",
-        "render_change": "DENIED",
-        "main_mutation": "DENIED",
-        "pr22_merge": "DENIED",
-        "pr45_merge": "DENIED",
-    }
+    assert set(boundary.values()) == {"DENIED"}
+    assert boundary["public_gpt_mutation"] == "DENIED"
+    assert boundary["migration_execution"] == "DENIED"
+    assert boundary["plugin_publication"] == "DENIED"
+    assert boundary["full_media_mcp_creation"] == "DENIED"
+    assert boundary["voicebridge_credential_binding"] == "DENIED"
+    assert boundary["render_change"] == "DENIED"
+    assert boundary["main_mutation"] == "DENIED"
+    assert boundary["pr22_merge"] == "DENIED"
+    assert boundary["pr45_merge"] == "DENIED"
 
 
 def test_auth_binding_preserves_13_operation_and_four_execution_boundary() -> None:
@@ -80,18 +95,30 @@ def test_auth_binding_preserves_13_operation_and_four_execution_boundary() -> No
     assert len(execution["execution_operations"]) == 4
     assert len(execution["read_only_operations"]) == 7
     assert len(execution["preflight_operations"]) == 2
+    assert execution["non_execution_operation_count"] == 9
+    assert execution["execution_operation_count"] == 4
+    assert execution["execution_tools_exposed_in_r3a"] is False
 
 
-def test_auth_binding_is_transport_neutral_and_server_side_secret_only() -> None:
+def test_auth_binding_selects_remote_mcp_and_preserves_secret_boundary() -> None:
     binding = load_yaml(AUTH_BINDING)
     transport = binding["transport_contract"]
-    assert transport["final_transport"] == "TBD_AFTER_SURFACE_INSPECTION"
+    assert transport["final_transport"] == "remote_mcp_http"
+    assert transport["protocol_version"] == "2026-07-28"
+    assert transport["selected_surface"] == "custom_remote_mcp"
+    assert transport["account_surface_proven"] is True
+    assert transport["web_surface_proven"] is True
+    assert transport["live_read_only_canary_proven"] is True
+    assert transport["current_canary_reusable_for_voicebridge_binding"] is False
     assert transport["local_mcp_direct_dependency"] is False
     assert transport["client_desktop_dependency_allowed_by_default"] is False
     assert transport["automatic_transport_retry"] is False
 
     credentials = binding["credentials"]
-    assert credentials["final_auth_method"] == "TBD_AFTER_SURFACE_INSPECTION"
+    assert credentials["final_auth_method"] == "R3_B_REQUIRED_BEFORE_VOICEBRIDGE_BINDING"
+    assert credentials["inbound_no_auth_allowed_for_full_binding"] is False
+    assert credentials["canary_no_auth_is_evidence_only"] is True
+    assert credentials["voicebridge_bearer_server_side_only"] is True
     assert credentials["model_visible_secret"] is False
     assert credentials["repository_secret"] is False
     assert "secret_in_skill_text" in credentials["forbidden_patterns"]
@@ -105,6 +132,7 @@ def test_auth_binding_preserves_consent_retry_and_error_safety() -> None:
     assert consent["youtube_preflight_must_not_call_provider"] is True
     assert consent["youtube_execution_requires_explicit_user_acknowledgement"] is True
     assert consent["consent_must_not_be_inferred_from_plugin_installation"] is True
+    assert consent["consent_must_not_be_inferred_from_plugin_connection"] is True
 
     retry = binding["retry_idempotency"]
     assert retry["completed"] == "REUSE"
@@ -116,7 +144,15 @@ def test_auth_binding_preserves_consent_retry_and_error_safety() -> None:
     errors = binding["errors"]
     assert errors["structured_error_required"] is True
     assert errors["credential_sanitization_required"] is True
+    assert errors["raw_voicebridge_authorization_header_exposed"] is False
     assert errors["media_failure_blocks_core"] is False
+
+
+def test_r3a_auth_binding_only_authorizes_repository_contract_changes() -> None:
+    boundary = load_yaml(AUTH_BINDING)["release_boundary"]
+    assert boundary["r3a_contract_changes"] == "AUTHORIZED"
+    denied = {key: value for key, value in boundary.items() if key != "r3a_contract_changes"}
+    assert set(denied.values()) == {"DENIED"}
 
 
 def test_sentinel_package_is_strictly_read_only() -> None:
