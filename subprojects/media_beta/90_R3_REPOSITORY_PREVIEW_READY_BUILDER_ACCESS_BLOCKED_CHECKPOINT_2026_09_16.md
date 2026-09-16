@@ -1,7 +1,7 @@
 # KRC MEDIA — R3 Repository Preview Ready / Builder Access Blocked — 2026-09-16
-Зафіксовано завершення repository-side R3 integration candidate та тимчасовий блокер прямого доступу до public GPT Builder UI.
+Зафіксовано завершення repository-side R3 integration candidate, виправлення карти доступів та вибір окремого browser-capable каналу для ChatGPT Builder.
 
-Status: R3 REPOSITORY CANDIDATE / PREVIEW READY / BUILDER ACCESS BLOCKED / PUBLIC ACTIVATION HOLD
+Status: R3 REPOSITORY CANDIDATE / PREVIEW READY / BROWSER CHANNEL SELECTED / USER CONNECT PENDING / PUBLIC ACTIVATION HOLD
 
 ## Accepted repository candidate
 
@@ -55,7 +55,20 @@ Project-boundary correction:
 
 The current KRC RDC capability provides server filesystem/terminal access, not interactive control of the authenticated ChatGPT Builder UI. The Builder blocker is therefore a **browser/UI-control capability gap**, not an offline-host condition.
 
-Therefore the public Builder was not modified through an unsupported or hidden path.
+Selected remediation channel: **TinyFish ChatGPT plugin**, because it exposes a live browser workflow with navigation, clicking, form interaction, and web-app state inspection.
+
+Channel state:
+- `KRC_BUILDER_HOST_DEPENDENCY=NONE`
+- `KRC_BACKEND_ACCESS=krc-cobalt`
+- `KRC_BACKEND_ACCESS=PASS`
+- `KRC_BUILDER_BROWSER_CHANNEL=TinyFish`
+- `KRC_BUILDER_BROWSER_CHANNEL_STATE=PENDING_USER_INSTALL_OR_CONNECT`
+- `PUBLIC_ACTIVATION=HOLD`
+
+Security boundary:
+- OpenAI login remains inside the authorized browser session; credentials are not to be copied into repository files, shell history, or KRC infrastructure.
+- TinyFish is a browser-control capability, not a KRC infrastructure host.
+- No cross-project workstation is a prerequisite for Builder access.
 
 ## Safety boundary
 
@@ -66,9 +79,9 @@ No Render deploy/runtime change occurred.
 
 ## Resume point
 
-When an authorized browser-capable ChatGPT Builder control path becomes available, resume with:
+After the owner installs/connects TinyFish, resume with:
 1. read-only snapshot of the current public KRC Builder instructions/actions;
 2. import `gpt_store/actions/media_public_r3_openapi.yaml` as preview Action;
 3. append `prompts/GPT_STORE_MEDIA_R3_PUBLIC_ADDENDUM.md` without replacing Core instructions;
 4. run preview regression: ordinary Core KRC + YouTube + Instagram + Facebook + Telegram;
-5. keep publication/activation HOLD until separate owner approval.
+5. stop before Publish/Update and keep publication/activation HOLD until separate owner approval.
