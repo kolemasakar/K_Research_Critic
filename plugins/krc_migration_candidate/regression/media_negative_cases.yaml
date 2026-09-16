@@ -1,0 +1,181 @@
+schema_version: "0.1"
+status: DESIGN_ONLY_NEGATIVE_FIXTURES
+source_openapi: gpt_store/actions/media_public_r3_openapi.yaml
+source_contract: plugins/krc_migration_candidate/contracts/media_tools.yaml
+purpose: >-
+  Negative and boundary fixtures that must remain fail-closed across the future
+  Plugin/App/MCP transport. These cases define expected policy behavior only;
+  they do not call providers or the live VoiceBridge service.
+
+cases:
+  - id: media_wrong_platform_on_instagram_route
+    tool: media_instagram_preflight
+    input:
+      url: "https://www.youtube.com/watch?v=example"
+      language_hint: auto
+    expected:
+      outcome: REJECT
+      reason: platform_mismatch
+    invariants:
+      - no_provider_call
+      - no_paid_fallback
+
+  - id: media_youtube_start_without_consent
+    tool: media_youtube_start
+    input:
+      url: "https://www.youtube.com/watch?v=example"
+      language_hint: en
+    expected:
+      outcome: BLOCK
+      reason: explicit_gemini_free_consent_missing
+    invariants:
+      - no_gemini_provider_work
+      - no_alternative_provider_fallback
+
+  - id: media_youtube_preflight_is_non_provider
+    tool: media_youtube_preflight
+    input:
+      url: "https://www.youtube.com/watch?v=example"
+      language_hint: auto
+    expected:
+      outcome: PREFLIGHT_ONLY
+    invariants:
+      - no_gemini_provider_work
+      - disclosure_returned
+      - explicit_consent_still_required
+
+  - id: media_paid_fallback_forbidden
+    tool: media_instagram_start
+    scenario:
+      free_provider_unavailable: true
+    expected:
+      outcome: FAIL_CLOSED
+    invariants:
+      - paid_retrieval_fallback_false
+      - paid_stt_fallback_false
+      - paid_proxy_fallback_false
+      - supadata_not_used
+      - scrapecreators_not_used
+
+  - id: media_failed_free_only_retry_requires_new_explicit_request
+    tool: media_telegram_start
+    scenario:
+      prior_status: FAILED
+      prior_charge_uncertain: false
+    expected:
+      outcome: FRESH_DETERMINISTIC_JOB_ONLY_AFTER_EXPLICIT_RETRY
+    invariants:
+      - no_automatic_retry_loop
+      - prior_failed_job_not_reused_as_processing
+
+  - id: media_credit_uncertain_replay_blocked
+    tool: media_facebook_start
+    scenario:
+      prior_status: FAILED
+      credit_charge_uncertain: true
+    expected:
+      outcome: BLOCK_REPLAY
+    invariants:
+      - no_fresh_retry
+      - no_paid_or_uncertain_replay
+
+  - id: media_completed_reused
+    tool: media_youtube_lookup
+    scenario:
+      prior_status: COMPLETED
+    expected:
+      outcome: REUSE
+    invariants:
+      - no_duplicate_provider_work
+
+  - id: media_processing_reused
+    tool: media_instagram_lookup
+    scenario:
+      prior_status: PROCESSING
+    expected:
+      outcome: REUSE_INFLIGHT
+    invariants:
+      - concurrency_protection
+      - no_duplicate_provider_work
+
+  - id: media_facebook_only_audio_not_canonical
+    tool: media_facebook_start
+    scenario:
+      proposed_retrieval_mode: cobalt_only_audio
+    expected:
+      outcome: REJECT_NON_CANONICAL_ROUTE
+    invariants:
+      - cobalt_video_plus_audio_required
+      - ffmpeg_mono_pcm_wav_16khz_required
+
+  - id: media_telegram_login_fallback_forbidden
+    tool: media_telegram_start
+    scenario:
+      public_web_unavailable: true
+    expected:
+      outcome: FAIL_CLOSED
+    invariants:
+      - no_telegram_login
+      - no_telegram_session
+      - no_telegram_bot_token
+
+  - id: media_malformed_job_id
+    tool: media_non_youtube_status
+    input:
+      job_id: "not-a-krcm-id"
+    expected:
+      outcome: REJECT
+      reason: invalid_job_id
+    invariants:
+      - no_backend_status_lookup_for_invalid_identifier
+
+  - id: media_segments_pagination_bounds
+    tool: media_non_youtube_segments
+    input:
+      job_id: "KRCM_fixture-1"
+      cursor: -1
+      limit: 51
+    expected:
+      outcome: REJECT
+      reason: invalid_pagination
+    invariants:
+      - cursor_minimum_zero
+      - limit_range_1_to_50
+
+  - id: media_secret_leakage_forbidden
+    tool: media_get_capabilities
+    scenario:
+      backend_error_contains_secret_like_material: true
+    expected:
+      outcome: SANITIZED_ERROR
+    invariants:
+      - bearer_not_model_visible
+      - cookies_not_model_visible
+      - browser_profile_id_not_model_visible
+      - provider_credentials_not_model_visible
+
+  - id: media_failure_isolated_from_core
+    tool: media_telegram_start
+    scenario:
+      media_outcome: FAILED
+    expected:
+      outcome: CORE_CONTINUES_WITH_LIMITATION
+    invariants:
+      - media_failure_does_not_block_core
+      - no_false_claim_of_transcript_success
+
+required_negative_dimensions:
+  - platform_validation
+  - explicit_consent
+  - no_provider_preflight
+  - paid_fallback_prohibition
+  - retry_semantics
+  - charge_uncertain_block
+  - durable_reuse
+  - concurrency_protection
+  - facebook_normalization
+  - telegram_public_only
+  - identifier_validation
+  - pagination_validation
+  - secret_sanitization
+  - core_isolation
