@@ -1,20 +1,21 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 11.1
-Status: **ACTIVE_HANDOFF / BOUNDED_CANARY_CLOSED_PASS / POST_CANARY_ROADMAP_APPROVED / R3-A_PLANNED_NOT_STARTED / PUBLICATION_HOLD**
+Version: 11.2
+Status: **ACTIVE_HANDOFF / BOUNDED_CANARY_CLOSED_PASS / ROADMAP_PLANNING_COMPLETE / R3-A_PLANNED_NOT_STARTED / EXECUTION_APPROVAL_REQUIRED / PUBLICATION_HOLD**
 Date: 2026-09-16
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md. Post-canary roadmap approved; R3-A planned but not yet started. Ask for/confirm separate execution approval before repository implementation.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md. Roadmap planning complete; R3-A planned but not started. Require separate owner execution approval before implementation.`
 
 ## Canonical recovery files
 
 1. `subprojects/media_beta/CURRENT_HANDOFF.md`
-2. `subprojects/media_beta/111_POST_CANARY_PLUGIN_MEDIA_ROADMAP_DECISION_2026_09_16.md`
-3. `subprojects/media_beta/02_ROADMAP.md` — v5.0
-4. `subprojects/media_beta/110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md`
-5. current PR #22 head/CI and current non-secret account/control-plane evidence
+2. `subprojects/media_beta/112_POST_CANARY_ROADMAP_PLANNING_COMPLETE_R3A_AWAITING_EXECUTION_APPROVAL_2026_09_16.md`
+3. `subprojects/media_beta/111_POST_CANARY_PLUGIN_MEDIA_ROADMAP_DECISION_2026_09_16.md`
+4. `subprojects/media_beta/02_ROADMAP.md` — v5.1
+5. `subprojects/media_beta/110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md`
+6. current PR #22 head/CI and current non-secret account/control-plane evidence
 
 ## Repository / PR
 
@@ -81,9 +82,9 @@ No phase auto-authorizes the next state-changing phase.
 
 ## Current authorization boundary
 
-The owner approved **roadmap planning**. R3-A is now defined and ready for a separate implementation approval, but implementation has not started under this handoff.
+Roadmap planning is complete. **R3-A implementation is not started and requires separate owner execution approval.**
 
-When separately approved, R3-A is repository-only and must:
+If separately approved, R3-A is repository-only and must:
 
 - reconcile/freeze the 13-tool contract against the proven Remote MCP surface;
 - freeze exact schemas, annotations, consent, retry/idempotency, audit, error, and secret boundaries;
@@ -134,6 +135,7 @@ MEDIA_FAILURE_CORE_ISOLATION=REQUIRED
 
 ```text
 R3_A_IMPLEMENTATION=NOT_STARTED
+R3_A_EXECUTION_APPROVAL=REQUIRED
 R3_B_AND_LATER=HOLD
 FULL_MEDIA_13_TOOL_DEPLOYMENT=DENIED
 VOICEBRIDGE_SECRET_BINDING=DENIED
@@ -150,4 +152,4 @@ PR45_MERGE=DENIED
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V11_1_POST_CANARY_ROADMAP_APPROVED_R3_A_PLANNED_NOT_STARTED_2026_09_16`
+`KRC_MEDIA_CURRENT_HANDOFF_V11_2_ROADMAP_PLANNING_COMPLETE_R3A_AWAITING_EXECUTION_APPROVAL_2026_09_16`
