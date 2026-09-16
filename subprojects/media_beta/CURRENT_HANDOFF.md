@@ -1,20 +1,21 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 12.1
-Status: **ACTIVE_HANDOFF / R3-A_PASS / R3-B_IN_PROGRESS / OAUTH_ENDPOINT_LIVE / PRESECRET_PASS / OWNER_SECRET_ACTION_REQUIRED / PUBLICATION_HOLD**
+Version: 12.2
+Status: **ACTIVE_HANDOFF / R3-A_PASS / R3-B_IN_PROGRESS / OAUTH_ENDPOINT_LIVE / OWNER_SECRET_PROVISIONED / CHATGPT_OAUTH_CONNECTION_GATE_READY / PUBLICATION_HOLD**
 Date: 2026-09-16
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md. R3-B OAuth endpoint live and pre-secret validation PASS. Continue only after owner manually provisions KRC_MCP_OWNER_CODE in Render without revealing it in chat.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md. R3-B OAuth endpoint live, owner secret provisioned server-side, post-secret validation PASS. Continue with owner-account ChatGPT OAuth connection to the isolated one-tool MCP only.`
 
 ## Canonical recovery files
 
 1. `subprojects/media_beta/CURRENT_HANDOFF.md`
-2. `subprojects/media_beta/114_R3B_OAUTH_ENDPOINT_PRESECRET_PASS_OWNER_SECRET_ACTION_REQUIRED_2026_09_16.md`
-3. `subprojects/media_beta/113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md`
-4. `subprojects/media_beta/02_ROADMAP.md` — v5.2
-5. current PR #22 head/CI and current non-secret account/control-plane evidence
+2. `subprojects/media_beta/115_R3B_OWNER_SECRET_PROVISIONED_AUTH_READY_FOR_CHATGPT_CONNECTION_2026_09_16.md`
+3. `subprojects/media_beta/114_R3B_OAUTH_ENDPOINT_PRESECRET_PASS_OWNER_SECRET_ACTION_REQUIRED_2026_09_16.md`
+4. `subprojects/media_beta/113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md`
+5. `subprojects/media_beta/02_ROADMAP.md` — v5.2
+6. current PR #22 head/CI and current non-secret account/control-plane evidence
 
 ## Repository / PR
 
@@ -49,11 +50,7 @@ EXECUTION_COUNT=4
 VOICEBRIDGE_BEARER_SERVER_SIDE_ONLY=true
 ```
 
-## R3-B implementation state
-
-R3-B owner execution approval has been received and implementation is in progress.
-
-Accepted auth implementation:
+## R3-B implementation
 
 ```text
 implementation_head=057f748a204f8ad0878090a85a8adc8e49de73ed
@@ -70,9 +67,9 @@ LIVE_TOOL_COUNT=1
 LIVE_TOOL=krc_media_capabilities_canary
 ```
 
-The one-tool MCP remains read-only and provider-free. No MEDIA backend operation is bound.
+The one-tool MCP remains deterministic, read-only and provider-free. No MEDIA backend operation is bound.
 
-## Isolated R3-B service
+## Isolated authenticated service
 
 ```text
 service=krc-mcp-auth-sentinel
@@ -84,14 +81,14 @@ deployed_commit=057f748a204f8ad0878090a85a8adc8e49de73ed
 base_url=https://krc-mcp-auth-sentinel.onrender.com
 mcp_url=https://krc-mcp-auth-sentinel.onrender.com/mcp
 auth_mode=oauth
-owner_secret_configured=NO
+owner_secret_configured=YES
+post_secret_deploy=dep-daleakp42hec73c6jq80
+post_secret_deploy_status=live
 ```
 
 The earlier no-auth evidence canary `krc-mcp-canary-sentinel` remains unchanged and separate.
 
-## R3-B pre-secret acceptance
-
-External checks passed:
+## R3-B auth acceptance to date
 
 ```text
 healthz=200
@@ -103,43 +100,48 @@ PKCE_S256=advertised
 dynamic_registration=201
 unauthenticated_mcp=401
 WWW_AUTHENTICATE_RESOURCE_METADATA=present
-OWNER_AUTH_UNCONFIGURED_UI=PASS
-OWNER_AUTH_POST_WITHOUT_SECRET=503_FAIL_CLOSED
-TEST_VALUE_REFLECTION=NO
+OWNER_AUTH_CONFIGURED_UI=PASS
+OWNER_AUTH_CONTROL_DISABLED=NO
+WRONG_OWNER_CODE=403
+FAIL_CLOSED_ON_WRONG_SECRET=PASS
+SECRET_REFLECTION=NO
 ```
 
-## Current owner action
+## Secret boundary
 
-The only current manual action is to provision `KRC_MCP_OWNER_CODE` directly in the Render environment UI for `krc-mcp-auth-sentinel`.
-
-Secret rules:
+The owner provisioned `KRC_MCP_OWNER_CODE` directly in Render. Its value was not requested, read, logged, committed, passed in tool arguments or recorded in project evidence.
 
 ```text
-never paste value into ChatGPT
-never commit value to Git
-never pass value in connector/tool arguments
-never record value in evidence/checkpoints
-never log or return value
-never reuse as VoiceBridge bearer
+OWNER_SECRET_SERVER_SIDE_ONLY=true
+MODEL_VISIBLE_SECRET=false
+REPOSITORY_SECRET=false
+TOOL_ARGUMENT_SECRET=false
+CHECKPOINT_SECRET=false
+VOICEBRIDGE_BEARER_REUSE=false
 ```
 
-Use a strong locally generated value and store it in the owner's password manager.
+## Current manual gate
 
-After provisioning, the owner should report only `готово` / `done`, never the secret value.
-
-## Next R3-B sequence after owner confirms
+Create/connect a second private ChatGPT custom MCP for the authenticated endpoint:
 
 ```text
-verify service remains live and OAuth fail-closed externally
-create/connect private custom MCP in ChatGPT with Authentication=OAuth
+Name=KRC MCP Auth Sentinel
 URL=https://krc-mcp-auth-sentinel.onrender.com/mcp
-complete authorization in browser using owner secret directly there
-Scan Tools / discovery -> exactly one krc_media_capabilities_canary
-invoke the read-only canary once
-record non-secret evidence
-close R3-B PASS
-STOP before R3-C
+Authentication=OAuth
 ```
+
+Complete OAuth only in the server-hosted authorization page. Enter the owner code there directly; never paste it into ChatGPT conversation text.
+
+Acceptance after connection:
+
+```text
+CHATGPT_OAUTH_CONNECTION=PASS
+DISCOVERED_TOOL_COUNT=1
+DISCOVERED_TOOL_NAME=krc_media_capabilities_canary
+READ_ONLY_CANARY_INVOCATION=PASS
+```
+
+After this evidence, close R3-B PASS and STOP before R3-C.
 
 ## Hard boundary
 
@@ -161,4 +163,4 @@ R3_C=HOLD
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V12_1_R3B_PRESECRET_PASS_OWNER_SECRET_ACTION_REQUIRED_2026_09_16`
+`KRC_MEDIA_CURRENT_HANDOFF_V12_2_R3B_AUTH_READY_FOR_CHATGPT_OAUTH_CONNECTION_2026_09_16`
