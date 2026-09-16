@@ -6,10 +6,11 @@ Status: R3_SENTINEL_DELEGATION_READY / VALIDATED / BUILDER_ENTRY_STALLED / PUBLI
 ## Repository state
 
 Branch: `agent/krc-public-media-r3-integration`
-Final validated head: `abd98e60e5a2f6962e12c88ca24907fc77acc9c0`
+Validated implementation head: `abd98e60e5a2f6962e12c88ca24907fc77acc9c0`.
+Current branch head must be read from PR #22 because checkpoint metadata commits may advance it without changing the validated R3 payload.
 Draft PR: `#22` — OPEN / DRAFT / UNMERGED / mergeable.
 
-Workflow run `35101729268` for final validated head:
+Workflow run `35101729268` validated implementation head `abd98e60e5a2f6962e12c88ca24907fc77acc9c0`:
 - Python 3.13: PASS
 - Python 3.14: PASS
 - Quality gates: PASS
@@ -30,7 +31,7 @@ Public control identifier:
 
 The real Browser Context Profile identifier is private Sentinel Remote state only and is forbidden in public repository evidence.
 
-A repository test now rejects concrete `prof_...` Browser Context identifiers in public KRC MEDIA checkpoint documents.
+A repository test rejects concrete `prof_...` Browser Context identifiers in public KRC MEDIA checkpoint documents.
 
 ## Runtime revalidation
 
