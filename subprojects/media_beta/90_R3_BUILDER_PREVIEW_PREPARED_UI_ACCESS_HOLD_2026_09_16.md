@@ -43,8 +43,14 @@ Builder-size guard for Core instructions plus the R3 addendum is included in the
 
 ## Current blocker
 
-The authorized Windows Builder session `HP-OMEN` is currently offline in Remote Desktop Commander. Available online project hosts are Linux infrastructure nodes and do not provide the authenticated ChatGPT Builder UI. Therefore no Builder fields were edited and no draft was saved.
+The blocker is **not a KRC host outage**. The current KRC remote-control channel provides server filesystem/terminal access but does not expose interactive control of the authenticated ChatGPT Builder UI. Therefore no Builder fields were edited and no draft was saved.
+
+`HP-OMEN` is the Windows development host for **K_AI Trading System** and is not part of KRC infrastructure or KRC Builder access. Its online/offline state is irrelevant to KRC R3 Builder Preview.
+
+`kgm-e4-owner-pilot` belongs to **KGM** and likewise is not a KRC Builder dependency.
+
+Relevant KRC infrastructure access remains through `krc-cobalt`; that access is sufficient for backend/runtime verification but not for ChatGPT Builder UI interaction.
 
 ## Next bounded action
 
-When the authorized Builder session is available, open the existing public `K-Research & Critic` GPT, snapshot current Builder state, append the R3 MEDIA addendum, import the R3 OpenAPI schema as the MEDIA Action, validate authentication/configuration without provider work where possible, run Core + YouTube + Instagram + Facebook + Telegram preview regressions, and stop before Publish/Update.
+When an authorized browser-capable ChatGPT Builder control path is available, open the existing public `K-Research & Critic` GPT, snapshot current Builder state, append the R3 MEDIA addendum, import the R3 OpenAPI schema as the MEDIA Action, validate authentication/configuration without provider work where possible, run Core + YouTube + Instagram + Facebook + Telegram preview regressions, and stop before Publish/Update.
