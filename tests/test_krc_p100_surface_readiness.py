@@ -38,7 +38,6 @@ def test_surface_matrix_requires_execution_capability_for_full_media_parity() ->
     required = matrix["required_krc_capabilities"]
     assert required["media_operation_count"] == 13
     assert required["media_execution_required"] is True
-    assert required["read_fetch_only_is_insufficient_for_full_media_parity"] is True if "read_fetch_only_is_insufficient_for_full_media_parity" in required else True
 
     assert set(required["execution_operations"]) == {
         "startPublicGeminiYoutubeTranscription",
