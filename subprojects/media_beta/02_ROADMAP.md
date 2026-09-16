@@ -2,8 +2,8 @@
 
 Current roadmap for K-Research & Critic MEDIA after successful Remote Custom MCP canary deployment, ChatGPT connection, one-tool discovery, and real ChatGPT-side invocation.
 
-Version: 5.0
-Status: **PLUGIN_FIRST / BOUNDED_CANARY_CLOSED_PASS / R3-A_READY / PUBLICATION_HOLD**
+Version: 5.1
+Status: **PLUGIN_FIRST / BOUNDED_CANARY_CLOSED_PASS / R3-A_PLANNED_NOT_STARTED / PUBLICATION_HOLD**
 Updated: 2026-09-16
 
 ## Product position
@@ -30,7 +30,7 @@ Core KRC               -> remains usable
 3. `110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md`
 4. current PR #22 head/CI
 
-Historical checkpoints 78-109 remain evidence, not the current continuation point.
+Historical checkpoints remain evidence, not the current continuation point.
 
 ## Proven canary baseline
 
@@ -56,7 +56,7 @@ VoiceBridge binding: not enabled
 execution tools: not enabled
 ```
 
-Final canary documentation head before roadmap planning:
+Final canary documentation baseline:
 
 ```text
 75a4b30e9f478fad892fafc017fea069ce949aec
@@ -108,9 +108,9 @@ plugins/krc_migration_candidate/contracts/migration_acceptance.yaml
 
 ## R3-A — Contract freeze and secure adapter baseline
 
-Status: **READY / NEXT IMPLEMENTATION GATE**.
+Status: **PLANNED / READY FOR SEPARATE EXECUTION APPROVAL / NOT STARTED**.
 
-Repository-only scope:
+Repository-only scope when separately approved:
 
 - freeze exact 13-tool names and schemas;
 - reconcile the contracts with the proven Remote MCP surface;
@@ -123,7 +123,7 @@ Exit: repository/CI PASS.
 
 ## R3-B — Inbound authentication and secret-boundary hardening
 
-Status: HOLD until R3-A PASS.
+Status: HOLD until R3-A PASS and separate owner authorization.
 
 Before any real VoiceBridge binding:
 
@@ -137,7 +137,7 @@ Exit: authenticated isolated MCP connection PASS with no provider/backend bindin
 
 ## R3-C — 9-tool non-execution VoiceBridge binding
 
-Status: HOLD until R3-B PASS.
+Status: HOLD until R3-B PASS and separate owner authorization.
 
 Target operations:
 
@@ -166,7 +166,7 @@ Exit: 9-tool parity PASS with zero execution-tool exposure.
 
 ## R3-D — Consequential-action confirmation semantics
 
-Status: HOLD until R3-C PASS.
+Status: HOLD until R3-C PASS and separate owner authorization.
 
 Use a no-provider/no-charge execution probe or equivalent isolated mechanism to verify:
 
@@ -180,7 +180,7 @@ Exit: action-confirmation semantics PASS without provider work.
 
 ## R3-E — Staged 4-route execution binding
 
-Status: HOLD until R3-D PASS.
+Status: HOLD until R3-D PASS; each route requires a separate bounded execution gate.
 
 Order:
 
@@ -191,7 +191,7 @@ E3 Facebook
 E4 Telegram
 ```
 
-Each route is an independent owner-gated real-execution canary and must preserve:
+Each route must preserve:
 
 - authenticated MCP boundary;
 - server-side-only VoiceBridge secret;
@@ -278,9 +278,9 @@ VoiceBridge merge/promotion
 ## Current gate model
 
 ```text
-Historical R0-R2 backend/product work: preserved as evidence
+Historical backend/product work: preserved as evidence
 Bounded Remote MCP canary: CLOSED PASS
-R3-A: READY
+R3-A: PLANNED / NOT STARTED
 R3-B: HOLD
 R3-C: HOLD
 R3-D: HOLD
@@ -291,22 +291,25 @@ R3-H: HOLD
 R4: HOLD
 ```
 
-## Immediate continuation point
+## Immediate decision point
+
+Roadmap planning is complete. No implementation starts automatically.
+
+If separately approved, the next executable block is **R3-A only**:
 
 ```text
-R3-A ONLY
-- repository-only contract freeze
-- secure adapter baseline
-- no deployment
-- no VoiceBridge secret binding
-- no provider work
-- no execution tools
-- no public GPT change
-- no Plugin publish/share/migrate
-- no PR #22 merge
-- no PR #45 merge
+repository-only contract freeze
+secure adapter baseline
+no deployment
+no VoiceBridge secret binding
+no provider work
+no execution tools
+no public GPT change
+no Plugin publish/share/migrate
+no PR #22 merge
+no PR #45 merge
 ```
 
 Recovery command:
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md і продовжуй з R3-A contract freeze / secure adapter baseline.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md. Roadmap approved; R3-A planned but not started.`
