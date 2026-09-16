@@ -6,11 +6,10 @@ Status: R3_SENTINEL_DELEGATION_READY / VALIDATED / BUILDER_ENTRY_STALLED / PUBLI
 ## Repository state
 
 Branch: `agent/krc-public-media-r3-integration`
-Validated head before this checkpoint: `89a81e14942f78d17ad983928246dfd521d6f16d`
-Checkpoint commit validated by CI: `a2d11a143d84090d4662571a17802d3a453ce982`
+Final validated head: `abd98e60e5a2f6962e12c88ca24907fc77acc9c0`
 Draft PR: `#22` — OPEN / DRAFT / UNMERGED / mergeable.
 
-Workflow run `35101577221` for checkpoint commit `a2d11a143d84090d4662571a17802d3a453ce982`:
+Workflow run `35101729268` for final validated head:
 - Python 3.13: PASS
 - Python 3.14: PASS
 - Quality gates: PASS
