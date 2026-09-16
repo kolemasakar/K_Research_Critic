@@ -30,7 +30,7 @@ OAuth mode requires:
 
 ```text
 KRC_MCP_AUTH_MODE=oauth
-KRC_MCP_PUBLIC_BASE_URL=https://<isolated-service-host>
+KRC_MCP_PUBLIC_BASE_URL=<isolated TLS service base URL>
 KRC_MCP_OWNER_CODE=<owner-provisioned secret in deployment dashboard only>
 ```
 
