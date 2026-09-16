@@ -141,6 +141,13 @@ def _valid_redirect_uri(uri: str) -> bool:
     return parsed.scheme == "http" and parsed.hostname in {"127.0.0.1", "localhost"}
 
 
+def _redirect_origin(uri: str) -> str:
+    parsed = urlsplit(uri)
+    if not parsed.scheme or not parsed.netloc:
+        return ""
+    return f"{parsed.scheme}://{parsed.netloc}"
+
+
 def _json_response(status: int, payload: Mapping[str, object]) -> OAuthResponse:
     return OAuthResponse(
         status=status,
@@ -154,7 +161,17 @@ def _json_response(status: int, payload: Mapping[str, object]) -> OAuthResponse:
     )
 
 
-def _html_response(status: int, html: str) -> OAuthResponse:
+def _html_response(
+    status: int,
+    html: str,
+    *,
+    form_action_redirect_uri: str | None = None,
+) -> OAuthResponse:
+    form_action = "form-action 'self'"
+    if form_action_redirect_uri:
+        callback_origin = _redirect_origin(form_action_redirect_uri)
+        if callback_origin:
+            form_action = f"{form_action} {callback_origin}"
     return OAuthResponse(
         status=status,
         headers={
@@ -162,7 +179,10 @@ def _html_response(status: int, html: str) -> OAuthResponse:
             "Cache-Control": "no-store",
             "Pragma": "no-cache",
             "X-Content-Type-Options": "nosniff",
-            "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'",
+            "Content-Security-Policy": (
+                "default-src 'none'; style-src 'unsafe-inline'; "
+                f"{form_action}; frame-ancestors 'none'"
+            ),
             "Referrer-Policy": "no-referrer",
         },
         body=html.encode("utf-8"),
@@ -248,6 +268,7 @@ def handle_oauth_request(
         configured = owner_code is not None and bool(owner_code)
         disabled = "" if configured else " disabled"
         status = "Enter the owner authorization code." if configured else "Owner authorization is not configured yet."
+        redirect_uri = query["redirect_uri"][0]
         return _html_response(
             200,
             "<!doctype html><html><head><title>KRC MCP authorization</title>"
@@ -255,6 +276,7 @@ def handle_oauth_request(
             f"</head><body><h1>KRC MCP R3-B</h1><p>{status}</p><form method=post action=/oauth/authorize>{hidden}"
             f'<input type="password" name="owner_code" autocomplete="one-time-code" required{disabled}>'
             f'<button type="submit"{disabled}>Authorize</button></form></body></html>',
+            form_action_redirect_uri=redirect_uri,
         )
 
     if clean_path == "/oauth/authorize" and method == "POST":
