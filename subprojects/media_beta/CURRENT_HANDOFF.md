@@ -1,22 +1,20 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 12.3
-Status: **ACTIVE_HANDOFF / R3-A_PASS / R3-B_IN_PROGRESS / CHATGPT_OAUTH_CONNECTION_PASS / DISCOVERY_PASS / FINAL_CANARY_INVOCATION_PENDING / PUBLICATION_HOLD**
+Version: 13.0
+Status: **ACTIVE_HANDOFF / R3-A_PASS / R3-B_PASS / R3-C_AWAITING_OWNER_APPROVAL / PUBLICATION_HOLD**
 Date: 2026-09-16
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md. R3-B authenticated ChatGPT OAuth connection and one-tool discovery PASS. Execute only one authenticated read-only krc_media_capabilities_canary invocation, record non-secret evidence, close R3-B PASS, then STOP before R3-C.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md. R3-A and R3-B PASS. Continue only after explicit owner approval for R3-C, limited to the 9 non-execution VoiceBridge operations.`
 
 ## Canonical recovery files
 
 1. `subprojects/media_beta/CURRENT_HANDOFF.md`
-2. `subprojects/media_beta/116_R3B_CHATGPT_OAUTH_CONNECTION_DISCOVERY_PASS_2026_09_16.md`
-3. `subprojects/media_beta/115_R3B_OWNER_SECRET_PROVISIONED_AUTH_READY_FOR_CHATGPT_CONNECTION_2026_09_16.md`
-4. `subprojects/media_beta/114_R3B_OAUTH_ENDPOINT_PRESECRET_PASS_OWNER_SECRET_ACTION_REQUIRED_2026_09_16.md`
-5. `subprojects/media_beta/113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md`
-6. `subprojects/media_beta/02_ROADMAP.md` — v5.2
-7. current PR #22 head/CI and current non-secret account/control-plane evidence
+2. `subprojects/media_beta/117_R3B_AUTHENTICATED_REMOTE_MCP_HARDENING_PASS_2026_09_16.md`
+3. `subprojects/media_beta/113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md`
+4. `subprojects/media_beta/02_ROADMAP.md` — v5.3
+5. current PR #22 head/CI and current non-secret account/control-plane evidence
 
 ## Repository / PR
 
@@ -28,10 +26,12 @@ base=main
 state=OPEN / DRAFT / UNMERGED
 ```
 
-## R3-A baseline
+## Accepted baseline
 
 ```text
+BOUNDED_CANARY_GATE=CLOSED_PASS
 R3_A=PASS
+R3_B=PASS
 MEDIA_OPERATION_COUNT=13
 NON_EXECUTION_COUNT=9
 EXECUTION_COUNT=4
@@ -41,7 +41,7 @@ protocol_version=2026-07-28
 VOICEBRIDGE_BEARER_SERVER_SIDE_ONLY=true
 ```
 
-## R3-B authenticated service
+## R3-B authenticated contour
 
 ```text
 service=krc-mcp-auth-sentinel
@@ -54,21 +54,16 @@ mcp_url=https://krc-mcp-auth-sentinel.onrender.com/mcp
 auth_mode=oauth
 AUTH_PROTOCOL=authorization_code+PKCE_S256
 DYNAMIC_CLIENT_REGISTRATION=YES
-REFRESH_TOKEN_ROTATION=YES
 MCP_SCOPE=krc.mcp.read
 OWNER_SECRET_SERVER_SIDE_ONLY=true
 LIVE_TOOL_COUNT=1
 LIVE_TOOL=krc_media_capabilities_canary
 ```
 
-The earlier no-auth evidence canary remains unchanged and separate.
-
-## R3-B implementation / CSP callback fix
-
-Current live auth service includes the callback-CSP fix:
+Current live auth implementation:
 
 ```text
-current_live_commit=4b8d172a23b88415839ada0da84357c1538614db
+live_commit=4b8d172a23b88415839ada0da84357c1538614db
 workflow=35138526850
 Python_3_13=PASS
 Python_3_14=PASS
@@ -78,13 +73,11 @@ live_deploy=dep-dalei1id0e5s73f4hu10
 live_deploy_status=live
 ```
 
-The authorization page permits form redirects only to self plus the validated origin of the registered OAuth redirect URI.
+## R3-B final acceptance
 
-## ChatGPT OAuth connection evidence
+Owner-account connection is established as `KRC MCP Auth Sentinel R3B`.
 
-Owner-account connection is now established under `KRC MCP Auth Sentinel R3B`.
-
-Observed server sequence:
+Observed OAuth/MCP sequence:
 
 ```text
 POST /oauth/register   -> 201
@@ -96,11 +89,7 @@ POST /mcp              -> 200  # authenticated MCP
 POST /mcp              -> 200  # authenticated MCP
 ```
 
-ChatGPT UI: `Підключено`.
-
-## Discovery evidence
-
-ChatGPT displays exactly one action:
+ChatGPT discovery:
 
 ```text
 CHATGPT_OAUTH_CONNECTION=PASS
@@ -109,11 +98,21 @@ DISCOVERED_TOOL_NAME=krc_media_capabilities_canary
 TOOL_CLASS=READ_ONLY
 ```
 
-The tool remains deterministic, provider-free, VoiceBridge-unbound and non-mutating.
+Real authenticated ChatGPT invocation result:
+
+```text
+status=ok
+mutation=false
+provider_work=false
+voicebridge_binding=not_enabled
+execution_tools=not_enabled
+media_operation_target_count=13
+AUTHENTICATED_CANARY_INVOCATION=PASS
+```
 
 ## Secret boundary
 
-The owner provisioned `KRC_MCP_OWNER_CODE` directly in Render. Its value was never requested, read, logged, committed, passed in connector/tool arguments or recorded in evidence.
+The owner provisioned `KRC_MCP_OWNER_CODE` directly in Render. Its value was never requested, read, committed, passed in connector/tool arguments or recorded in evidence.
 
 ```text
 MODEL_VISIBLE_SECRET=false
@@ -124,9 +123,15 @@ VOICEBRIDGE_BEARER_REUSE=false
 SECRET_REFLECTION=NO
 ```
 
+## OAuth callback recovery evidence
+
+The first live owner authorization exposed a CSP callback issue: `form-action 'self'` blocked the external OAuth callback redirect despite the server returning 302. The authorization page was hardened to permit only self plus the validated registered redirect origin. Regression coverage and workflow `35138526850` PASS.
+
+A redeploy reset the in-memory DCR state; the stale ChatGPT client was intentionally replaced with a newly registered `KRC MCP Auth Sentinel R3B` connection. The subsequent DCR, PKCE token exchange, discovery and authenticated invocation all passed.
+
 ## Known operational debt
 
-OAuth DCR clients, authorization codes and tokens are currently process-memory state. Restart/redeploy resets them.
+OAuth DCR clients, authorization codes and tokens are process-memory state. Restart/redeploy invalidates them.
 
 ```text
 OAUTH_STATE_PERSISTENCE=NOT_IMPLEMENTED
@@ -134,53 +139,50 @@ PRODUCTION_READY=NO
 R3_G_DEBT=YES
 ```
 
-Do not redeploy the auth service during the remaining R3-B invocation gate.
+Do not treat the current authenticated canary contour as production-ready.
 
-## Current final R3-B action
+## Next phase — R3-C
 
-Use the connected `KRC MCP Auth Sentinel R3B` in ChatGPT and invoke only:
+R3-C is **not started** and requires separate explicit owner authorization.
+
+Permitted R3-C target, if approved:
 
 ```text
-krc_media_capabilities_canary
+media_get_capabilities
+media_youtube_preflight
+media_youtube_lookup
+media_youtube_status
+media_youtube_segments
+media_instagram_preflight
+media_instagram_lookup
+media_non_youtube_status
+media_non_youtube_segments
 ```
 
-Acceptance result must include:
+R3-C constraints:
 
 ```text
-status=ok
-mutation=false
-provider_work=false
-voicebridge_binding=not_enabled
-execution_tools=not_enabled
-media_operation_target_count=13
-```
-
-After that evidence:
-
-```text
-R3_B=PASS
-R3_C=HOLD
-STOP
+VOICEBRIDGE_BEARER=SERVER_SIDE_ONLY
+EXECUTION_TOOL_COUNT=0
+START_OPERATIONS_EXPOSED=NO
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING=NO
+GPT_MIGRATION=NO
+PUBLIC_GPT_MUTATION=NO
+MAIN_MUTATION=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
 ```
 
 ## Hard boundary
 
 ```text
-VOICEBRIDGE_CREDENTIAL_BINDING=NO
-VOICEBRIDGE_RUNTIME_CHANGE=NO
-PROVIDER_CALL=NO
-NINE_TOOL_BACKEND_BINDING=NO
-REAL_EXECUTION_TOOL_EXPOSURE=NO
-PUBLIC_GPT_MUTATION=NO
-PLUGIN_PUBLICATION=NO
-PLUGIN_SHARING=NO
-GPT_MIGRATION=NO
-MAIN_MUTATION=NO
-PR22_MERGE=NO
-PR45_MERGE=NO
-R3_C=HOLD
+R3_C=PLANNED_NOT_STARTED
+R3_C_EXECUTION_APPROVAL=REQUIRED
+R3_D_AND_LATER=HOLD
+R4=HOLD
 ```
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V12_3_R3B_OAUTH_CONNECTION_DISCOVERY_PASS_FINAL_INVOCATION_PENDING_2026_09_16`
+`KRC_MEDIA_CURRENT_HANDOFF_V13_0_R3A_PASS_R3B_PASS_R3C_AWAITING_OWNER_APPROVAL_2026_09_16`
