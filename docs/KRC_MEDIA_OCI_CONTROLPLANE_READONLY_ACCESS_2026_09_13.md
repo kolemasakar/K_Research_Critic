@@ -1,4 +1,5 @@
 # KRC MEDIA — OCI Control-Plane Read-Only Access
+Підтверджений канал читання OCI control plane для інфраструктури KRC MEDIA.
 
 Date: 2026-09-13
 Status: ACTIVE / READ-ONLY / VERIFIED
