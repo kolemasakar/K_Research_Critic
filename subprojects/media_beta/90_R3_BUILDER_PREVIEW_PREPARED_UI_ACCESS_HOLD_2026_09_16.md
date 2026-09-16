@@ -1,7 +1,7 @@
 # R3 Builder Preview Prepared / UI Access Hold — 2026-09-16
 Репозиторний payload для preview інтеграції MEDIA в існуючий public KRC підготовлено та перевірено; публічна активація не виконувалась.
 
-Status: R3_BUILDER_PREVIEW_PREPARED / UI_ACCESS_HOLD / PUBLIC_ACTIVATION_HOLD
+Status: R3_BUILDER_PREVIEW_PREPARED / BROWSER_CHANNEL_SELECTED / USER_CONNECT_PENDING / PUBLIC_ACTIVATION_HOLD
 
 ## Authorized scope
 
@@ -41,16 +41,24 @@ Candidate branch: `agent/krc-public-media-r3-integration`.
 Repository candidate CI at accepted pre-preview head was green for Python 3.13, Python 3.14, repository policy, GPT Store package validation, and coverage gate.
 Builder-size guard for Core instructions plus the R3 addendum is included in the candidate tests.
 
-## Current blocker
+## Builder control channel
 
-The blocker is **not a KRC host outage**. The current KRC remote-control channel provides server filesystem/terminal access but does not expose interactive control of the authenticated ChatGPT Builder UI. Therefore no Builder fields were edited and no draft was saved.
+The blocker is **not a KRC host outage**. The current KRC Remote Desktop Commander channel provides server filesystem/terminal access but does not expose interactive control of the authenticated ChatGPT Builder UI.
 
-`HP-OMEN` is the Windows development host for **K_AI Trading System** and is not part of KRC infrastructure or KRC Builder access. Its online/offline state is irrelevant to KRC R3 Builder Preview.
+Selected browser-capable channel: **TinyFish ChatGPT plugin**.
+Purpose: authorized live-browser interaction with ChatGPT Builder for read-only snapshot, preview configuration, and regression testing.
+State: `SELECTED / PENDING USER INSTALL_OR_CONNECT`.
 
-`kgm-e4-owner-pilot` belongs to **KGM** and likewise is not a KRC Builder dependency.
+Security boundary:
+- OpenAI authentication stays in the browser session; no password is stored in KRC repository or infrastructure.
+- TinyFish is not a KRC infrastructure host and creates no dependency on K_AI or KGM hosts.
+- Publication/activation remains HOLD and requires separate owner approval.
 
-Relevant KRC infrastructure access remains through `krc-cobalt`; that access is sufficient for backend/runtime verification but not for ChatGPT Builder UI interaction.
+Project-boundary correction:
+- `HP-OMEN` belongs to **K_AI Trading System** and is not part of KRC infrastructure or KRC Builder access.
+- `kgm-e4-owner-pilot` belongs to **KGM** and is not a KRC Builder dependency.
+- Relevant KRC infrastructure access remains through `krc-cobalt` for backend/runtime verification only.
 
 ## Next bounded action
 
-When an authorized browser-capable ChatGPT Builder control path is available, open the existing public `K-Research & Critic` GPT, snapshot current Builder state, append the R3 MEDIA addendum, import the R3 OpenAPI schema as the MEDIA Action, validate authentication/configuration without provider work where possible, run Core + YouTube + Instagram + Facebook + Telegram preview regressions, and stop before Publish/Update.
+After the owner installs/connects TinyFish, use the authorized browser session to open the existing public `K-Research & Critic` GPT, snapshot current Builder state, append the R3 MEDIA addendum, import the R3 OpenAPI schema as the MEDIA Action, validate authentication/configuration without provider work where possible, run Core + YouTube + Instagram + Facebook + Telegram preview regressions, and stop before Publish/Update.
