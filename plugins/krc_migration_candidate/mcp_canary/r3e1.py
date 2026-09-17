@@ -255,7 +255,9 @@ def dispatch_r3e1(
         return _error(request_id, -32602, "Unknown tool")
 
     if name != R3E1_EXECUTION_TOOL_NAME:
-        return _rewrite_server_info(dispatch_r3c(message, binding))
+        return _rewrite_server_info(
+            dispatch_r3c(message, binding, backend_call=call_voicebridge)
+        )
 
     arguments = params.get("arguments", {})
     if not isinstance(arguments, Mapping):
