@@ -1,5 +1,5 @@
 # K-Research & Critic - MEDIA BETA Recovery Pointer
-Aktualnyi pokazhchyk vidnovlennia KRC MEDIA BETA: R3-E1 zablokovanyi infrastrukturoiu, polityka proektu FREE-ONLY.
+Актуальний покажчик відновлення KRC MEDIA BETA: R3-E1 заблокований інфраструктурою, політика проекту FREE-ONLY.
 
 Status: ACTIVE POINTER / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_BLOCKED_INFRASTRUCTURE / FREE_ONLY / PUBLICATION_HOLD
 Updated: 2026-09-17
