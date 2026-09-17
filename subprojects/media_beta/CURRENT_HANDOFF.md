@@ -11,7 +11,7 @@ Date: 2026-09-17
 ## Canonical recovery files
 
 1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v16.0; current authority.
-2. `subprojects/media_beta/126_NEW_CHAT_TRANSITION_R3E1_FREE_ONLY_NEON_MIGRATION_GATE_2026_09_17.md` — transition checkpoint.
+2. `subprojects/media_beta/126_CHAT_TRANSITION_R3E1_FREE_ONLY_NEON_MIGRATION_GATE_2026_09_17.md` — transition checkpoint.
 3. `subprojects/media_beta/125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md` — free-only policy and database audit.
 4. `subprojects/media_beta/124_R3D_CONSEQUENTIAL_ACTION_CONFIRMATION_PASS_2026_09_17.md` — R3-D closure.
 5. `subprojects/media_beta/121_R3C_NINE_TOOL_READONLY_VOICEBRIDGE_BINDING_PASS_2026_09_16.md` — R3-C closure.
