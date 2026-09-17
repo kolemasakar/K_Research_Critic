@@ -15,7 +15,7 @@ Primary handoff:
 `subprojects/media_beta/CURRENT_HANDOFF.md` — v16.0
 
 Transition checkpoint:
-`subprojects/media_beta/126_NEW_CHAT_TRANSITION_R3E1_FREE_ONLY_NEON_MIGRATION_GATE_2026_09_17.md`
+`subprojects/media_beta/126_CHAT_TRANSITION_R3E1_FREE_ONLY_NEON_MIGRATION_GATE_2026_09_17.md`
 
 Infrastructure-policy checkpoint:
 `subprojects/media_beta/125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md`
