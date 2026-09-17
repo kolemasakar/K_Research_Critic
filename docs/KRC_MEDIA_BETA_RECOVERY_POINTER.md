@@ -1,18 +1,19 @@
-# K-Research & Critic — MEDIA BETA Recovery Pointer
+# K-Research & Critic - MEDIA BETA Recovery Pointer
+Aktualnyi pokazhchyk vidnovlennia KRC MEDIA BETA: R3-E1 zablokovanyi infrastrukturoiu, polityka proektu FREE-ONLY.
 
 Status: ACTIVE POINTER / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_BLOCKED_INFRASTRUCTURE / FREE_ONLY / PUBLICATION_HOLD
 Updated: 2026-09-17
 
-`K-Research & Critic — MEDIA BETA` remains an additive capability under migration from Custom GPT Actions toward a private authenticated Plugin/Remote MCP surface. The published public KRC GPT remains unchanged and protected.
+`K-Research & Critic - MEDIA BETA` remains an additive capability under migration from Custom GPT Actions toward a private authenticated Plugin/Remote MCP surface. The published public KRC GPT remains unchanged and protected.
 
 ## Current canonical recovery point
 
 Repository: `kolemasakar/K_Research_Critic`
 Branch: `agent/krc-public-media-r3-integration`
-PR: `#22` — OPEN / DRAFT / UNMERGED
+PR: `#22` - OPEN / DRAFT / UNMERGED
 
 Primary handoff:
-`subprojects/media_beta/CURRENT_HANDOFF.md` — v16.0
+`subprojects/media_beta/CURRENT_HANDOFF.md` - v16.0
 
 Transition checkpoint:
 `subprojects/media_beta/126_CHAT_TRANSITION_R3E1_FREE_ONLY_NEON_MIGRATION_GATE_2026_09_17.md`
@@ -21,11 +22,11 @@ Infrastructure-policy checkpoint:
 `subprojects/media_beta/125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md`
 
 Roadmap:
-`subprojects/media_beta/02_ROADMAP.md` — v5.6
+`subprojects/media_beta/02_ROADMAP.md` - v5.6
 
 Recovery command:
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 126. R3-A/B/C/D PASS; R3-E1 YouTube authorized and prepared but blocked by expired Render Free PostgreSQL. Project is FREE-ONLY. Continue from Neon Free durable-state migration preflight; do not run real media_youtube_start until the database gate passes.`
+`Recover K-Research & Critic MEDIA from subprojects/media_beta/CURRENT_HANDOFF.md and checkpoint 126. R3-A/B/C/D PASS; R3-E1 YouTube authorized and prepared but blocked by expired Render Free PostgreSQL. Project is FREE-ONLY. Continue from Neon Free durable-state migration preflight; do not run real media_youtube_start until the database gate passes.`
 
 ## Current gate state
 
@@ -94,7 +95,7 @@ postgres=18
 branch=production
 database=krc_media_beta
 storage_limit=512MiB
-current_storage≈32MB
+current_storage~32MB
 ```
 
 Tables:
