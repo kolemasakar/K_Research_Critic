@@ -28,7 +28,7 @@ paid provider fallback -> denied
 ## Canonical current reading order
 
 1. `CURRENT_HANDOFF.md` — v16.0; current recovery authority.
-2. `126_NEW_CHAT_TRANSITION_R3E1_FREE_ONLY_NEON_MIGRATION_GATE_2026_09_17.md` — new-chat transition checkpoint.
+2. `126_CHAT_TRANSITION_R3E1_FREE_ONLY_NEON_MIGRATION_GATE_2026_09_17.md` — new-chat transition checkpoint.
 3. `125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md` — free-only policy and PostgreSQL incident audit.
 4. `02_ROADMAP.md` — v5.6; active gate sequence.
 5. `124_R3D_CONSEQUENTIAL_ACTION_CONFIRMATION_PASS_2026_09_17.md` — R3-D PASS.
