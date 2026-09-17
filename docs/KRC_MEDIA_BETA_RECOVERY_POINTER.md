@@ -1,137 +1,148 @@
-# K-Research & Critic - MEDIA BETA Recovery Pointer
-Активний покажчик відновлення KRC MEDIA BETA для checkpoint 89.
+# K-Research & Critic — MEDIA BETA Recovery Pointer
 
-Status: ACTIVE POINTER / CHECKPOINT 89 / R2 COMPLETE / RETRY LIVE PASS / R3 READY FOR INTEGRATION / PUBLIC ACTIVATION HOLD
-Updated: 2026-09-16
+Status: ACTIVE POINTER / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_BLOCKED_INFRASTRUCTURE / FREE_ONLY / PUBLICATION_HOLD
+Updated: 2026-09-17
 
-`K-Research & Critic - MEDIA BETA` remains an additive MEDIA capability planned for the existing published `K-Research & Critic` identity.
+`K-Research & Critic — MEDIA BETA` remains an additive capability under migration from Custom GPT Actions toward a private authenticated Plugin/Remote MCP surface. The published public KRC GPT remains unchanged and protected.
 
-## Current canonical checkpoint
+## Current canonical recovery point
 
 Repository: `kolemasakar/K_Research_Critic`
-Branch: `main`
+Branch: `agent/krc-public-media-r3-integration`
+PR: `#22` — OPEN / DRAFT / UNMERGED
 
-Checkpoint:
-`subprojects/media_beta/89_R2_FULL_ACCEPTANCE_RETRY_PASS_R3_READY_CHECKPOINT_2026_09_16.md`
+Primary handoff:
+`subprojects/media_beta/CURRENT_HANDOFF.md` — v16.0
 
-Handoff:
-`docs/handoffs/BOOTSTRAP_PACKAGE_2026-09-16_KRC_MEDIA_R2_COMPLETE_R3_READY_HANDOFF.md`
+Transition checkpoint:
+`subprojects/media_beta/126_NEW_CHAT_TRANSITION_R3E1_FREE_ONLY_NEON_MIGRATION_GATE_2026_09_17.md`
+
+Infrastructure-policy checkpoint:
+`subprojects/media_beta/125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md`
+
+Roadmap:
+`subprojects/media_beta/02_ROADMAP.md` — v5.6
 
 Recovery command:
 
-`recover KRC MEDIA BETA checkpoint 89 R2 complete retry pass R3 ready 2026-09-16`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 126. R3-A/B/C/D PASS; R3-E1 YouTube authorized and prepared but blocked by expired Render Free PostgreSQL. Project is FREE-ONLY. Continue from Neon Free durable-state migration preflight; do not run real media_youtube_start until the database gate passes.`
 
-## Gate state
-
-```text
-R0   PASS
-R1   COMPLETE
-R2-A PASS
-R2-B PASS
-R2-C COMPLETE
-R2   COMPLETE / PASS
-R3_READY = TRUE
-R3   READY FOR INTEGRATION / PUBLIC ACTIVATION HOLD
-R4   HOLD
-```
-
-`R3_READY = TRUE` authorizes no public mutation by itself. Public Builder changes and PR merges still require explicit owner authorization.
-
-## Accepted VoiceBridge runtime
+## Current gate state
 
 ```text
-repository: kolemasakar/VoiceBridge
-branch: agent/krc-media-gemini-migration
-accepted head: 3e8cb29b3815e1bf98f143682644899b801826e0
-Validate #813: SUCCESS
-PR #45: OPEN / DRAFT / UNMERGED
+R3_A=PASS
+R3_B=PASS
+R3_C=PASS
+R3_D=PASS
+R3_E1=AUTHORIZED / PREPARED / BLOCKED_INFRASTRUCTURE
+R3_E2=HOLD
+R3_E3=HOLD
+R3_E4=HOLD
+R3_F_AND_LATER=HOLD
+R4=HOLD
 ```
 
-Render:
+## Cost policy
 
 ```text
-service: voicebridge-krc-media-beta-kolemasakar
-service id: srv-da1kic5bedkc73d6fk60
-autoDeploy: no
-accepted deploy: dep-dal6abdg1s2s73ed059g
-live commit: 3e8cb29b3815e1bf98f143682644899b801826e0
-health: HTTP 200 / status=ok
+PROJECT_COST_POLICY=FREE_ONLY
+PAID_DATABASE_UPGRADE=DENIED
+PAID_HOSTING_FALLBACK=DENIED
+PAID_PROVIDER_FALLBACK=DENIED
+UNEXPECTED_BILLING_RISK=DENIED
 ```
 
-## Accepted free-only route matrix
+## R3-E1 prepared surface
 
 ```text
-YouTube   -> Gemini Developer API Free Tier direct -> Neon
-Instagram -> OCI self-hosted Cobalt -> AssemblyAI universal-2 Free -> Neon
-Facebook  -> OCI Cobalt video+audio -> VoiceBridge ffmpeg mono PCM WAV 16 kHz -> AssemblyAI -> Neon
-Telegram  -> telegram_public_web -> AssemblyAI universal-2 Free -> Neon
+service=krc-mcp-r3e1-youtube-sentinel
+service_id=srv-dall4qv40ujc73ednpqg
+surface=r3e1_youtube_execution
+tool_count=10
+non_execution_tool_count=9
+execution_tool_count=1
+execution_tool=media_youtube_start
+other_execution_tools=not_enabled
 ```
 
-Forbidden automatic fallback remains unchanged:
+No real YouTube start acceptance call has been executed.
+
+## Durable-state incident
+
+Render Free PostgreSQL:
 
 ```text
-paid retrieval: none
-paid STT: none
-paid proxy: none
-Supadata public fallback: none
-ScrapeCreators public fallback: none
-cookies/login fallback: none
+name=voicebridge-krc-media-beta-db
+id=dpg-da1sdn3l550s73amicvg-a
+status=suspended
+suspender=billing
+expired=2026-09-17T02:43:40Z
 ```
 
-## R2 accepted live evidence
+Paid upgrade is forbidden. Render Free PostgreSQL is rejected as the durable production dependency.
 
-- YouTube Gemini-direct regression after Cobalt cutover: PASS.
-- Instagram control Reel through OCI Cobalt + AssemblyAI: PASS.
-- Facebook fresh Reel through Cobalt video+audio + local ffmpeg extraction + AssemblyAI: PASS.
-- Telegram speech fixture `https://t.me/techcrimes/12107`: PASS.
-- Render/Neon durable execution: PASS.
-- No-paid-fallback audit: PASS.
-- Forced MEDIA failure / Core isolation: PASS; health remained HTTP 200.
+## Primary free replacement candidate
 
-## FAILED free-only retry semantics
-
-Accepted at VoiceBridge head `3e8cb29b3815e1bf98f143682644899b801826e0`:
+Existing Neon Free project:
 
 ```text
-COMPLETED -> reuse
-PROCESSING in-flight -> reuse
-FAILED free-only -> fresh deterministic retry job
-FAILED paid/credit-charge-uncertain -> automatic replay blocked
+project=krc-media-beta-neon
+project_id=plain-snow-71973546
+subscription=free_v3
+region=aws-eu-central-1
+postgres=18
+branch=production
+database=krc_media_beta
+storage_limit=512MiB
+current_storage≈32MB
 ```
 
-Live proof used Telegram no-speech fixture `https://t.me/techcrimes/12101` while the prior FAILED record was still retained:
+Tables:
 
 ```text
-old job: KRCM_a58b1cc8-f072-4aec-88a9-f1fa06a53fcd
-old request_key: 7d5fa785d60fb9778d62e0da0f61e68abb0e51922702be299adc78ce73e8a4b7
-new job: KRCM_0ca16eb0-e9d2-477e-98d9-27cb923df9d6
-new request_key: 63bb22d30582246a686dfe34949d68935050d721ed35cae38825e77eaad1152b
+public.krc_managed_media_jobs
+public.krc_media_client_jobs
+public.krc_media_stt_charges
 ```
 
-The fresh job was created before the old one expired. Both remained free-only with zero retrieval credits, zero paid credits, and `credit_charge_uncertain=false`.
-
-## OCI Cobalt retained state
+Audit-time row counts:
 
 ```text
-instance: krc-cobalt-media-beta
-region: eu-frankfurt-1
-public endpoint: https://89-168-65-88.sslip.io
-Cobalt bind: 127.0.0.1:9000 only
-public HTTPS: Caddy
-API auth: required
+managed_jobs=0
+client_jobs=0
+stt_charges=10
 ```
 
-Do not expose Cobalt API keys or relax the loopback-only port-9000 boundary.
+Candidate order:
 
-## Public KRC boundary
+```text
+PRIMARY_CANDIDATE=NEON_FREE
+SECONDARY_CANDIDATE=SUPABASE_FREE
+INFRA_CONTROLLED_FALLBACK=OCI_ALWAYS_FREE_SELF_HOSTED_POSTGRES
+```
 
-The published `K-Research & Critic` GPT remains unchanged at R2 closure.
-Draft public integration candidate PR #20 is staging/evidence only.
-Do not attach/activate MEDIA Actions in the public GPT without explicit owner authorization.
-Do not merge VoiceBridge PR #45 without separate owner authorization.
+## Next bounded work
 
-## R3 starting point
+Continue with Neon Free durable-state migration preflight only:
 
-Begin R3 by revalidating current GitHub heads/CI, Render live deploy, private MEDIA BETA Builder state, and public KRC Builder state. Then integrate the accepted MEDIA Action/routing into public KRC in bounded steps and regression-test ordinary Core KRC plus YouTube, Instagram, Facebook, and Telegram before any public activation.
+- schema/constraints/index parity audit against VoiceBridge persistence contract;
+- durable/idempotency field audit;
+- server-side-only `DATABASE_URL` cutover plan;
+- fail-closed and scale-to-zero validation;
+- bounded cutover only after required consequential approval;
+- restart-resilient create/read/status/segments/replay acceptance;
+- confirm zero paid fallback and audit/charge evidence;
+- only then resume R3-E1 YouTube live execution acceptance.
 
-Recovery must start from checkpoint 89 and the 2026-09-16 handoff, not checkpoint 88.
+## Protected boundaries
+
+```text
+PUBLIC_GPT_MUTATION=NO
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING=NO
+MAIN_MUTATION=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+PAID_UPGRADE=NO
+REAL_YOUTUBE_START=HOLD
+```
