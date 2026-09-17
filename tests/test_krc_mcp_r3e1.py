@@ -215,7 +215,7 @@ def test_r3e1_read_only_tool_delegates_to_r3c(monkeypatch) -> None:
         return {"status": "ok"}
 
     monkeypatch.setattr(
-        "plugins.krc_migration_candidate.mcp_canary.r3c.call_voicebridge",
+        "plugins.krc_migration_candidate.mcp_canary.r3e1.call_voicebridge",
         fake_call,
     )
     response = dispatch_r3e1(
