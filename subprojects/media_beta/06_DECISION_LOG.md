@@ -98,7 +98,7 @@ Required sequence: schema/constraint/index parity audit, durable/idempotency fie
 ## Canonical authority
 
 - `CURRENT_HANDOFF.md` version 16.0
-- `126_NEW_CHAT_TRANSITION_R3E1_FREE_ONLY_NEON_MIGRATION_GATE_2026_09_17.md`
+- `126_CHAT_TRANSITION_R3E1_FREE_ONLY_NEON_MIGRATION_GATE_2026_09_17.md`
 - `125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md`
 - `02_ROADMAP.md` version 5.6
 
