@@ -2,173 +2,153 @@
 
 Canonical documentation index for K-Research & Critic MEDIA BETA / Plugin migration work.
 
-Version: 7.1
-Status: **ACTIVE / PLUGIN_FIRST / BOUNDED_CANARY_CLOSED_PASS / R3-A_PLANNED_NOT_STARTED / PUBLICATION_HOLD**
-Updated: 2026-09-16
+Version: 8.0
+Status: **ACTIVE / PLUGIN_FIRST / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_BLOCKED_INFRASTRUCTURE / FREE_ONLY / PUBLICATION_HOLD**
+Updated: 2026-09-17
 
 ## Product boundary
 
 ```text
-public KRC Custom GPT: published / unchanged
+public KRC Custom GPT: published / unchanged / protected
 MEDIA migration candidate: private Remote Custom MCP / Plugin surface
-backend authority: existing VoiceBridge MEDIA API
+backend authority: VoiceBridge MEDIA API
 canonical MEDIA parity target: 13 operations
+project cost policy: FREE_ONLY
 ```
 
-Critical invariant:
+Critical invariants:
 
 ```text
 MEDIA unavailable/fails -> MEDIA fails closed
-Core KRC               -> remains usable and accessible
+Core KRC               -> remains usable
+paid mandatory infra   -> denied
+paid provider fallback -> denied
 ```
 
 ## Canonical current reading order
 
-1. `CURRENT_HANDOFF.md` — v11.1; current recovery authority.
-2. `111_POST_CANARY_PLUGIN_MEDIA_ROADMAP_DECISION_2026_09_16.md` — approved post-canary roadmap.
-3. `02_ROADMAP.md` — v5.1; active gate sequence R3-A through R4.
-4. `110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md` — completed ChatGPT-side invocation PASS.
-5. `109_CHATGPT_CUSTOM_MCP_CONNECTION_DISCOVERY_PASS_2026_09_16.md` — owner-account connection and one-tool discovery PASS.
-6. `108_SENTINEL_REMOTE_MCP_CANARY_LIVE_DEPLOYMENT_CONNECTION_BLOCKED_2026_09_16.md` — live endpoint validation and historical auth-context blocker.
-7. `107_KRC_DEPLOYABLE_REMOTE_MCP_CANARY_REPO_ACCEPTANCE_2026_09_16.md` — deployable package acceptance.
-8. `102_KRC_P100_ACCOUNT_SURFACE_INSPECTION_RESULT_2026_09_16.md` — account-specific Plugin/custom MCP surface evidence.
-9. `102_OPENAI_RETIREMENT_RESEARCH_INTEGRATION_ACCEPTANCE_HARDENING_2026_09_16.md` — migration acceptance hardening.
+1. `CURRENT_HANDOFF.md` — v16.0; current recovery authority.
+2. `126_NEW_CHAT_TRANSITION_R3E1_FREE_ONLY_NEON_MIGRATION_GATE_2026_09_17.md` — new-chat transition checkpoint.
+3. `125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md` — free-only policy and PostgreSQL incident audit.
+4. `02_ROADMAP.md` — v5.6; active gate sequence.
+5. `124_R3D_CONSEQUENTIAL_ACTION_CONFIRMATION_PASS_2026_09_17.md` — R3-D PASS.
+6. `121_R3C_NINE_TOOL_READONLY_VOICEBRIDGE_BINDING_PASS_2026_09_16.md` — R3-C PASS.
+7. `117_R3B_AUTHENTICATED_REMOTE_MCP_HARDENING_PASS_2026_09_16.md` — R3-B PASS.
+8. `113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md` — R3-A PASS.
+9. current PR #22 head/CI and current Render/Neon non-secret evidence.
 
-Older checkpoints remain historical evidence and are not the current continuation point.
+Older checkpoints remain historical evidence and do not override the current handoff.
 
 ## Current repository / PR
 
 ```text
-repository: kolemasakar/K_Research_Critic
-branch: agent/krc-public-media-r3-integration
-PR: #22
-base: main
-state: OPEN / DRAFT / UNMERGED
+repository=kolemasakar/K_Research_Critic
+branch=agent/krc-public-media-r3-integration
+PR=#22
+base=main
+state=OPEN / DRAFT / UNMERGED
 ```
 
-Final bounded-canary baseline before roadmap planning:
+## Accepted R3 state
 
 ```text
-head: 75a4b30e9f478fad892fafc017fea069ce949aec
-workflow: 35131580138
-result: SUCCESS
-Python 3.13: PASS
-Python 3.14: PASS
-Quality gates: PASS
+R3_A=PASS
+R3_B=PASS
+R3_C=PASS
+R3_D=PASS
+R3_E1=AUTHORIZED / PREPARED / BLOCKED_INFRASTRUCTURE
+R3_E2=HOLD
+R3_E3=HOLD
+R3_E4=HOLD
 ```
 
-## Proven Remote MCP canary state
+## R3-C accepted authenticated read-only surface
 
 ```text
-MCP_CANARY_DEPLOYABLE=PASS
-LIVE_MCP_DEPLOYMENT=PASS
-EXTERNAL_PROTOCOL_VALIDATION=PASS
-CHATGPT_MCP_CONNECTION=PASS
-CHATGPT_DISCOVERED_TOOL_COUNT=1
-CHATGPT_CANARY_INVOCATION=PASS
-BOUNDED_CANARY_GATE=CLOSED_PASS
+service=krc-mcp-auth-sentinel
+surface=r3c_readonly
+DISCOVERED_TOOL_COUNT=9
+EXECUTION_TOOL_COUNT=0
+VOICEBRIDGE_BINDING=SERVER_SIDE_ONLY
 ```
 
-Live evidence-only canary:
+## R3-D accepted confirmation surface
 
 ```text
-name: KRC MCP Canary Sentinel
-endpoint: https://krc-mcp-canary-sentinel.onrender.com/mcp
-autoDeploy: off
-authentication: No authentication, bounded canary only
-tool: krc_media_capabilities_canary
-VoiceBridge binding: not enabled
-execution tools: not enabled
-provider work: false
+service=krc-mcp-r3d-confirmation-sentinel
+surface=r3d_confirmation_probe
+CHATGPT_CONFIRMATION_UI=PASS
+APPROVE_PATH=PASS
+CANCEL_PATH=PASS
+NO_PRECONFIRM_EXECUTION=PASS
+NO_EXECUTION_AFTER_DENY=PASS
 ```
 
-This canary must not receive VoiceBridge credentials or become the production MEDIA surface.
-
-## Target architecture
+## R3-E1 prepared YouTube surface
 
 ```text
-ChatGPT Plugin/App
--> authenticated remote MCP adapter
--> server-side VoiceBridge credential injection
--> existing VoiceBridge MEDIA API
--> existing free-only provider routes + durable state
+service=krc-mcp-r3e1-youtube-sentinel
+surface=r3e1_youtube_execution
+tool_count=10
+non_execution_tool_count=9
+execution_tool_count=1
+execution_tool=media_youtube_start
+other_execution_tools=not_enabled
 ```
 
-## Canonical migration contracts
+No live YouTube execution acceptance has been performed because durable PostgreSQL is currently blocked.
+
+## Durable-state incident
 
 ```text
-plugins/krc_migration_candidate/contracts/media_tools.yaml
-plugins/krc_migration_candidate/contracts/media_adapter.yaml
-plugins/krc_migration_candidate/contracts/auth_transport_binding.yaml
-plugins/krc_migration_candidate/contracts/migration_acceptance.yaml
-plugins/krc_migration_candidate/contracts/surface_decision_matrix.yaml
+Render DB=voicebridge-krc-media-beta-db
+Render DB state=suspended / billing
+Render Free PostgreSQL=REJECTED_FOR_DURABLE_STATE
+PAID_UPGRADE=DENIED
+REAL_YOUTUBE_START=HOLD
 ```
 
-Current semantic target:
+## Free replacement authority
 
 ```text
-13 total MEDIA operations
-9 non-execution operations
-4 start/execution operations
+PRIMARY_CANDIDATE=NEON_FREE
+project=krc-media-beta-neon
+subscription=free_v3
+postgres=18
+database=krc_media_beta
+SECONDARY_CANDIDATE=SUPABASE_FREE
+INFRA_CONTROLLED_FALLBACK=OCI_ALWAYS_FREE_SELF_HOSTED_POSTGRES
 ```
 
-## Active roadmap gates
+Neon already contains the expected VoiceBridge persistence tables. Audit-time row counts were `managed_jobs=0`, `client_jobs=0`, `stt_charges=10`; therefore it is not a full backup of the suspended Render database.
+
+## Active next gate
+
+The next bounded work is **Neon Free durable-state migration preflight**, not a real MEDIA start:
 
 ```text
-R3-A  Contract freeze / secure adapter baseline            PLANNED / NOT STARTED
-R3-B  Inbound auth + secret-boundary hardening             HOLD
-R3-C  9-tool non-execution VoiceBridge binding             HOLD
-R3-D  Consequential-action confirmation semantics          HOLD
-R3-E  Staged 4-route execution binding                     HOLD
-R3-F  Full 13-operation parity regression                  HOLD
-R3-G  Private operational hardening                        HOLD
-R3-H  Migration/publication readiness                      HOLD
-R4    Owner-approved cutover/migration/publication         HOLD
+schema/constraints/index audit
+-> durable/idempotency field audit
+-> server-side DATABASE_URL cutover plan
+-> fail-closed/scale-to-zero validation
+-> bounded cutover when explicitly approved if consequential
+-> restart-resilient durable-state acceptance
+-> resume R3-E1 only after PASS
 ```
 
-Roadmap planning approval does not automatically authorize R3-A implementation. A separate execution approval is required.
-
-## Immediate decision point
-
-If separately approved, R3-A is repository-only.
-
-Required:
-
-- freeze/reconcile exact 13-tool names and schemas;
-- freeze annotations, consent, retry/idempotency, audit, error and secret boundaries;
-- preserve exact Core skill parity;
-- pass repository CI.
-
-Forbidden in R3-A:
+## Preserved release boundary
 
 ```text
-new live deployment
-live canary mutation
-VoiceBridge secret binding
-provider calls
-real execution/start tools
-public GPT mutation
-Plugin publish/share/migrate
-main mutation
-PR #22 merge
-VoiceBridge PR #45 merge
-```
-
-## Historical backend/provider evidence
-
-Earlier backend/provider checkpoints remain valid historical evidence for VoiceBridge, Cobalt, Gemini, Instagram/Facebook/Telegram routing, free-only policy, durable KRCM jobs, and Core isolation requirements. They do not override the current Plugin-first continuation point.
-
-Current policy remains:
-
-```text
-paid retrieval fallback: false
-paid STT fallback: false
-paid proxy fallback: false
-automatic retry loop: false
-user cookies/login fallback: forbidden
-YouTube paid/Cobalt/AssemblyAI fallback: forbidden
+PUBLIC_GPT_MUTATION=NO
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING=NO
+MAIN_MUTATION=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+PAID_UPGRADE=NO
+R4=HOLD
 ```
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md. Roadmap approved; R3-A planned but not started.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 126. R3-A/B/C/D PASS; R3-E1 authorized but infrastructure-blocked; project FREE-ONLY; continue from Neon Free durable-state migration preflight.`
