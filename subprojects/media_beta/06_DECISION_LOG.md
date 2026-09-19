@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 4.2
-Status: ACTIVE / HISTORY_PRESERVED / R3E1_PASS
+Version: 4.3
+Status: ACTIVE / HISTORY_PRESERVED / R3E1_PASS / R3E2_PREFLIGHT_PASS_WITH_GAPS
 Updated: 2026-09-19
 
 The full historical decision log remains preserved in Git history and numbered checkpoints. Current active decisions are summarized here and detailed in the canonical handoff, roadmap, and checkpoints.
@@ -28,7 +28,7 @@ R3_D=PASS
 
 ```text
 R3_E1_YOUTUBE=PASS
-R3_E2_INSTAGRAM=HOLD
+R3_E2_INSTAGRAM=READONLY_PREFLIGHT_PASS_WITH_EXPLICIT_GAPS / EXECUTION_HOLD
 R3_E3_FACEBOOK=HOLD
 R3_E4_TELEGRAM=HOLD
 ```
@@ -111,13 +111,30 @@ The current persistence contract deletes `krc_media_stt_charges` rows older than
 
 All temporary execution/replay startup environment switches were disabled after evidence capture. Final R3-E1 runtime is healthy with no automatic acceptance execution.
 
+### D050 — R3-E2 Instagram read-only/free-only preflight accepted
+
+Checkpoint 131 confirms the current Instagram route remains:
+
+```text
+Instagram -> OCI self-hosted Cobalt -> AssemblyAI universal-2 -> Neon
+retrieval_credits=0
+automatic_paid_fallback=false
+paid provider fallback=NO
+```
+
+The relevant Instagram retrieval, URL normalization, persistence, and AssemblyAI pipeline files are unchanged from the accepted R2 head. Current OCI Cobalt runtime identity matches the accepted baseline. No Instagram job or provider work was created during this preflight.
+
+Execution remains blocked until a dedicated R3-E2 route-scoped bearer, isolated Instagram execution surface, authenticated app-level preflight/lookup, and Instagram-specific confirmation acceptance are implemented.
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` version 17.2
+- `CURRENT_HANDOFF.md` version 17.3
+- `131_R3E2_INSTAGRAM_READONLY_FREE_ONLY_PREFLIGHT_2026_09_19.md`
+- `130_POST_R3E1_CONTROL_POINT_BEFORE_R3E2_2026_09_19.md`
 - `129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md`
 - `128_R3E1_RESTART_CONNECTIVITY_PASS_RECORD_REPLAY_PENDING_2026_09_19.md`
 - `127_R3E1_NEON_CUTOVER_COMPLETE_DURABLE_ACCEPTANCE_PENDING_2026_09_19.md`
-- `02_ROADMAP.md` version 5.8
+- `02_ROADMAP.md` version 5.9
 
 ## Hard boundary
 
@@ -129,6 +146,7 @@ MAIN_MUTATION=NO
 PR22_MERGE=NO
 PR45_MERGE=NO
 PAID_UPGRADE=NO
-R3_E2_E3_E4=HOLD
+R3_E2_EXECUTION=HOLD
+R3_E3_E4=HOLD
 R4=HOLD
 ```
