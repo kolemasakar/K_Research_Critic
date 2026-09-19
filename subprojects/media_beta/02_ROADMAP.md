@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 6.4
-Status: **PLUGIN_FIRST / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_PASS / R3-E2_ATTEMPT1_REMEDIATED_RECONNECT_PENDING / FREE_ONLY / PUBLICATION_HOLD**
+Version: 6.5
+Status: **PLUGIN_FIRST / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_PASS / R3-E2_LIVE_CANARY_PASS_RESTART_IDEMPOTENCY_PENDING / FREE_ONLY / PUBLICATION_HOLD**
 Updated: 2026-09-19
 
 ## Product position
@@ -28,10 +28,11 @@ paid provider fallback -> forbidden
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v17.8.
-2. `136_R3E2_ATTEMPT1_TRANSIENT_COLD_START_REMEDIATION_PASS_RECONNECT_REQUIRED_2026_09_19.md`.
-3. `135_R3E2_CREDENTIAL_ROTATION_PROBE_DISABLED_LIVE_CANARY_READY_2026_09_19.md`.
-4. `134_R3E2_CHATGPT_CONFIRMATION_UI_PASS_ZERO_SIDE_EFFECT_2026_09_19.md`.
+1. `CURRENT_HANDOFF.md` — v17.9.
+2. `137_R3E2_INSTAGRAM_LIVE_CANARY_DURABLE_FREE_ONLY_PASS_2026_09_19.md`.
+3. `136_R3E2_ATTEMPT1_TRANSIENT_COLD_START_REMEDIATION_PASS_RECONNECT_REQUIRED_2026_09_19.md`.
+4. `135_R3E2_CREDENTIAL_ROTATION_PROBE_DISABLED_LIVE_CANARY_READY_2026_09_19.md`.
+5. `134_R3E2_CHATGPT_CONFIRMATION_UI_PASS_ZERO_SIDE_EFFECT_2026_09_19.md`.
 5. `133_FREE_ONLY_INFRASTRUCTURE_POLICY_RENDER_WEB_ALLOWED_POSTGRES_REJECTED_2026_09_19.md`.
 6. `132_R3E2_ISOLATED_SENTINEL_AUTHENTICATED_PREFLIGHT_PASS_CONFIRMATION_PENDING_2026_09_19.md`.
 7. `131_R3E2_INSTAGRAM_READONLY_FREE_ONLY_PREFLIGHT_2026_09_19.md`.
@@ -144,7 +145,7 @@ Temporary acceptance startup probes are disabled in the final runtime.
 
 ### R3-E2 — Instagram
 
-Status: **CHATGPT CONFIRMATION UI PASS / ATTEMPT 1 TRANSIENT PRE-PROVIDER FAILURE / COLD-START REMEDIATION PASS / RECONNECT PENDING / RETRY READY**.
+Status: **LIVE CANARY PASS / DURABLE NEON PASS / FREE-ONLY PASS / RESTART + IDEMPOTENCY PENDING**.
 
 Accepted:
 
@@ -189,13 +190,30 @@ R3E2_Tests_1717=SUCCESS
 patched_runtimes=LIVE
 ```
 
-Required before retry:
+Live retry accepted:
 
 ```text
-1. fresh DCR/reconnect private R3-E2 MCP after redeploy
-2. verify authenticated isolated 5-tool surface
-3. retry exactly one bounded live canary with Allow once
-4. live start -> Neon persistence -> restart replay -> duplicate-start idempotency
+job_id=KRCM_04e6d847-449c-4d0f-82c7-b494871d9322
+status=COMPLETED
+provider=assemblyai
+provider_mode=cobalt_retrieval_stt
+retrieval_provider=cobalt
+segment_count=1
+credits_charged=0
+retrieval_credits_charged=0
+metadata_credits_charged=0
+credit_charge_uncertain=false
+provider_data_deleted=true
+```
+
+Remaining acceptance:
+
+```text
+1. VoiceBridge restart replay
+2. R3-E2 restart/reconnect replay
+3. status + segments read after restart
+4. duplicate-start idempotency with separate owner confirmation
+5. final error scan and R3-E2 closure
 ```
 
 ### R3-E3 — Facebook
@@ -232,7 +250,7 @@ R3-B: PASS
 R3-C: PASS
 R3-D: PASS
 R3-E1: PASS
-R3-E2: ATTEMPT 1 REMEDIATED / RECONNECT PENDING / RETRY READY
+R3-E2: LIVE CANARY PASS / RESTART + IDEMPOTENCY PENDING
 R3-E3: HOLD
 R3-E4: HOLD
 R3-F: HOLD
@@ -243,4 +261,4 @@ R4: HOLD
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 136. R3-E1 PASS; R3-E2 attempt 1 failed transiently pre-provider; no Neon/provider work; VoiceBridge cold-start/rate-limit remediation and R3-E2 health warmup PASS; both patched runtimes LIVE; fresh DCR/reconnect required before one bounded retry.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 137. R3-E1 PASS; R3-E2 live Instagram canary PASS via Cobalt -> AssemblyAI -> Neon; durable COMPLETED job with one segment and zero paid/retrieval credits; restart replay and duplicate-start idempotency remain pending.`
