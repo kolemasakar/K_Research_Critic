@@ -1,24 +1,25 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 16.0
-Status: **ACTIVE_HANDOFF / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_AUTHORIZED_BLOCKED_INFRASTRUCTURE / FREE_ONLY / PUBLICATION_HOLD**
-Date: 2026-09-17
+Version: 17.0
+Status: **ACTIVE_HANDOFF / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_AUTHORIZED_DURABLE_RUNTIME_ACCEPTANCE_PENDING / FREE_ONLY / PUBLICATION_HOLD**
+Date: 2026-09-19
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 126. R3-A/B/C/D PASS; R3-E1 YouTube authorized and prepared but blocked by expired Render Free PostgreSQL. Project is FREE-ONLY. Continue from Neon Free durable-state migration preflight; do not run real media_youtube_start until the database gate passes.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 127. R3-A/B/C/D PASS; Neon Free DATABASE_URL cutover COMPLETE on Render deploy dep-dan5uf0ae00c73dke480; health PASS; R3-E1 YouTube remains HOLD until authenticated app-level durable read/create/restart acceptance passes. Do not use R3C for this recovery unless separately requested.`
 
 ## Canonical recovery files
 
-1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v16.0; current authority.
-2. `subprojects/media_beta/126_CHAT_TRANSITION_R3E1_FREE_ONLY_NEON_MIGRATION_GATE_2026_09_17.md` — transition checkpoint.
-3. `subprojects/media_beta/125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md` — free-only policy and database audit.
-4. `subprojects/media_beta/124_R3D_CONSEQUENTIAL_ACTION_CONFIRMATION_PASS_2026_09_17.md` — R3-D closure.
-5. `subprojects/media_beta/121_R3C_NINE_TOOL_READONLY_VOICEBRIDGE_BINDING_PASS_2026_09_16.md` — R3-C closure.
-6. `subprojects/media_beta/117_R3B_AUTHENTICATED_REMOTE_MCP_HARDENING_PASS_2026_09_16.md` — R3-B closure.
-7. `subprojects/media_beta/113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md` — R3-A closure.
-8. `subprojects/media_beta/02_ROADMAP.md` — active roadmap.
-9. current PR #22 head/CI and current non-secret Render/Neon evidence.
+1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v17.0; current authority.
+2. `subprojects/media_beta/127_R3E1_NEON_CUTOVER_COMPLETE_DURABLE_ACCEPTANCE_PENDING_2026_09_19.md` — current cutover checkpoint.
+3. `subprojects/media_beta/126_CHAT_TRANSITION_R3E1_FREE_ONLY_NEON_MIGRATION_GATE_2026_09_17.md` — historical transition checkpoint.
+4. `subprojects/media_beta/125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md` — free-only policy and Render database incident.
+5. `subprojects/media_beta/124_R3D_CONSEQUENTIAL_ACTION_CONFIRMATION_PASS_2026_09_17.md` — R3-D closure.
+6. `subprojects/media_beta/121_R3C_NINE_TOOL_READONLY_VOICEBRIDGE_BINDING_PASS_2026_09_16.md` — R3-C closure.
+7. `subprojects/media_beta/117_R3B_AUTHENTICATED_REMOTE_MCP_HARDENING_PASS_2026_09_16.md` — R3-B closure.
+8. `subprojects/media_beta/113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md` — R3-A closure.
+9. `subprojects/media_beta/02_ROADMAP.md` — active roadmap.
+10. current PR #22 head/CI and current non-secret Render/Neon evidence.
 
 ## Repository / PR
 
@@ -37,7 +38,7 @@ R3_A=PASS
 R3_B=PASS
 R3_C=PASS
 R3_D=PASS
-R3_E1=AUTHORIZED / PREPARED / BLOCKED_INFRASTRUCTURE
+R3_E1=AUTHORIZED / PREPARED / DURABLE_RUNTIME_ACCEPTANCE_PENDING
 R3_E2=HOLD
 R3_E3=HOLD
 R3_E4=HOLD
@@ -75,6 +76,8 @@ provider_work_started=false
 start_execution_tools_called=false
 ```
 
+R3-C remains historical accepted evidence. It is not required for the current Neon recovery/cutover acceptance path and should remain untouched unless separately requested.
+
 ## R3-D accepted confirmation evidence
 
 ```text
@@ -106,7 +109,7 @@ surface=r3e1_youtube_execution
 implementation_commit=508cd2754787c3e8b9280a7b67c1605d143781d4
 tool_count=10
 non_execution_tool_count=9
-execution_tool_count=1
+execution_count=1
 youtube_execution_enabled=true
 other_execution_tools=not_enabled
 provider_work_started=false
@@ -114,13 +117,7 @@ provider_work_started=false
 
 The surface contains the nine R3-C tools plus exactly one execution operation, `media_youtube_start`. It requires exact Gemini Developer API Free Tier consent. Other `*_start` tools remain disabled.
 
-R3-E1 preparation initially produced one regression-test failure in read-only delegation (`320 passed / 1 failed`). The test binding was corrected without provider work in commit:
-
-```text
-3529cef70c54265ae49ee6ef21e1619c3ee34924
-```
-
-No real YouTube start acceptance call has been executed.
+No real YouTube start acceptance call has been executed in the current R3-E1 acceptance sequence.
 
 ## Render PostgreSQL incident
 
@@ -136,7 +133,7 @@ suspender=billing
 
 Paid upgrade is prohibited. Render Free PostgreSQL is rejected as a durable KRC MEDIA dependency. Any Render-only rows are at deletion risk and must not be assumed preserved elsewhere.
 
-## Neon Free primary durable-state candidate
+## Neon Free durable backend
 
 ```text
 project=krc-media-beta-neon
@@ -160,48 +157,64 @@ public.krc_media_client_jobs
 public.krc_media_stt_charges
 ```
 
-Observed row counts:
+Post-cutover observed state:
 
 ```text
 managed_jobs=0
 client_jobs=0
 stt_charges=10
+stt_seconds_total=285
 ```
 
-Neon has the expected VoiceBridge persistence schema and some charge/audit history, but it is not a full backup of the suspended Render database.
+Schema/constraint/index parity and durable/idempotency field parity are PASS. Neon is not a full backup of the suspended Render database.
 
-Candidate order:
+## 2026-09-19 VoiceBridge database cutover
+
+Owner-approved bounded mutation completed:
 
 ```text
-PRIMARY_CANDIDATE=NEON_FREE
-SECONDARY_CANDIDATE=SUPABASE_FREE
-INFRA_CONTROLLED_FALLBACK=OCI_ALWAYS_FREE_SELF_HOSTED_POSTGRES
-RENDER_FREE_POSTGRES=REJECTED_FOR_DURABLE_STATE
+VOICEBRIDGE_DATABASE_CUTOVER=COMPLETE
+target=Neon Free / krc_media_beta
+Render service=voicebridge-krc-media-beta-kolemasakar
+service_id=srv-da1kic5bedkc73d6fk60
+deploy=dep-dan5uf0ae00c73dke480
+commit=3e8cb29b3815e1bf98f143682644899b801826e0
+deploy_status=LIVE
+health=HTTP 200 / status=ok
+secret_exposed=false
+provider_work=false
 ```
+
+Only `KRC_MEDIA_DATABASE_URL` was changed. The Neon credential remained server-side and was not written to repository documentation or user-visible output.
 
 ## Current blocker and execution boundary
 
 ```text
-BLOCKER=FREE_DURABLE_POSTGRES_NOT_YET_ACCEPTED
-R3_E1=BLOCKED_INFRASTRUCTURE
+BLOCKER=APP_LEVEL_DURABLE_RUNTIME_ACCEPTANCE_NOT_COMPLETE
+NEON_SCHEMA_PARITY=PASS
+VOICEBRIDGE_DATABASE_CUTOVER=COMPLETE
+RENDER_DEPLOY_AFTER_CUTOVER=PASS
+VOICEBRIDGE_HEALTH_AFTER_CUTOVER=PASS
+POST_DEPLOY_ERROR_SCAN=PASS
+APP_LEVEL_DURABLE_LOOKUP_AFTER_CUTOVER=PENDING
+APP_LEVEL_DURABLE_CREATE_READ_RESTART_ACCEPTANCE=PENDING
+R3_E1=DURABLE_RUNTIME_ACCEPTANCE_PENDING
 REAL_YOUTUBE_START=HOLD
-VOICEBRIDGE_DATABASE_CUTOVER=NOT_STARTED
 PROVIDER_WORK=NO
 ```
 
-Do not execute live `media_youtube_start` until Neon Free durable-state acceptance passes.
+Do not execute live `media_youtube_start` until authenticated application-level durable-state acceptance passes.
 
 ## Next bounded work
 
 ```text
-1. audit Neon schema/constraints/indexes against VoiceBridge persistence contract and migrations
-2. audit required durable job, segment, replay/idempotency and charge/audit fields
-3. prepare server-side-only VoiceBridge DATABASE_URL cutover to Neon Free
-4. validate fail-closed connectivity and scale-to-zero behavior
-5. perform bounded cutover only after any required consequential secret/config approval
-6. validate durable create/read/status/segments and replay/idempotency across restart
-7. confirm zero paid fallback and audit/charge evidence
-8. only then resume R3-E1 YouTube live execution acceptance
+1. perform authenticated no-provider-work durable lookup/status probe against post-cutover VoiceBridge
+2. prove the runtime can read Neon durable state without MANAGED_DURABLE_STORE_UNAVAILABLE
+3. perform bounded durable create/read/status/segments acceptance only under the existing execution/consent boundary
+4. validate restart/cold-wake replay/idempotency
+5. confirm zero paid fallback and charge/audit evidence
+6. close the free durable-state database gate
+7. only then resume R3-E1 YouTube live execution acceptance
 ```
 
 ## Secret boundary
@@ -241,4 +254,4 @@ R4=HOLD
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V16_0_R3E1_FREE_ONLY_NEON_GATE_2026_09_17`
+`KRC_MEDIA_CURRENT_HANDOFF_V17_0_R3E1_NEON_CUTOVER_DURABLE_ACCEPTANCE_PENDING_2026_09_19`
