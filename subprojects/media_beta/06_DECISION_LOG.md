@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 4.1
-Status: ACTIVE / HISTORY_PRESERVED / CURRENT_R3E1_NEON_CUTOVER_GATE
+Version: 4.2
+Status: ACTIVE / HISTORY_PRESERVED / R3E1_PASS
 Updated: 2026-09-19
 
 The full historical decision log remains preserved in Git history and numbered checkpoints. Current active decisions are summarized here and detailed in the canonical handoff, roadmap, and checkpoints.
@@ -24,16 +24,16 @@ R3_C=PASS
 R3_D=PASS
 ```
 
-### D038 — R3-E1 YouTube authorization is route-bounded
+### D038 — Staged execution remains route-bounded
 
 ```text
-R3_E1=AUTHORIZED
-R3_E2=HOLD
-R3_E3=HOLD
-R3_E4=HOLD
+R3_E1_YOUTUBE=PASS
+R3_E2_INSTAGRAM=HOLD
+R3_E3_FACEBOOK=HOLD
+R3_E4_TELEGRAM=HOLD
 ```
 
-### D039 — Project infrastructure and provider cost policy is FREE-ONLY
+### D039 — Project infrastructure and provider policy is FREE-ONLY
 
 ```text
 PROJECT_COST_POLICY=FREE_ONLY
@@ -45,65 +45,79 @@ UNEXPECTED_BILLING_RISK=DENIED
 
 ### D040 — Render Free PostgreSQL rejected for durable KRC MEDIA state
 
-`voicebridge-krc-media-beta-db` expired and became billing-suspended on 2026-09-17. Paid upgrade remains prohibited.
+The expired billing-suspended Render database is not an accepted durable dependency. Paid upgrade remains prohibited.
 
-### D041 — Neon Free selected as primary replacement
+### D041 — Neon Free is the primary durable backend
 
 ```text
-PRIMARY_CANDIDATE=NEON_FREE
+PRIMARY_DURABLE_BACKEND=NEON_FREE
 project=krc-media-beta-neon
 project_id=plain-snow-71973546
 database=krc_media_beta
-SECONDARY_CANDIDATE=SUPABASE_FREE
-INFRA_CONTROLLED_FALLBACK=OCI_ALWAYS_FREE_SELF_HOSTED_POSTGRES
 ```
 
-### D042 — Neon migration preflight required before cutover
+### D042 — Neon schema and runtime preflight required before execution
 
-The preflight audited schema, constraints, indexes, durable/idempotency fields, scale-to-zero identity and free-plan status before any configuration mutation.
+Schema, constraints, indexes, idempotency fields, scale-to-zero identity and free-plan state were verified before live execution.
 
-### D043 — Owner-approved Neon DATABASE_URL cutover completed
-
-On 2026-09-19 the owner explicitly approved the bounded cutover.
+### D043 — Neon DATABASE_URL cutover completed
 
 ```text
-VOICEBRIDGE_DATABASE_CUTOVER=COMPLETE
-target=Neon Free / krc_media_beta
-Render service=voicebridge-krc-media-beta-kolemasakar
-deploy=dep-dan5uf0ae00c73dke480
-commit=3e8cb29b3815e1bf98f143682644899b801826e0
-deploy_status=LIVE
-health=HTTP 200 / status=ok
+VOICEBRIDGE_DATABASE_CUTOVER=PASS
 secret_exposed=false
 paid_upgrade=false
-provider_work=false
 ```
 
-Only `KRC_MEDIA_DATABASE_URL` was changed. The database credential remained server-side.
+### D044 — App-level durable lookup and restart connectivity required
 
-### D044 — Database gate remains open until app-level durable runtime acceptance
+A health endpoint alone was insufficient. R3-E1 had to exercise the VoiceBridge durable store before provider execution.
 
-Health and deploy success do not exercise the lazy PostgreSQL store. Therefore:
+### D045 — R3-E1 uses a dedicated YouTube-scoped server-side bearer
+
+A separate `KRC_MEDIA_R3E1_ACTION_TOKEN` is accepted only by the VoiceBridge YouTube Gemini handler. The general MEDIA action token and R3-C surface are not widened by R3-E1.
+
+### D046 — Owner-approved Gemini Free Tier execution completed
+
+After explicit owner acknowledgement of Gemini Developer API Free Tier data-use terms, one bounded YouTube execution completed:
 
 ```text
-NEON_SCHEMA_PARITY=PASS
-VOICEBRIDGE_DATABASE_CUTOVER=COMPLETE
-APP_LEVEL_DURABLE_LOOKUP_AFTER_CUTOVER=PENDING
-APP_LEVEL_DURABLE_CREATE_READ_RESTART_ACCEPTANCE=PENDING
-REAL_YOUTUBE_START=HOLD
+job_id=KRCM_3f4e62c1-2518-4815-839b-ece80935d794
+status=COMPLETED
+provider=gemini
+provider_mode=youtube_gemini_direct
+retrieval_credits_charged=0
+stt_seconds_charged=0
+credits_charged=0
 ```
 
-Required sequence: authenticated no-provider durable lookup/status, app-level Neon read proof, bounded durable create/read/status/segments acceptance, restart/cold-wake replay/idempotency, zero-paid-fallback and audit/charge validation, then database-gate closure.
+### D047 — R3-E1 durable replay and idempotency accepted
 
-R3-C is not required for this recovery path and remains untouched unless separately requested.
+The completed job and segments were read after VoiceBridge + R3-E1 restarts without provider replay. A duplicate start returned the same job with `reused=true` and `provider_work_started=false`.
+
+Therefore:
+
+```text
+R3_E1=PASS / COMPLETE
+NEON_DURABLE_REPLAY=PASS
+DUPLICATE_START_IDEMPOTENCY=PASS
+PAID_FALLBACK=NO
+```
+
+### D048 — STT charge table is a bounded quota ledger
+
+The current persistence contract deletes `krc_media_stt_charges` rows older than two days. It must not be described as a long-term immutable audit trail. Long-term acceptance evidence is maintained in checkpoints/Git history.
+
+### D049 — Acceptance-only startup probes disabled after test
+
+All temporary execution/replay startup environment switches were disabled after evidence capture. Final R3-E1 runtime is healthy with no automatic acceptance execution.
 
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` version 17.0
+- `CURRENT_HANDOFF.md` version 17.2
+- `129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md`
+- `128_R3E1_RESTART_CONNECTIVITY_PASS_RECORD_REPLAY_PENDING_2026_09_19.md`
 - `127_R3E1_NEON_CUTOVER_COMPLETE_DURABLE_ACCEPTANCE_PENDING_2026_09_19.md`
-- `126_CHAT_TRANSITION_R3E1_FREE_ONLY_NEON_MIGRATION_GATE_2026_09_17.md` — historical
-- `125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md`
-- `02_ROADMAP.md` version 5.7
+- `02_ROADMAP.md` version 5.8
 
 ## Hard boundary
 
@@ -115,5 +129,6 @@ MAIN_MUTATION=NO
 PR22_MERGE=NO
 PR45_MERGE=NO
 PAID_UPGRADE=NO
+R3_E2_E3_E4=HOLD
 R4=HOLD
 ```
