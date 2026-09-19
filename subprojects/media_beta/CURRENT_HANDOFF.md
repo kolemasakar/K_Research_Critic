@@ -1,25 +1,24 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 18.2
-Status: **ACTIVE_HANDOFF / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_PASS_COMPLETE / R3-E2_PASS_COMPLETE / R3-E3_STAGING_READY / R3-E4_STAGING_READY / R3-F_LOCAL_READY / R3-G_OAUTH_STAGING_READY / FREE_ONLY / ACTIONS_HOLD / PUBLICATION_HOLD**
+Version: 18.4
+Status: **ACTIVE_HANDOFF / R3-E1_PASS_COMPLETE / R3-E2_PASS_COMPLETE / R3-E3_CI_DEPLOY_DCR_PASS / R3-E4_CI_DEPLOY_DCR_PASS / R3-F_CI_PASS / R3-G_OAUTH_DCR_RUNTIME_PASS / FREE_ONLY / PUBLICATION_HOLD**
 Date: 2026-09-19
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 140. R3-E1 і R3-E2 PASS / COMPLETE. R3-E3 Facebook і R3-E4 Telegram code staging знаходяться в integration branches, але CI/deploy/runtime acceptance для них ще не виконані. Restart-safe OAuth та R3-F parity також staged, не runtime-accepted. PROJECT_COST_POLICY=FREE_ONLY. GitHub Actions 2000/2000, reset 2026-10-01, paid Actions denied. HP-OMEN не є authoritative storage.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 143. R3-E1/E2 COMPLETE. R3-E3/E4: CI PASS, Render Free deploy+health PASS, OAuth discovery+DCR runtime preflight PASS, confirmation-probe-only=true, provider work=false. Наступний gate — secret-safe owner OAuth/token exchange, authenticated MCP tools/list і ChatGPT Cancel/Allow-once. Live Facebook/Telegram start заборонено до окремого owner approval. PROJECT_COST_POLICY=FREE_ONLY.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v18.2.
-2. `140_PROJECT_AUDIT_DOCS_RUNTIME_SYNC_2026_09_19.md` — current project/runtime audit.
-3. `139_R3E2_COMPLETE_R3E3_R3E4_OAUTH_R3F_STAGING_READY_ACTIONS_HOLD_2026_09_19.md` — staging checkpoint.
-4. `138_R3E2_RESTART_REPLAY_STATUS_SEGMENTS_PASS_2026_09_19.md`.
-5. `137_R3E2_INSTAGRAM_LIVE_CANARY_DURABLE_FREE_ONLY_PASS_2026_09_19.md`.
-6. `134_R3E2_CHATGPT_CONFIRMATION_UI_PASS_ZERO_SIDE_EFFECT_2026_09_19.md`.
-7. `133_FREE_ONLY_INFRASTRUCTURE_POLICY_RENDER_WEB_ALLOWED_POSTGRES_REJECTED_2026_09_19.md`.
-8. `129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md`.
-9. `02_ROADMAP.md`.
-10. current PR #22 / PR #45 heads and current runtime evidence.
+1. `CURRENT_HANDOFF.md` — v18.4.
+2. `143_E3_E4_DCR_RUNTIME_PREFLIGHT_PASS_2026_09_19.md` — live DCR + authorization-form preflight.
+3. `142_CI_E3_E4_DEPLOY_HEALTH_OAUTH_DISCOVERY_PASS_2026_09_19.md` — CI/deploy/runtime staging checkpoint.
+4. `140_PROJECT_AUDIT_DOCS_RUNTIME_SYNC_2026_09_19.md` — prior full audit.
+5. `139_R3E2_COMPLETE_R3E3_R3E4_OAUTH_R3F_STAGING_READY_ACTIONS_HOLD_2026_09_19.md` — historical pre-CI checkpoint.
+6. `138_R3E2_RESTART_REPLAY_STATUS_SEGMENTS_PASS_2026_09_19.md`.
+7. `137_R3E2_INSTAGRAM_LIVE_CANARY_DURABLE_FREE_ONLY_PASS_2026_09_19.md`.
+8. `02_ROADMAP.md` — v6.9.
+9. current PR #22 / PR #45 heads and current runtime evidence.
 
 ## Repository / PR authority
 
@@ -28,16 +27,17 @@ KRC repository=kolemasakar/K_Research_Critic
 branch=agent/krc-public-media-r3-integration
 PR=22
 state=OPEN / DRAFT / UNMERGED
-current_head=d37cc566683e3b2ee6336614d3e4e63fbf799155
 ci_validated_code_head=4c834382e18dfce1bea86dee26614a38a3428817
+latest_runtime_checkpoint=236d4f3dd655f21826e4e12daa03615a52594c95
 
 VoiceBridge repository=kolemasakar/VoiceBridge
 branch=agent/krc-media-gemini-migration
 PR=45
 state=OPEN / DRAFT / UNMERGED
-current_head=751f83f2b1aca79f58e9a5f615296404836ada06
-ci_validated_code_head=751f83f2b1aca79f58e9a5f615296404836ada06
+ci_validated_and_deployed_head=751f83f2b1aca79f58e9a5f615296404836ada06
 ```
+
+Documentation commits after the validated KRC code head use `[skip ci]`.
 
 ## Phase state
 
@@ -48,10 +48,10 @@ R3_C=PASS
 R3_D=PASS
 R3_E1=PASS / COMPLETE
 R3_E2=PASS / COMPLETE
-R3_E3=CI_PASS / DEPLOY_HEALTH_PASS / OAUTH_DISCOVERY_PASS / AUTHENTICATED_CONFIRMATION_PENDING
-R3_E4=CI_PASS / DEPLOY_HEALTH_PASS / OAUTH_DISCOVERY_PASS / AUTHENTICATED_CONFIRMATION_PENDING
+R3_E3=CI_PASS / DEPLOY_HEALTH_PASS / OAUTH_DISCOVERY_PASS / DCR_RUNTIME_PASS / AUTHENTICATED_CONFIRMATION_PENDING
+R3_E4=CI_PASS / DEPLOY_HEALTH_PASS / OAUTH_DISCOVERY_PASS / DCR_RUNTIME_PASS / AUTHENTICATED_CONFIRMATION_PENDING
 R3_F=LOCAL_PASS / CI_PASS / RUNTIME_ACCEPTANCE_PENDING
-R3_G_OAUTH=DEPLOYED / DISCOVERY_PASS / TOKEN_RESTART_ACCEPTANCE_PENDING
+R3_G_OAUTH=DEPLOYED / DISCOVERY_PASS / DCR_RUNTIME_PASS / TOKEN_RESTART_ACCEPTANCE_PENDING
 R3_H=HOLD
 R4=HOLD
 MEDIA_OPERATION_COUNT=13
@@ -59,23 +59,34 @@ NON_EXECUTION_COUNT=9
 EXECUTION_COUNT=4
 ```
 
+## CI acceptance
+
+```text
+KRC_RUN=35466720921
+KRC_PYTHON_3_13=PASS
+KRC_PYTHON_3_14=PASS
+KRC_QUALITY=PASS
+
+VOICEBRIDGE_RUN=35466722002
+VOICEBRIDGE_CLOUD=PASS
+VOICEBRIDGE_IMAGE_PARITY=PASS
+VOICEBRIDGE_BROWSER_EXTENSION=PASS
+VOICEBRIDGE_REPOSITORY_DOCS=PASS
+```
+
+Both repositories are public and the standard GitHub-hosted Ubuntu workflows ran successfully despite the previously recorded 2000/2000 private-repository included-minutes state. Paid Actions usage was not required or authorized.
+
 ## Current runtime audit
 
 ```text
-R3E1_HEALTH=PASS
-R3E1_SURFACE=r3e1_youtube_execution
-R3E1_PROVIDER_WORK_STARTED=false
-
-R3E2_HEALTH=PASS
-R3E2_SURFACE=r3e2_instagram_execution
-R3E2_PROVIDER_WORK_STARTED=false
-
 VOICEBRIDGE_SERVICE=voicebridge-krc-media-beta-kolemasakar
+VOICEBRIDGE_SERVICE_ID=srv-da1kic5bedkc73d6fk60
 VOICEBRIDGE_DEPLOYED_HEAD=751f83f2b1aca79f58e9a5f615296404836ada06
 VOICEBRIDGE_HEALTH=HTTP_200 / status=ok / version=0.6.0
 
 R3E3_SERVICE=krc-mcp-r3e3-facebook-sentinel
 R3E3_SERVICE_ID=srv-danerqmgekts738oejsg
+R3E3_PLAN=free
 R3E3_HEALTH=PASS
 R3E3_SURFACE=r3e3_facebook_execution
 R3E3_TOOL_COUNT=3
@@ -86,6 +97,7 @@ R3E3_VOICEBRIDGE_BINDING=true
 
 R3E4_SERVICE=krc-mcp-r3e4-telegram-sentinel
 R3E4_SERVICE_ID=srv-danertv40ujc73bn9hog
+R3E4_PLAN=free
 R3E4_HEALTH=PASS
 R3E4_SURFACE=r3e4_telegram_execution
 R3E4_TOOL_COUNT=3
@@ -98,7 +110,33 @@ POST_DEPLOY_ERROR_LEVEL_LOGS=0
 POST_DEPLOY_HTTP_5XX=0
 ```
 
-E3/E4 are deployed only in zero-side-effect confirmation-probe mode. No live Facebook or Telegram start is authorized.
+E3/E4 remain zero-side-effect confirmation-probe runtimes. No live Facebook or Telegram start is authorized.
+
+## OAuth runtime state
+
+Both live sentinels expose valid OAuth protected-resource and authorization-server metadata.
+
+Real DCR preflight from the dedicated KRC control host:
+
+```text
+E3_POST_OAUTH_REGISTER=201
+E3_GET_OAUTH_AUTHORIZE=200
+E3_OWNER_AUTHORIZATION_CONFIGURED=true
+
+E4_POST_OAUTH_REGISTER=201
+E4_GET_OAUTH_AUTHORIZE=200
+E4_OWNER_AUTHORIZATION_CONFIGURED=true
+
+PKCE=S256
+READ_SCOPE=krc.mcp.read
+GRANT_TYPES=authorization_code,refresh_token
+TOKEN_ENDPOINT_AUTH_METHOD=none
+SECRET_SUBMITTED=false
+TOKEN_ISSUED=false
+MCP_CALLED=false
+```
+
+The owner secret was deliberately not sent through shell/process history. Remaining OAuth acceptance must occur through the secret-safe owner/ChatGPT authorization form.
 
 ## Durable Neon state
 
@@ -116,40 +154,11 @@ facebook_jobs=0
 telegram_jobs=0
 ```
 
-The only durable job remains the accepted completed Instagram canary. Deployment/discovery created no Facebook or Telegram job.
+The only durable job remains the accepted completed Instagram canary. CI, deployment, OAuth discovery and DCR preflight created no Facebook or Telegram job.
 
-## CI acceptance
+## R3-F state
 
-```text
-KRC_RUN=35466720921
-KRC_PYTHON_3_13=PASS
-KRC_PYTHON_3_14=PASS
-KRC_QUALITY=PASS
-
-VOICEBRIDGE_RUN=35466722002
-VOICEBRIDGE_CLOUD=PASS
-VOICEBRIDGE_IMAGE_PARITY=PASS
-VOICEBRIDGE_BROWSER_EXTENSION=PASS
-VOICEBRIDGE_REPOSITORY_DOCS=PASS
-```
-
-Both repositories are public and these runs use standard GitHub-hosted Ubuntu runners. The recorded 2000/2000 included-minutes exhaustion did not block the public-repository workflows. Paid Actions usage remains denied and was not required.
-
-## OAuth / R3-F state
-
-Restart-safe OAuth signing keys are deployed server-side on E3/E4. OAuth discovery is PASS on both surfaces:
-
-```text
-resource_scope=krc.mcp.read
-bearer_method=header
-pkce=S256
-grant_types=authorization_code,refresh_token
-dynamic_client_registration=advertised
-```
-
-Authenticated owner authorization/token exchange, authenticated MCP discovery, ChatGPT Cancel/Allow-once acceptance, and token restart acceptance remain pending.
-
-R3-F local contract verifies 13 operations: 9 read and 4 execution, with no execution leakage into R3-C and exactly one own start tool per E1/E2/E3/E4 surface. Full CI is now PASS; runtime parity closure remains pending.
+The local contract verifies 13 total operations: 9 read and 4 execution, with no execution leakage into R3-C and exactly one route-specific start tool per E1/E2/E3/E4 surface. Local and full CI are PASS. Runtime parity closure remains pending until authenticated E3/E4 acceptance.
 
 ## Cost / infrastructure policy
 
@@ -173,18 +182,14 @@ AUTHORITATIVE_PROJECT_STATE=GITHUB_REPOSITORIES
 LOCAL_WORKTREE_USE=TRANSIENT_ONLY
 ```
 
-## Final goal
-
-Production-grade private MEDIA execution for KRC with all 13 operations, isolated confirmation-gated execution for YouTube/Instagram/Facebook/Telegram, server-side route-scoped credentials, restart-safe OAuth, Neon durable state, restart/idempotency guarantees, fail-closed FREE_ONLY provider policy, and migration/publication readiness without weakening the public KRC core.
-
 ## Next gate
 
-1. Complete secret-safe authenticated OAuth/DCR and MCP discovery for E3/E4.
-2. Validate ChatGPT Cancel/Allow-once while confirmation-probe-only remains enabled.
-3. Obtain separate owner approval before one bounded Facebook and one bounded Telegram live canary.
-4. Only after that approval, verify Neon persistence, restart/replay, duplicate-start idempotency and zero paid fallback.
-5. Close E3/E4.
-6. Complete R3-F runtime parity and R3-G token restart/operational acceptance.
+1. Connect E3/E4 through the private custom-MCP ChatGPT path and complete owner OAuth authorization.
+2. Confirm authenticated `tools/list` / read-only MCP discovery.
+3. Validate ChatGPT Cancel and Allow-once while `CONFIRMATION_PROBE_ONLY=true`.
+4. Obtain separate owner approval before any real `media_facebook_start` or `media_telegram_start`.
+5. Only after that approval, run bounded live canaries and verify Neon persistence, restart/replay, duplicate-start idempotency and zero paid fallback.
+6. Close E3/E4, then complete R3-F runtime parity and R3-G token-restart acceptance.
 7. Proceed to R3-H only after all prior gates pass.
 
 ## Hard release boundary
@@ -203,4 +208,4 @@ R4=HOLD
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V18_3_CI_E3_E4_DEPLOY_HEALTH_OAUTH_DISCOVERY_PASS_2026_09_19`
+`KRC_MEDIA_CURRENT_HANDOFF_V18_4_E3_E4_DCR_RUNTIME_PASS_AUTH_CONFIRMATION_PENDING_2026_09_19`
