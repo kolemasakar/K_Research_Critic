@@ -1,30 +1,31 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 17.4
+Version: 17.5
 Status: **ACTIVE_HANDOFF / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_PASS / R3-E2_ISOLATED_SENTINEL_PREFLIGHT_PASS_CONFIRMATION_PENDING / FREE_ONLY / PUBLICATION_HOLD**
 Date: 2026-09-19
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 132. R3-E1 PASS. R3-E2 isolated Instagram sentinel + scoped bearer + authenticated preflight/lookup PASS; ChatGPT confirmation UI and credential rotation remain pending; live media_instagram_start HOLD. Do not use R3C unless separately requested.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoints 132-133. R3-E1 PASS. R3-E2 isolated Instagram sentinel + scoped bearer + authenticated preflight/lookup PASS; ChatGPT confirmation UI and credential rotation remain pending; live media_instagram_start HOLD. Infrastructure policy: Render Free Web Services allowed, Render PostgreSQL rejected for durable state, Neon Free primary DB. Do not use R3C unless separately requested.`
 
 ## Canonical recovery files
 
-1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v17.4; current authority.
-2. `subprojects/media_beta/132_R3E2_ISOLATED_SENTINEL_AUTHENTICATED_PREFLIGHT_PASS_CONFIRMATION_PENDING_2026_09_19.md` — current R3-E2 implementation/runtime checkpoint.
-3. `subprojects/media_beta/131_R3E2_INSTAGRAM_READONLY_FREE_ONLY_PREFLIGHT_2026_09_19.md` — R3-E2 read-only preflight.
-4. `subprojects/media_beta/130_POST_R3E1_CONTROL_POINT_BEFORE_R3E2_2026_09_19.md` — pre-R3-E2 control point.
-5. `subprojects/media_beta/129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md` — R3-E1 closure.
-6. `subprojects/media_beta/128_R3E1_RESTART_CONNECTIVITY_PASS_RECORD_REPLAY_PENDING_2026_09_19.md` — restart-connectivity checkpoint.
-7. `subprojects/media_beta/127_R3E1_NEON_CUTOVER_COMPLETE_DURABLE_ACCEPTANCE_PENDING_2026_09_19.md` — Neon cutover checkpoint.
-8. `subprojects/media_beta/126_CHAT_TRANSITION_R3E1_FREE_ONLY_NEON_MIGRATION_GATE_2026_09_17.md` — historical transition.
-9. `subprojects/media_beta/125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md` — free-only policy / Render DB incident.
-10. `subprojects/media_beta/124_R3D_CONSEQUENTIAL_ACTION_CONFIRMATION_PASS_2026_09_17.md`.
-11. `subprojects/media_beta/121_R3C_NINE_TOOL_READONLY_VOICEBRIDGE_BINDING_PASS_2026_09_16.md`.
-12. `subprojects/media_beta/117_R3B_AUTHENTICATED_REMOTE_MCP_HARDENING_PASS_2026_09_16.md`.
-13. `subprojects/media_beta/113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md`.
-14. `subprojects/media_beta/02_ROADMAP.md`.
-15. current PR #22 / PR #45 head and CI plus current Render/Neon non-secret evidence.
+1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v17.5; current authority.
+2. `subprojects/media_beta/133_FREE_ONLY_INFRASTRUCTURE_POLICY_RENDER_WEB_ALLOWED_POSTGRES_REJECTED_2026_09_19.md` — current infrastructure policy clarification.
+3. `subprojects/media_beta/132_R3E2_ISOLATED_SENTINEL_AUTHENTICATED_PREFLIGHT_PASS_CONFIRMATION_PENDING_2026_09_19.md` — current R3-E2 implementation/runtime checkpoint.
+4. `subprojects/media_beta/131_R3E2_INSTAGRAM_READONLY_FREE_ONLY_PREFLIGHT_2026_09_19.md` — R3-E2 read-only preflight.
+5. `subprojects/media_beta/130_POST_R3E1_CONTROL_POINT_BEFORE_R3E2_2026_09_19.md` — pre-R3-E2 control point.
+6. `subprojects/media_beta/129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md` — R3-E1 closure.
+7. `subprojects/media_beta/128_R3E1_RESTART_CONNECTIVITY_PASS_RECORD_REPLAY_PENDING_2026_09_19.md` — restart-connectivity checkpoint.
+8. `subprojects/media_beta/127_R3E1_NEON_CUTOVER_COMPLETE_DURABLE_ACCEPTANCE_PENDING_2026_09_19.md` — Neon cutover checkpoint.
+9. `subprojects/media_beta/126_CHAT_TRANSITION_R3E1_FREE_ONLY_NEON_MIGRATION_GATE_2026_09_17.md` — historical transition.
+10. `subprojects/media_beta/125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md` — free-only policy / Render DB incident.
+11. `subprojects/media_beta/124_R3D_CONSEQUENTIAL_ACTION_CONFIRMATION_PASS_2026_09_17.md`.
+12. `subprojects/media_beta/121_R3C_NINE_TOOL_READONLY_VOICEBRIDGE_BINDING_PASS_2026_09_16.md`.
+13. `subprojects/media_beta/117_R3B_AUTHENTICATED_REMOTE_MCP_HARDENING_PASS_2026_09_16.md`.
+14. `subprojects/media_beta/113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md`.
+15. `subprojects/media_beta/02_ROADMAP.md`.
+16. current PR #22 / PR #45 head and CI plus current Render/Neon non-secret evidence.
 
 ## Repository / PR
 
@@ -63,15 +64,23 @@ R3-E1 authorization and acceptance apply only to YouTube. They do not authorize 
 
 ```text
 PROJECT_COST_POLICY=FREE_ONLY
-PAID_DATABASE_UPGRADE=DENIED
+RENDER_FREE_WEB_SERVICES=ACCEPTED
+RENDER_ONRENDER_COM_ENDPOINTS=ACCEPTED
+RENDER_POSTGRES=REJECTED_FOR_DURABLE_STATE
+RENDER_PAID_UPGRADE=DENIED
+NEON_FREE_POSTGRES=PRIMARY_DURABLE_DATABASE
+OCI_ALWAYS_FREE=ACCEPTED
+SELF_HOSTED_COBALT_ON_OCI=ACCEPTED
 PAID_HOSTING_FALLBACK=DENIED
 PAID_PROVIDER_FALLBACK=DENIED
 UNEXPECTED_BILLING_RISK=DENIED
 ```
 
+Render is **not** rejected as a platform. Render Free Web Services remain accepted for VoiceBridge and isolated MCP sentinels while they remain on free plans. `.onrender.com` endpoints are therefore expected in the accepted architecture.
+
 ## Durable backend
 
-Render Free PostgreSQL remains rejected after expiry/suspension.
+Only Render PostgreSQL is rejected for durable state after expiry/suspension.
 
 Primary durable backend:
 
@@ -256,4 +265,4 @@ R4=HOLD
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V17_4_R3E2_ISOLATED_SENTINEL_PREFLIGHT_PASS_CONFIRMATION_PENDING_2026_09_19`
+`KRC_MEDIA_CURRENT_HANDOFF_V17_5_RENDER_FREE_WEB_ALLOWED_R3E2_CONFIRMATION_PENDING_2026_09_19`
