@@ -1,4 +1,5 @@
 # KRC MEDIA access changelog — 2026-09-13
+Журнал змін доступу KRC MEDIA станом на 2026-09-13.
 
 - Added OCI instance-principal access for live infrastructure observation.
 - Persistent OCI permission is read-only.

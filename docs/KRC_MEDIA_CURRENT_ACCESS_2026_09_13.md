@@ -1,4 +1,5 @@
 # KRC MEDIA — Current Access Paths
+Поточні підтверджені шляхи доступу до KRC MEDIA.
 
 Date: 2026-09-13
 Status: CURRENT / VERIFIED

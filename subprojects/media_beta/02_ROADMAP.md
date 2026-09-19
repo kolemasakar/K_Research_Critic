@@ -1,267 +1,133 @@
 # MEDIA BETA Roadmap
 
-Поточний roadmap K-Research & Critic MEDIA BETA після YouTube acceptance, Render Cobalt edge-blocker isolation, and successful local Instagram retrieval on the owner-approved OCI free-only replacement.
+Version: 6.8
+Status: **PLUGIN_FIRST / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_STAGING_READY / R3-E4_STAGING_READY / R3-F_LOCAL_READY / R3-G_OAUTH_STAGING_READY / FREE_ONLY / ACTIONS_HOLD / PUBLICATION_HOLD**
+Updated: 2026-09-19
 
-Version: 4.9
-Status: R2_PARTIAL_PASS / YOUTUBE_ACCEPTED / OCI_COBALT_LOCAL_PASS / INSTAGRAM_LOCAL_RETRIEVAL_PASS / PUBLIC_HTTPS_PENDING / R3_HOLD
-Updated: 2026-09-08
+## End state
 
-## Product position
+Build a production-grade private MEDIA surface for K-Research & Critic while preserving the published public KRC core.
 
-`K-Research & Critic - MEDIA BETA` is a private owner-only validation surface for an additive MEDIA capability planned for the already-published `K-Research & Critic` GPT.
+The finished system must provide:
 
-```text
-product/release authority: kolemasakar/K_Research_Critic
-public KRC: existing published GPT / unchanged
-private MEDIA BETA GPT: owner-only
-backend implementation: kolemasakar/VoiceBridge
-VoiceBridge branch: agent/krc-media-gemini-migration
-```
+- the canonical 13 MEDIA operations;
+- strict separation of 9 read operations and 4 consequential start operations;
+- isolated execution surfaces for YouTube, Instagram, Facebook and Telegram;
+- ChatGPT confirmation before each consequential start;
+- server-side route-scoped credentials;
+- restart-safe OAuth/DCR;
+- Neon durable state;
+- restart replay and duplicate-start idempotency;
+- fail-closed behavior and no automatic paid fallback;
+- PROJECT_COST_POLICY=FREE_ONLY;
+- migration/publication readiness only after full parity and operational acceptance.
 
-Critical invariant:
-
-```text
-MEDIA unavailable/fails -> MEDIA unavailable/fails closed
-Core KRC               -> remains usable and accessible
-```
-
-## Canonical recovery authority
-
-`88_R2_OCI_COBALT_LOCAL_INSTAGRAM_RETRIEVAL_PASS_PUBLIC_HTTPS_PENDING_CHECKPOINT_2026_09_08.md`
-
-Recovery command:
-
-`recover KRC MEDIA BETA checkpoint 88 OCI Cobalt local Instagram retrieval pass public HTTPS pending 2026-09-08`
-
-## Current provider routing
-
-Logical free-only routing remains:
+## Current roadmap position
 
 ```text
-YouTube   -> Gemini Developer API Free Tier direct public URL -> durable KRCM/Neon
-Instagram -> self-hosted Cobalt -> AssemblyAI universal-2 Free -> durable KRCM/Neon
-Facebook  -> self-hosted Cobalt -> AssemblyAI universal-2 Free -> durable KRCM/Neon
-Telegram  -> public Telegram web -> AssemblyAI universal-2 Free -> durable KRCM/Neon
+R3-A Contract freeze/security baseline        PASS
+R3-B Authentication/secret hardening          PASS
+R3-C 9-tool read-only binding                 PASS
+R3-D Consequential-action confirmation        PASS
+R3-E1 YouTube execution                       PASS / COMPLETE
+R3-E2 Instagram execution                     PASS / COMPLETE
+R3-E3 Facebook execution                      STAGING_READY / CI+DEPLOY+ACCEPTANCE_PENDING
+R3-E4 Telegram execution                      STAGING_READY / CI+DEPLOY+ACCEPTANCE_PENDING
+R3-F Full 13-operation parity                 LOCAL_READY / CI_PENDING
+R3-G Private operational hardening            OAUTH_STAGING_READY / DEPLOY_ACCEPTANCE_PENDING
+R3-H Migration/publication readiness          HOLD
+R4 Owner-approved cutover/publication         HOLD
 ```
 
-Policy:
+**Current position:** R3-E1/E2 are closed; development has reached E3/E4 staging and prebuilt R3-F/R3-G work, but runtime acceptance is waiting on CI/deployment gates.
+
+## Canonical contract
 
 ```text
-Supadata public: inactive
-ScrapeCreators public paid retrieval: forbidden
-paid retrieval fallback: false
-paid STT fallback: false
-paid proxy fallback: false
-paid hosting remediation: excluded
-YouTube Cobalt fallback: none
-YouTube AssemblyAI fallback: none
-user cookies/login: forbidden
+TOTAL_OPERATIONS=13
+READ_OPERATIONS=9
+EXECUTION_OPERATIONS=4
 ```
 
-## R0 - Public KRC Update Safety Preflight
+Execution operations:
 
-Status: PASS.
+- `media_youtube_start`
+- `media_instagram_start`
+- `media_facebook_start`
+- `media_telegram_start`
 
-The existing public KRC identity remains the protected product target. No MEDIA Action is attached to public KRC and checkpoint 88 does not authorize changing it.
+## Current runtime
 
-## R1 - Repository integration
+Accepted and healthy:
 
-Status: COMPLETE.
+- R3-E1 YouTube sentinel;
+- R3-E2 Instagram sentinel;
+- VoiceBridge v0.6.0 health endpoint;
+- OCI Cobalt v11.7.1;
+- Neon Free durable backend.
 
-KRC repository contains the public MEDIA candidate Action, private canary package, privacy candidate, regression tests, and recovery documentation.
+Not yet accepted as runtime:
 
-## R2 - Permanent MEDIA backend promotion/readiness
+- R3-E3 Facebook staging head;
+- R3-E4 Telegram staging head;
+- restart-safe OAuth staging;
+- full R3-F parity staging.
 
-Status: PARTIAL PASS / OCI PUBLIC-HTTPS REMEDIATION IN PROGRESS.
-
-Completed:
+## Current operational hold
 
 ```text
-R2-A public free-tier admission: PASS
-R2-B failure isolation/free quota: PASS
-R2-C privacy/promotion preparation: COMPLETE
-exact VoiceBridge Gemini-direct deployment: PASS
-Render VoiceBridge health/startup: PASS
-private MEDIA BETA Builder activation: PASS
-Action bearer auth: PASS
-capability read: PASS
-YouTube Gemini consent canary: PASS
-YouTube durable completion: PASS
-YouTube transcript retrieval: PASS
-YouTube duplicate reuse/idempotency: PASS
-YouTube no-paid/no-fallback boundary: PASS
-Instagram fail-closed behavior on blocked Render Cobalt: PASS as safety behavior
-OCI Always Free-eligible VM creation: PASS
-OCI Docker/pinned Cobalt deployment: PASS
-OCI local port isolation 127.0.0.1:9000: PASS
-OCI API-key fail-closed gate: PASS
-OCI authenticated Instagram retrieval-only local preflight: PASS
+GITHUB_ACTIONS_MINUTES=2000/2000
+ACTIONS_RESET=2026-10-01
+PAID_ACTIONS_USAGE=DENIED
 ```
 
-Exact accepted VoiceBridge backend remains:
+Current E3/E4/OAuth/R3-F staging commits intentionally have zero workflow runs.
+
+## Nearest tasks
+
+### Before Actions reset
+
+- keep the staged heads stable;
+- avoid paid CI;
+- no live Facebook/Telegram execution;
+- prepare deployment/acceptance checklists and server-side configuration plan;
+- keep all authoritative state in GitHub;
+- clean non-authoritative HP-OMEN residue when elevated Windows rights are available.
+
+### After reset or explicit override
+
+1. run VoiceBridge CI;
+2. run KRC CI;
+3. deploy restart-safe OAuth signing key and E3/E4 scoped bearers;
+4. deploy E3/E4 isolated Render Free sentinels;
+5. run authenticated read-only preflight/lookup;
+6. validate zero-side-effect ChatGPT confirmation flows;
+7. obtain separate owner approval for bounded live canaries;
+8. prove Neon persistence, restart/replay and duplicate-start idempotency;
+9. close E3/E4;
+10. run R3-F full parity acceptance;
+11. finish R3-G operational hardening;
+12. enter R3-H migration/publication readiness.
+
+## Infrastructure policy
 
 ```text
-Render service: voicebridge-krc-media-beta-kolemasakar
-branch: agent/krc-media-gemini-migration
-autoDeploy: no
-live commit: 68a39d9109455c3e9e69ffeb3a7456998f0620db
-live deploy: dep-dafhul0n74is73a3nncg
-latest known Validate on exact head: 34159780308 / SUCCESS
-PR #45: OPEN / DRAFT / UNMERGED / mergeable=true
+PROJECT_COST_POLICY=FREE_ONLY
+RENDER_FREE_WEB_SERVICES=ACCEPTED
+RENDER_POSTGRES=REJECTED_FOR_DURABLE_STATE
+NEON_FREE_POSTGRES=PRIMARY_DURABLE_DATABASE
+OCI_ALWAYS_FREE=ACCEPTED
+PAID_HOSTING_FALLBACK=DENIED
+PAID_PROVIDER_FALLBACK=DENIED
+PAID_ACTIONS_USAGE=DENIED
 ```
 
-Old blocked Render Cobalt remains present and externally configured until a separate cutover:
+## Storage policy
 
 ```text
-Render service: krc-cobalt-media-beta-kolemasakar
-plan: free
-region: frankfurt
-image: ghcr.io/imputnet/cobalt@sha256:63186dd68afd57ce3bb1f62cc4c139f5fa95b9c3e87a3cf5c6e4c7a570523f62
-historical blocker: edge HTTP 429 / non-JSON
+AUTHORITATIVE_PROJECT_STATE=GITHUB_REPOSITORIES
+HP_OMEN_LOCAL_DISK_AS_PROJECT_STORAGE=DENIED
+LOCAL_WORKTREES=TRANSIENT_ONLY
 ```
 
-### OCI Cobalt local acceptance
-
-Current VM/runtime:
-
-```text
-instance: krc-cobalt-media-beta
-shape: VM.Standard.E2.1.Micro / Always Free-eligible
-region: eu-frankfurt-1
-public IP: 89.168.65.88
-private IP: 10.0.0.26
-Docker: 29.1.3
-Compose: 2.40.3
-Cobalt: 11.7.1 / commit a636575b09de1fc55d9b8cd98cac88f5f2f16b42
-container port: 127.0.0.1:9000 only
-API auth required: yes
-```
-
-Security state:
-
-```text
-SSH local ingress narrowed to 91.199.188.209/32
-iptables persistence: enabled
-swap: 2 GiB
-missing API key -> blocked / error.api.auth.key.missing
-valid API key -> accepted by auth layer
-```
-
-Instagram local retrieval-only evidence:
-
-```text
-source: https://www.instagram.com/reel/DEAyVa4SF3E/
-POST: HTTP 200
-status: tunnel
-fresh tunnel download: rc=0
-bytes: 214560
-paid retrieval: none
-```
-
-Therefore:
-
-`OCI_COBALT_INSTAGRAM_LOCAL_RETRIEVAL = PASS`.
-
-### Public endpoint still pending
-
-DNS preparation passed:
-
-```text
-89-168-65-88.sslip.io -> 89.168.65.88
-```
-
-Still required before VoiceBridge cutover:
-
-```text
-dedicated OCI NSG attached to krc-cobalt-vnic
-80/443 ingress without modifying the shared default Security List
-matching local firewall rules while preserving SSH restriction/OCI instance-service rules
-HTTPS reverse proxy + public TLS
-Cobalt API_URL set to public HTTPS base URL
-external authenticated Instagram POST + tunnel preflight
-```
-
-Cobalt port 9000 must remain loopback-only.
-
-A local OCI API key exists for preflight. Before live cutover, align OCI Cobalt server-side to the existing VoiceBridge `KRC_MEDIA_COBALT_API_KEY` without exposing the secret, preserving the intended live configuration change as `KRC_MEDIA_COBALT_ENDPOINT` only.
-
-### YouTube regression boundary
-
-The OCI Cobalt diagnostic control returned:
-
-```text
-HTTP 400
-error.api.youtube.login
-```
-
-This does not revoke accepted YouTube R2 evidence because current YouTube processing is Gemini direct. Before changing the Cobalt endpoint, prove the accepted Gemini-direct path is unaffected and no Cobalt fallback can be introduced.
-
-Still required before full R2 PASS:
-
-```text
-OCI public HTTPS endpoint/preflight
-server-side API-key alignment
-Gemini-direct YouTube regression protection
-VoiceBridge endpoint cutover only after endpoint preflight PASS
-Instagram functional live canary PASS
-Facebook bounded canary PASS
-Telegram bounded canary PASS
-Render + Neon delta/no-paid-fallback verification
-Core KRC isolation regression including forced MEDIA failure
-```
-
-## R3 - Update existing published KRC GPT
-
-Status: HOLD / NOT READY.
-
-R3 cannot start until full R2 PASS is recorded.
-
-No current authorization exists to modify or update the public GPT.
-
-## R4 - Post-update public verification
-
-Status: HOLD until R3.
-
-Required after any future R3 update:
-
-- same public KRC identity/URL remains accessible;
-- Core tasks work without MEDIA;
-- MEDIA works only as intended;
-- MEDIA failure does not degrade Core;
-- sharing state remains intact;
-- rollback remains available.
-
-## Current gate model
-
-```text
-R0  PASS
-R1  COMPLETE
-R2  PARTIAL PASS / YouTube accepted / OCI Instagram local retrieval PASS / public HTTPS pending
-R3  HOLD / NOT READY
-R4  HOLD
-```
-
-Every gate remains independent. Successful OCI local retrieval does not authorize endpoint cutover, R3, or public GPT changes.
-
-## Exact continuation point
-
-```text
-OCI PUBLIC HTTPS COMPLETION
-- dedicated NSG for krc-cobalt-vnic; do not change shared default Security List
-- required 80/443 OCI + local firewall path
-- HTTPS reverse proxy/TLS for 89-168-65-88.sslip.io
-- Cobalt API_URL -> public HTTPS base URL
-- keep 9000 loopback-only
-- align OCI API key to existing VoiceBridge secret server-side
-- external authenticated Instagram POST/tunnel preflight
-- verify Gemini-direct YouTube regression protection
-- update KRC_MEDIA_COBALT_ENDPOINT only after public preflight PASS
-- repeat Instagram live canary
-- Facebook
-- Telegram
-- Render/Neon no-paid-fallback checks
-- Core isolation regression
-
-NO PUBLIC GPT CHANGE
-NO PR #45 MERGE
-```
+Recovery authority: `CURRENT_HANDOFF.md` + checkpoint 140.
