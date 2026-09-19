@@ -1,29 +1,30 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 17.3
-Status: **ACTIVE_HANDOFF / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_PASS / R3-E2_READONLY_PREFLIGHT_PASS_WITH_GAPS / FREE_ONLY / PUBLICATION_HOLD**
+Version: 17.4
+Status: **ACTIVE_HANDOFF / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_PASS / R3-E2_ISOLATED_SENTINEL_PREFLIGHT_PASS_CONFIRMATION_PENDING / FREE_ONLY / PUBLICATION_HOLD**
 Date: 2026-09-19
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoints 130-131. R3-E1 YouTube PASS. R3-E2 Instagram read-only/free-only preflight PASS_WITH_EXPLICIT_GAPS; execution remains HOLD. Do not use R3C unless separately requested.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 132. R3-E1 PASS. R3-E2 isolated Instagram sentinel + scoped bearer + authenticated preflight/lookup PASS; ChatGPT confirmation UI and credential rotation remain pending; live media_instagram_start HOLD. Do not use R3C unless separately requested.`
 
 ## Canonical recovery files
 
-1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v17.3; current authority.
-2. `subprojects/media_beta/131_R3E2_INSTAGRAM_READONLY_FREE_ONLY_PREFLIGHT_2026_09_19.md` — current R3-E2 preflight.
-3. `subprojects/media_beta/130_POST_R3E1_CONTROL_POINT_BEFORE_R3E2_2026_09_19.md` — pre-R3-E2 control point.
-4. `subprojects/media_beta/129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md` — R3-E1 closure.
-5. `subprojects/media_beta/128_R3E1_RESTART_CONNECTIVITY_PASS_RECORD_REPLAY_PENDING_2026_09_19.md` — restart-connectivity checkpoint.
-6. `subprojects/media_beta/127_R3E1_NEON_CUTOVER_COMPLETE_DURABLE_ACCEPTANCE_PENDING_2026_09_19.md` — Neon cutover checkpoint.
-7. `subprojects/media_beta/126_CHAT_TRANSITION_R3E1_FREE_ONLY_NEON_MIGRATION_GATE_2026_09_17.md` — historical transition.
-8. `subprojects/media_beta/125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md` — free-only policy / Render DB incident.
-9. `subprojects/media_beta/124_R3D_CONSEQUENTIAL_ACTION_CONFIRMATION_PASS_2026_09_17.md`.
-10. `subprojects/media_beta/121_R3C_NINE_TOOL_READONLY_VOICEBRIDGE_BINDING_PASS_2026_09_16.md`.
-11. `subprojects/media_beta/117_R3B_AUTHENTICATED_REMOTE_MCP_HARDENING_PASS_2026_09_16.md`.
-12. `subprojects/media_beta/113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md`.
-13. `subprojects/media_beta/02_ROADMAP.md`.
-14. current PR #22 / PR #45 head and CI plus current Render/Neon non-secret evidence.
+1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v17.4; current authority.
+2. `subprojects/media_beta/132_R3E2_ISOLATED_SENTINEL_AUTHENTICATED_PREFLIGHT_PASS_CONFIRMATION_PENDING_2026_09_19.md` — current R3-E2 implementation/runtime checkpoint.
+3. `subprojects/media_beta/131_R3E2_INSTAGRAM_READONLY_FREE_ONLY_PREFLIGHT_2026_09_19.md` — R3-E2 read-only preflight.
+4. `subprojects/media_beta/130_POST_R3E1_CONTROL_POINT_BEFORE_R3E2_2026_09_19.md` — pre-R3-E2 control point.
+5. `subprojects/media_beta/129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md` — R3-E1 closure.
+6. `subprojects/media_beta/128_R3E1_RESTART_CONNECTIVITY_PASS_RECORD_REPLAY_PENDING_2026_09_19.md` — restart-connectivity checkpoint.
+7. `subprojects/media_beta/127_R3E1_NEON_CUTOVER_COMPLETE_DURABLE_ACCEPTANCE_PENDING_2026_09_19.md` — Neon cutover checkpoint.
+8. `subprojects/media_beta/126_CHAT_TRANSITION_R3E1_FREE_ONLY_NEON_MIGRATION_GATE_2026_09_17.md` — historical transition.
+9. `subprojects/media_beta/125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md` — free-only policy / Render DB incident.
+10. `subprojects/media_beta/124_R3D_CONSEQUENTIAL_ACTION_CONFIRMATION_PASS_2026_09_17.md`.
+11. `subprojects/media_beta/121_R3C_NINE_TOOL_READONLY_VOICEBRIDGE_BINDING_PASS_2026_09_16.md`.
+12. `subprojects/media_beta/117_R3B_AUTHENTICATED_REMOTE_MCP_HARDENING_PASS_2026_09_16.md`.
+13. `subprojects/media_beta/113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md`.
+14. `subprojects/media_beta/02_ROADMAP.md`.
+15. current PR #22 / PR #45 head and CI plus current Render/Neon non-secret evidence.
 
 ## Repository / PR
 
@@ -47,7 +48,7 @@ R3_B=PASS
 R3_C=PASS
 R3_D=PASS
 R3_E1=PASS / COMPLETE
-R3_E2=READONLY_PREFLIGHT_PASS_WITH_EXPLICIT_GAPS / EXECUTION_HOLD
+R3_E2=ISOLATED_SENTINEL_PASS / AUTHENTICATED_PREFLIGHT_PASS / CONFIRMATION_UI_PENDING / EXECUTION_HOLD
 R3_E3=HOLD
 R3_E4=HOLD
 R3_F_AND_LATER=HOLD
@@ -187,20 +188,36 @@ There is no remaining R3-E1 database or YouTube acceptance blocker.
 
 ```text
 R3_E1=PASS
-R3_E2_INSTAGRAM=READONLY_PREFLIGHT_PASS_WITH_EXPLICIT_GAPS / EXECUTION_HOLD
+R3_E2_INSTAGRAM=ISOLATED_SENTINEL_PASS / AUTHENTICATED_PREFLIGHT_PASS / CONFIRMATION_UI_PENDING / EXECUTION_HOLD
 R3_E3_FACEBOOK=HOLD
 R3_E4_TELEGRAM=HOLD
 ```
 
-R3-E2 read-only/free-only preflight is complete. Confirmed route: Instagram -> OCI self-hosted Cobalt -> AssemblyAI universal-2 -> Neon, with automatic paid fallback disabled. Current Cobalt runtime identity matches the accepted R2 baseline and no Instagram job/provider work was created during preflight.
+R3-E2 implementation/runtime preflight is complete:
 
-Remaining implementation gaps before any live Instagram execution:
-- dedicated R3-E2 route-scoped bearer;
-- isolated R3-E2 MCP surface exposing only `media_instagram_start` as an execution tool;
-- authenticated app-level Instagram preflight/lookup without using R3-C;
-- Instagram-specific consequential-action confirmation acceptance.
+```text
+VoiceBridge scoped bearer code/runtime=PASS
+isolated R3-E2 service=PASS
+service=krc-mcp-r3e2-instagram-sentinel-v2
+service_id=srv-dan7vsijnfac73fmrtl0
+deploy=dep-dan800dii2qc73bm47k0
+tool_count=5
+execution_tool_count=1
+execution_tool=media_instagram_start
+authenticated Instagram preflight=PASS
+durable lookup=PASS_EMPTY
+provider work=false
+start_called=false
+confirmation contract=PASS
+```
 
-Live `media_instagram_start` remains HOLD.
+Remaining live gates:
+- rotate temporary R3-E2 scoped credential;
+- connect the private R3-E2 MCP surface to the owner ChatGPT account;
+- verify ChatGPT confirmation UI, beginning with CANCEL;
+- only then request explicit authorization for one bounded live Instagram start.
+
+The first Render provisioning attempt `srv-dan7s6egekts7381bbj0` is not accepted and must not be used.
 
 ## Secret boundary
 
@@ -239,4 +256,4 @@ R4=HOLD
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V17_3_R3E2_READONLY_PREFLIGHT_PASS_WITH_GAPS_2026_09_19`
+`KRC_MEDIA_CURRENT_HANDOFF_V17_4_R3E2_ISOLATED_SENTINEL_PREFLIGHT_PASS_CONFIRMATION_PENDING_2026_09_19`
