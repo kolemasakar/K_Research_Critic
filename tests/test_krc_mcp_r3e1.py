@@ -19,7 +19,10 @@ from plugins.krc_migration_candidate.mcp_canary.r3e1 import (
     r3e1_health,
     tool_descriptors,
 )
-from plugins.krc_migration_candidate.mcp_canary.r3e1_http_server import handle_r3e1_http_request
+from plugins.krc_migration_candidate.mcp_canary.r3e1_http_server import (
+    handle_r3e1_http_request,
+    run_r3e1_durable_lookup_probe,
+)
 
 MODERN_META = {
     "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -305,3 +308,95 @@ def test_http_r3e1_requires_oauth_and_binding_then_lists_ten_tools() -> None:
     assert listed.status == 200
     names = [tool["name"] for tool in json.loads(listed.body)["result"]["tools"]]
     assert names == list(R3E1_TOOL_NAMES)
+
+
+def test_r3e1_durable_lookup_probe_accepts_expected_empty_store_404(monkeypatch) -> None:
+    source_url = "https://www.youtube.com/watch?v=durable-probe-fixture"
+    secret = "test-only-voicebridge-secret-value"
+    config = HttpConfig(
+        auth_mode="oauth",
+        public_base_url="https://mcp.invalid",
+        surface=R3E1_SURFACE,
+        voicebridge_base_url="https://voicebridge.invalid",
+        voicebridge_bearer=secret,
+    )
+    observed: dict[str, object] = {}
+
+    def fake_dispatch(message, binding):
+        observed["message"] = message
+        observed["binding_configured"] = binding.configured
+        return {
+            "jsonrpc": "2.0",
+            "id": "startup-durable-lookup",
+            "result": {
+                "isError": True,
+                "structuredContent": {
+                    "status": "error",
+                    "error": {
+                        "code": "voicebridge_http_error",
+                        "http_status": 404,
+                        "retryable": False,
+                    },
+                },
+            },
+        }
+
+    monkeypatch.setattr(
+        "plugins.krc_migration_candidate.mcp_canary.r3e1_http_server.dispatch_r3e1",
+        fake_dispatch,
+    )
+    result = run_r3e1_durable_lookup_probe(config, source_url)
+
+    assert result == {
+        "event": "r3e1_durable_lookup_probe",
+        "status": "pass",
+        "tool": "media_youtube_lookup",
+        "provider_work_started": False,
+        "backend_code": "voicebridge_http_error",
+        "http_status": 404,
+        "backend_result": "durable_store_reachable_empty_lookup",
+    }
+    message = observed["message"]
+    assert message["params"]["name"] == "media_youtube_lookup"
+    assert "gemini_free_consent" not in json.dumps(message)
+    assert observed["binding_configured"] is True
+    rendered = json.dumps(result)
+    assert source_url not in rendered
+    assert secret not in rendered
+
+
+def test_r3e1_durable_lookup_probe_fails_closed_on_store_unavailable(monkeypatch) -> None:
+    config = HttpConfig(
+        surface=R3E1_SURFACE,
+        voicebridge_base_url="https://voicebridge.invalid",
+        voicebridge_bearer="test-only-voicebridge-secret-value",
+    )
+
+    def fake_dispatch(_message, _binding):
+        return {
+            "jsonrpc": "2.0",
+            "id": "startup-durable-lookup",
+            "result": {
+                "isError": True,
+                "structuredContent": {
+                    "status": "error",
+                    "error": {
+                        "code": "voicebridge_http_error",
+                        "http_status": 503,
+                        "retryable": True,
+                    },
+                },
+            },
+        }
+
+    monkeypatch.setattr(
+        "plugins.krc_migration_candidate.mcp_canary.r3e1_http_server.dispatch_r3e1",
+        fake_dispatch,
+    )
+    result = run_r3e1_durable_lookup_probe(
+        config,
+        "https://www.youtube.com/watch?v=durable-probe-fixture",
+    )
+    assert result["status"] == "fail"
+    assert result["http_status"] == 503
+    assert result["provider_work_started"] is False
