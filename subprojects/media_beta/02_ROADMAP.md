@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 5.9
-Status: **PLUGIN_FIRST / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_PASS / R3-E2_READONLY_PREFLIGHT_PASS_WITH_GAPS / FREE_ONLY / PUBLICATION_HOLD**
+Version: 6.0
+Status: **PLUGIN_FIRST / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_PASS / R3-E2_ISOLATED_SENTINEL_PREFLIGHT_PASS_CONFIRMATION_PENDING / FREE_ONLY / PUBLICATION_HOLD**
 Updated: 2026-09-19
 
 ## Product position
@@ -25,16 +25,17 @@ paid provider fallback -> forbidden
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v17.3.
-2. `131_R3E2_INSTAGRAM_READONLY_FREE_ONLY_PREFLIGHT_2026_09_19.md`.
-3. `130_POST_R3E1_CONTROL_POINT_BEFORE_R3E2_2026_09_19.md`.
-4. `129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md`.
-5. `128_R3E1_RESTART_CONNECTIVITY_PASS_RECORD_REPLAY_PENDING_2026_09_19.md`.
-6. `127_R3E1_NEON_CUTOVER_COMPLETE_DURABLE_ACCEPTANCE_PENDING_2026_09_19.md`.
-7. `125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md`.
-8. `124_R3D_CONSEQUENTIAL_ACTION_CONFIRMATION_PASS_2026_09_17.md`.
-9. `121_R3C_NINE_TOOL_READONLY_VOICEBRIDGE_BINDING_PASS_2026_09_16.md`.
-10. current PR #22 / PR #45 head and CI.
+1. `CURRENT_HANDOFF.md` — v17.4.
+2. `132_R3E2_ISOLATED_SENTINEL_AUTHENTICATED_PREFLIGHT_PASS_CONFIRMATION_PENDING_2026_09_19.md`.
+3. `131_R3E2_INSTAGRAM_READONLY_FREE_ONLY_PREFLIGHT_2026_09_19.md`.
+4. `130_POST_R3E1_CONTROL_POINT_BEFORE_R3E2_2026_09_19.md`.
+5. `129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md`.
+6. `128_R3E1_RESTART_CONNECTIVITY_PASS_RECORD_REPLAY_PENDING_2026_09_19.md`.
+7. `127_R3E1_NEON_CUTOVER_COMPLETE_DURABLE_ACCEPTANCE_PENDING_2026_09_19.md`.
+8. `125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md`.
+9. `124_R3D_CONSEQUENTIAL_ACTION_CONFIRMATION_PASS_2026_09_17.md`.
+10. `121_R3C_NINE_TOOL_READONLY_VOICEBRIDGE_BINDING_PASS_2026_09_16.md`.
+11. current PR #22 / PR #45 head and CI.
 
 ## Proven baseline
 
@@ -128,30 +129,33 @@ Temporary acceptance startup probes are disabled in the final runtime.
 
 ### R3-E2 — Instagram
 
-Status: **READ-ONLY / FREE-ONLY PREFLIGHT PASS WITH EXPLICIT GAPS / EXECUTION HOLD**.
+Status: **ISOLATED SENTINEL PASS / AUTHENTICATED PREFLIGHT PASS / CONFIRMATION UI PENDING / EXECUTION HOLD**.
 
-Confirmed:
+Accepted:
 
 ```text
 route=Instagram -> OCI self-hosted Cobalt -> AssemblyAI universal-2 -> Neon
+route-scoped bearer=PASS
+isolated MCP surface=PASS
+tool_count=5
+execution_tool=media_instagram_start only
+authenticated preflight=PASS
+durable lookup=PASS_EMPTY
 retrieval_credits=0
 automatic_paid_fallback=false
-ScrapeCreators public fallback=FORBIDDEN
-Supadata public fallback=NOT ACTIVE
-Neon durable compatibility=PASS
-current Cobalt runtime identity=PASS
-historical R2 Instagram live canary=PASS
-provider work during R3-E2 preflight=NO
+provider_work=false
+start_called=false
+server-side confirmation contract=PASS
 ```
 
-Required before execution:
+Required before live execution:
 
 ```text
-1. dedicated R3-E2 route-scoped bearer
-2. isolated R3-E2 MCP surface with exactly media_instagram_start as its execution tool
-3. authenticated app-level Instagram preflight + lookup without provider work
-4. Instagram-specific confirmation acceptance
-5. owner authorization for one bounded live canary
+1. rotate the temporary R3-E2 scoped credential
+2. connect private R3-E2 MCP to owner ChatGPT account
+3. verify ChatGPT confirmation UI with CANCEL first
+4. obtain explicit owner authorization for one bounded live canary
+5. live start -> Neon persistence -> restart replay -> duplicate-start idempotency
 ```
 
 ### R3-E3 — Facebook
@@ -188,7 +192,7 @@ R3-B: PASS
 R3-C: PASS
 R3-D: PASS
 R3-E1: PASS
-R3-E2: READONLY PREFLIGHT PASS WITH GAPS / EXECUTION HOLD
+R3-E2: ISOLATED SENTINEL PREFLIGHT PASS / CONFIRMATION UI PENDING / EXECUTION HOLD
 R3-E3: HOLD
 R3-E4: HOLD
 R3-F: HOLD
@@ -199,4 +203,4 @@ R4: HOLD
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoints 130-131. R3-E1 PASS; R3-E2 read-only/free-only preflight PASS_WITH_EXPLICIT_GAPS; execution HOLD.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 132. R3-E1 PASS; R3-E2 isolated sentinel + authenticated preflight PASS; confirmation UI and credential rotation pending; execution HOLD.`
