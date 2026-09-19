@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 4.3
-Status: ACTIVE / HISTORY_PRESERVED / R3E1_PASS / R3E2_PREFLIGHT_PASS_WITH_GAPS
+Version: 4.4
+Status: ACTIVE / HISTORY_PRESERVED / R3E1_PASS / R3E2_SENTINEL_PREFLIGHT_PASS_CONFIRMATION_PENDING
 Updated: 2026-09-19
 
 The full historical decision log remains preserved in Git history and numbered checkpoints. Current active decisions are summarized here and detailed in the canonical handoff, roadmap, and checkpoints.
@@ -28,7 +28,7 @@ R3_D=PASS
 
 ```text
 R3_E1_YOUTUBE=PASS
-R3_E2_INSTAGRAM=READONLY_PREFLIGHT_PASS_WITH_EXPLICIT_GAPS / EXECUTION_HOLD
+R3_E2_INSTAGRAM=ISOLATED_SENTINEL_PASS / AUTHENTICATED_PREFLIGHT_PASS / CONFIRMATION_UI_PENDING / EXECUTION_HOLD
 R3_E3_FACEBOOK=HOLD
 R3_E4_TELEGRAM=HOLD
 ```
@@ -126,15 +126,43 @@ The relevant Instagram retrieval, URL normalization, persistence, and AssemblyAI
 
 Execution remains blocked until a dedicated R3-E2 route-scoped bearer, isolated Instagram execution surface, authenticated app-level preflight/lookup, and Instagram-specific confirmation acceptance are implemented.
 
+### D051 — R3-E2 isolated Instagram surface and route-scoped bearer accepted
+
+VoiceBridge accepts a dedicated R3-E2 credential only on the public Cobalt Instagram scope. The isolated R3-E2 MCP service exposes four Instagram-relevant read tools plus exactly one execution tool, `media_instagram_start`.
+
+```text
+VoiceBridge head=e640900bfddd367680badcc8e7cf349e471e2d8a
+Validate #820=SUCCESS
+KRC R3-E2 implementation head=7a09b857033a791a7dd6d10d7c41ed182f227e09
+Tests #1678=SUCCESS
+active service=krc-mcp-r3e2-instagram-sentinel-v2
+active service id=srv-dan7vsijnfac73fmrtl0
+active deploy=dep-dan800dii2qc73bm47k0
+```
+
+Authenticated Instagram preflight + durable lookup passed with zero provider work, zero new Instagram jobs, zero automatic paid fallback, and no start call.
+
+### D052 — R3-E2 live execution remains gated
+
+```text
+R3E2_CONFIRMATION_CONTRACT=PASS
+R3E2_CHATGPT_CONFIRMATION_UI=PENDING
+R3E2_SCOPED_CREDENTIAL_ROTATION_BEFORE_LIVE=REQUIRED
+media_instagram_start=HOLD
+```
+
+The first Render provisioning artifact `srv-dan7s6egekts7381bbj0` is not accepted and must not be used.
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` version 17.3
+- `CURRENT_HANDOFF.md` version 17.4
+- `132_R3E2_ISOLATED_SENTINEL_AUTHENTICATED_PREFLIGHT_PASS_CONFIRMATION_PENDING_2026_09_19.md`
 - `131_R3E2_INSTAGRAM_READONLY_FREE_ONLY_PREFLIGHT_2026_09_19.md`
 - `130_POST_R3E1_CONTROL_POINT_BEFORE_R3E2_2026_09_19.md`
 - `129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md`
 - `128_R3E1_RESTART_CONNECTIVITY_PASS_RECORD_REPLAY_PENDING_2026_09_19.md`
 - `127_R3E1_NEON_CUTOVER_COMPLETE_DURABLE_ACCEPTANCE_PENDING_2026_09_19.md`
-- `02_ROADMAP.md` version 5.9
+- `02_ROADMAP.md` version 6.0
 
 ## Hard boundary
 
