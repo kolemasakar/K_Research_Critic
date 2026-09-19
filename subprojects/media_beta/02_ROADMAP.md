@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 6.3
-Status: **PLUGIN_FIRST / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_PASS / R3-E2_LIVE_CANARY_READY_RECONNECT_PENDING / FREE_ONLY / PUBLICATION_HOLD**
+Version: 6.4
+Status: **PLUGIN_FIRST / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_PASS / R3-E2_ATTEMPT1_REMEDIATED_RECONNECT_PENDING / FREE_ONLY / PUBLICATION_HOLD**
 Updated: 2026-09-19
 
 ## Product position
@@ -28,20 +28,21 @@ paid provider fallback -> forbidden
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v17.7.
-2. `135_R3E2_CREDENTIAL_ROTATION_PROBE_DISABLED_LIVE_CANARY_READY_2026_09_19.md`.
-2. `134_R3E2_CHATGPT_CONFIRMATION_UI_PASS_ZERO_SIDE_EFFECT_2026_09_19.md`.
-3. `133_FREE_ONLY_INFRASTRUCTURE_POLICY_RENDER_WEB_ALLOWED_POSTGRES_REJECTED_2026_09_19.md`.
-4. `132_R3E2_ISOLATED_SENTINEL_AUTHENTICATED_PREFLIGHT_PASS_CONFIRMATION_PENDING_2026_09_19.md`.
-5. `131_R3E2_INSTAGRAM_READONLY_FREE_ONLY_PREFLIGHT_2026_09_19.md`.
-6. `130_POST_R3E1_CONTROL_POINT_BEFORE_R3E2_2026_09_19.md`.
-7. `129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md`.
-8. `128_R3E1_RESTART_CONNECTIVITY_PASS_RECORD_REPLAY_PENDING_2026_09_19.md`.
-9. `127_R3E1_NEON_CUTOVER_COMPLETE_DURABLE_ACCEPTANCE_PENDING_2026_09_19.md`.
-10. `125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md`.
-11. `124_R3D_CONSEQUENTIAL_ACTION_CONFIRMATION_PASS_2026_09_17.md`.
-12. `121_R3C_NINE_TOOL_READONLY_VOICEBRIDGE_BINDING_PASS_2026_09_16.md`.
-13. current PR #22 / PR #45 head and CI.
+1. `CURRENT_HANDOFF.md` — v17.8.
+2. `136_R3E2_ATTEMPT1_TRANSIENT_COLD_START_REMEDIATION_PASS_RECONNECT_REQUIRED_2026_09_19.md`.
+3. `135_R3E2_CREDENTIAL_ROTATION_PROBE_DISABLED_LIVE_CANARY_READY_2026_09_19.md`.
+4. `134_R3E2_CHATGPT_CONFIRMATION_UI_PASS_ZERO_SIDE_EFFECT_2026_09_19.md`.
+5. `133_FREE_ONLY_INFRASTRUCTURE_POLICY_RENDER_WEB_ALLOWED_POSTGRES_REJECTED_2026_09_19.md`.
+6. `132_R3E2_ISOLATED_SENTINEL_AUTHENTICATED_PREFLIGHT_PASS_CONFIRMATION_PENDING_2026_09_19.md`.
+7. `131_R3E2_INSTAGRAM_READONLY_FREE_ONLY_PREFLIGHT_2026_09_19.md`.
+8. `130_POST_R3E1_CONTROL_POINT_BEFORE_R3E2_2026_09_19.md`.
+9. `129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md`.
+10. `128_R3E1_RESTART_CONNECTIVITY_PASS_RECORD_REPLAY_PENDING_2026_09_19.md`.
+11. `127_R3E1_NEON_CUTOVER_COMPLETE_DURABLE_ACCEPTANCE_PENDING_2026_09_19.md`.
+12. `125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md`.
+13. `124_R3D_CONSEQUENTIAL_ACTION_CONFIRMATION_PASS_2026_09_17.md`.
+14. `121_R3C_NINE_TOOL_READONLY_VOICEBRIDGE_BINDING_PASS_2026_09_16.md`.
+15. current PR #22 / PR #45 head and CI.
 
 ## Proven baseline
 
@@ -143,7 +144,7 @@ Temporary acceptance startup probes are disabled in the final runtime.
 
 ### R3-E2 — Instagram
 
-Status: **ISOLATED SENTINEL PASS / AUTHENTICATED PREFLIGHT PASS / CHATGPT CONFIRMATION UI PASS / LIVE CANARY PENDING / EXECUTION HOLD**.
+Status: **CHATGPT CONFIRMATION UI PASS / ATTEMPT 1 TRANSIENT PRE-PROVIDER FAILURE / COLD-START REMEDIATION PASS / RECONNECT PENDING / RETRY READY**.
 
 Accepted:
 
@@ -170,15 +171,31 @@ provider work=false
 real media start=false
 ```
 
-Required before live execution:
+Attempt 1 / remediation:
 
 ```text
-1. rotate the temporary R3-E2 scoped VoiceBridge credential
-2. disable KRC_R3E2_CONFIRMATION_PROBE_ONLY
-3. reconnect/fresh-DCR after restart/redeploy if required by in-memory OAuth state
-4. re-verify runtime health and isolated 5-tool surface
-5. obtain explicit owner authorization for exactly one bounded live canary
-6. live start -> Neon persistence -> restart replay -> duplicate-start idempotency
+attempt_1=HTTP 429 retryable
+failure_stage=PRE_PROVIDER
+Neon_job=false
+Cobalt_work=false
+AssemblyAI_work=false
+VoiceBridge_health_during_incident=503
+
+VoiceBridge_health_outside_global_limiter=PASS
+R3E2_health_warmup_before_start=PASS
+AUTO_RETRY_CONSEQUENTIAL_POST=false
+VoiceBridge_Validate_822=SUCCESS
+R3E2_Tests_1717=SUCCESS
+patched_runtimes=LIVE
+```
+
+Required before retry:
+
+```text
+1. fresh DCR/reconnect private R3-E2 MCP after redeploy
+2. verify authenticated isolated 5-tool surface
+3. retry exactly one bounded live canary with Allow once
+4. live start -> Neon persistence -> restart replay -> duplicate-start idempotency
 ```
 
 ### R3-E3 — Facebook
@@ -215,7 +232,7 @@ R3-B: PASS
 R3-C: PASS
 R3-D: PASS
 R3-E1: PASS
-R3-E2: CONFIRMATION UI PASS / LIVE CANARY PENDING / EXECUTION HOLD
+R3-E2: ATTEMPT 1 REMEDIATED / RECONNECT PENDING / RETRY READY
 R3-E3: HOLD
 R3-E4: HOLD
 R3-F: HOLD
@@ -226,4 +243,4 @@ R4: HOLD
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 134. R3-E1 PASS; R3-E2 isolated sentinel + authenticated preflight + ChatGPT CANCEL/APPROVE confirmation UI PASS in zero-side-effect mode; live execution HOLD pending scoped-credential rotation, probe disable, reconnect if required and explicit owner authorization. Render Free Web accepted; Render PostgreSQL rejected; Neon Free primary durable DB.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 136. R3-E1 PASS; R3-E2 attempt 1 failed transiently pre-provider; no Neon/provider work; VoiceBridge cold-start/rate-limit remediation and R3-E2 health warmup PASS; both patched runtimes LIVE; fresh DCR/reconnect required before one bounded retry.`
