@@ -23,6 +23,7 @@ from plugins.krc_migration_candidate.mcp_canary.r3e2 import (
 )
 from plugins.krc_migration_candidate.mcp_canary.r3e2_http_server import (
     run_r3e2_preflight_lookup_probe,
+    run_r3e2_record_replay_probe,
 )
 
 INSTAGRAM_URL = "https://www.instagram.com/reel/DF1CIrPSVmf/"
@@ -373,3 +374,71 @@ def test_r3e2_voicebridge_warmup_retries_retryable_status_then_passes(monkeypatc
 
     assert calls == 2
     assert sleeps == [r3e2_http._VOICEBRIDGE_WARMUP_RETRY_DELAY_SECONDS]
+
+
+def test_r3e2_record_replay_probe_reads_status_and_segments_only(monkeypatch) -> None:
+    calls: list[str] = []
+    job_id = "KRCM_04e6d847-449c-4d0f-82c7-b494871d9322"
+
+    def fake_dispatch(message, _binding):
+        name = message["params"]["name"]
+        calls.append(name)
+        if name == "media_non_youtube_status":
+            return {
+                "jsonrpc": "2.0",
+                "id": "r3e2-replay-status",
+                "result": {
+                    "isError": False,
+                    "structuredContent": {
+                        "job_id": job_id,
+                        "status": "COMPLETED",
+                        "segment_count": 1,
+                    },
+                },
+            }
+        if name == "media_non_youtube_segments":
+            return {
+                "jsonrpc": "2.0",
+                "id": "r3e2-replay-segments",
+                "result": {
+                    "isError": False,
+                    "structuredContent": {
+                        "job_id": job_id,
+                        "segments": [{"index": 0, "text": "fixture"}],
+                        "next_cursor": None,
+                    },
+                },
+            }
+        raise AssertionError(name)
+
+    monkeypatch.setattr(
+        "plugins.krc_migration_candidate.mcp_canary.r3e2_http_server.dispatch_r3e2",
+        fake_dispatch,
+    )
+    result = run_r3e2_record_replay_probe(
+        HttpConfig(
+            auth_mode="oauth",
+            public_base_url="https://mcp.invalid",
+            surface=R3E2_SURFACE,
+            voicebridge_base_url="https://voicebridge.invalid",
+            voicebridge_bearer="test-only-r3e2-server-token",
+        ),
+        job_id,
+    )
+
+    assert result == {
+        "event": "r3e2_record_replay_probe",
+        "status": "pass",
+        "job_id": job_id,
+        "provider_work_started": False,
+        "start_called": False,
+        "job_status": "COMPLETED",
+        "segment_count": 1,
+        "page_segment_count": 1,
+        "next_cursor": None,
+    }
+    assert calls == [
+        "media_non_youtube_status",
+        "media_non_youtube_segments",
+    ]
+    assert "media_instagram_start" not in calls
