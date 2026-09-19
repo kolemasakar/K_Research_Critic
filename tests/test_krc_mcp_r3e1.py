@@ -22,6 +22,8 @@ from plugins.krc_migration_candidate.mcp_canary.r3e1 import (
 from plugins.krc_migration_candidate.mcp_canary.r3e1_http_server import (
     handle_r3e1_http_request,
     run_r3e1_durable_lookup_probe,
+    run_r3e1_execution_probe,
+    run_r3e1_record_replay_probe,
 )
 
 MODERN_META = {
@@ -400,3 +402,175 @@ def test_r3e1_durable_lookup_probe_fails_closed_on_store_unavailable(monkeypatch
     assert result["status"] == "fail"
     assert result["http_status"] == 503
     assert result["provider_work_started"] is False
+
+
+def test_r3e1_execution_probe_uses_exact_consent_and_sanitizes_result(monkeypatch) -> None:
+    config = HttpConfig(
+        surface=R3E1_SURFACE,
+        voicebridge_base_url="https://voicebridge.invalid",
+        voicebridge_bearer="test-only-voicebridge-secret-value",
+    )
+    source_url = "https://www.youtube.com/watch?v=execution-probe-fixture"
+    observed: dict[str, object] = {}
+
+    def fake_dispatch(message, binding):
+        observed["message"] = message
+        observed["binding_configured"] = binding.configured
+        return {
+            "jsonrpc": "2.0",
+            "id": "startup-youtube-start",
+            "result": {
+                "isError": False,
+                "structuredContent": {
+                    "job_id": "KRCM_execution-probe",
+                    "status": "COMPLETED",
+                    "provider": "gemini",
+                    "provider_mode": "youtube_gemini_direct",
+                    "provider_model": "gemini-3.7-flash",
+                    "retrieval_provider": "gemini_youtube_url",
+                    "retrieval_credits_charged": 0,
+                    "stt_seconds_charged": 0,
+                    "credits_charged": 0,
+                    "segment_count": 1,
+                    "transcript_characters": 123,
+                    "reused": False,
+                    "gemini_free_data_use_acknowledged": True,
+                    "transcript_text": "must-not-be-logged",
+                    "segments": [{"text": "must-not-be-logged"}],
+                },
+            },
+        }
+
+    monkeypatch.setattr(
+        "plugins.krc_migration_candidate.mcp_canary.r3e1_http_server.dispatch_r3e1",
+        fake_dispatch,
+    )
+    result = run_r3e1_execution_probe(config, source_url)
+
+    assert result["status"] == "pass"
+    assert result["job_id"] == "KRCM_execution-probe"
+    assert result["provider_work_started"] is True
+    assert result["retrieval_credits_charged"] == 0
+    assert result["stt_seconds_charged"] == 0
+    assert result["gemini_free_data_use_acknowledged"] is True
+
+    message = observed["message"]
+    assert message["params"]["name"] == "media_youtube_start"
+    args = message["params"]["arguments"]
+    assert args["url"] == source_url
+    assert args["gemini_free_consent"] == {
+        "provider": "google_gemini",
+        "tier": "free",
+        "data_use_acknowledged": True,
+    }
+    rendered = json.dumps(result)
+    assert source_url not in rendered
+    assert "must-not-be-logged" not in rendered
+    assert "test-only-voicebridge-secret-value" not in rendered
+
+
+def test_r3e1_execution_probe_marks_duplicate_reuse_without_provider_work(monkeypatch) -> None:
+    config = HttpConfig(
+        surface=R3E1_SURFACE,
+        voicebridge_base_url="https://voicebridge.invalid",
+        voicebridge_bearer="test-only-voicebridge-secret-value",
+    )
+
+    def fake_dispatch(_message, _binding):
+        return {
+            "jsonrpc": "2.0",
+            "id": "startup-youtube-start",
+            "result": {
+                "isError": False,
+                "structuredContent": {
+                    "job_id": "KRCM_execution-probe",
+                    "status": "COMPLETED",
+                    "provider": "gemini",
+                    "reused": True,
+                    "retrieval_credits_charged": 0,
+                    "stt_seconds_charged": 0,
+                    "gemini_free_data_use_acknowledged": True,
+                },
+            },
+        }
+
+    monkeypatch.setattr(
+        "plugins.krc_migration_candidate.mcp_canary.r3e1_http_server.dispatch_r3e1",
+        fake_dispatch,
+    )
+    result = run_r3e1_execution_probe(
+        config,
+        "https://www.youtube.com/watch?v=execution-probe-fixture",
+    )
+    assert result["status"] == "pass"
+    assert result["reused"] is True
+    assert result["provider_work_started"] is False
+
+
+def test_r3e1_record_replay_probe_reads_status_and_segments_only(monkeypatch) -> None:
+    config = HttpConfig(
+        surface=R3E1_SURFACE,
+        voicebridge_base_url="https://voicebridge.invalid",
+        voicebridge_bearer="test-only-voicebridge-secret-value",
+    )
+    calls: list[dict] = []
+
+    def fake_dispatch(message, _binding):
+        calls.append(message)
+        name = message["params"]["name"]
+        if name == "media_youtube_status":
+            return {
+                "jsonrpc": "2.0",
+                "id": "startup-replay-status",
+                "result": {
+                    "isError": False,
+                    "structuredContent": {
+                        "job_id": "KRCM_replay-probe",
+                        "status": "COMPLETED",
+                        "segment_count": 2,
+                        "transcript_text": "must-not-be-logged",
+                    },
+                },
+            }
+        if name == "media_youtube_segments":
+            return {
+                "jsonrpc": "2.0",
+                "id": "startup-replay-segments",
+                "result": {
+                    "isError": False,
+                    "structuredContent": {
+                        "job_id": "KRCM_replay-probe",
+                        "status": "COMPLETED",
+                        "cursor": 0,
+                        "next_cursor": None,
+                        "segments": [
+                            {"index": 0, "text": "one"},
+                            {"index": 1, "text": "two"},
+                        ],
+                    },
+                },
+            }
+        raise AssertionError(name)
+
+    monkeypatch.setattr(
+        "plugins.krc_migration_candidate.mcp_canary.r3e1_http_server.dispatch_r3e1",
+        fake_dispatch,
+    )
+    result = run_r3e1_record_replay_probe(config, "KRCM_replay-probe")
+
+    assert result == {
+        "event": "r3e1_record_replay_probe",
+        "status": "pass",
+        "job_id": "KRCM_replay-probe",
+        "provider_work_started": False,
+        "job_status": "COMPLETED",
+        "segment_count": 2,
+        "page_segment_count": 2,
+        "next_cursor": None,
+    }
+    assert [call["params"]["name"] for call in calls] == [
+        "media_youtube_status",
+        "media_youtube_segments",
+    ]
+    assert "media_youtube_start" not in json.dumps(calls)
+    assert "must-not-be-logged" not in json.dumps(result)
