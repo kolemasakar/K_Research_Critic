@@ -1,6 +1,6 @@
 # MEDIA BETA Decision Log
 
-Version: 4.4
+Version: 4.5
 Status: ACTIVE / HISTORY_PRESERVED / R3E1_PASS / R3E2_SENTINEL_PREFLIGHT_PASS_CONFIRMATION_PENDING
 Updated: 2026-09-19
 
@@ -37,11 +37,19 @@ R3_E4_TELEGRAM=HOLD
 
 ```text
 PROJECT_COST_POLICY=FREE_ONLY
-PAID_DATABASE_UPGRADE=DENIED
+RENDER_FREE_WEB_SERVICES=ACCEPTED
+RENDER_ONRENDER_COM_ENDPOINTS=ACCEPTED
+RENDER_POSTGRES=REJECTED_FOR_DURABLE_STATE
+RENDER_PAID_UPGRADE=DENIED
+NEON_FREE_POSTGRES=PRIMARY_DURABLE_DATABASE
+OCI_ALWAYS_FREE=ACCEPTED
+SELF_HOSTED_COBALT_ON_OCI=ACCEPTED
 PAID_HOSTING_FALLBACK=DENIED
 PAID_PROVIDER_FALLBACK=DENIED
 UNEXPECTED_BILLING_RISK=DENIED
 ```
+
+The policy does not require removing Render. Free Render Web Services are an accepted hosting layer.
 
 ### D040 — Render Free PostgreSQL rejected for durable KRC MEDIA state
 
@@ -153,16 +161,30 @@ media_instagram_start=HOLD
 
 The first Render provisioning artifact `srv-dan7s6egekts7381bbj0` is not accepted and must not be used.
 
+### D053 — Render Free Web Services remain accepted
+
+The project does not aim to eliminate Render as a platform.
+
+```text
+Render Free Web Services=ACCEPTED
+.onrender.com service endpoints=ACCEPTED
+Render PostgreSQL durable backend=REJECTED
+Neon Free PostgreSQL=PRIMARY DURABLE DATABASE
+```
+
+The previous Render database was rejected because its free trial expired/suspended and continued use would require a paid upgrade. This decision does not apply to free Render web services such as VoiceBridge or isolated MCP sentinels.
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` version 17.4
+- `CURRENT_HANDOFF.md` version 17.5
+- `133_FREE_ONLY_INFRASTRUCTURE_POLICY_RENDER_WEB_ALLOWED_POSTGRES_REJECTED_2026_09_19.md`
 - `132_R3E2_ISOLATED_SENTINEL_AUTHENTICATED_PREFLIGHT_PASS_CONFIRMATION_PENDING_2026_09_19.md`
 - `131_R3E2_INSTAGRAM_READONLY_FREE_ONLY_PREFLIGHT_2026_09_19.md`
 - `130_POST_R3E1_CONTROL_POINT_BEFORE_R3E2_2026_09_19.md`
 - `129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md`
 - `128_R3E1_RESTART_CONNECTIVITY_PASS_RECORD_REPLAY_PENDING_2026_09_19.md`
 - `127_R3E1_NEON_CUTOVER_COMPLETE_DURABLE_ACCEPTANCE_PENDING_2026_09_19.md`
-- `02_ROADMAP.md` version 6.0
+- `02_ROADMAP.md` version 6.1
 
 ## Hard boundary
 
