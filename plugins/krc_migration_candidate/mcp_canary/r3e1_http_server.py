@@ -31,6 +31,10 @@ from .r3e1 import (
 from .server import LEGACY_PROTOCOL_VERSION, MCP_PROTOCOL_VERSION, SERVER_NAME
 
 R3E1_DURABLE_PROBE_ENV = "KRC_R3E1_DURABLE_PROBE_URL"
+R3E1_EXECUTION_PROBE_ENV = "KRC_R3E1_EXECUTION_PROBE_URL"
+R3E1_EXECUTION_CONSENT_ENV = "KRC_R3E1_EXECUTION_PROBE_CONSENT"
+R3E1_EXECUTION_CONSENT_MARKER = "acknowledged"
+R3E1_REPLAY_PROBE_ENV = "KRC_R3E1_REPLAY_PROBE_JOB_ID"
 
 
 def _binding(config: HttpConfig) -> VoiceBridgeBinding:
@@ -254,6 +258,159 @@ def run_r3e1_durable_lookup_probe(
     return summary
 
 
+def _structured_result(response: object) -> Mapping[str, object] | None:
+    if not isinstance(response, Mapping):
+        return None
+    result = response.get("result")
+    if not isinstance(result, Mapping):
+        return None
+    structured = result.get("structuredContent")
+    return structured if isinstance(structured, Mapping) else None
+
+
+def run_r3e1_execution_probe(
+    config: HttpConfig,
+    source_url: str,
+) -> dict[str, object]:
+    """Execute exactly one consented YouTube start and emit sanitized evidence."""
+
+    message = {
+        "jsonrpc": "2.0",
+        "id": "startup-youtube-start",
+        "method": "tools/call",
+        "params": {
+            "name": "media_youtube_start",
+            "arguments": {
+                "url": source_url,
+                "language_hint": "auto",
+                "gemini_free_consent": {
+                    "provider": "google_gemini",
+                    "tier": "free",
+                    "data_use_acknowledged": True,
+                },
+            },
+        },
+    }
+    response = dispatch_r3e1(message, _binding(config))
+    summary: dict[str, object] = {
+        "event": "r3e1_youtube_start_probe",
+        "status": "fail",
+        "tool": "media_youtube_start",
+        "consent_provider": "google_gemini",
+        "consent_tier": "free",
+        "data_use_acknowledged": True,
+    }
+    structured = _structured_result(response)
+    if structured is None:
+        summary["reason"] = "missing_structured_content"
+        return summary
+    result = response.get("result") if isinstance(response, Mapping) else None
+    if isinstance(result, Mapping) and result.get("isError") is True:
+        error = structured.get("error")
+        if isinstance(error, Mapping):
+            code = error.get("code")
+            http_status = error.get("http_status")
+            if isinstance(code, str):
+                summary["backend_code"] = code
+            if isinstance(http_status, int):
+                summary["http_status"] = http_status
+        summary["reason"] = "backend_start_failed"
+        return summary
+
+    for key in (
+        "job_id",
+        "status",
+        "provider",
+        "provider_mode",
+        "provider_model",
+        "retrieval_provider",
+        "retrieval_credits_charged",
+        "stt_seconds_charged",
+        "credits_charged",
+        "segment_count",
+        "transcript_characters",
+        "reused",
+        "gemini_free_data_use_acknowledged",
+    ):
+        value = structured.get(key)
+        if isinstance(value, (str, int, bool)) or value is None:
+            summary[key] = value
+    reused = structured.get("reused")
+    summary["provider_work_started"] = reused is not True
+    error = structured.get("error")
+    if isinstance(error, Mapping):
+        code = error.get("code")
+        if isinstance(code, str):
+            summary["job_error_code"] = code
+    summary["status"] = "pass"
+    return summary
+
+
+def run_r3e1_record_replay_probe(
+    config: HttpConfig,
+    job_id: str,
+) -> dict[str, object]:
+    """Read durable job status and segments without starting provider work."""
+
+    summary: dict[str, object] = {
+        "event": "r3e1_record_replay_probe",
+        "status": "fail",
+        "job_id": job_id,
+        "provider_work_started": False,
+    }
+    status_message = {
+        "jsonrpc": "2.0",
+        "id": "startup-replay-status",
+        "method": "tools/call",
+        "params": {
+            "name": "media_youtube_status",
+            "arguments": {"job_id": job_id},
+        },
+    }
+    status_response = dispatch_r3e1(status_message, _binding(config))
+    status_structured = _structured_result(status_response)
+    if status_structured is None:
+        summary["reason"] = "status_missing"
+        return summary
+    status_result = status_response.get("result") if isinstance(status_response, Mapping) else None
+    if isinstance(status_result, Mapping) and status_result.get("isError") is True:
+        summary["reason"] = "status_error"
+        return summary
+
+    segments_message = {
+        "jsonrpc": "2.0",
+        "id": "startup-replay-segments",
+        "method": "tools/call",
+        "params": {
+            "name": "media_youtube_segments",
+            "arguments": {"job_id": job_id, "cursor": 0, "limit": 50},
+        },
+    }
+    segments_response = dispatch_r3e1(segments_message, _binding(config))
+    segments_structured = _structured_result(segments_response)
+    if segments_structured is None:
+        summary["reason"] = "segments_missing"
+        return summary
+    segments_result = segments_response.get("result") if isinstance(segments_response, Mapping) else None
+    if isinstance(segments_result, Mapping) and segments_result.get("isError") is True:
+        summary["reason"] = "segments_error"
+        return summary
+
+    returned_job_id = status_structured.get("job_id")
+    page_job_id = segments_structured.get("job_id")
+    if returned_job_id != job_id or page_job_id != job_id:
+        summary["reason"] = "job_id_mismatch"
+        return summary
+
+    summary["job_status"] = status_structured.get("status")
+    summary["segment_count"] = status_structured.get("segment_count")
+    segments = segments_structured.get("segments")
+    summary["page_segment_count"] = len(segments) if isinstance(segments, list) else None
+    summary["next_cursor"] = segments_structured.get("next_cursor")
+    summary["status"] = "pass"
+    return summary
+
+
 def main() -> None:
     host = os.getenv("KRC_MCP_BIND_HOST", "127.0.0.1")
     port = int(os.getenv("PORT", os.getenv("KRC_MCP_PORT", "8000")))
@@ -268,6 +425,30 @@ def main() -> None:
             ),
             flush=True,
         )
+
+    execution_url = os.getenv(R3E1_EXECUTION_PROBE_ENV, "").strip()
+    execution_consent = os.getenv(R3E1_EXECUTION_CONSENT_ENV, "").strip().lower()
+    if execution_url and execution_consent == R3E1_EXECUTION_CONSENT_MARKER:
+        print(
+            json.dumps(
+                run_r3e1_execution_probe(config, execution_url),
+                separators=(",", ":"),
+                sort_keys=True,
+            ),
+            flush=True,
+        )
+
+    replay_job_id = os.getenv(R3E1_REPLAY_PROBE_ENV, "").strip()
+    if replay_job_id:
+        print(
+            json.dumps(
+                run_r3e1_record_replay_probe(config, replay_job_id),
+                separators=(",", ":"),
+                sort_keys=True,
+            ),
+            flush=True,
+        )
+
     server = R3E1HTTPServer((host, port), R3E1RequestHandler)
     server.serve_forever()
 
