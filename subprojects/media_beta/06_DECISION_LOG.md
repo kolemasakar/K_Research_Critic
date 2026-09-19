@@ -1,10 +1,10 @@
 # MEDIA BETA Decision Log
 
-Version: 4.6
-Status: ACTIVE / HISTORY_PRESERVED / R3E2_COMPLETE / E3_E4_OAUTH_R3F_STAGING_READY / ACTIONS_HOLD
+Version: 4.7
+Status: ACTIVE / AUDITED / HISTORY_PRESERVED / R3E2_COMPLETE / E3_E4_OAUTH_R3F_STAGING_READY / ACTIONS_HOLD
 Updated: 2026-09-19
 
-Historical decisions remain preserved in Git history and numbered checkpoints. Current active decisions are summarized below.
+Historical decisions remain preserved in Git history and numbered checkpoints.
 
 ## Active decisions
 
@@ -24,16 +24,16 @@ R3_C=PASS
 R3_D=PASS
 ```
 
-### D038 — Staged execution remains route-bounded
+### D038 — Execution remains route-bounded
 
 ```text
 R3_E1_YOUTUBE=PASS / COMPLETE
 R3_E2_INSTAGRAM=PASS / COMPLETE
-R3_E3_FACEBOOK=STAGING_READY / DEPLOY_PENDING
-R3_E4_TELEGRAM=STAGING_READY / DEPLOY_PENDING
+R3_E3_FACEBOOK=STAGING_READY / RUNTIME_PENDING
+R3_E4_TELEGRAM=STAGING_READY / RUNTIME_PENDING
 ```
 
-### D039 — Infrastructure/provider policy is FREE_ONLY
+### D039 — Project policy remains FREE_ONLY
 
 ```text
 PROJECT_COST_POLICY=FREE_ONLY
@@ -47,41 +47,11 @@ PAID_PROVIDER_FALLBACK=DENIED
 PAID_ACTIONS_USAGE=DENIED
 ```
 
-### D040 — Render PostgreSQL rejected; Render Free Web remains accepted
-
-Render Free Web Services and `.onrender.com` endpoints remain valid. Render PostgreSQL is not accepted as durable project state.
-
-### D041 — Neon Free is primary durable backend
-
-```text
-project=krc-media-beta-neon
-project_id=plain-snow-71973546
-database=krc_media_beta
-```
-
-### D047 — R3-E1 durable replay/idempotency accepted
-
-R3-E1 is PASS / COMPLETE.
-
 ### D053 — R3-E2 accepted as PASS / COMPLETE
 
-Owner acceptance establishes:
+Confirmation UI, live canary, Neon durability, restart/replay and duplicate-start idempotency are accepted. Duplicate provider work is NO and new provider charge is 0.
 
-```text
-confirmation_ui=PASS
-cancel_path=PASS
-approve_path=PASS
-live_canary=PASS
-durable_neon=PASS
-restart_replay=PASS
-status_segments_after_restart=PASS
-duplicate_start_idempotency=PASS
-duplicate_provider_work=NO
-new_provider_charge=0
-error_scan=PASS
-```
-
-### D054 — HP-OMEN local disk is not authoritative project storage
+### D054 — GitHub is authoritative storage
 
 ```text
 HP_OMEN_LOCAL_DISK_AS_PROJECT_STORAGE=DENIED
@@ -89,9 +59,7 @@ AUTHORITATIVE_PROJECT_STATE=GITHUB_REPOSITORIES
 LOCAL_WORKTREE_USE=TRANSIENT_ONLY
 ```
 
-After verified repository transfer, temporary local staging trees and patch artifacts must be removed.
-
-### D055 — GitHub Actions paid overage is denied until reset
+### D055 — GitHub Actions paid overage denied
 
 ```text
 GITHUB_ACTIONS_MINUTES=2000/2000
@@ -99,36 +67,43 @@ ACTIONS_RESET=2026-10-01
 PAID_ACTIONS_USAGE=DENIED
 ```
 
-New staging commits may use CI-skip semantics. Full CI is deferred until reset or separate owner decision.
+### D056 — E3/E4/OAuth/R3-F staging accepted into repositories
 
-### D056 — R3-E3 / R3-E4 / OAuth / R3-F staging accepted for repository storage
+The integration branches contain Facebook and Telegram isolated execution staging, restart-safe OAuth/DCR staging and R3-F parity tests. This does not mean runtime acceptance.
 
-Prepared implementation includes:
+### D057 — 2026-09-19 project/runtime audit boundary
 
-- R3-E3 Facebook scoped bearer + isolated execution surface;
-- R3-E4 Telegram scoped bearer + isolated execution surface;
-- zero-side-effect confirmation probes;
-- cold-start warmup with no automatic consequential POST retry;
-- durable lookup/replay isolation;
-- restart-safe OAuth/DCR via optional signing key;
-- R3-F 13-operation parity regression package.
-
-Local validation prior to repository transfer:
+Audit confirms:
 
 ```text
-KRC combined=65/65 PASS
-VoiceBridge relevant regression=23/23 PASS
-Facebook/Telegram scoped targeted=11/11 PASS
+R3E1_RUNTIME=HEALTHY
+R3E2_RUNTIME=HEALTHY
+VOICEBRIDGE_RUNTIME=HEALTHY
+COBALT_ENDPOINT=HEALTHY
+NEON_DURABLE_STATE=CONSISTENT
+
+R3E3_CODE=IN_REPOSITORY
+R3E3_RUNTIME=NOT_ACCEPTED
+R3E4_CODE=IN_REPOSITORY
+R3E4_RUNTIME=NOT_ACCEPTED
+OAUTH_RESTART_SAFE_CODE=IN_REPOSITORY
+OAUTH_RESTART_SAFE_RUNTIME=NOT_ACCEPTED
+R3F_LOCAL_PARITY=READY
+R3F_CI=NOT_RUN
 ```
 
-This staging decision does not authorize live Facebook or Telegram provider work.
+This distinction is authoritative: `STAGING_READY != DEPLOYED != PASS`.
+
+### D058 — Final project goal
+
+The target is a production-grade private MEDIA surface with all 13 operations, four isolated confirmation-gated execution paths, route-scoped server-side credentials, restart-safe OAuth, Neon durability, restart/idempotency guarantees, FREE_ONLY fail-closed behavior, and eventual migration/publication readiness without weakening the public KRC core.
 
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` version 18.1
-- checkpoint 139
-- `02_ROADMAP.md` version 6.7
-- `00_INDEX.md` version 8.6
+- `CURRENT_HANDOFF.md` v18.2
+- checkpoint 140
+- `02_ROADMAP.md` v6.8
+- `00_INDEX.md` v8.7
 
 ## Hard boundary
 
@@ -139,7 +114,6 @@ PLUGIN_SHARING=NO
 MAIN_MUTATION=NO
 PR22_MERGE=NO
 PR45_MERGE=NO
-PAID_UPGRADE=NO
 LIVE_FACEBOOK_START=NO
 LIVE_TELEGRAM_START=NO
 R4=HOLD
