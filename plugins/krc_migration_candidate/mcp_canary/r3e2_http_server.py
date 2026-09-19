@@ -31,6 +31,33 @@ from .r3e2 import (
 from .server import LEGACY_PROTOCOL_VERSION, MCP_PROTOCOL_VERSION, SERVER_NAME
 
 R3E2_PREFLIGHT_PROBE_ENV = "KRC_R3E2_PREFLIGHT_PROBE_URL"
+R3E2_CONFIRMATION_PROBE_ONLY_ENV = "KRC_R3E2_CONFIRMATION_PROBE_ONLY"
+_CONFIRMATION_PROBE_INVOCATIONS = 0
+
+
+def _confirmation_probe_enabled() -> bool:
+    return os.getenv(R3E2_CONFIRMATION_PROBE_ONLY_ENV, "").strip().lower() == "true"
+
+
+def _confirmation_probe_backend(
+    _binding_value: VoiceBridgeBinding,
+    _method: str,
+    _path: str,
+    _payload: Mapping[str, object] | None,
+    _query: Mapping[str, object],
+) -> dict[str, object]:
+    global _CONFIRMATION_PROBE_INVOCATIONS
+    _CONFIRMATION_PROBE_INVOCATIONS += 1
+    return {
+        "status": "ok",
+        "phase": "R3-E2",
+        "confirmation_probe_executed": True,
+        "external_mutation": False,
+        "provider_work": False,
+        "provider_charge": False,
+        "real_media_start": False,
+        "invocation_count": _CONFIRMATION_PROBE_INVOCATIONS,
+    }
 
 
 def _binding(config: HttpConfig) -> VoiceBridgeBinding:
@@ -73,7 +100,10 @@ def handle_r3e2_http_request(
             )
 
     if clean_path == HEALTH_PATH and method == "GET":
-        return _json_response(HTTPStatus.OK, r3e2_health(_binding(config)))
+        health = r3e2_health(_binding(config))
+        health["confirmation_probe_only"] = _confirmation_probe_enabled()
+        health["confirmation_probe_invocation_count"] = _CONFIRMATION_PROBE_INVOCATIONS
+        return _json_response(HTTPStatus.OK, health)
 
     if clean_path != MCP_PATH:
         return _json_response(HTTPStatus.NOT_FOUND, {"status": "not_found"})
@@ -163,7 +193,19 @@ def handle_r3e2_http_request(
             ),
         )
 
-    response = dispatch_r3e2(decoded, _binding(config))
+    if (
+        _confirmation_probe_enabled()
+        and method_name == "tools/call"
+        and isinstance(decoded.get("params"), Mapping)
+        and decoded["params"].get("name") == "media_instagram_start"
+    ):
+        response = dispatch_r3e2(
+            decoded,
+            _binding(config),
+            backend_call=_confirmation_probe_backend,
+        )
+    else:
+        response = dispatch_r3e2(decoded, _binding(config))
     if response is None:
         return HttpResponse(
             status=HTTPStatus.ACCEPTED,
