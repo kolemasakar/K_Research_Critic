@@ -9,6 +9,7 @@ sys.path.insert(0, str(ROOT))
 sys.dont_write_bytecode = True
 
 from plugins.krc_migration_candidate.mcp_canary.http_server import HttpConfig
+import plugins.krc_migration_candidate.mcp_canary.r3e2_http_server as r3e2_http
 from plugins.krc_migration_candidate.mcp_canary.r3c import VoiceBridgeBinding, VoiceBridgeError
 from plugins.krc_migration_candidate.mcp_canary.r3e2 import (
     R3E2_EXECUTION_TOOL_NAME,
@@ -260,3 +261,44 @@ def test_r3e2_backend_error_is_sanitized() -> None:
             "http_status": 403,
         },
     }
+
+
+def test_r3e2_confirmation_probe_mode_is_zero_side_effect(monkeypatch) -> None:
+    monkeypatch.setenv("KRC_R3E2_CONFIRMATION_PROBE_ONLY", "true")
+    r3e2_http._CONFIRMATION_PROBE_INVOCATIONS = 0
+
+    result = r3e2_http._confirmation_probe_backend(
+        _binding(),
+        "POST",
+        "/api/v1/media/managed/transcriptions",
+        {"url": INSTAGRAM_URL, "language_hint": "auto"},
+        {},
+    )
+    assert result == {
+        "status": "ok",
+        "phase": "R3-E2",
+        "confirmation_probe_executed": True,
+        "external_mutation": False,
+        "provider_work": False,
+        "provider_charge": False,
+        "real_media_start": False,
+        "invocation_count": 1,
+    }
+
+    health = r3e2_http.handle_r3e2_http_request(
+        "GET",
+        "/healthz",
+        {},
+        config=HttpConfig(
+            auth_mode="oauth",
+            public_base_url="https://mcp.invalid",
+            surface=R3E2_SURFACE,
+            voicebridge_base_url="https://voicebridge.invalid",
+            voicebridge_bearer="test-only-r3e2-server-token",
+        ),
+    )
+    assert health.status == 200
+    payload = json.loads(health.body)
+    assert payload["confirmation_probe_only"] is True
+    assert payload["confirmation_probe_invocation_count"] == 1
+    assert payload["provider_work_started"] is False
