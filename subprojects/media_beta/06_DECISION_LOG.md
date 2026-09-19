@@ -1,10 +1,10 @@
 # MEDIA BETA Decision Log
 
-Version: 4.5
-Status: ACTIVE / HISTORY_PRESERVED / R3E1_PASS / R3E2_SENTINEL_PREFLIGHT_PASS_CONFIRMATION_PENDING
+Version: 4.6
+Status: ACTIVE / HISTORY_PRESERVED / R3E2_COMPLETE / E3_E4_OAUTH_R3F_STAGING_READY / ACTIONS_HOLD
 Updated: 2026-09-19
 
-The full historical decision log remains preserved in Git history and numbered checkpoints. Current active decisions are summarized here and detailed in the canonical handoff, roadmap, and checkpoints.
+Historical decisions remain preserved in Git history and numbered checkpoints. Current active decisions are summarized below.
 
 ## Active decisions
 
@@ -27,164 +27,108 @@ R3_D=PASS
 ### D038 — Staged execution remains route-bounded
 
 ```text
-R3_E1_YOUTUBE=PASS
-R3_E2_INSTAGRAM=ISOLATED_SENTINEL_PASS / AUTHENTICATED_PREFLIGHT_PASS / CONFIRMATION_UI_PENDING / EXECUTION_HOLD
-R3_E3_FACEBOOK=HOLD
-R3_E4_TELEGRAM=HOLD
+R3_E1_YOUTUBE=PASS / COMPLETE
+R3_E2_INSTAGRAM=PASS / COMPLETE
+R3_E3_FACEBOOK=STAGING_READY / DEPLOY_PENDING
+R3_E4_TELEGRAM=STAGING_READY / DEPLOY_PENDING
 ```
 
-### D039 — Project infrastructure and provider policy is FREE-ONLY
+### D039 — Infrastructure/provider policy is FREE_ONLY
 
 ```text
 PROJECT_COST_POLICY=FREE_ONLY
 RENDER_FREE_WEB_SERVICES=ACCEPTED
-RENDER_ONRENDER_COM_ENDPOINTS=ACCEPTED
 RENDER_POSTGRES=REJECTED_FOR_DURABLE_STATE
-RENDER_PAID_UPGRADE=DENIED
 NEON_FREE_POSTGRES=PRIMARY_DURABLE_DATABASE
 OCI_ALWAYS_FREE=ACCEPTED
 SELF_HOSTED_COBALT_ON_OCI=ACCEPTED
 PAID_HOSTING_FALLBACK=DENIED
 PAID_PROVIDER_FALLBACK=DENIED
-UNEXPECTED_BILLING_RISK=DENIED
+PAID_ACTIONS_USAGE=DENIED
 ```
 
-The policy does not require removing Render. Free Render Web Services are an accepted hosting layer.
+### D040 — Render PostgreSQL rejected; Render Free Web remains accepted
 
-### D040 — Render Free PostgreSQL rejected for durable KRC MEDIA state
+Render Free Web Services and `.onrender.com` endpoints remain valid. Render PostgreSQL is not accepted as durable project state.
 
-The expired billing-suspended Render database is not an accepted durable dependency. Paid upgrade remains prohibited.
-
-### D041 — Neon Free is the primary durable backend
+### D041 — Neon Free is primary durable backend
 
 ```text
-PRIMARY_DURABLE_BACKEND=NEON_FREE
 project=krc-media-beta-neon
 project_id=plain-snow-71973546
 database=krc_media_beta
 ```
 
-### D042 — Neon schema and runtime preflight required before execution
+### D047 — R3-E1 durable replay/idempotency accepted
 
-Schema, constraints, indexes, idempotency fields, scale-to-zero identity and free-plan state were verified before live execution.
+R3-E1 is PASS / COMPLETE.
 
-### D043 — Neon DATABASE_URL cutover completed
+### D053 — R3-E2 accepted as PASS / COMPLETE
 
-```text
-VOICEBRIDGE_DATABASE_CUTOVER=PASS
-secret_exposed=false
-paid_upgrade=false
-```
-
-### D044 — App-level durable lookup and restart connectivity required
-
-A health endpoint alone was insufficient. R3-E1 had to exercise the VoiceBridge durable store before provider execution.
-
-### D045 — R3-E1 uses a dedicated YouTube-scoped server-side bearer
-
-A separate `KRC_MEDIA_R3E1_ACTION_TOKEN` is accepted only by the VoiceBridge YouTube Gemini handler. The general MEDIA action token and R3-C surface are not widened by R3-E1.
-
-### D046 — Owner-approved Gemini Free Tier execution completed
-
-After explicit owner acknowledgement of Gemini Developer API Free Tier data-use terms, one bounded YouTube execution completed:
+Owner acceptance establishes:
 
 ```text
-job_id=KRCM_3f4e62c1-2518-4815-839b-ece80935d794
-status=COMPLETED
-provider=gemini
-provider_mode=youtube_gemini_direct
-retrieval_credits_charged=0
-stt_seconds_charged=0
-credits_charged=0
+confirmation_ui=PASS
+cancel_path=PASS
+approve_path=PASS
+live_canary=PASS
+durable_neon=PASS
+restart_replay=PASS
+status_segments_after_restart=PASS
+duplicate_start_idempotency=PASS
+duplicate_provider_work=NO
+new_provider_charge=0
+error_scan=PASS
 ```
 
-### D047 — R3-E1 durable replay and idempotency accepted
-
-The completed job and segments were read after VoiceBridge + R3-E1 restarts without provider replay. A duplicate start returned the same job with `reused=true` and `provider_work_started=false`.
-
-Therefore:
+### D054 — HP-OMEN local disk is not authoritative project storage
 
 ```text
-R3_E1=PASS / COMPLETE
-NEON_DURABLE_REPLAY=PASS
-DUPLICATE_START_IDEMPOTENCY=PASS
-PAID_FALLBACK=NO
+HP_OMEN_LOCAL_DISK_AS_PROJECT_STORAGE=DENIED
+AUTHORITATIVE_PROJECT_STATE=GITHUB_REPOSITORIES
+LOCAL_WORKTREE_USE=TRANSIENT_ONLY
 ```
 
-### D048 — STT charge table is a bounded quota ledger
+After verified repository transfer, temporary local staging trees and patch artifacts must be removed.
 
-The current persistence contract deletes `krc_media_stt_charges` rows older than two days. It must not be described as a long-term immutable audit trail. Long-term acceptance evidence is maintained in checkpoints/Git history.
-
-### D049 — Acceptance-only startup probes disabled after test
-
-All temporary execution/replay startup environment switches were disabled after evidence capture. Final R3-E1 runtime is healthy with no automatic acceptance execution.
-
-### D050 — R3-E2 Instagram read-only/free-only preflight accepted
-
-Checkpoint 131 confirms the current Instagram route remains:
+### D055 — GitHub Actions paid overage is denied until reset
 
 ```text
-Instagram -> OCI self-hosted Cobalt -> AssemblyAI universal-2 -> Neon
-retrieval_credits=0
-automatic_paid_fallback=false
-paid provider fallback=NO
+GITHUB_ACTIONS_MINUTES=2000/2000
+ACTIONS_RESET=2026-10-01
+PAID_ACTIONS_USAGE=DENIED
 ```
 
-The relevant Instagram retrieval, URL normalization, persistence, and AssemblyAI pipeline files are unchanged from the accepted R2 head. Current OCI Cobalt runtime identity matches the accepted baseline. No Instagram job or provider work was created during this preflight.
+New staging commits may use CI-skip semantics. Full CI is deferred until reset or separate owner decision.
 
-Execution remains blocked until a dedicated R3-E2 route-scoped bearer, isolated Instagram execution surface, authenticated app-level preflight/lookup, and Instagram-specific confirmation acceptance are implemented.
+### D056 — R3-E3 / R3-E4 / OAuth / R3-F staging accepted for repository storage
 
-### D051 — R3-E2 isolated Instagram surface and route-scoped bearer accepted
+Prepared implementation includes:
 
-VoiceBridge accepts a dedicated R3-E2 credential only on the public Cobalt Instagram scope. The isolated R3-E2 MCP service exposes four Instagram-relevant read tools plus exactly one execution tool, `media_instagram_start`.
+- R3-E3 Facebook scoped bearer + isolated execution surface;
+- R3-E4 Telegram scoped bearer + isolated execution surface;
+- zero-side-effect confirmation probes;
+- cold-start warmup with no automatic consequential POST retry;
+- durable lookup/replay isolation;
+- restart-safe OAuth/DCR via optional signing key;
+- R3-F 13-operation parity regression package.
+
+Local validation prior to repository transfer:
 
 ```text
-VoiceBridge head=e640900bfddd367680badcc8e7cf349e471e2d8a
-Validate #820=SUCCESS
-KRC R3-E2 implementation head=7a09b857033a791a7dd6d10d7c41ed182f227e09
-Tests #1678=SUCCESS
-active service=krc-mcp-r3e2-instagram-sentinel-v2
-active service id=srv-dan7vsijnfac73fmrtl0
-active deploy=dep-dan800dii2qc73bm47k0
+KRC combined=65/65 PASS
+VoiceBridge relevant regression=23/23 PASS
+Facebook/Telegram scoped targeted=11/11 PASS
 ```
 
-Authenticated Instagram preflight + durable lookup passed with zero provider work, zero new Instagram jobs, zero automatic paid fallback, and no start call.
-
-### D052 — R3-E2 live execution remains gated
-
-```text
-R3E2_CONFIRMATION_CONTRACT=PASS
-R3E2_CHATGPT_CONFIRMATION_UI=PENDING
-R3E2_SCOPED_CREDENTIAL_ROTATION_BEFORE_LIVE=REQUIRED
-media_instagram_start=HOLD
-```
-
-The first Render provisioning artifact `srv-dan7s6egekts7381bbj0` is not accepted and must not be used.
-
-### D053 — Render Free Web Services remain accepted
-
-The project does not aim to eliminate Render as a platform.
-
-```text
-Render Free Web Services=ACCEPTED
-.onrender.com service endpoints=ACCEPTED
-Render PostgreSQL durable backend=REJECTED
-Neon Free PostgreSQL=PRIMARY DURABLE DATABASE
-```
-
-The previous Render database was rejected because its free trial expired/suspended and continued use would require a paid upgrade. This decision does not apply to free Render web services such as VoiceBridge or isolated MCP sentinels.
+This staging decision does not authorize live Facebook or Telegram provider work.
 
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` version 17.5
-- `133_FREE_ONLY_INFRASTRUCTURE_POLICY_RENDER_WEB_ALLOWED_POSTGRES_REJECTED_2026_09_19.md`
-- `132_R3E2_ISOLATED_SENTINEL_AUTHENTICATED_PREFLIGHT_PASS_CONFIRMATION_PENDING_2026_09_19.md`
-- `131_R3E2_INSTAGRAM_READONLY_FREE_ONLY_PREFLIGHT_2026_09_19.md`
-- `130_POST_R3E1_CONTROL_POINT_BEFORE_R3E2_2026_09_19.md`
-- `129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md`
-- `128_R3E1_RESTART_CONNECTIVITY_PASS_RECORD_REPLAY_PENDING_2026_09_19.md`
-- `127_R3E1_NEON_CUTOVER_COMPLETE_DURABLE_ACCEPTANCE_PENDING_2026_09_19.md`
-- `02_ROADMAP.md` version 6.1
+- `CURRENT_HANDOFF.md` version 18.1
+- checkpoint 139
+- `02_ROADMAP.md` version 6.7
+- `00_INDEX.md` version 8.6
 
 ## Hard boundary
 
@@ -196,7 +140,7 @@ MAIN_MUTATION=NO
 PR22_MERGE=NO
 PR45_MERGE=NO
 PAID_UPGRADE=NO
-R3_E2_EXECUTION=HOLD
-R3_E3_E4=HOLD
+LIVE_FACEBOOK_START=NO
+LIVE_TELEGRAM_START=NO
 R4=HOLD
 ```

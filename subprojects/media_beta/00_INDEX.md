@@ -1,42 +1,30 @@
 # MEDIA BETA Documentation Index
 
-Canonical documentation index for K-Research & Critic MEDIA BETA / Plugin migration work.
-
-Version: 8.5
-Status: **ACTIVE / PLUGIN_FIRST / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_PASS / R3-E2_ISOLATED_SENTINEL_PREFLIGHT_PASS_CONFIRMATION_PENDING / FREE_ONLY / PUBLICATION_HOLD**
+Version: 8.6
+Status: **ACTIVE / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_E4_STAGING_READY / OAUTH_STAGING_READY / R3-F_LOCAL_READY / FREE_ONLY / ACTIONS_HOLD**
 Updated: 2026-09-19
 
-## Product boundary
+## Canonical reading order
 
-```text
-public KRC Custom GPT: published / unchanged / protected
-MEDIA migration candidate: private Remote Custom MCP / Plugin surface
-backend authority: VoiceBridge MEDIA API
-canonical MEDIA parity target: 13 operations
-project cost policy: FREE_ONLY
-```
+1. `CURRENT_HANDOFF.md` — v18.1.
+2. `139_R3E2_COMPLETE_R3E3_R3E4_OAUTH_R3F_STAGING_READY_ACTIONS_HOLD_2026_09_19.md`.
+3. `138_R3E2_RESTART_REPLAY_STATUS_SEGMENTS_PASS_2026_09_19.md`.
+4. `137_R3E2_INSTAGRAM_LIVE_CANARY_DURABLE_FREE_ONLY_PASS_2026_09_19.md`.
+5. `136_R3E2_ATTEMPT1_TRANSIENT_COLD_START_REMEDIATION_PASS_RECONNECT_REQUIRED_2026_09_19.md`.
+6. `135_R3E2_CREDENTIAL_ROTATION_PROBE_DISABLED_LIVE_CANARY_READY_2026_09_19.md`.
+7. `134_R3E2_CHATGPT_CONFIRMATION_UI_PASS_ZERO_SIDE_EFFECT_2026_09_19.md`.
+8. `133_FREE_ONLY_INFRASTRUCTURE_POLICY_RENDER_WEB_ALLOWED_POSTGRES_REJECTED_2026_09_19.md`.
+9. `132_R3E2_ISOLATED_SENTINEL_AUTHENTICATED_PREFLIGHT_PASS_CONFIRMATION_PENDING_2026_09_19.md`.
+10. `131_R3E2_INSTAGRAM_READONLY_FREE_ONLY_PREFLIGHT_2026_09_19.md`.
+11. `130_POST_R3E1_CONTROL_POINT_BEFORE_R3E2_2026_09_19.md`.
+12. `129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md`.
+13. `02_ROADMAP.md` — v6.7.
+14. `06_DECISION_LOG.md` — v4.6.
+15. current PR #22 / PR #45 heads and current runtime evidence.
 
-## Canonical current reading order
+Older checkpoints are historical evidence and do not override the current handoff.
 
-1. `CURRENT_HANDOFF.md` — v17.5.
-2. `133_FREE_ONLY_INFRASTRUCTURE_POLICY_RENDER_WEB_ALLOWED_POSTGRES_REJECTED_2026_09_19.md` — current infrastructure policy clarification.
-3. `132_R3E2_ISOLATED_SENTINEL_AUTHENTICATED_PREFLIGHT_PASS_CONFIRMATION_PENDING_2026_09_19.md` — current R3-E2 checkpoint.
-4. `131_R3E2_INSTAGRAM_READONLY_FREE_ONLY_PREFLIGHT_2026_09_19.md` — read-only R3-E2 preflight.
-5. `130_POST_R3E1_CONTROL_POINT_BEFORE_R3E2_2026_09_19.md` — pre-R3-E2 control point.
-6. `129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md` — R3-E1 closure.
-7. `128_R3E1_RESTART_CONNECTIVITY_PASS_RECORD_REPLAY_PENDING_2026_09_19.md`.
-8. `127_R3E1_NEON_CUTOVER_COMPLETE_DURABLE_ACCEPTANCE_PENDING_2026_09_19.md`.
-9. `125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md`.
-10. `02_ROADMAP.md` — v5.8.
-11. `124_R3D_CONSEQUENTIAL_ACTION_CONFIRMATION_PASS_2026_09_17.md`.
-12. `121_R3C_NINE_TOOL_READONLY_VOICEBRIDGE_BINDING_PASS_2026_09_16.md`.
-13. `117_R3B_AUTHENTICATED_REMOTE_MCP_HARDENING_PASS_2026_09_16.md`.
-14. `113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md`.
-15. current PR #22 / PR #45 head and current Render/Neon evidence.
-
-Older checkpoints remain historical evidence and do not override the current handoff.
-
-## Current accepted R3 state
+## Current R3 state
 
 ```text
 R3_A=PASS
@@ -44,39 +32,35 @@ R3_B=PASS
 R3_C=PASS
 R3_D=PASS
 R3_E1=PASS / COMPLETE
-R3_E2=ISOLATED_SENTINEL_PASS / AUTHENTICATED_PREFLIGHT_PASS / CONFIRMATION_UI_PENDING / EXECUTION_HOLD
-R3_E3=HOLD
-R3_E4=HOLD
+R3_E2=PASS / COMPLETE
+R3_E3=STAGING_READY / DEPLOY_PENDING
+R3_E4=STAGING_READY / DEPLOY_PENDING
+R3_F=LOCAL_READY / CI_PENDING
+R3_G_OAUTH=STAGING_READY / DEPLOY_PENDING
 ```
 
-## Current infrastructure / durable-state authority
+## Infrastructure authority
 
 ```text
+PROJECT_COST_POLICY=FREE_ONLY
 RENDER_FREE_WEB_SERVICES=ACCEPTED
-RENDER_ONRENDER_COM_ENDPOINTS=ACCEPTED
-RENDER_FREE_POSTGRES=REJECTED_FOR_DURABLE_STATE
-RENDER_PAID_UPGRADE=DENIED
-PRIMARY_DURABLE_TARGET=NEON_FREE
-project=krc-media-beta-neon
-project_id=plain-snow-71973546
-database=krc_media_beta
-VOICEBRIDGE_DATABASE_CUTOVER=PASS
-R3E1_LIVE_PERSISTENCE=PASS
-R3E1_RESTART_REPLAY=PASS
-R3E1_DUPLICATE_START_IDEMPOTENCY=PASS
+RENDER_POSTGRES=REJECTED
+NEON_FREE_POSTGRES=PRIMARY_DURABLE_DATABASE
+OCI_ALWAYS_FREE=ACCEPTED
+PAID_ACTIONS_USAGE=DENIED
+GITHUB_ACTIONS_MINUTES=2000/2000
+ACTIONS_RESET=2026-10-01
 ```
 
-The accepted R3-E1 live job was stored exactly once in Neon and recovered after VoiceBridge + R3-E1 restarts. Runtime jobs remain subject to configured TTL.
+## Storage authority
 
-`krc_media_stt_charges` is a short-retention quota ledger, not a long-term audit log.
+```text
+HP_OMEN_LOCAL_DISK_AS_PROJECT_STORAGE=DENIED
+AUTHORITATIVE_PROJECT_STATE=GITHUB
+LOCAL_WORKTREE_USE=TRANSIENT_ONLY
+```
 
-## Active next gate
-
-The R3-E2 scoped bearer, isolated Instagram surface, authenticated preflight and durable lookup are PASS. Execution remains HOLD pending credential rotation and owner-account ChatGPT confirmation UI acceptance.
-
-R3-C is historical accepted evidence and is not part of the current execution path unless separately requested.
-
-## Preserved release boundary
+## Release boundary
 
 ```text
 PUBLIC_GPT_MUTATION=NO
@@ -85,10 +69,5 @@ PLUGIN_SHARING=NO
 MAIN_MUTATION=NO
 PR22_MERGE=NO
 PR45_MERGE=NO
-PAID_UPGRADE=NO
 R4=HOLD
 ```
-
-## Recovery command
-
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoints 132-133. R3-E1 PASS; R3-E2 isolated sentinel + authenticated preflight PASS; confirmation UI and credential rotation pending; execution HOLD. Render Free Web accepted; Render PostgreSQL rejected; Neon Free primary DB.`

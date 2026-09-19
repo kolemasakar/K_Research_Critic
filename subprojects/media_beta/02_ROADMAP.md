@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 6.6
-Status: **PLUGIN_FIRST / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_PASS / R3-E2_RESTART_REPLAY_PASS_DUPLICATE_IDEMPOTENCY_PENDING / FREE_ONLY / PUBLICATION_HOLD**
+Version: 6.7
+Status: **PLUGIN_FIRST / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_STAGING_READY / R3-E4_STAGING_READY / OAUTH_STAGING_READY / R3-F_LOCAL_READY / FREE_ONLY / ACTIONS_HOLD / PUBLICATION_HOLD**
 Updated: 2026-09-19
 
 ## Product position
@@ -12,265 +12,126 @@ private MEDIA migration candidate: Remote Custom MCP / Plugin surface
 backend authority: VoiceBridge MEDIA API
 MEDIA semantic parity target: 13 operations
 project infrastructure policy: FREE_ONLY
+project authoritative storage: GitHub repositories
 ```
 
-Critical invariants:
+## Current phase state
 
 ```text
-MEDIA unavailable/fails -> MEDIA fails closed
-Core KRC               -> remains usable
-Render Free Web        -> accepted hosting layer
-Render PostgreSQL      -> rejected for durable state
-Neon Free PostgreSQL   -> primary durable database
-paid infrastructure    -> not accepted as required dependency
-paid provider fallback -> forbidden
+R3-A=PASS
+R3-B=PASS
+R3-C=PASS
+R3-D=PASS
+R3-E1=PASS / COMPLETE
+R3-E2=PASS / COMPLETE
+R3-E3=STAGING_READY / DEPLOY_PENDING
+R3-E4=STAGING_READY / DEPLOY_PENDING
+R3-F=LOCAL_PARITY_READY / CI_PENDING
+R3-G OAuth persistence=STAGING_READY / DEPLOY_PENDING
+R3-H=HOLD
+R4=HOLD
 ```
 
-## Canonical current authority
-
-1. `CURRENT_HANDOFF.md` — v18.0.
-2. `138_R3E2_RESTART_REPLAY_STATUS_SEGMENTS_PASS_2026_09_19.md`.
-3. `137_R3E2_INSTAGRAM_LIVE_CANARY_DURABLE_FREE_ONLY_PASS_2026_09_19.md`.
-3. `136_R3E2_ATTEMPT1_TRANSIENT_COLD_START_REMEDIATION_PASS_RECONNECT_REQUIRED_2026_09_19.md`.
-4. `135_R3E2_CREDENTIAL_ROTATION_PROBE_DISABLED_LIVE_CANARY_READY_2026_09_19.md`.
-5. `134_R3E2_CHATGPT_CONFIRMATION_UI_PASS_ZERO_SIDE_EFFECT_2026_09_19.md`.
-5. `133_FREE_ONLY_INFRASTRUCTURE_POLICY_RENDER_WEB_ALLOWED_POSTGRES_REJECTED_2026_09_19.md`.
-6. `132_R3E2_ISOLATED_SENTINEL_AUTHENTICATED_PREFLIGHT_PASS_CONFIRMATION_PENDING_2026_09_19.md`.
-7. `131_R3E2_INSTAGRAM_READONLY_FREE_ONLY_PREFLIGHT_2026_09_19.md`.
-8. `130_POST_R3E1_CONTROL_POINT_BEFORE_R3E2_2026_09_19.md`.
-9. `129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md`.
-10. `128_R3E1_RESTART_CONNECTIVITY_PASS_RECORD_REPLAY_PENDING_2026_09_19.md`.
-11. `127_R3E1_NEON_CUTOVER_COMPLETE_DURABLE_ACCEPTANCE_PENDING_2026_09_19.md`.
-12. `125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md`.
-13. `124_R3D_CONSEQUENTIAL_ACTION_CONFIRMATION_PASS_2026_09_17.md`.
-14. `121_R3C_NINE_TOOL_READONLY_VOICEBRIDGE_BINDING_PASS_2026_09_16.md`.
-15. current PR #22 / PR #45 head and CI.
-
-## Proven baseline
-
-```text
-R3_A=PASS
-R3_B=PASS
-R3_C=PASS
-R3_D=PASS
-R3_E1=PASS
-```
-
-R3-E1 proves a consented YouTube Free-Tier start, Neon durable persistence, VoiceBridge+R3-E1 restart replay, status+segments reads, duplicate-start reuse, zero paid fallback evidence and zero error logs in the acceptance window.
-
-## Cost and provider policy
+## Cost and operational constraints
 
 ```text
 PROJECT_COST_POLICY=FREE_ONLY
 RENDER_FREE_WEB_SERVICES=ACCEPTED
-RENDER_ONRENDER_COM_ENDPOINTS=ACCEPTED
 RENDER_POSTGRES=REJECTED_FOR_DURABLE_STATE
-RENDER_PAID_UPGRADE=DENIED
 NEON_FREE_POSTGRES=PRIMARY_DURABLE_DATABASE
 OCI_ALWAYS_FREE=ACCEPTED
-SELF_HOSTED_COBALT_ON_OCI=ACCEPTED
 PAID_HOSTING_FALLBACK=DENIED
 PAID_PROVIDER_FALLBACK=DENIED
-AUTOMATIC_PAID_RETRIEVAL=false
-AUTOMATIC_PAID_STT=false
-AUTOMATIC_PAID_PROXY=false
-UNEXPECTED_BILLING_RISK=DENIED
+PAID_ACTIONS_USAGE=DENIED
+
+GITHUB_ACTIONS_MINUTES=2000/2000
+ACTIONS_RESET=2026-10-01
 ```
 
-Render Free Web Services remain part of the target architecture. The rejected Render dependency is specifically Render PostgreSQL as durable storage.
-
-## Target architecture
+## Storage policy
 
 ```text
-ChatGPT Plugin/App
--> authenticated Remote MCP adapter
--> server-side VoiceBridge credential injection
--> VoiceBridge MEDIA API
--> free-only providers
--> Neon Free PostgreSQL durable state
+HP_OMEN_LOCAL_DISK_AS_PROJECT_STORAGE=DENIED
+AUTHORITATIVE_PROJECT_STATE=GITHUB_REPOSITORIES
+LOCAL_WORKTREES=TRANSIENT_ONLY
 ```
 
-## Canonical MEDIA operation target
+## Canonical MEDIA contract
 
 ```text
 13 total operations
-9 non-execution/read/preflight/lookup/status/segments
-4 start/execution operations
+9 read/non-execution operations
+4 execution operations
 ```
 
-Execution operations remain `media_youtube_start`, `media_instagram_start`, `media_facebook_start`, `media_telegram_start`.
+Execution operations:
+- `media_youtube_start`
+- `media_instagram_start`
+- `media_facebook_start`
+- `media_telegram_start`
 
-## R3-A — Contract freeze and secure adapter baseline
+## R3-E1 — YouTube
 
 Status: **PASS / COMPLETE**.
 
-## R3-B — Inbound authentication and secret-boundary hardening
+## R3-E2 — Instagram
 
 Status: **PASS / COMPLETE**.
 
-Known R3-G debt: OAuth client/code/token persistence is in-memory; restart/redeploy requires reconnect.
+Accepted: confirmation UI, Cancel/Allow-once, live canary, Neon durable state, restart/replay, status/segments after restart, duplicate-start idempotency, zero duplicate provider work, zero new provider charge.
 
-## R3-C — 9-tool non-execution VoiceBridge binding
+## R3-E3 — Facebook
 
-Status: **PASS / COMPLETE / HISTORICAL ACCEPTED EVIDENCE**.
+Status: **STAGING_READY / RUNTIME_DEPLOY_PENDING**.
 
-R3-C was intentionally not used during the 2026-09-19 Neon/R3-E1 recovery path.
+Prepared:
+- route-scoped bearer;
+- isolated MCP surface;
+- one execution tool only;
+- durable lookup;
+- status/segments isolation;
+- paid/AI route denial;
+- confirmation probe;
+- cold-start warmup;
+- replay probe.
 
-## R3-D — Consequential-action confirmation semantics
+## R3-E4 — Telegram
 
-Status: **PASS / COMPLETE**.
+Status: **STAGING_READY / RUNTIME_DEPLOY_PENDING**.
 
-## R3-E — Staged execution binding
+Prepared:
+- route-scoped bearer;
+- isolated MCP surface;
+- one execution tool only;
+- durable lookup;
+- status/segments isolation;
+- confirmation probe;
+- cold-start warmup;
+- replay probe.
 
-### R3-E1 — YouTube
+## R3-F — Full parity regression
 
-Status: **PASS / COMPLETE**.
+Status: **LOCAL PACKAGE READY / CI PENDING**.
 
-Accepted contour:
-
-```text
-service=krc-mcp-r3e1-youtube-sentinel
-surface=r3e1_youtube_execution
-tool_count=10
-execution_tool_count=1
-execution_tool=media_youtube_start
-other_execution_tools=not_enabled
-Neon_durable_backend=PASS
-live_start=PASS
-restart_replay=PASS
-duplicate_start_reuse=PASS
-paid_fallback=NO
-```
-
-Temporary acceptance startup probes are disabled in the final runtime.
-
-### R3-E2 — Instagram
-
-Status: **LIVE CANARY PASS / RESTART REPLAY PASS / STATUS+SEGMENTS PASS / DUPLICATE IDEMPOTENCY PENDING**.
-
-Accepted:
-
-```text
-route=Instagram -> OCI self-hosted Cobalt -> AssemblyAI universal-2 -> Neon
-route-scoped bearer=PASS
-isolated MCP surface=PASS
-tool_count=5
-execution_tool=media_instagram_start only
-authenticated preflight=PASS
-durable lookup=PASS_EMPTY
-retrieval_credits=0
-automatic_paid_fallback=false
-provider_work=false
-start_called=false
-server-side confirmation contract=PASS
-ChatGPT confirmation UI=PASS
-cancel path=PASS
-no execution after deny=PASS
-approve path=PASS
-exactly one invocation after approve=PASS
-zero-side-effect confirmation probe=PASS
-provider work=false
-real media start=false
-```
-
-Attempt 1 / remediation:
-
-```text
-attempt_1=HTTP 429 retryable
-failure_stage=PRE_PROVIDER
-Neon_job=false
-Cobalt_work=false
-AssemblyAI_work=false
-VoiceBridge_health_during_incident=503
-
-VoiceBridge_health_outside_global_limiter=PASS
-R3E2_health_warmup_before_start=PASS
-AUTO_RETRY_CONSEQUENTIAL_POST=false
-VoiceBridge_Validate_822=SUCCESS
-R3E2_Tests_1717=SUCCESS
-patched_runtimes=LIVE
-```
-
-Live retry accepted:
-
-```text
-job_id=KRCM_04e6d847-449c-4d0f-82c7-b494871d9322
-status=COMPLETED
-provider=assemblyai
-provider_mode=cobalt_retrieval_stt
-retrieval_provider=cobalt
-segment_count=1
-credits_charged=0
-retrieval_credits_charged=0
-metadata_credits_charged=0
-credit_charge_uncertain=false
-provider_data_deleted=true
-```
-
-Restart/replay accepted:
-
-```text
-VoiceBridge_restart_replay=PASS
-R3E2_restart_replay=PASS
-status_after_restart=PASS
-segments_after_restart=PASS
-provider_work_after_restart=false
-start_called_during_replay=false
-error_scan=PASS
-```
-
-Remaining acceptance:
-
-```text
-1. fresh DCR/reconnect after final clean redeploy
-2. duplicate-start idempotency with separate owner confirmation
-3. prove reused=true and zero provider replay
-4. final R3-E2 closure
-```
-
-### R3-E3 — Facebook
-
-Status: **HOLD**.
-
-### R3-E4 — Telegram
-
-Status: **HOLD**.
-
-## R3-F — Full 13-operation parity regression
-
-Status: **HOLD until R3-E2/E3/E4 close**.
+Local contract verifies all 13 operations, no execution leakage into R3-C, and exactly one own start operation per E1/E2/E3/E4 isolated execution surface.
 
 ## R3-G — Private operational hardening
 
-Status: **HOLD**.
+OAuth restart-safe implementation is staged via optional `KRC_MCP_OAUTH_SIGNING_KEY`.
 
-Known debt includes OAuth-state persistence across restart/redeploy.
+Runtime deployment acceptance is pending.
 
-## R3-H — Migration/publication readiness
+## Next gate
 
-Status: **HOLD**.
+After Actions reset or explicit owner override:
 
-## R4 — Owner-approved cutover / migration / publication
+1. CI VoiceBridge staging head.
+2. CI KRC staging head.
+3. Deploy server-side OAuth signing key and scoped bearers.
+4. Deploy R3-E3 and R3-E4 sentinels on Render Free.
+5. Read-only authenticated preflight/lookup.
+6. Zero-side-effect ChatGPT confirmation acceptance.
+7. Separate approval for bounded Facebook and Telegram live canaries.
+8. Durable/restart/idempotency acceptance.
 
-Status: **HOLD**.
-
-## Current gate model
-
-```text
-R3-A: PASS
-R3-B: PASS
-R3-C: PASS
-R3-D: PASS
-R3-E1: PASS
-R3-E2: RESTART REPLAY PASS / DUPLICATE IDEMPOTENCY PENDING
-R3-E3: HOLD
-R3-E4: HOLD
-R3-F: HOLD
-R3-G: HOLD
-R3-H: HOLD
-R4: HOLD
-```
-
-## Recovery command
-
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 138. R3-E1 PASS; R3-E2 live Instagram canary PASS; VoiceBridge + R3-E2 restart replay PASS; status+segments after restart PASS; provider replay zero; only duplicate-start idempotency and final closure remain.`
+Recovery authority: `CURRENT_HANDOFF.md` + checkpoint 139.

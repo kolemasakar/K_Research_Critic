@@ -4,6 +4,7 @@ import base64
 import hashlib
 import hmac
 import json
+import os
 import secrets
 import threading
 import time
@@ -131,7 +132,153 @@ class OAuthState:
         return required_scope in set(record.scope.split())
 
 
-GLOBAL_OAUTH_STATE = OAuthState()
+class RestartSafeOAuthState(OAuthState):
+    """Restart-safe owner OAuth without replayable authorization codes.
+
+    Dynamic client registrations, access tokens and refresh tokens are HMAC-signed
+    self-contained values, so established clients survive process replacement.
+    Authorization codes intentionally remain in-memory and single-use via OAuthState.
+    A restart during the short authorization-code exchange window requires only that
+    authorization flow to be retried; it does not require fresh dynamic registration.
+    """
+
+    _PREFIX = "krc1"
+
+    def __init__(self, signing_key: str) -> None:
+        if len(signing_key) < 32:
+            raise ValueError("oauth_signing_key_too_short")
+        super().__init__()
+        self._key = signing_key.encode("utf-8")
+
+    @staticmethod
+    def _b64encode(value: bytes) -> str:
+        return base64.urlsafe_b64encode(value).rstrip(b"=").decode("ascii")
+
+    @staticmethod
+    def _b64decode(value: str) -> bytes:
+        padding = "=" * (-len(value) % 4)
+        return base64.urlsafe_b64decode((value + padding).encode("ascii"))
+
+    def _encode(self, kind: str, payload: Mapping[str, object]) -> str:
+        body = {"v": 1, "typ": kind, **dict(payload)}
+        raw = json.dumps(body, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        body_part = self._b64encode(raw)
+        signed = f"{self._PREFIX}.{body_part}".encode("ascii")
+        signature = self._b64encode(hmac.new(self._key, signed, hashlib.sha256).digest())
+        return f"{self._PREFIX}.{body_part}.{signature}"
+
+    def _decode(self, token: str, expected_kind: str) -> dict[str, object] | None:
+        try:
+            prefix, body_part, signature = token.split(".", 2)
+            if prefix != self._PREFIX:
+                return None
+            signed = f"{prefix}.{body_part}".encode("ascii")
+            expected = self._b64encode(hmac.new(self._key, signed, hashlib.sha256).digest())
+            if not hmac.compare_digest(expected, signature):
+                return None
+            payload = json.loads(self._b64decode(body_part).decode("utf-8"))
+        except (ValueError, UnicodeDecodeError, json.JSONDecodeError):
+            return None
+        if not isinstance(payload, dict):
+            return None
+        if payload.get("v") != 1 or payload.get("typ") != expected_kind:
+            return None
+        return payload
+
+    def register_client(self, redirect_uris: list[str]) -> str:
+        normalized = sorted({uri for uri in redirect_uris if _valid_redirect_uri(uri)})
+        if not normalized or len(normalized) != len(redirect_uris):
+            raise ValueError("invalid_redirect_uri")
+        return self._encode(
+            "client",
+            {
+                "redirect_uris": normalized,
+                "iat": int(self._now()),
+                "nonce": secrets.token_urlsafe(12),
+            },
+        )
+
+    def client_redirect_allowed(self, client_id: str, redirect_uri: str) -> bool:
+        payload = self._decode(client_id, "client")
+        if payload is None:
+            return False
+        uris = payload.get("redirect_uris")
+        return isinstance(uris, list) and redirect_uri in uris
+
+    def _issue_tokens(self, *, client_id: str, scope: str) -> tuple[str, str, int, str]:
+        now = int(self._now())
+        access_token = self._encode(
+            "access",
+            {
+                "client_id": client_id,
+                "scope": scope,
+                "exp": now + ACCESS_TOKEN_TTL_SECONDS,
+                "nonce": secrets.token_urlsafe(16),
+            },
+        )
+        refresh_token = self._encode(
+            "refresh",
+            {
+                "client_id": client_id,
+                "scope": scope,
+                "exp": now + REFRESH_TOKEN_TTL_SECONDS,
+                "nonce": secrets.token_urlsafe(20),
+            },
+        )
+        return access_token, refresh_token, ACCESS_TOKEN_TTL_SECONDS, scope
+
+    def refresh(
+        self,
+        *,
+        refresh_token: str,
+        client_id: str,
+    ) -> tuple[str, str, int, str] | None:
+        record = self._decode(refresh_token, "refresh")
+        if record is None:
+            return None
+        exp = record.get("exp")
+        if not isinstance(exp, int) or exp < int(self._now()):
+            return None
+        if record.get("client_id") != client_id:
+            return None
+        scope = record.get("scope")
+        if not isinstance(scope, str):
+            return None
+
+        now = int(self._now())
+        access_token = self._encode(
+            "access",
+            {
+                "client_id": client_id,
+                "scope": scope,
+                "exp": now + ACCESS_TOKEN_TTL_SECONDS,
+                "nonce": secrets.token_urlsafe(16),
+            },
+        )
+        # The restart-safe refresh token is intentionally reusable until expiry.
+        # Global signing-key rotation is the revocation boundary for this private
+        # owner-only OAuth surface.
+        return access_token, refresh_token, ACCESS_TOKEN_TTL_SECONDS, scope
+
+    def access_allowed(self, token: str, required_scope: str = READ_SCOPE) -> bool:
+        record = self._decode(token, "access")
+        if record is None:
+            return False
+        exp = record.get("exp")
+        scope = record.get("scope")
+        if not isinstance(exp, int) or exp < int(self._now()) or not isinstance(scope, str):
+            return False
+        return required_scope in set(scope.split())
+
+
+def oauth_state_from_env() -> OAuthState:
+    signing_key = os.getenv("KRC_MCP_OAUTH_SIGNING_KEY", "").strip()
+    if not signing_key:
+        return OAuthState()
+    return RestartSafeOAuthState(signing_key)
+
+
+GLOBAL_OAUTH_STATE = oauth_state_from_env()
 
 
 def _valid_redirect_uri(uri: str) -> bool:

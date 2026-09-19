@@ -32,6 +32,7 @@ OAuth mode requires:
 KRC_MCP_AUTH_MODE=oauth
 KRC_MCP_PUBLIC_BASE_URL=<isolated TLS service base URL>
 KRC_MCP_OWNER_CODE=<owner-provisioned secret in deployment dashboard only>
+KRC_MCP_OAUTH_SIGNING_KEY=<server-side random secret, minimum 32 characters>
 ```
 
 `KRC_MCP_OWNER_CODE` must be created and entered directly by the owner in the deployment platform secret/environment UI. It must never be pasted into chat, committed to Git, included in tool arguments, written to evidence/checkpoints, or emitted to logs/responses. The service fails closed at authorization until this value is configured.
@@ -47,7 +48,7 @@ OAuth discovery endpoints:
 /oauth/token
 ```
 
-The R3-B OAuth store is intentionally isolated and in-memory. A service restart invalidates issued access/refresh tokens and may require owner reauthorization. Durable identity/session hardening belongs to the later private-operational-hardening phase, not R3-B.
+OAuth state defaults to the original isolated in-memory store when KRC_MCP_OAUTH_SIGNING_KEY is absent. When KRC_MCP_OAUTH_SIGNING_KEY is configured, dynamic client registrations plus access/refresh tokens are restart-safe HMAC-signed values. Authorization codes remain short-lived, single-use, and in-memory; a restart during code exchange requires only that authorization flow to be retried. Signing-key rotation is the revocation boundary for restart-safe owner sessions.
 
 No OAuth credential is the VoiceBridge bearer. The future VoiceBridge credential remains server-side-only and is still forbidden from this isolated auth canary.
 
