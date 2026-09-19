@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
+from urllib.error import HTTPError
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -302,3 +303,73 @@ def test_r3e2_confirmation_probe_mode_is_zero_side_effect(monkeypatch) -> None:
     assert payload["confirmation_probe_only"] is True
     assert payload["confirmation_probe_invocation_count"] == 1
     assert payload["provider_work_started"] is False
+
+
+def test_r3e2_cold_start_backend_warms_before_single_start(monkeypatch) -> None:
+    events: list[str] = []
+
+    def fake_warm(binding):
+        assert binding.configured
+        events.append("warm")
+
+    def fake_call(binding, method, path, payload, query):
+        assert binding.configured
+        events.append("start")
+        assert method == "POST"
+        assert path == "/api/v1/media/managed/transcriptions"
+        assert payload == {"url": INSTAGRAM_URL}
+        assert query == {}
+        return {"job_id": "KRCM_warmed", "status": "PROCESSING"}
+
+    monkeypatch.setattr(r3e2_http, "_warm_voicebridge", fake_warm)
+    monkeypatch.setattr(r3e2_http, "call_voicebridge", fake_call)
+
+    result = r3e2_http._cold_start_resilient_backend(
+        _binding(),
+        "POST",
+        "/api/v1/media/managed/transcriptions",
+        {"url": INSTAGRAM_URL},
+        {},
+    )
+
+    assert result["job_id"] == "KRCM_warmed"
+    assert events == ["warm", "start"]
+
+
+def test_r3e2_voicebridge_warmup_retries_retryable_status_then_passes(monkeypatch) -> None:
+    calls = 0
+    sleeps: list[float] = []
+
+    class FakeResponse:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def read(self, _limit):
+            return b'{"status":"ok"}'
+
+    def fake_urlopen(_request, timeout):
+        nonlocal calls
+        calls += 1
+        assert timeout == 5.0
+        if calls == 1:
+            raise HTTPError(
+                "https://voicebridge.invalid/api/v1/health",
+                503,
+                "Service Unavailable",
+                {},
+                None,
+            )
+        return FakeResponse()
+
+    monkeypatch.setattr(r3e2_http, "urlopen", fake_urlopen)
+    monkeypatch.setattr(r3e2_http, "sleep", lambda value: sleeps.append(value))
+
+    r3e2_http._warm_voicebridge(_binding())
+
+    assert calls == 2
+    assert sleeps == [r3e2_http._VOICEBRIDGE_WARMUP_RETRY_DELAY_SECONDS]
