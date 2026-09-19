@@ -4,8 +4,11 @@ import json
 import os
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from time import monotonic, sleep
 from typing import Mapping
+from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
+from urllib.request import Request, urlopen
 
 from .http_server import (
     HEALTH_PATH,
@@ -21,7 +24,7 @@ from .http_server import (
     _validate_origin,
 )
 from .oauth import GLOBAL_OAUTH_STATE, OAuthState, handle_oauth_request
-from .r3c import VoiceBridgeBinding
+from .r3c import VoiceBridgeBinding, VoiceBridgeError, call_voicebridge
 from .r3e2 import (
     R3E2_SURFACE,
     R3E2_TOOL_NAME_SET,
@@ -66,6 +69,86 @@ def _binding(config: HttpConfig) -> VoiceBridgeBinding:
         bearer_token=config.voicebridge_bearer,
         timeout_seconds=config.voicebridge_timeout_seconds,
     )
+
+
+_VOICEBRIDGE_WARMUP_PATH = "/api/v1/health"
+_VOICEBRIDGE_WARMUP_RETRY_STATUSES = frozenset({429, 502, 503, 504})
+_VOICEBRIDGE_WARMUP_BUDGET_SECONDS = 45.0
+_VOICEBRIDGE_WARMUP_RETRY_DELAY_SECONDS = 2.0
+_VOICEBRIDGE_WARMUP_REQUEST_TIMEOUT_SECONDS = 5.0
+
+
+def _warm_voicebridge(binding: VoiceBridgeBinding) -> None:
+    """Wake a free-tier VoiceBridge instance using health-only GETs.
+
+    No MEDIA provider work is started here. The consequential POST is sent
+    exactly once by _cold_start_resilient_backend after health becomes ready.
+    """
+
+    if not binding.configured or not binding.base_url:
+        raise VoiceBridgeError("binding_unavailable")
+    base = binding.base_url.rstrip("/")
+    parsed = urlsplit(base)
+    if parsed.scheme != "https" or not parsed.netloc or parsed.username or parsed.password:
+        raise VoiceBridgeError("binding_invalid")
+
+    deadline = monotonic() + _VOICEBRIDGE_WARMUP_BUDGET_SECONDS
+    last_error = VoiceBridgeError("voicebridge_unavailable", retryable=True)
+    while True:
+        request = Request(
+            base + _VOICEBRIDGE_WARMUP_PATH,
+            headers={
+                "Accept": "application/json",
+                "User-Agent": "krc-media-mcp-r3e2-warmup",
+            },
+            method="GET",
+        )
+        try:
+            with urlopen(
+                request,
+                timeout=min(
+                    max(binding.timeout_seconds, 1.0),
+                    _VOICEBRIDGE_WARMUP_REQUEST_TIMEOUT_SECONDS,
+                ),
+            ) as response:
+                status = int(response.status)
+                response.read(64 * 1024)
+            if status == 200:
+                return
+            last_error = VoiceBridgeError(
+                "voicebridge_http_error",
+                http_status=status,
+                retryable=status in _VOICEBRIDGE_WARMUP_RETRY_STATUSES,
+            )
+            if status not in _VOICEBRIDGE_WARMUP_RETRY_STATUSES:
+                raise last_error
+        except HTTPError as exc:
+            status = int(exc.code)
+            last_error = VoiceBridgeError(
+                "voicebridge_http_error",
+                http_status=status,
+                retryable=status in _VOICEBRIDGE_WARMUP_RETRY_STATUSES,
+            )
+            if status not in _VOICEBRIDGE_WARMUP_RETRY_STATUSES:
+                raise last_error from None
+        except (URLError, TimeoutError, OSError):
+            last_error = VoiceBridgeError("voicebridge_unavailable", retryable=True)
+
+        if monotonic() >= deadline:
+            raise last_error
+        sleep(_VOICEBRIDGE_WARMUP_RETRY_DELAY_SECONDS)
+
+
+def _cold_start_resilient_backend(
+    binding: VoiceBridgeBinding,
+    method: str,
+    path: str,
+    payload: Mapping[str, object] | None,
+    query: Mapping[str, object],
+) -> dict[str, object]:
+    if method == "POST" and path == "/api/v1/media/managed/transcriptions":
+        _warm_voicebridge(binding)
+    return call_voicebridge(binding, method, path, payload, query)
 
 
 def handle_r3e2_http_request(
@@ -205,7 +288,11 @@ def handle_r3e2_http_request(
             backend_call=_confirmation_probe_backend,
         )
     else:
-        response = dispatch_r3e2(decoded, _binding(config))
+        response = dispatch_r3e2(
+            decoded,
+            _binding(config),
+            backend_call=_cold_start_resilient_backend,
+        )
     if response is None:
         return HttpResponse(
             status=HTTPStatus.ACCEPTED,
