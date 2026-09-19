@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 6.8
-Status: **PLUGIN_FIRST / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_STAGING_READY / R3-E4_STAGING_READY / R3-F_LOCAL_READY / R3-G_OAUTH_STAGING_READY / FREE_ONLY / ACTIONS_HOLD / PUBLICATION_HOLD**
+Version: 6.9
+Status: **PLUGIN_FIRST / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_RUNTIME_STAGING / R3-E4_RUNTIME_STAGING / R3-F_CI_PASS / R3-G_OAUTH_DEPLOYED / FREE_ONLY / PUBLICATION_HOLD**
 Updated: 2026-09-19
 
 ## End state
@@ -31,15 +31,15 @@ R3-C 9-tool read-only binding                 PASS
 R3-D Consequential-action confirmation        PASS
 R3-E1 YouTube execution                       PASS / COMPLETE
 R3-E2 Instagram execution                     PASS / COMPLETE
-R3-E3 Facebook execution                      STAGING_READY / CI+DEPLOY+ACCEPTANCE_PENDING
-R3-E4 Telegram execution                      STAGING_READY / CI+DEPLOY+ACCEPTANCE_PENDING
-R3-F Full 13-operation parity                 LOCAL_READY / CI_PENDING
-R3-G Private operational hardening            OAUTH_STAGING_READY / DEPLOY_ACCEPTANCE_PENDING
+R3-E3 Facebook execution                      CI+DEPLOY_HEALTH+OAUTH_DISCOVERY PASS / AUTH CONFIRMATION PENDING
+R3-E4 Telegram execution                      CI+DEPLOY_HEALTH+OAUTH_DISCOVERY PASS / AUTH CONFIRMATION PENDING
+R3-F Full 13-operation parity                 LOCAL+CI PASS / RUNTIME ACCEPTANCE PENDING
+R3-G Private operational hardening            OAUTH DEPLOYED / DISCOVERY PASS / TOKEN RESTART ACCEPTANCE PENDING
 R3-H Migration/publication readiness          HOLD
 R4 Owner-approved cutover/publication         HOLD
 ```
 
-**Current position:** R3-E1/E2 are closed; development has reached E3/E4 staging and prebuilt R3-F/R3-G work, but runtime acceptance is waiting on CI/deployment gates.
+**Current position:** E3/E4 zero-side-effect staging runtimes are live on Render Free. CI and unauthenticated OAuth discovery are complete. The next boundary is secret-safe authenticated OAuth/MCP discovery and ChatGPT confirmation acceptance.
 
 ## Canonical contract
 
@@ -62,52 +62,62 @@ Accepted and healthy:
 
 - R3-E1 YouTube sentinel;
 - R3-E2 Instagram sentinel;
-- VoiceBridge v0.6.0 health endpoint;
+- VoiceBridge v0.6.0 staging head with E3/E4 route-scoped bearer support;
+- R3-E3 Facebook sentinel in confirmation-probe-only mode;
+- R3-E4 Telegram sentinel in confirmation-probe-only mode;
 - OCI Cobalt v11.7.1;
 - Neon Free durable backend.
 
-Not yet accepted as runtime:
+Still pending acceptance:
 
-- R3-E3 Facebook staging head;
-- R3-E4 Telegram staging head;
-- restart-safe OAuth staging;
-- full R3-F parity staging.
+- authenticated OAuth/DCR + MCP discovery for E3/E4;
+- ChatGPT Cancel/Allow-once on E3/E4;
+- restart-safe OAuth token continuity across restart;
+- live E3/E4 canaries, which require separate owner authorization;
+- R3-F runtime parity closure.
 
-## Current operational hold
+## CI state
 
 ```text
-GITHUB_ACTIONS_MINUTES=2000/2000
-ACTIONS_RESET=2026-10-01
-PAID_ACTIONS_USAGE=DENIED
+KRC_RUN=35466720921
+KRC_PYTHON_3_13=PASS
+KRC_PYTHON_3_14=PASS
+KRC_QUALITY=PASS
+
+VOICEBRIDGE_RUN=35466722002
+VOICEBRIDGE_CLOUD=PASS
+VOICEBRIDGE_IMAGE_PARITY=PASS
+VOICEBRIDGE_BROWSER_EXTENSION=PASS
+VOICEBRIDGE_REPOSITORY_DOCS=PASS
 ```
 
-Current E3/E4/OAuth/R3-F staging commits intentionally have zero workflow runs.
+The repositories are public and these standard GitHub-hosted Ubuntu jobs were not blocked by the previously recorded 2000/2000 private-repository included-minutes state. Paid Actions usage remains denied and was not needed.
+
+## Safety invariant
+
+```text
+E3_CONFIRMATION_PROBE_ONLY=true
+E4_CONFIRMATION_PROBE_ONLY=true
+E3_PROVIDER_WORK_STARTED=false
+E4_PROVIDER_WORK_STARTED=false
+NEON_MANAGED_JOBS=1
+NEON_INSTAGRAM_JOBS=1
+NEON_FACEBOOK_JOBS=0
+NEON_TELEGRAM_JOBS=0
+POST_DEPLOY_ERROR_LEVEL_LOGS=0
+POST_DEPLOY_HTTP_5XX=0
+```
 
 ## Nearest tasks
 
-### Before Actions reset
-
-- keep the staged heads stable;
-- avoid paid CI;
-- no live Facebook/Telegram execution;
-- prepare deployment/acceptance checklists and server-side configuration plan;
-- keep all authoritative state in GitHub;
-- clean non-authoritative HP-OMEN residue when elevated Windows rights are available.
-
-### After reset or explicit override
-
-1. run VoiceBridge CI;
-2. run KRC CI;
-3. deploy restart-safe OAuth signing key and E3/E4 scoped bearers;
-4. deploy E3/E4 isolated Render Free sentinels;
-5. run authenticated read-only preflight/lookup;
-6. validate zero-side-effect ChatGPT confirmation flows;
-7. obtain separate owner approval for bounded live canaries;
-8. prove Neon persistence, restart/replay and duplicate-start idempotency;
-9. close E3/E4;
-10. run R3-F full parity acceptance;
-11. finish R3-G operational hardening;
-12. enter R3-H migration/publication readiness.
+1. Complete secret-safe authenticated OAuth/DCR and authenticated MCP discovery for E3/E4.
+2. Validate ChatGPT Cancel and Allow-once while confirmation-probe-only remains enabled.
+3. Obtain separate owner approval before any real Facebook or Telegram execution.
+4. After that approval only, run one bounded canary per platform and prove Neon durability, restart/replay, duplicate-start idempotency and zero paid fallback.
+5. Close R3-E3 and R3-E4.
+6. Complete R3-F runtime parity acceptance.
+7. Complete R3-G restart-safe token continuity and operational hardening.
+8. Enter R3-H migration/publication readiness.
 
 ## Infrastructure policy
 
@@ -130,4 +140,4 @@ HP_OMEN_LOCAL_DISK_AS_PROJECT_STORAGE=DENIED
 LOCAL_WORKTREES=TRANSIENT_ONLY
 ```
 
-Recovery authority: `CURRENT_HANDOFF.md` + checkpoint 140.
+Recovery authority: `CURRENT_HANDOFF.md` v18.3 + checkpoint 142.
