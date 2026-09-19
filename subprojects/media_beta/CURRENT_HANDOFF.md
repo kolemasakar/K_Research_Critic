@@ -1,33 +1,34 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 17.7
-Status: **ACTIVE_HANDOFF / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_PASS / R3-E2_LIVE_CANARY_READY_RECONNECT_PENDING / FREE_ONLY / PUBLICATION_HOLD**
+Version: 17.8
+Status: **ACTIVE_HANDOFF / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_PASS / R3-E2_ATTEMPT1_TRANSIENT_REMEDIATED_RECONNECT_PENDING / FREE_ONLY / PUBLICATION_HOLD**
 Date: 2026-09-19
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 135. R3-E1 PASS. R3-E2 authenticated preflight + ChatGPT CANCEL/APPROVE confirmation UI PASS; scoped bearer rotated; confirmation probe disabled; runtimes healthy; fresh DCR/reconnect required after restart. Live media_instagram_start remains HOLD until explicit owner authorization. Do not use R3C unless separately requested.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 136. R3-E1 PASS. R3-E2 confirmation UI PASS; live canary attempt 1 failed transiently pre-provider with HTTP 429 while VoiceBridge was cold/stopped; no Neon job/provider work. VoiceBridge health was moved outside the global limiter and R3-E2 now performs bounded side-effect-free health warmup before exactly one consequential POST. Both CI and deploys PASS/LIVE. Fresh DCR/reconnect is required after redeploy before retry. Do not use R3C unless separately requested.`
 
 ## Canonical recovery files
 
-1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v17.7; current authority.
-2. `subprojects/media_beta/135_R3E2_CREDENTIAL_ROTATION_PROBE_DISABLED_LIVE_CANARY_READY_2026_09_19.md` — current R3-E2 live-canary readiness checkpoint.
-3. `subprojects/media_beta/134_R3E2_CHATGPT_CONFIRMATION_UI_PASS_ZERO_SIDE_EFFECT_2026_09_19.md` — current R3-E2 confirmation UI checkpoint.
-4. `subprojects/media_beta/133_FREE_ONLY_INFRASTRUCTURE_POLICY_RENDER_WEB_ALLOWED_POSTGRES_REJECTED_2026_09_19.md` — current infrastructure policy clarification.
-5. `subprojects/media_beta/132_R3E2_ISOLATED_SENTINEL_AUTHENTICATED_PREFLIGHT_PASS_CONFIRMATION_PENDING_2026_09_19.md` — current R3-E2 implementation/runtime checkpoint.
-6. `subprojects/media_beta/131_R3E2_INSTAGRAM_READONLY_FREE_ONLY_PREFLIGHT_2026_09_19.md` — R3-E2 read-only preflight.
-7. `subprojects/media_beta/130_POST_R3E1_CONTROL_POINT_BEFORE_R3E2_2026_09_19.md` — pre-R3-E2 control point.
-8. `subprojects/media_beta/129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md` — R3-E1 closure.
-9. `subprojects/media_beta/128_R3E1_RESTART_CONNECTIVITY_PASS_RECORD_REPLAY_PENDING_2026_09_19.md` — restart-connectivity checkpoint.
-10. `subprojects/media_beta/127_R3E1_NEON_CUTOVER_COMPLETE_DURABLE_ACCEPTANCE_PENDING_2026_09_19.md` — Neon cutover checkpoint.
-11. `subprojects/media_beta/126_CHAT_TRANSITION_R3E1_FREE_ONLY_NEON_MIGRATION_GATE_2026_09_17.md` — historical transition.
-12. `subprojects/media_beta/125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md` — free-only policy / Render DB incident.
-13. `subprojects/media_beta/124_R3D_CONSEQUENTIAL_ACTION_CONFIRMATION_PASS_2026_09_17.md`.
-14. `subprojects/media_beta/121_R3C_NINE_TOOL_READONLY_VOICEBRIDGE_BINDING_PASS_2026_09_16.md`.
-15. `subprojects/media_beta/117_R3B_AUTHENTICATED_REMOTE_MCP_HARDENING_PASS_2026_09_16.md`.
-16. `subprojects/media_beta/113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md`.
-17. `subprojects/media_beta/02_ROADMAP.md`.
-18. current PR #22 / PR #45 head and CI plus current Render/Neon non-secret evidence.
+1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v17.8; current authority.
+2. `subprojects/media_beta/136_R3E2_ATTEMPT1_TRANSIENT_COLD_START_REMEDIATION_PASS_RECONNECT_REQUIRED_2026_09_19.md` — current R3-E2 incident/remediation checkpoint.
+3. `subprojects/media_beta/135_R3E2_CREDENTIAL_ROTATION_PROBE_DISABLED_LIVE_CANARY_READY_2026_09_19.md` — current R3-E2 live-canary readiness checkpoint.
+4. `subprojects/media_beta/134_R3E2_CHATGPT_CONFIRMATION_UI_PASS_ZERO_SIDE_EFFECT_2026_09_19.md` — current R3-E2 confirmation UI checkpoint.
+5. `subprojects/media_beta/133_FREE_ONLY_INFRASTRUCTURE_POLICY_RENDER_WEB_ALLOWED_POSTGRES_REJECTED_2026_09_19.md` — current infrastructure policy clarification.
+6. `subprojects/media_beta/132_R3E2_ISOLATED_SENTINEL_AUTHENTICATED_PREFLIGHT_PASS_CONFIRMATION_PENDING_2026_09_19.md` — current R3-E2 implementation/runtime checkpoint.
+7. `subprojects/media_beta/131_R3E2_INSTAGRAM_READONLY_FREE_ONLY_PREFLIGHT_2026_09_19.md` — R3-E2 read-only preflight.
+8. `subprojects/media_beta/130_POST_R3E1_CONTROL_POINT_BEFORE_R3E2_2026_09_19.md` — pre-R3-E2 control point.
+9. `subprojects/media_beta/129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md` — R3-E1 closure.
+10. `subprojects/media_beta/128_R3E1_RESTART_CONNECTIVITY_PASS_RECORD_REPLAY_PENDING_2026_09_19.md` — restart-connectivity checkpoint.
+11. `subprojects/media_beta/127_R3E1_NEON_CUTOVER_COMPLETE_DURABLE_ACCEPTANCE_PENDING_2026_09_19.md` — Neon cutover checkpoint.
+12. `subprojects/media_beta/126_CHAT_TRANSITION_R3E1_FREE_ONLY_NEON_MIGRATION_GATE_2026_09_17.md` — historical transition.
+13. `subprojects/media_beta/125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md` — free-only policy / Render DB incident.
+14. `subprojects/media_beta/124_R3D_CONSEQUENTIAL_ACTION_CONFIRMATION_PASS_2026_09_17.md`.
+15. `subprojects/media_beta/121_R3C_NINE_TOOL_READONLY_VOICEBRIDGE_BINDING_PASS_2026_09_16.md`.
+16. `subprojects/media_beta/117_R3B_AUTHENTICATED_REMOTE_MCP_HARDENING_PASS_2026_09_16.md`.
+17. `subprojects/media_beta/113_R3A_CONTRACT_FREEZE_SECURE_ADAPTER_BASELINE_PASS_2026_09_16.md`.
+18. `subprojects/media_beta/02_ROADMAP.md`.
+19. current PR #22 / PR #45 head and CI plus current Render/Neon non-secret evidence.
 
 ## Repository / PR
 
@@ -51,7 +52,7 @@ R3_B=PASS
 R3_C=PASS
 R3_D=PASS
 R3_E1=PASS / COMPLETE
-R3_E2=ISOLATED_SENTINEL_PASS / AUTHENTICATED_PREFLIGHT_PASS / CONFIRMATION_UI_PASS / CREDENTIAL_ROTATION_PASS / PROBE_DISABLED / RECONNECT_PENDING / LIVE_CANARY_READY_NOT_AUTHORIZED
+R3_E2=CONFIRMATION_UI_PASS / ATTEMPT1_TRANSIENT_PRE_PROVIDER_FAILURE / COLD_START_REMEDIATION_PASS / RECONNECT_PENDING / RETRY_READY
 R3_E3=HOLD
 R3_E4=HOLD
 R3_F_AND_LATER=HOLD
@@ -199,7 +200,7 @@ There is no remaining R3-E1 database or YouTube acceptance blocker.
 
 ```text
 R3_E1=PASS
-R3_E2_INSTAGRAM=CONFIRMATION_UI_PASS / CREDENTIAL_ROTATION_PASS / PROBE_DISABLED / RECONNECT_PENDING / LIVE_CANARY_READY_NOT_AUTHORIZED
+R3_E2_INSTAGRAM=ATTEMPT1_TRANSIENT_PRE_PROVIDER_FAILURE / COLD_START_REMEDIATION_PASS / RECONNECT_PENDING / RETRY_READY
 R3_E3_FACEBOOK=HOLD
 R3_E4_TELEGRAM=HOLD
 ```
@@ -244,6 +245,36 @@ Remaining live gates:
 - obtain explicit owner authorization for exactly one bounded live Instagram start;
 - then prove Neon persistence, restart replay and duplicate-start idempotency.
 
+R3-E2 live canary attempt 1 and remediation:
+
+```text
+attempt_1_result=HTTP_429 / retryable
+failure_stage=PRE_PROVIDER
+Neon_job_created=false
+Cobalt_work=false
+AssemblyAI_work=false
+provider_charge=false
+
+VoiceBridge_fix=health outside global rate limiter
+VoiceBridge_head=e7b8ebb2803f46656ed07483f87beb31b740f436
+VoiceBridge_Validate_822=SUCCESS
+VoiceBridge_deploy=dep-danac9btqb8s73b77h40 / LIVE
+
+R3E2_fix=bounded health warmup before exactly one consequential POST
+R3E2_head=e0cf1b1c0c46f936df7524c2906b5f7be0b96f6a
+R3E2_Tests_1717=SUCCESS
+R3E2_deploy=dep-danace8ae00c73e3e940 / LIVE
+
+AUTO_RETRY_CONSEQUENTIAL_POST=false
+fresh_DCR_reconnect_required=true
+```
+
+Remaining live gates:
+- recreate/reconnect the private R3-E2 MCP after redeploy;
+- verify authenticated 5-tool surface;
+- retry exactly one bounded Instagram canary with Allow once;
+- prove Neon persistence, terminal state, restart replay and duplicate-start idempotency.
+
 The first Render provisioning attempt `srv-dan7s6egekts7381bbj0` is not accepted and must not be used.
 
 ## Secret boundary
@@ -262,7 +293,7 @@ CHECKPOINT_SECRET=false
 ```text
 OAUTH_STATE_PERSISTENCE=NOT_IMPLEMENTED
 restart/redeploy=>reconnect_required
-Render_free_service_cold_wake_transient_errors=KNOWN
+Render_free_service_cold_wake_transient_errors=MITIGATED_BY_R3E2_HEALTH_WARMUP
 Render_Free_Postgres_expiration=REJECTED_DEPENDENCY
 PRODUCTION_READY=NO
 R3_G_DEBT=YES
@@ -283,4 +314,4 @@ R4=HOLD
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V17_7_R3E2_LIVE_CANARY_READY_RECONNECT_PENDING_2026_09_19`
+`KRC_MEDIA_CURRENT_HANDOFF_V17_8_R3E2_ATTEMPT1_REMEDIATED_RECONNECT_PENDING_2026_09_19`
