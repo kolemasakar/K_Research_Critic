@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 6.5
-Status: **PLUGIN_FIRST / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_PASS / R3-E2_LIVE_CANARY_PASS_RESTART_IDEMPOTENCY_PENDING / FREE_ONLY / PUBLICATION_HOLD**
+Version: 6.6
+Status: **PLUGIN_FIRST / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_PASS / R3-E2_RESTART_REPLAY_PASS_DUPLICATE_IDEMPOTENCY_PENDING / FREE_ONLY / PUBLICATION_HOLD**
 Updated: 2026-09-19
 
 ## Product position
@@ -28,8 +28,9 @@ paid provider fallback -> forbidden
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v17.9.
-2. `137_R3E2_INSTAGRAM_LIVE_CANARY_DURABLE_FREE_ONLY_PASS_2026_09_19.md`.
+1. `CURRENT_HANDOFF.md` — v18.0.
+2. `138_R3E2_RESTART_REPLAY_STATUS_SEGMENTS_PASS_2026_09_19.md`.
+3. `137_R3E2_INSTAGRAM_LIVE_CANARY_DURABLE_FREE_ONLY_PASS_2026_09_19.md`.
 3. `136_R3E2_ATTEMPT1_TRANSIENT_COLD_START_REMEDIATION_PASS_RECONNECT_REQUIRED_2026_09_19.md`.
 4. `135_R3E2_CREDENTIAL_ROTATION_PROBE_DISABLED_LIVE_CANARY_READY_2026_09_19.md`.
 5. `134_R3E2_CHATGPT_CONFIRMATION_UI_PASS_ZERO_SIDE_EFFECT_2026_09_19.md`.
@@ -145,7 +146,7 @@ Temporary acceptance startup probes are disabled in the final runtime.
 
 ### R3-E2 — Instagram
 
-Status: **LIVE CANARY PASS / DURABLE NEON PASS / FREE-ONLY PASS / RESTART + IDEMPOTENCY PENDING**.
+Status: **LIVE CANARY PASS / RESTART REPLAY PASS / STATUS+SEGMENTS PASS / DUPLICATE IDEMPOTENCY PENDING**.
 
 Accepted:
 
@@ -206,14 +207,25 @@ credit_charge_uncertain=false
 provider_data_deleted=true
 ```
 
+Restart/replay accepted:
+
+```text
+VoiceBridge_restart_replay=PASS
+R3E2_restart_replay=PASS
+status_after_restart=PASS
+segments_after_restart=PASS
+provider_work_after_restart=false
+start_called_during_replay=false
+error_scan=PASS
+```
+
 Remaining acceptance:
 
 ```text
-1. VoiceBridge restart replay
-2. R3-E2 restart/reconnect replay
-3. status + segments read after restart
-4. duplicate-start idempotency with separate owner confirmation
-5. final error scan and R3-E2 closure
+1. fresh DCR/reconnect after final clean redeploy
+2. duplicate-start idempotency with separate owner confirmation
+3. prove reused=true and zero provider replay
+4. final R3-E2 closure
 ```
 
 ### R3-E3 — Facebook
@@ -250,7 +262,7 @@ R3-B: PASS
 R3-C: PASS
 R3-D: PASS
 R3-E1: PASS
-R3-E2: LIVE CANARY PASS / RESTART + IDEMPOTENCY PENDING
+R3-E2: RESTART REPLAY PASS / DUPLICATE IDEMPOTENCY PENDING
 R3-E3: HOLD
 R3-E4: HOLD
 R3-F: HOLD
@@ -261,4 +273,4 @@ R4: HOLD
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 137. R3-E1 PASS; R3-E2 live Instagram canary PASS via Cobalt -> AssemblyAI -> Neon; durable COMPLETED job with one segment and zero paid/retrieval credits; restart replay and duplicate-start idempotency remain pending.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 138. R3-E1 PASS; R3-E2 live Instagram canary PASS; VoiceBridge + R3-E2 restart replay PASS; status+segments after restart PASS; provider replay zero; only duplicate-start idempotency and final closure remain.`
