@@ -34,6 +34,7 @@ from .r3e2 import (
 from .server import LEGACY_PROTOCOL_VERSION, MCP_PROTOCOL_VERSION, SERVER_NAME
 
 R3E2_PREFLIGHT_PROBE_ENV = "KRC_R3E2_PREFLIGHT_PROBE_URL"
+R3E2_REPLAY_PROBE_ENV = "KRC_R3E2_REPLAY_PROBE_JOB_ID"
 R3E2_CONFIRMATION_PROBE_ONLY_ENV = "KRC_R3E2_CONFIRMATION_PROBE_ONLY"
 _CONFIRMATION_PROBE_INVOCATIONS = 0
 
@@ -357,6 +358,82 @@ def _structured(response: object) -> Mapping[str, object] | None:
     return structured if isinstance(structured, Mapping) else None
 
 
+def run_r3e2_record_replay_probe(
+    config: HttpConfig,
+    job_id: str,
+) -> dict[str, object]:
+    """Read durable Instagram job status and segments without provider work."""
+
+    summary: dict[str, object] = {
+        "event": "r3e2_record_replay_probe",
+        "status": "fail",
+        "job_id": job_id,
+        "provider_work_started": False,
+        "start_called": False,
+    }
+
+    status_message = {
+        "jsonrpc": "2.0",
+        "id": "r3e2-replay-status",
+        "method": "tools/call",
+        "params": {
+            "name": "media_non_youtube_status",
+            "arguments": {"job_id": job_id},
+        },
+    }
+    status_response = dispatch_r3e2(status_message, _binding(config))
+    status_structured = _structured(status_response)
+    if status_structured is None:
+        summary["reason"] = "status_missing"
+        return summary
+    status_result = (
+        status_response.get("result")
+        if isinstance(status_response, Mapping)
+        else None
+    )
+    if isinstance(status_result, Mapping) and status_result.get("isError") is True:
+        summary["reason"] = "status_error"
+        return summary
+
+    segments_message = {
+        "jsonrpc": "2.0",
+        "id": "r3e2-replay-segments",
+        "method": "tools/call",
+        "params": {
+            "name": "media_non_youtube_segments",
+            "arguments": {"job_id": job_id, "cursor": 0, "limit": 50},
+        },
+    }
+    segments_response = dispatch_r3e2(segments_message, _binding(config))
+    segments_structured = _structured(segments_response)
+    if segments_structured is None:
+        summary["reason"] = "segments_missing"
+        return summary
+    segments_result = (
+        segments_response.get("result")
+        if isinstance(segments_response, Mapping)
+        else None
+    )
+    if isinstance(segments_result, Mapping) and segments_result.get("isError") is True:
+        summary["reason"] = "segments_error"
+        return summary
+
+    if (
+        status_structured.get("job_id") != job_id
+        or segments_structured.get("job_id") != job_id
+    ):
+        summary["reason"] = "job_id_mismatch"
+        return summary
+
+    summary["job_status"] = status_structured.get("status")
+    summary["segment_count"] = status_structured.get("segment_count")
+    segments = segments_structured.get("segments")
+    summary["page_segment_count"] = len(segments) if isinstance(segments, list) else None
+    summary["next_cursor"] = segments_structured.get("next_cursor")
+    summary["status"] = "pass"
+    return summary
+
+
 def run_r3e2_preflight_lookup_probe(
     config: HttpConfig,
     source_url: str,
@@ -472,6 +549,18 @@ def main() -> None:
             ),
             flush=True,
         )
+
+    replay_job_id = os.getenv(R3E2_REPLAY_PROBE_ENV, "").strip()
+    if replay_job_id:
+        print(
+            json.dumps(
+                run_r3e2_record_replay_probe(config, replay_job_id),
+                separators=(",", ":"),
+                sort_keys=True,
+            ),
+            flush=True,
+        )
+
     server = R3E2HTTPServer((host, port), R3E2RequestHandler)
     server.serve_forever()
 
