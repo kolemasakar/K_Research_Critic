@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 6.1
-Status: **PLUGIN_FIRST / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_PASS / R3-E2_ISOLATED_SENTINEL_PREFLIGHT_PASS_CONFIRMATION_PENDING / FREE_ONLY / PUBLICATION_HOLD**
+Version: 6.2
+Status: **PLUGIN_FIRST / R3-A_PASS / R3-B_PASS / R3-C_PASS / R3-D_PASS / R3-E1_PASS / R3-E2_CONFIRMATION_UI_PASS_LIVE_CANARY_PENDING / FREE_ONLY / PUBLICATION_HOLD**
 Updated: 2026-09-19
 
 ## Product position
@@ -28,18 +28,19 @@ paid provider fallback -> forbidden
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v17.5.
-2. `133_FREE_ONLY_INFRASTRUCTURE_POLICY_RENDER_WEB_ALLOWED_POSTGRES_REJECTED_2026_09_19.md`.
-3. `132_R3E2_ISOLATED_SENTINEL_AUTHENTICATED_PREFLIGHT_PASS_CONFIRMATION_PENDING_2026_09_19.md`.
-4. `131_R3E2_INSTAGRAM_READONLY_FREE_ONLY_PREFLIGHT_2026_09_19.md`.
-5. `130_POST_R3E1_CONTROL_POINT_BEFORE_R3E2_2026_09_19.md`.
-6. `129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md`.
-7. `128_R3E1_RESTART_CONNECTIVITY_PASS_RECORD_REPLAY_PENDING_2026_09_19.md`.
-8. `127_R3E1_NEON_CUTOVER_COMPLETE_DURABLE_ACCEPTANCE_PENDING_2026_09_19.md`.
-9. `125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md`.
-10. `124_R3D_CONSEQUENTIAL_ACTION_CONFIRMATION_PASS_2026_09_17.md`.
-11. `121_R3C_NINE_TOOL_READONLY_VOICEBRIDGE_BINDING_PASS_2026_09_16.md`.
-12. current PR #22 / PR #45 head and CI.
+1. `CURRENT_HANDOFF.md` — v17.6.
+2. `134_R3E2_CHATGPT_CONFIRMATION_UI_PASS_ZERO_SIDE_EFFECT_2026_09_19.md`.
+3. `133_FREE_ONLY_INFRASTRUCTURE_POLICY_RENDER_WEB_ALLOWED_POSTGRES_REJECTED_2026_09_19.md`.
+4. `132_R3E2_ISOLATED_SENTINEL_AUTHENTICATED_PREFLIGHT_PASS_CONFIRMATION_PENDING_2026_09_19.md`.
+5. `131_R3E2_INSTAGRAM_READONLY_FREE_ONLY_PREFLIGHT_2026_09_19.md`.
+6. `130_POST_R3E1_CONTROL_POINT_BEFORE_R3E2_2026_09_19.md`.
+7. `129_R3E1_YOUTUBE_LIVE_DURABLE_REPLAY_IDEMPOTENCY_PASS_2026_09_19.md`.
+8. `128_R3E1_RESTART_CONNECTIVITY_PASS_RECORD_REPLAY_PENDING_2026_09_19.md`.
+9. `127_R3E1_NEON_CUTOVER_COMPLETE_DURABLE_ACCEPTANCE_PENDING_2026_09_19.md`.
+10. `125_FREE_ONLY_INFRASTRUCTURE_POLICY_AND_POSTGRES_AUDIT_2026_09_17.md`.
+11. `124_R3D_CONSEQUENTIAL_ACTION_CONFIRMATION_PASS_2026_09_17.md`.
+12. `121_R3C_NINE_TOOL_READONLY_VOICEBRIDGE_BINDING_PASS_2026_09_16.md`.
+13. current PR #22 / PR #45 head and CI.
 
 ## Proven baseline
 
@@ -141,7 +142,7 @@ Temporary acceptance startup probes are disabled in the final runtime.
 
 ### R3-E2 — Instagram
 
-Status: **ISOLATED SENTINEL PASS / AUTHENTICATED PREFLIGHT PASS / CONFIRMATION UI PENDING / EXECUTION HOLD**.
+Status: **ISOLATED SENTINEL PASS / AUTHENTICATED PREFLIGHT PASS / CHATGPT CONFIRMATION UI PASS / LIVE CANARY PENDING / EXECUTION HOLD**.
 
 Accepted:
 
@@ -158,16 +159,25 @@ automatic_paid_fallback=false
 provider_work=false
 start_called=false
 server-side confirmation contract=PASS
+ChatGPT confirmation UI=PASS
+cancel path=PASS
+no execution after deny=PASS
+approve path=PASS
+exactly one invocation after approve=PASS
+zero-side-effect confirmation probe=PASS
+provider work=false
+real media start=false
 ```
 
 Required before live execution:
 
 ```text
-1. rotate the temporary R3-E2 scoped credential
-2. connect private R3-E2 MCP to owner ChatGPT account
-3. verify ChatGPT confirmation UI with CANCEL first
-4. obtain explicit owner authorization for one bounded live canary
-5. live start -> Neon persistence -> restart replay -> duplicate-start idempotency
+1. rotate the temporary R3-E2 scoped VoiceBridge credential
+2. disable KRC_R3E2_CONFIRMATION_PROBE_ONLY
+3. reconnect/fresh-DCR after restart/redeploy if required by in-memory OAuth state
+4. re-verify runtime health and isolated 5-tool surface
+5. obtain explicit owner authorization for exactly one bounded live canary
+6. live start -> Neon persistence -> restart replay -> duplicate-start idempotency
 ```
 
 ### R3-E3 — Facebook
@@ -204,7 +214,7 @@ R3-B: PASS
 R3-C: PASS
 R3-D: PASS
 R3-E1: PASS
-R3-E2: ISOLATED SENTINEL PREFLIGHT PASS / CONFIRMATION UI PENDING / EXECUTION HOLD
+R3-E2: CONFIRMATION UI PASS / LIVE CANARY PENDING / EXECUTION HOLD
 R3-E3: HOLD
 R3-E4: HOLD
 R3-F: HOLD
@@ -215,4 +225,4 @@ R4: HOLD
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoints 132-133. R3-E1 PASS; R3-E2 isolated sentinel + authenticated preflight PASS; confirmation UI and credential rotation pending; execution HOLD. Render Free Web accepted; Render PostgreSQL rejected; Neon Free primary durable DB.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 134. R3-E1 PASS; R3-E2 isolated sentinel + authenticated preflight + ChatGPT CANCEL/APPROVE confirmation UI PASS in zero-side-effect mode; live execution HOLD pending scoped-credential rotation, probe disable, reconnect if required and explicit owner authorization. Render Free Web accepted; Render PostgreSQL rejected; Neon Free primary durable DB.`
