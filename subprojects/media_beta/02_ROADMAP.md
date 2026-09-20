@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 7.1
-Status: **PLUGIN_FIRST / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_FACEBOOK_COMPLETE / R3-E4_TELEGRAM_LIVE_CANARY_ARMED / R3-F_CI_PASS / R3-G_OAUTH_RUNTIME_ACTIVE / FREE_ONLY / PUBLICATION_HOLD**
+Version: 7.2
+Status: **PLUGIN_FIRST / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_FACEBOOK_COMPLETE / R3-E4_FIRST_CANARY_BOUNDED_TERMINAL / REPLACEMENT_APPROVAL_HOLD / R3-F_CI_PASS / R3-G_OAUTH_RUNTIME_ACTIVE / FREE_ONLY / PUBLICATION_HOLD**
 Updated: 2026-09-20
 
 ## End state
@@ -32,14 +32,14 @@ R3-D Consequential-action confirmation        PASS
 R3-E1 YouTube execution                       PASS / COMPLETE
 R3-E2 Instagram execution                     PASS / COMPLETE
 R3-E3 Facebook execution                      PASS / COMPLETE
-R3-E4 Telegram execution                      LIVE CANARY ARMED / LIVE ACCEPTANCE PENDING
+R3-E4 Telegram execution                      FIRST LIVE CANARY BOUNDED TERMINAL / REPLACEMENT APPROVAL HOLD
 R3-F Full 13-operation parity                 LOCAL+CI PASS / RUNTIME ACCEPTANCE PENDING
 R3-G Private operational hardening            OAUTH ACTIVE / TOKEN RESTART ACCEPTANCE PENDING
 R3-H Migration/publication readiness          HOLD
 R4 Owner-approved cutover/publication         HOLD
 ```
 
-**Current position:** R3-E3 Facebook is fully accepted, including live FREE_ONLY execution, Neon durability, VoiceBridge restart durability, duplicate-start idempotency, and zero paid fallback. R3-E4 Telegram has completed OAuth and confirmation acceptance and is now armed for exactly one owner-approved bounded live canary.
+**Current position:** R3-E3 Facebook is fully accepted. R3-E4 Telegram completed a real FREE_ONLY public-web route canary, persisted a deterministic non-retryable `no spoken audio` terminal state, and passed restart durability with zero charge. E4 is back in probe-only mode. A preflighted speech-oriented replacement Telegram fixture is ready but requires a new explicit owner approval.
 
 ## Canonical contract
 
@@ -83,26 +83,29 @@ facebook_jobs=1
 current_E3_probe_only=true
 ```
 
-R3-E4 Telegram current readiness:
+R3-E4 Telegram current state:
 
 ```text
 CHATGPT_OAUTH=PASS
 CANCEL=PASS
 ALLOW_ONCE_PROBE=PASS
-deploy=dep-danj16740ujc73c47c0g
-deploy_status=live
-current_E4_probe_only=false
-provider_work_started=false
-telegram_jobs=0
-voicebridge_pre_warm_200=3/3
+first_live_job=KRCM_59d7bdc2-9ea0-4028-b8c6-dfe3f39828f9
+first_live_status=FAILED
+first_live_error=STT_TRANSCRIPTION_FAILED/no_spoken_audio
+retrieval_provider=telegram_public_web
+retrieval_credits_charged=0
+credits_charged=0
+restart_durability=PASS
+current_E4_probe_only=true
+replacement_candidate=https://t.me/Ingiliz_tili_kanalim/731
+replacement_preflight=PASS
+replacement_owner_approval=PENDING
 ```
 
 Still pending:
 
-- one bounded Telegram live canary;
-- Telegram Neon durability;
-- Telegram VoiceBridge restart durability;
-- Telegram duplicate-start idempotency;
+- explicit owner approval for one replacement Telegram live canary;
+- a COMPLETED Telegram runtime job suitable for live duplicate-start idempotency acceptance;
 - R3-F runtime parity closure;
 - R3-G restart-safe OAuth token continuity.
 
@@ -129,14 +132,15 @@ The repositories are public and standard GitHub-hosted Ubuntu jobs ran successfu
 E3_CONFIRMATION_PROBE_ONLY=true
 E3_PROVIDER_WORK_STARTED=false
 
-E4_CONFIRMATION_PROBE_ONLY=false
+E4_CONFIRMATION_PROBE_ONLY=true
 E4_PROVIDER_WORK_STARTED=false
-E4_OWNER_APPROVED_BOUNDED_LIVE_CANARY=true
+E4_REPLACEMENT_LIVE_CANARY_AUTHORIZED=false
 
-NEON_TOTAL_JOBS=2
+NEON_TOTAL_JOBS=3
 NEON_INSTAGRAM_JOBS=1
 NEON_FACEBOOK_JOBS=1
-NEON_TELEGRAM_JOBS=0
+NEON_TELEGRAM_JOBS=1
+NEON_TELEGRAM_FAILED_JOBS=1
 
 PROJECT_COST_POLICY=FREE_ONLY
 AUTOMATIC_PAID_FALLBACK=DENIED
@@ -144,11 +148,11 @@ AUTOMATIC_PAID_FALLBACK=DENIED
 
 ## Nearest tasks
 
-1. Execute exactly one `media_telegram_start` for `https://t.me/techcrimes/12101`.
-2. Verify durable Telegram job, public Telegram retrieval and zero retrieval credits.
-3. Controlled-redeploy VoiceBridge on the validated head.
-4. Verify Telegram job/segments survive restart.
-5. Repeat the exact Telegram start once and require same job id, `reused=true`, no new provider work, and zero charge.
+1. Obtain explicit owner approval for the preflighted replacement Telegram canary `https://t.me/Ingiliz_tili_kanalim/731`.
+2. Arm E4 only after approval and warm VoiceBridge.
+3. Execute exactly one replacement `media_telegram_start`.
+4. If COMPLETED, verify Neon persistence and restart durability.
+5. Repeat the exact completed start once and require same job id, `reused=true`, no new provider work, and zero charge.
 6. Return E4 to `CONFIRMATION_PROBE_ONLY=true`.
 7. Close R3-E4.
 8. Complete R3-F runtime parity and R3-G OAuth restart acceptance.
@@ -175,4 +179,4 @@ HP_OMEN_LOCAL_DISK_AS_PROJECT_STORAGE=DENIED
 LOCAL_WORKTREES=TRANSIENT_ONLY
 ```
 
-Recovery authority: `CURRENT_HANDOFF.md` v19.0 + checkpoint 154.
+Recovery authority: `CURRENT_HANDOFF.md` v19.1 + checkpoint 155.
