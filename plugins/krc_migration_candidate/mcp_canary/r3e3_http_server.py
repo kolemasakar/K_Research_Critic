@@ -38,6 +38,7 @@ R3E3_PREFLIGHT_PROBE_ENV = "KRC_R3E3_PREFLIGHT_PROBE_URL"
 R3E3_REPLAY_PROBE_ENV = "KRC_R3E3_REPLAY_PROBE_JOB_ID"
 R3E3_CONFIRMATION_PROBE_ONLY_ENV = "KRC_R3E3_CONFIRMATION_PROBE_ONLY"
 R3E3_VOICEBRIDGE_BEARER_OVERRIDE_ENV = "KRC_R3E3_VOICEBRIDGE_BEARER_OVERRIDE"
+R3E3_SCOPE_DIAGNOSTIC_TELEGRAM_JOB_ENV = "KRC_R3E3_SCOPE_DIAGNOSTIC_TELEGRAM_JOB_ID"
 _CONFIRMATION_PROBE_INVOCATIONS = 0
 
 
@@ -371,6 +372,56 @@ def _structured(response: object) -> Mapping[str, object] | None:
     return structured if isinstance(structured, Mapping) else None
 
 
+def _raw_binding(config: HttpConfig) -> VoiceBridgeBinding:
+    return VoiceBridgeBinding(
+        base_url=config.voicebridge_base_url,
+        bearer_token=config.voicebridge_bearer,
+        timeout_seconds=config.voicebridge_timeout_seconds,
+    )
+
+
+def run_r3e3_binding_diagnostic(
+    config: HttpConfig,
+    facebook_job_id: str,
+    telegram_job_id: str,
+    *,
+    backend_call=call_voicebridge,
+) -> dict[str, object]:
+    """Compare raw/derived bearer scope using read-only durable job GETs."""
+
+    summary: dict[str, object] = {
+        "event": "r3e3_binding_diagnostic",
+        "provider_work_started": False,
+        "start_called": False,
+    }
+    variants = {
+        "raw": _raw_binding(config),
+        "derived": _binding(config),
+    }
+    jobs = {
+        "facebook": facebook_job_id,
+        "telegram": telegram_job_id,
+    }
+    for variant, binding in variants.items():
+        for platform, job_id in jobs.items():
+            key = f"{variant}_{platform}"
+            try:
+                payload = backend_call(
+                    binding,
+                    "GET",
+                    f"/api/v1/media/managed/transcriptions/{job_id}",
+                    None,
+                    {},
+                )
+            except VoiceBridgeError as exc:
+                summary[f"{key}_http_status"] = exc.http_status
+                summary[f"{key}_code"] = exc.code
+                continue
+            summary[f"{key}_http_status"] = 200
+            summary[f"{key}_job_match"] = payload.get("job_id") == job_id
+    return summary
+
+
 def run_r3e3_record_replay_probe(
     config: HttpConfig,
     job_id: str,
@@ -533,6 +584,22 @@ def main() -> None:
         )
 
     replay_job_id = os.getenv(R3E3_REPLAY_PROBE_ENV, "").strip()
+    scope_diag_telegram_job_id = os.getenv(
+        R3E3_SCOPE_DIAGNOSTIC_TELEGRAM_JOB_ENV, ""
+    ).strip()
+    if replay_job_id and scope_diag_telegram_job_id:
+        print(
+            json.dumps(
+                run_r3e3_binding_diagnostic(
+                    config,
+                    replay_job_id,
+                    scope_diag_telegram_job_id,
+                ),
+                separators=(",", ":"),
+                sort_keys=True,
+            ),
+            flush=True,
+        )
     if replay_job_id:
         print(
             json.dumps(
