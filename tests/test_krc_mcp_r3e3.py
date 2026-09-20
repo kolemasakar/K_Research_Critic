@@ -362,3 +362,21 @@ def test_r3e3_binding_diagnostic_is_read_only_and_reports_scope(monkeypatch) -> 
     assert result["derived_facebook_http_status"] == 200
     assert result["derived_telegram_http_status"] == 403
     assert len(calls) == 4
+
+
+def test_r3e3_health_reports_override_integrity_without_secret(monkeypatch) -> None:
+    secret = "runtime-route-secret-123456789-abcdef"
+    expected = __import__("hashlib").sha256(secret.encode("utf-8")).hexdigest()
+    monkeypatch.setenv("KRC_R3E3_VOICEBRIDGE_BEARER_OVERRIDE", secret)
+    monkeypatch.setenv("KRC_R3E3_OVERRIDE_EXPECTED_SHA256", expected)
+
+    response = r3e3_http.handle_r3e3_http_request(
+        "GET",
+        "/healthz",
+        {},
+        config=_config(),
+    )
+    body = json.loads(response.body.decode("utf-8"))
+    assert body["voicebridge_override_configured"] is True
+    assert body["voicebridge_override_matches_expected_sha256"] is True
+    assert secret not in response.body.decode("utf-8")
