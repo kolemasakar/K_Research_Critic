@@ -75,6 +75,15 @@ def test_r3e3_health_declares_exact_execution_boundary() -> None:
     assert health["provider_work_started"] is False
 
 
+def test_r3e3_route_bearer_override_precedes_legacy_binding(monkeypatch) -> None:
+    monkeypatch.setenv(
+        "KRC_R3E3_VOICEBRIDGE_BEARER_OVERRIDE",
+        "override-route-scoped-r3e3-token-123456789",
+    )
+    binding = r3e3_http._binding(_config())
+    assert binding.bearer_token == "override-route-scoped-r3e3-token-123456789"
+
+
 def test_r3e3_start_routes_only_facebook_to_free_endpoint() -> None:
     observed: dict[str, object] = {}
 
