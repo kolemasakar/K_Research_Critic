@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+from hashlib import sha256
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from time import monotonic, sleep
@@ -65,11 +66,21 @@ def _confirmation_probe_backend(
     }
 
 
+def _derive_r3e3_route_bearer(base_bearer: str) -> str:
+    material = f"krc-media-route:r3e3:v1:{base_bearer}".encode("utf-8")
+    return "r3e3-" + sha256(material).hexdigest()
+
+
 def _binding(config: HttpConfig) -> VoiceBridgeBinding:
     override_bearer = os.getenv(R3E3_VOICEBRIDGE_BEARER_OVERRIDE_ENV, "").strip()
+    derived_bearer = (
+        _derive_r3e3_route_bearer(config.voicebridge_bearer)
+        if config.voicebridge_bearer
+        else None
+    )
     return VoiceBridgeBinding(
         base_url=config.voicebridge_base_url,
-        bearer_token=override_bearer or config.voicebridge_bearer,
+        bearer_token=override_bearer or derived_bearer,
         timeout_seconds=config.voicebridge_timeout_seconds,
     )
 
