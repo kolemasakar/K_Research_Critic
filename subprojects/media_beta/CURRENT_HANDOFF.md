@@ -1,26 +1,24 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 18.9
-Status: **ACTIVE_HANDOFF / R3-E1_PASS_COMPLETE / R3-E2_PASS_COMPLETE / R3-E3_ZERO_SIDE_EFFECT_CONFIRMATION_COMPLETE / R3-E4_ZERO_SIDE_EFFECT_CONFIRMATION_COMPLETE / R3-F_CI_PASS / R3-G_OAUTH_RUNTIME_ACTIVE / FREE_ONLY / LIVE_CANARY_APPROVAL_HOLD / PUBLICATION_HOLD**
+Version: 19.0
+Status: **ACTIVE_HANDOFF / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_FACEBOOK_COMPLETE / R3-E4_TELEGRAM_LIVE_CANARY_ARMED / R3-F_CI_PASS / R3-G_OAUTH_RUNTIME_ACTIVE / FREE_ONLY / PUBLICATION_HOLD**
 Date: 2026-09-20
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 149. R3-E1/E2 COMPLETE. R3-E3 Facebook і R3-E4 Telegram zero-side-effect confirmation COMPLETE: OAuth/ChatGPT OAuth/Cancel/Allow-once PASS; invocation_count=1 на кожному probe surface; provider_work=false; real_media_start=false; Neon facebook_jobs=0, telegram_jobs=0. Наступний gate — окремий owner approval для bounded live Facebook і Telegram canaries. PROJECT_COST_POLICY=FREE_ONLY.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 154. R3-E1/E2 COMPLETE. R3-E3 Facebook COMPLETE: live canary PASS, Neon persistence PASS, VoiceBridge restart durability PASS, duplicate-start idempotency PASS, zero paid fallback PASS. Facebook surface повернуто в CONFIRMATION_PROBE_ONLY=true. R3-E4 Telegram уже owner-approved і armed: CONFIRMATION_PROBE_ONLY=false, deploy LIVE, provider_work=false, telegram_jobs=0, VoiceBridge попередньо прогрітий 3x health=200. Наступний gate — один bounded media_telegram_start для https://t.me/techcrimes/12101, потім restart/idempotency acceptance. PROJECT_COST_POLICY=FREE_ONLY.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v18.9.
-2. `149_R3E4_TELEGRAM_CHATGPT_ALLOW_ONCE_ZERO_SIDE_EFFECT_PASS_2026_09_20.md`.
-3. `148_R3E4_TELEGRAM_CHATGPT_CANCEL_PATH_PASS_2026_09_20.md`.
-4. `147_R3E4_CHATGPT_OAUTH_CONNECTED_ZERO_SIDE_EFFECT_2026_09_20.md`.
-5. `146_R3E3_FACEBOOK_CHATGPT_ALLOW_ONCE_ZERO_SIDE_EFFECT_PASS_2026_09_20.md`.
-6. `145_R3E3_FACEBOOK_CHATGPT_CANCEL_PATH_PASS_2026_09_20.md`.
-7. `144_R3E3_CHATGPT_OAUTH_CONNECTED_ZERO_SIDE_EFFECT_2026_09_20.md`.
-8. `143_E3_E4_DCR_RUNTIME_PREFLIGHT_PASS_2026_09_19.md`.
-9. `142_CI_E3_E4_DEPLOY_HEALTH_OAUTH_DISCOVERY_PASS_2026_09_19.md`.
-10. `02_ROADMAP.md` — v6.9.
-11. current PR #22 / PR #45 heads and current runtime evidence.
+1. `CURRENT_HANDOFF.md` — v19.0.
+2. `154_R3E3_COMPLETE_R3E4_TELEGRAM_LIVE_CANARY_ARMED_2026_09_20.md`.
+3. `153_R3E3_FACEBOOK_LIVE_ACCEPTANCE_COMPLETE_2026_09_20.md`.
+4. `152_R3E3_FACEBOOK_LIVE_CANARY_RESTART_DURABILITY_PASS_IDEMPOTENCY_PENDING_2026_09_20.md`.
+5. `151_FACEBOOK_LIVE_CANARY_COLD_START_NO_SIDE_EFFECT_RETRY_SAFE_2026_09_20.md`.
+6. `150_OWNER_APPROVED_FACEBOOK_TELEGRAM_LIVE_CANARIES_FACEBOOK_ARMED_2026_09_20.md`.
+7. `149_R3E4_TELEGRAM_CHATGPT_ALLOW_ONCE_ZERO_SIDE_EFFECT_PASS_2026_09_20.md`.
+8. `02_ROADMAP.md` — v7.0.
+9. current PR #22 / PR #45 heads and current runtime evidence.
 
 ## Repository / PR authority
 
@@ -30,7 +28,7 @@ branch=agent/krc-public-media-r3-integration
 PR=22
 state=OPEN / DRAFT / UNMERGED
 ci_validated_code_head=4c834382e18dfce1bea86dee26614a38a3428817
-latest_runtime_checkpoint=056cea6b202349520bc0e9f0bda8091845443476
+latest_runtime_checkpoint=8aebd2617663e1112208d76255a3046626335721
 
 VoiceBridge repository=kolemasakar/VoiceBridge
 branch=agent/krc-media-gemini-migration
@@ -39,7 +37,7 @@ state=OPEN / DRAFT / UNMERGED
 ci_validated_and_deployed_head=751f83f2b1aca79f58e9a5f615296404836ada06
 ```
 
-Documentation commits after the validated KRC code head use `[skip ci]`.
+Documentation-only commits after validated code heads use `[skip ci]`.
 
 ## Phase state
 
@@ -50,10 +48,10 @@ R3_C=PASS
 R3_D=PASS
 R3_E1=PASS / COMPLETE
 R3_E2=PASS / COMPLETE
-R3_E3=CI_PASS / DEPLOY_PASS / CHATGPT_OAUTH_PASS / CANCEL_PASS / ALLOW_ONCE_PASS / ZERO_SIDE_EFFECT_CONFIRMATION_COMPLETE / LIVE_CANARY_HOLD
-R3_E4=CI_PASS / DEPLOY_PASS / CHATGPT_OAUTH_PASS / CANCEL_PASS / ALLOW_ONCE_PASS / ZERO_SIDE_EFFECT_CONFIRMATION_COMPLETE / LIVE_CANARY_HOLD
+R3_E3=PASS / COMPLETE
+R3_E4=ZERO_SIDE_EFFECT_CONFIRMATION_COMPLETE / LIVE_CANARY_ARMED / LIVE_ACCEPTANCE_PENDING
 R3_F=LOCAL_PASS / CI_PASS / RUNTIME_ACCEPTANCE_PENDING
-R3_G_OAUTH=DEPLOYED / DCR_PASS / E3_TOKEN_FLOW_PASS / E4_TOKEN_FLOW_PASS / TOKEN_RESTART_ACCEPTANCE_PENDING
+R3_G_OAUTH=DEPLOYED / E3_TOKEN_FLOW_PASS / E4_TOKEN_FLOW_PASS / TOKEN_RESTART_ACCEPTANCE_PENDING
 R3_H=HOLD
 R4=HOLD
 MEDIA_OPERATION_COUNT=13
@@ -61,67 +59,59 @@ NON_EXECUTION_COUNT=9
 EXECUTION_COUNT=4
 ```
 
-## R3-E3 acceptance evidence
+## R3-E3 Facebook acceptance
 
 ```text
 plugin=MCP E3 Facebook 1
-CHATGPT_OAUTH_CONNECTION=PASS
-AUTHENTICATED_MCP_TRANSPORT=PASS
-CHATGPT_CONFIRMATION_UI=PASS
-CANCEL_PATH=PASS
-ALLOW_ONCE_PATH=PASS
-CONFIRMATION_PROBE_ONLY=true
-CONFIRMATION_PROBE_INVOCATION_COUNT=1
-EXTERNAL_MUTATION=false
-PROVIDER_WORK=false
-PROVIDER_CHARGE=false
-REAL_MEDIA_START=false
-NEON_FACEBOOK_JOBS=0
+CHATGPT_OAUTH=PASS
+CANCEL=PASS
+ALLOW_ONCE_PROBE=PASS
+LIVE_CANARY=PASS
+job_id=KRCM_2dbbe3ba-c2da-49c4-9941-f64b22630880
+status=COMPLETED
+retrieval_provider=cobalt
+retrieval_credits_charged=0
+credits_charged=0
+provider_data_deleted=true
+segment_count=1
+VOICEBRIDGE_RESTART_DURABILITY=PASS
+DUPLICATE_START_IDEMPOTENCY=PASS
+duplicate_result_reused=true
+facebook_jobs=1
+ZERO_PAID_FALLBACK=PASS
+CURRENT_E3_CONFIRMATION_PROBE_ONLY=true
 ```
 
-## R3-E4 OAuth acceptance evidence
+## R3-E4 Telegram current runtime
 
 ```text
 plugin=MCP E4 Telegram 1
-CHATGPT_OAUTH_CONNECTION=PASS
-AUTHENTICATED_MCP_TRANSPORT=PASS
-POST_OAUTH_REGISTER=201
-GET_OAUTH_AUTHORIZE=200
-POST_OAUTH_AUTHORIZE=302
-POST_OAUTH_TOKEN=200
-AUTHENTICATED_POST_MCP=200
-CONFIRMATION_PROBE_ONLY=true
-CONFIRMATION_PROBE_INVOCATION_COUNT=1
-PROVIDER_WORK=false
-PROVIDER_CHARGE=false
-REAL_MEDIA_START=false
-NEON_TELEGRAM_JOBS=0
-CANCEL_PATH=PASS
-ALLOW_ONCE_PATH=PASS
-POST_APPROVE_ERROR_LEVEL_LOGS=0
+CHATGPT_OAUTH=PASS
+CANCEL=PASS
+ALLOW_ONCE_PROBE=PASS
+service=krc-mcp-r3e4-telegram-sentinel
+service_id=srv-danertv40ujc73bn9hog
+deploy=dep-danj16740ujc73c47c0g
+deploy_status=live
+KRC_R3E4_CONFIRMATION_PROBE_ONLY=false
+provider_work_started=false
+telegram_jobs=0
+error_level_logs=0
+bounded_live_url=https://t.me/techcrimes/12101
 ```
 
-## Current runtime audit
+Exactly one Telegram live canary is owner-authorized.
+
+## VoiceBridge readiness
 
 ```text
-VOICEBRIDGE_SERVICE=voicebridge-krc-media-beta-kolemasakar
-VOICEBRIDGE_HEALTH=HTTP_200 / status=ok / version=0.6.0
-
-R3E3_SERVICE=krc-mcp-r3e3-facebook-sentinel
-R3E3_SERVICE_ID=srv-danerqmgekts738oejsg
-R3E3_HEALTH=PASS
-R3E3_SURFACE=r3e3_facebook_execution
-R3E3_CONFIRMATION_PROBE_ONLY=true
-R3E3_CONFIRMATION_PROBE_INVOCATIONS=1
-R3E3_PROVIDER_WORK_STARTED=false
-
-R3E4_SERVICE=krc-mcp-r3e4-telegram-sentinel
-R3E4_SERVICE_ID=srv-danertv40ujc73bn9hog
-R3E4_HEALTH=PASS
-R3E4_SURFACE=r3e4_telegram_execution
-R3E4_CONFIRMATION_PROBE_ONLY=true
-R3E4_CONFIRMATION_PROBE_INVOCATIONS=1
-R3E4_PROVIDER_WORK_STARTED=false
+service=voicebridge-krc-media-beta-kolemasakar
+service_id=srv-da1kic5bedkc73d6fk60
+head=751f83f2b1aca79f58e9a5f615296404836ada06
+health=PASS
+version=0.6.0
+pre_telegram_warmup_checks=3
+pre_telegram_warmup_http_200=3
 ```
 
 ## Durable Neon state
@@ -134,11 +124,13 @@ branch=production
 branch_id=br-summer-union-b2qlszfv
 database=krc_media_beta
 
-managed_jobs=1
+total_jobs=2
 instagram_jobs=1
-facebook_jobs=0
+facebook_jobs=1
 telegram_jobs=0
 ```
+
+The Facebook durable record is completed and survived a controlled VoiceBridge redeploy.
 
 ## CI acceptance
 
@@ -157,14 +149,29 @@ VOICEBRIDGE_REPOSITORY_DOCS=PASS
 
 Paid Actions usage was not required or authorized.
 
+## Cost / infrastructure policy
+
+```text
+PROJECT_COST_POLICY=FREE_ONLY
+RENDER_FREE_WEB_SERVICES=ACCEPTED
+NEON_FREE_POSTGRES=PRIMARY_DURABLE_DATABASE
+OCI_ALWAYS_FREE=ACCEPTED
+SELF_HOSTED_COBALT_ON_OCI=ACCEPTED
+PAID_HOSTING_FALLBACK=DENIED
+PAID_PROVIDER_FALLBACK=DENIED
+PAID_ACTIONS_USAGE=DENIED
+```
+
 ## Next gate
 
-1. Obtain separate owner approval for one bounded Facebook live canary and one bounded Telegram live canary.
-2. Only after explicit approval, disable probe-only mode in a controlled manner and run one canary per platform.
-3. Prove Neon persistence, restart/replay, duplicate-start idempotency and zero paid fallback for each platform.
-4. Close R3-E3/R3-E4.
-5. Complete R3-F runtime parity and R3-G token-restart acceptance.
-6. Proceed to R3-H only after all prior gates pass.
+1. Execute exactly one `media_telegram_start` for `https://t.me/techcrimes/12101` through `MCP E4 Telegram 1`.
+2. Verify durable Telegram job, public Telegram retrieval route and zero retrieval credits.
+3. Controlled-redeploy VoiceBridge on the validated head and verify Telegram job/segments survive.
+4. Repeat exact Telegram start once and require same job id + `reused=true` + no new provider work.
+5. Return E4 to `CONFIRMATION_PROBE_ONLY=true`.
+6. Close R3-E4.
+7. Complete R3-F runtime parity and R3-G OAuth token-restart acceptance.
+8. Proceed to R3-H only after all prior gates pass.
 
 ## Hard release boundary
 
@@ -176,11 +183,11 @@ PLUGIN_SHARING=NO
 MAIN_MUTATION=NO
 PR22_MERGE=NO
 PR45_MERGE=NO
-LIVE_FACEBOOK_START=NO
-LIVE_TELEGRAM_START=NO
+FACEBOOK_ADDITIONAL_LIVE_STARTS=NO
+TELEGRAM_LIVE_STARTS_REMAINING=1
 R4=HOLD
 ```
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V18_9_E3_E4_ZERO_SIDE_EFFECT_CONFIRMATION_COMPLETE_LIVE_APPROVAL_HOLD_2026_09_20`
+`KRC_MEDIA_CURRENT_HANDOFF_V19_0_R3E3_COMPLETE_R3E4_TELEGRAM_ARMED_2026_09_20`
