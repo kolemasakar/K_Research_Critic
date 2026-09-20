@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 7.5
-Status: **PLUGIN_FIRST / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_COMPLETE / R3-E4_COMPLETE / R3-F_COMPLETE / R3-G_COMPLETE / R3-H_READY_FOR_REVIEW / FREE_ONLY / PUBLICATION_HOLD**
+Version: 7.6
+Status: **PLUGIN_FIRST / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_COMPLETE / R3-E4_COMPLETE / R3-F_COMPLETE / R3-G_COMPLETE / R3-H_COMPLETE / R4_OWNER_DECISION_HOLD / FREE_ONLY / PUBLICATION_HOLD**
 Updated: 2026-09-20
 
 ## Current roadmap position
@@ -17,73 +17,58 @@ R3-E3 Facebook execution                      PASS / COMPLETE
 R3-E4 Telegram execution                      PASS / COMPLETE
 R3-F Full 13-operation parity                 PASS / COMPLETE
 R3-G Private operational hardening            PASS / COMPLETE
-R3-H Migration/publication readiness          READY FOR REVIEW
+R3-H Migration/publication readiness          PASS / COMPLETE
 R4 Owner-approved cutover/publication         HOLD
 ```
 
-## R3-G accepted contract
+## R3-H result
 
-Runtime:
+Readiness review completed without migration/publication mutation.
 
-- OAuth DCR PASS;
-- initial token issuance PASS;
-- authenticated E3/E4 calls PASS;
-- authenticated calls after service redeploy PASS;
-- runtime access-token refresh after 3600-second TTL PASS;
-- refresh-token continuity without ChatGPT reconnect PASS;
-- E3→VoiceBridge route-scoped auth remediation PASS;
-- effective route token integrity PASS;
-- managed-media TTL confirmed at 3600 seconds;
-- old canary rows expired by policy; post-expiry 404 expected.
+Accepted:
 
-CI:
+- migration-candidate documentation synchronized;
+- PR #22 and PR #45 descriptions synchronized;
+- current private E3/E4 permission model reviewed;
+- remote MCP/auth/confirmation design consistent with accepted runtime;
+- rollback/recovery plan prepared;
+- R4 release checklist prepared.
 
-- DCR client continuity across restart;
-- access/refresh token continuity across restart;
-- reusable refresh token until expiry;
-- authorization code single-use and in-memory;
-- wrong signing key / rotation invalidation;
-- tampered token fail-closed;
-- expired access/refresh fail-closed.
+Remaining R4 preconditions:
 
-```text
-R3_G=COMPLETE
-```
+- fresh current-account migration/plugin UI inspection;
+- install permission confirmation;
+- share permission confirmation for intended audience;
+- publish permission confirmation if publication is required;
+- explicit owner cutover approval.
 
-## R3-H scope
+## R4 boundary
 
-Readiness review only:
-
-- contract/docs consistency;
-- plugin install/share/publication surface readiness;
-- security/auth/confirmation boundaries;
-- rollback and recovery plan;
-- release checklist;
-- explicit owner approval gate before any public mutation.
-
-No publication, sharing, merge, public-GPT mutation or R4 execution is authorized by entering R3-H.
-
-## Safety invariant
+R4 is a consequential release phase. It may include migration, replacement-plugin setup, sharing/publication or public GPT cutover only after a new explicit owner approval.
 
 ```text
-E2_CONFIRMATION_PROBE_ONLY=true
-E3_CONFIRMATION_PROBE_ONLY=true
-E4_CONFIRMATION_PROBE_ONLY=true
-ADDITIONAL_LIVE_MEDIA_STARTS=NO
-PROJECT_COST_POLICY=FREE_ONLY
-AUTOMATIC_PAID_FALLBACK=DENIED
-
+R4_AUTHORIZED=NO
 PUBLIC_GPT_MUTATION=NO
 PLUGIN_PUBLICATION=NO
 PLUGIN_SHARING=NO
 MAIN_MUTATION=NO
 PR22_MERGE=NO
 PR45_MERGE=NO
-R4=HOLD
+ADDITIONAL_LIVE_MEDIA_STARTS=NO
+```
+
+## Safety invariant
+
+```text
+PROJECT_COST_POLICY=FREE_ONLY
+AUTOMATIC_PAID_FALLBACK=DENIED
+E2_CONFIRMATION_PROBE_ONLY=true
+E3_CONFIRMATION_PROBE_ONLY=true
+E4_CONFIRMATION_PROBE_ONLY=true
 ```
 
 ## Next phase
 
-R3-H migration/publication readiness review.
+R4 owner cutover decision gate. First step, when authorized to inspect, is a fresh read-only account-surface check. No migration control should be activated during that inspection.
 
-Recovery authority: `CURRENT_HANDOFF.md` v19.4 + checkpoint 161.
+Recovery authority: `CURRENT_HANDOFF.md` v19.5 + checkpoint 162.
