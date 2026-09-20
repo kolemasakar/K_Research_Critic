@@ -323,3 +323,42 @@ def test_r3e3_record_replay_probe_never_calls_start(monkeypatch) -> None:
     assert result["start_called"] is False
     assert calls == ["media_non_youtube_status", "media_non_youtube_segments"]
     assert "media_facebook_start" not in calls
+
+
+def test_r3e3_binding_diagnostic_is_read_only_and_reports_scope(monkeypatch) -> None:
+    monkeypatch.delenv("KRC_R3E3_VOICEBRIDGE_BEARER_OVERRIDE", raising=False)
+    config = replace(
+        _config(),
+        voicebridge_bearer="legacy-r3e3-action-token-123456789",
+    )
+    facebook_job = "KRCM_fb-diagnostic"
+    telegram_job = "KRCM_tg-diagnostic"
+    calls: list[tuple[str, str, str | None]] = []
+
+    def fake_call(binding, method, path, payload, query):
+        calls.append((method, path, binding.bearer_token))
+        assert method == "GET"
+        assert payload is None
+        assert query == {}
+        if path.endswith(telegram_job):
+            raise VoiceBridgeError(
+                "voicebridge_http_error",
+                http_status=403,
+                retryable=False,
+            )
+        return {"job_id": facebook_job, "status": "COMPLETED"}
+
+    result = r3e3_http.run_r3e3_binding_diagnostic(
+        config,
+        facebook_job,
+        telegram_job,
+        backend_call=fake_call,
+    )
+
+    assert result["provider_work_started"] is False
+    assert result["start_called"] is False
+    assert result["raw_facebook_http_status"] == 200
+    assert result["raw_telegram_http_status"] == 403
+    assert result["derived_facebook_http_status"] == 200
+    assert result["derived_telegram_http_status"] == 403
+    assert len(calls) == 4
