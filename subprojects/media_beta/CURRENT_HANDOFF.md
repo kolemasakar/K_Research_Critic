@@ -1,21 +1,23 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 19.3
-Status: **ACTIVE_HANDOFF / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_COMPLETE / R3-E4_COMPLETE / R3-F_COMPLETE / R3-G_REFRESH_RUNTIME_PENDING / FREE_ONLY / PUBLICATION_HOLD**
+Version: 19.4
+Status: **ACTIVE_HANDOFF / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_COMPLETE / R3-E4_COMPLETE / R3-F_COMPLETE / R3-G_COMPLETE / R3-H_READY_FOR_REVIEW / FREE_ONLY / PUBLICATION_HOLD**
 Date: 2026-09-20
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 159. R3-E1/E2/E3/E4 COMPLETE. R3-F full 13-operation runtime parity PASS: R3-C=9 read-only/0 execution; E1/E2/E3/E4 кожен має рівно свій start tool, other_execution_tools=not_enabled. E2/E3/E4 повернуті в confirmation_probe_only=true. R3-G: DCR/access-token continuity через redeploy фактично PASS; CI покриває refresh-after-restart, rotation/tamper/expiry fail-closed та single-use auth code; runtime refresh-token acceptance ще pending. PROJECT_COST_POLICY=FREE_ONLY.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 161. R3-E1/E2/E3/E4 COMPLETE. R3-F full 13-operation runtime parity PASS. R3-G COMPLETE: OAuth runtime refresh after 3600-second TTL PASS without reconnect; E3→VoiceBridge scoped auth remediation PASS; managed-media job TTL=3600 seconds confirmed; old canary rows expired by policy. PROJECT_COST_POLICY=FREE_ONLY. R3-H readiness review next. Publication/merge/R4 remain HOLD.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v19.3.
-2. `159_R3F_FULL_13_OPERATION_RUNTIME_PARITY_PASS_2026_09_20.md`.
-3. `158_R3E4_TELEGRAM_LIVE_ACCEPTANCE_COMPLETE_2026_09_20.md`.
-4. `153_R3E3_FACEBOOK_LIVE_ACCEPTANCE_COMPLETE_2026_09_20.md`.
-5. `02_ROADMAP.md`.
-6. current PR #22 / PR #45 heads and current runtime evidence.
+1. `CURRENT_HANDOFF.md` — v19.4.
+2. `161_R3G_OPERATIONAL_HARDENING_COMPLETE_2026_09_20.md`.
+3. `160_R3G_OAUTH_REFRESH_RUNTIME_PASS_E3_BEARER_REMEDIATION_PENDING_READBACK_2026_09_20.md`.
+4. `159_R3F_FULL_13_OPERATION_RUNTIME_PARITY_PASS_2026_09_20.md`.
+5. `158_R3E4_TELEGRAM_LIVE_ACCEPTANCE_COMPLETE_2026_09_20.md`.
+6. `153_R3E3_FACEBOOK_LIVE_ACCEPTANCE_COMPLETE_2026_09_20.md`.
+7. `02_ROADMAP.md`.
+8. current PR #22 / PR #45 heads and current runtime evidence.
 
 ## Repository / PR authority
 
@@ -24,14 +26,16 @@ KRC repository=kolemasakar/K_Research_Critic
 branch=agent/krc-public-media-r3-integration
 PR=22
 state=OPEN / DRAFT / UNMERGED
-ci_validated_code_head=4c834382e18dfce1bea86dee26614a38a3428817
-latest_runtime_checkpoint=9080a16a10dd937f62c46f17304715123709b700
+ci_validated_code_head=dbcebdff0201fd9240a7aeafa5f5d5dd46ca08f7
+ci_run=35485995871 PASS
 
 VoiceBridge repository=kolemasakar/VoiceBridge
 branch=agent/krc-media-gemini-migration
 PR=45
 state=OPEN / DRAFT / UNMERGED
-ci_validated_and_deployed_head=751f83f2b1aca79f58e9a5f615296404836ada06
+ci_validated_and_deployed_head=db9fb62c57fc731732f88ff5b417a0f15be178b6
+ci_run=35492121039 PASS
+deploy=dep-dann2op42hec73f1s7s0 LIVE
 ```
 
 ## Phase state
@@ -46,35 +50,26 @@ R3_E2=PASS / COMPLETE
 R3_E3=PASS / COMPLETE
 R3_E4=PASS / COMPLETE
 R3_F=PASS / COMPLETE
-R3_G=DCR_PASS / ACCESS_TOKEN_REDEPLOY_CONTINUITY_PASS / REFRESH_RUNTIME_PENDING
-R3_H=HOLD
+R3_G=PASS / COMPLETE
+R3_H=READY_FOR_REVIEW
 R4=HOLD
 ```
 
-## R3-F runtime parity
+## Runtime parity
 
 ```text
 R3C_READ_ONLY_TOOL_COUNT=9
 R3C_EXECUTION_TOOL_COUNT=0
 
 E1_EXECUTION_TOOL=media_youtube_start
-E1_EXECUTION_TOOL_COUNT=1
-E1_OTHER_EXECUTION_TOOLS=0
-
 E2_EXECUTION_TOOL=media_instagram_start
-E2_EXECUTION_TOOL_COUNT=1
-E2_OTHER_EXECUTION_TOOLS=0
-E2_CONFIRMATION_PROBE_ONLY=true
-
 E3_EXECUTION_TOOL=media_facebook_start
-E3_EXECUTION_TOOL_COUNT=1
-E3_OTHER_EXECUTION_TOOLS=0
-E3_CONFIRMATION_PROBE_ONLY=true
-
 E4_EXECUTION_TOOL=media_telegram_start
-E4_EXECUTION_TOOL_COUNT=1
+
+E1_OTHER_EXECUTION_TOOLS=0
+E2_OTHER_EXECUTION_TOOLS=0
+E3_OTHER_EXECUTION_TOOLS=0
 E4_OTHER_EXECUTION_TOOLS=0
-E4_CONFIRMATION_PROBE_ONLY=true
 
 TOTAL_CANONICAL_OPERATIONS=13
 READ_ONLY_EXECUTION_LEAKAGE=0
@@ -104,25 +99,16 @@ Telegram:
   duplicate_start_idempotency=PASS
 ```
 
-## R3-G OAuth state
-
-Runtime evidence already established:
+## R3-G accepted evidence
 
 ```text
 E3_DCR=PASS
 E3_INITIAL_TOKEN=PASS
 E3_AUTHENTICATED_CALL_AFTER_SERVICE_REDEPLOY=PASS
-
 E4_DCR=PASS
 E4_INITIAL_TOKEN=PASS
 E4_AUTHENTICATED_CALL_AFTER_SERVICE_REDEPLOY=PASS
-```
 
-Therefore DCR/client registration and access-token restart continuity are operationally demonstrated.
-
-CI restart-safe OAuth contract:
-
-```text
 DCR_CLIENT_SURVIVES_RESTART=PASS
 ACCESS_TOKEN_SURVIVES_RESTART=PASS
 REFRESH_TOKEN_SURVIVES_RESTART=PASS
@@ -132,9 +118,14 @@ WRONG_SIGNING_KEY_FAIL_CLOSED=PASS
 TAMPERED_TOKEN_FAIL_CLOSED=PASS
 EXPIRED_ACCESS_FAIL_CLOSED=PASS
 EXPIRED_REFRESH_FAIL_CLOSED=PASS
-```
 
-Runtime refresh-token exchange remains pending because access-token TTL is 3600 seconds.
+RUNTIME_REFRESH_AFTER_3600S_TTL=PASS
+CHATGPT_RECONNECT_REQUIRED=NO
+E3_TO_VOICEBRIDGE_ROUTE_AUTH=PASS
+VOICEBRIDGE_R3E3_EFFECTIVE_TOKEN_INTEGRITY=PASS
+MANAGED_MEDIA_JOB_TTL_SECONDS=3600
+POST_EXPIRY_404=EXPECTED
+```
 
 ## Safety / cost
 
@@ -151,13 +142,17 @@ PAID_PROVIDER_FALLBACK=DENIED
 PAID_ACTIONS_USAGE=DENIED
 ```
 
-## Next gate
+## Next gate — R3-H
 
-1. After OAuth access-token TTL is exceeded, perform one authenticated read-only call through an already connected private MCP surface.
-2. Confirm Render receives `POST /oauth/token -> 200` followed by authenticated `POST /mcp -> 200` without reconnect.
-3. Record runtime refresh-token continuity PASS.
-4. Close R3-G operational hardening.
-5. Proceed to R3-H migration/publication readiness.
+Perform migration/publication readiness review only:
+
+- final contract/docs consistency;
+- install/share/publication surface readiness;
+- security and confirmation boundary review;
+- rollback/recovery plan;
+- release checklist.
+
+Do **not** publish, share, merge, mutate public GPT, or enter R4 without separate owner approval.
 
 ## Hard release boundary
 
@@ -174,4 +169,4 @@ R4=HOLD
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V19_3_R3F_COMPLETE_R3G_REFRESH_RUNTIME_PENDING_2026_09_20`
+`KRC_MEDIA_CURRENT_HANDOFF_V19_4_R3G_COMPLETE_R3H_READY_2026_09_20`
