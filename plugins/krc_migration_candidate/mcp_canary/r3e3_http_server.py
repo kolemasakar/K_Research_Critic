@@ -39,6 +39,7 @@ R3E3_REPLAY_PROBE_ENV = "KRC_R3E3_REPLAY_PROBE_JOB_ID"
 R3E3_CONFIRMATION_PROBE_ONLY_ENV = "KRC_R3E3_CONFIRMATION_PROBE_ONLY"
 R3E3_VOICEBRIDGE_BEARER_OVERRIDE_ENV = "KRC_R3E3_VOICEBRIDGE_BEARER_OVERRIDE"
 R3E3_SCOPE_DIAGNOSTIC_TELEGRAM_JOB_ENV = "KRC_R3E3_SCOPE_DIAGNOSTIC_TELEGRAM_JOB_ID"
+R3E3_OVERRIDE_EXPECTED_SHA256_ENV = "KRC_R3E3_OVERRIDE_EXPECTED_SHA256"
 _CONFIRMATION_PROBE_INVOCATIONS = 0
 
 
@@ -201,6 +202,14 @@ def handle_r3e3_http_request(
         health = r3e3_health(_binding(config))
         health["confirmation_probe_only"] = _confirmation_probe_enabled()
         health["confirmation_probe_invocation_count"] = _CONFIRMATION_PROBE_INVOCATIONS
+        override_bearer = os.getenv(R3E3_VOICEBRIDGE_BEARER_OVERRIDE_ENV, "").strip()
+        expected_sha256 = os.getenv(R3E3_OVERRIDE_EXPECTED_SHA256_ENV, "").strip().lower()
+        health["voicebridge_override_configured"] = bool(override_bearer)
+        health["voicebridge_override_matches_expected_sha256"] = bool(
+            override_bearer
+            and expected_sha256
+            and sha256(override_bearer.encode("utf-8")).hexdigest() == expected_sha256
+        )
         return _json_response(HTTPStatus.OK, health)
 
     if clean_path != MCP_PATH:
