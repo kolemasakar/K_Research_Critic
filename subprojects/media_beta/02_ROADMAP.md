@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 7.4
-Status: **PLUGIN_FIRST / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_COMPLETE / R3-E4_COMPLETE / R3-F_COMPLETE / R3-G_REFRESH_RUNTIME_PENDING / FREE_ONLY / PUBLICATION_HOLD**
+Version: 7.5
+Status: **PLUGIN_FIRST / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_COMPLETE / R3-E4_COMPLETE / R3-F_COMPLETE / R3-G_COMPLETE / R3-H_READY_FOR_REVIEW / FREE_ONLY / PUBLICATION_HOLD**
 Updated: 2026-09-20
 
 ## Current roadmap position
@@ -16,51 +16,52 @@ R3-E2 Instagram execution                     PASS / COMPLETE
 R3-E3 Facebook execution                      PASS / COMPLETE
 R3-E4 Telegram execution                      PASS / COMPLETE
 R3-F Full 13-operation parity                 PASS / COMPLETE
-R3-G Private operational hardening            ACCESS RESTART PASS / REFRESH RUNTIME PENDING
-R3-H Migration/publication readiness          HOLD
+R3-G Private operational hardening            PASS / COMPLETE
+R3-H Migration/publication readiness          READY FOR REVIEW
 R4 Owner-approved cutover/publication         HOLD
 ```
 
-## R3-F accepted contract
+## R3-G accepted contract
 
-```text
-READ_OPERATIONS=9
-EXECUTION_OPERATIONS=4
-TOTAL_OPERATIONS=13
-R3C_EXECUTION_TOOLS=0
-E1_OTHER_EXECUTION_TOOLS=0
-E2_OTHER_EXECUTION_TOOLS=0
-E3_OTHER_EXECUTION_TOOLS=0
-E4_OTHER_EXECUTION_TOOLS=0
-RUNTIME_PARITY=PASS
-```
+Runtime:
 
-## R3-G remaining work
+- OAuth DCR PASS;
+- initial token issuance PASS;
+- authenticated E3/E4 calls PASS;
+- authenticated calls after service redeploy PASS;
+- runtime access-token refresh after 3600-second TTL PASS;
+- refresh-token continuity without ChatGPT reconnect PASS;
+- E3→VoiceBridge route-scoped auth remediation PASS;
+- effective route token integrity PASS;
+- managed-media TTL confirmed at 3600 seconds;
+- old canary rows expired by policy; post-expiry 404 expected.
 
-Already demonstrated at runtime:
+CI:
 
-- OAuth DCR;
-- initial token issuance;
-- authenticated E3/E4 calls;
-- authenticated calls after E3/E4 service redeploy;
-- stable server-side signing keys.
-
-Already covered in CI:
-
-- client/access/refresh continuity across restart;
+- DCR client continuity across restart;
+- access/refresh token continuity across restart;
 - reusable refresh token until expiry;
 - authorization code single-use and in-memory;
 - wrong signing key / rotation invalidation;
 - tampered token fail-closed;
 - expired access/refresh fail-closed.
 
-Remaining runtime gate:
+```text
+R3_G=COMPLETE
+```
 
-1. wait until the existing access token exceeds the 3600-second TTL;
-2. invoke one read-only operation on an already connected private MCP;
-3. require `POST /oauth/token -> 200`;
-4. require subsequent authenticated `POST /mcp -> 200` without reconnect;
-5. close R3-G.
+## R3-H scope
+
+Readiness review only:
+
+- contract/docs consistency;
+- plugin install/share/publication surface readiness;
+- security/auth/confirmation boundaries;
+- rollback and recovery plan;
+- release checklist;
+- explicit owner approval gate before any public mutation.
+
+No publication, sharing, merge, public-GPT mutation or R4 execution is authorized by entering R3-H.
 
 ## Safety invariant
 
@@ -71,12 +72,18 @@ E4_CONFIRMATION_PROBE_ONLY=true
 ADDITIONAL_LIVE_MEDIA_STARTS=NO
 PROJECT_COST_POLICY=FREE_ONLY
 AUTOMATIC_PAID_FALLBACK=DENIED
+
+PUBLIC_GPT_MUTATION=NO
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING=NO
+MAIN_MUTATION=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+R4=HOLD
 ```
 
-## Next phases
+## Next phase
 
-- close R3-G runtime refresh-token continuity;
-- perform R3-H migration/publication readiness review;
-- keep public mutation, plugin publication/sharing, main merges and R4 on HOLD until separately approved.
+R3-H migration/publication readiness review.
 
-Recovery authority: `CURRENT_HANDOFF.md` v19.3 + checkpoint 159.
+Recovery authority: `CURRENT_HANDOFF.md` v19.4 + checkpoint 161.
