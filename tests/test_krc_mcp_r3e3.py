@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 import sys
 from pathlib import Path
 
@@ -77,8 +78,10 @@ def test_r3e3_health_declares_exact_execution_boundary() -> None:
 
 def test_r3e3_route_bearer_derivation_is_stable(monkeypatch) -> None:
     monkeypatch.delenv("KRC_R3E3_VOICEBRIDGE_BEARER_OVERRIDE", raising=False)
-    config = _config()
-    config.voicebridge_bearer = "general-media-action-token-123456789"
+    config = replace(
+        _config(),
+        voicebridge_bearer="general-media-action-token-123456789",
+    )
     binding = r3e3_http._binding(config)
     assert binding.bearer_token == (
         "r3e3-b9e9c294b678947317d24274938f4417715d95c2c082413abe48d81633604f9d"
