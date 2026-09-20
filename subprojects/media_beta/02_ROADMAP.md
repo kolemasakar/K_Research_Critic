@@ -1,8 +1,8 @@
 # MEDIA BETA Roadmap
 
-Version: 7.0
-Status: **PLUGIN_FIRST / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_CONFIRMATION_COMPLETE / R3-E4_CONFIRMATION_COMPLETE / R3-F_CI_PASS / R3-G_OAUTH_RUNTIME_ACTIVE / FREE_ONLY / LIVE_CANARY_APPROVAL_HOLD / PUBLICATION_HOLD**
-Updated: 2026-09-19
+Version: 7.1
+Status: **PLUGIN_FIRST / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_FACEBOOK_COMPLETE / R3-E4_TELEGRAM_LIVE_CANARY_ARMED / R3-F_CI_PASS / R3-G_OAUTH_RUNTIME_ACTIVE / FREE_ONLY / PUBLICATION_HOLD**
+Updated: 2026-09-20
 
 ## End state
 
@@ -31,15 +31,15 @@ R3-C 9-tool read-only binding                 PASS
 R3-D Consequential-action confirmation        PASS
 R3-E1 YouTube execution                       PASS / COMPLETE
 R3-E2 Instagram execution                     PASS / COMPLETE
-R3-E3 Facebook execution                      ZERO-SIDE-EFFECT CONFIRMATION COMPLETE / LIVE CANARY HOLD
-R3-E4 Telegram execution                      ZERO-SIDE-EFFECT CONFIRMATION COMPLETE / LIVE CANARY HOLD
+R3-E3 Facebook execution                      PASS / COMPLETE
+R3-E4 Telegram execution                      LIVE CANARY ARMED / LIVE ACCEPTANCE PENDING
 R3-F Full 13-operation parity                 LOCAL+CI PASS / RUNTIME ACCEPTANCE PENDING
-R3-G Private operational hardening            OAUTH DEPLOYED / DISCOVERY PASS / TOKEN RESTART ACCEPTANCE PENDING
+R3-G Private operational hardening            OAUTH ACTIVE / TOKEN RESTART ACCEPTANCE PENDING
 R3-H Migration/publication readiness          HOLD
 R4 Owner-approved cutover/publication         HOLD
 ```
 
-**Current position:** E3/E4 zero-side-effect ChatGPT confirmation acceptance is complete, including OAuth connection, Cancel, and Allow-once paths. No real Facebook or Telegram provider work has occurred. The next boundary is separate owner approval for one bounded live canary per platform.
+**Current position:** R3-E3 Facebook is fully accepted, including live FREE_ONLY execution, Neon durability, VoiceBridge restart durability, duplicate-start idempotency, and zero paid fallback. R3-E4 Telegram has completed OAuth and confirmation acceptance and is now armed for exactly one owner-approved bounded live canary.
 
 ## Canonical contract
 
@@ -60,21 +60,51 @@ Execution operations:
 
 Accepted and healthy:
 
-- R3-E1 YouTube sentinel;
-- R3-E2 Instagram sentinel;
-- VoiceBridge v0.6.0 staging head with E3/E4 route-scoped bearer support;
-- R3-E3 Facebook sentinel in confirmation-probe-only mode;
-- R3-E4 Telegram sentinel in confirmation-probe-only mode;
+- R3-E1 YouTube;
+- R3-E2 Instagram;
+- R3-E3 Facebook — COMPLETE;
+- VoiceBridge v0.6.0 on validated staging head;
+- E3/E4 route-scoped bearer isolation;
 - OCI Cobalt v11.7.1;
 - Neon Free durable backend.
 
-Still pending acceptance:
+R3-E3 Facebook accepted evidence:
 
-- one separately authorized live Facebook canary;
-- one separately authorized live Telegram canary;
-- Neon persistence/restart/replay/idempotency for E3/E4;
-- restart-safe OAuth token continuity across restart;
-- R3-F runtime parity closure.
+```text
+job_id=KRCM_2dbbe3ba-c2da-49c4-9941-f64b22630880
+status=COMPLETED
+retrieval_provider=cobalt
+retrieval_credits_charged=0
+credits_charged=0
+restart_durability=PASS
+duplicate_start_idempotency=PASS
+duplicate_reused=true
+facebook_jobs=1
+current_E3_probe_only=true
+```
+
+R3-E4 Telegram current readiness:
+
+```text
+CHATGPT_OAUTH=PASS
+CANCEL=PASS
+ALLOW_ONCE_PROBE=PASS
+deploy=dep-danj16740ujc73c47c0g
+deploy_status=live
+current_E4_probe_only=false
+provider_work_started=false
+telegram_jobs=0
+voicebridge_pre_warm_200=3/3
+```
+
+Still pending:
+
+- one bounded Telegram live canary;
+- Telegram Neon durability;
+- Telegram VoiceBridge restart durability;
+- Telegram duplicate-start idempotency;
+- R3-F runtime parity closure;
+- R3-G restart-safe OAuth token continuity.
 
 ## CI state
 
@@ -91,35 +121,38 @@ VOICEBRIDGE_BROWSER_EXTENSION=PASS
 VOICEBRIDGE_REPOSITORY_DOCS=PASS
 ```
 
-The repositories are public and these standard GitHub-hosted Ubuntu jobs were not blocked by the previously recorded 2000/2000 private-repository included-minutes state. Paid Actions usage remains denied and was not needed.
+The repositories are public and standard GitHub-hosted Ubuntu jobs ran successfully. Paid Actions usage remains denied and was not needed.
 
-## Safety invariant
+## Current safety invariant
 
 ```text
 E3_CONFIRMATION_PROBE_ONLY=true
-E4_CONFIRMATION_PROBE_ONLY=true
-E3_CONFIRMATION_PROBE_INVOCATIONS=1
-E4_CONFIRMATION_PROBE_INVOCATIONS=1
 E3_PROVIDER_WORK_STARTED=false
+
+E4_CONFIRMATION_PROBE_ONLY=false
 E4_PROVIDER_WORK_STARTED=false
-NEON_MANAGED_JOBS=1
+E4_OWNER_APPROVED_BOUNDED_LIVE_CANARY=true
+
+NEON_TOTAL_JOBS=2
 NEON_INSTAGRAM_JOBS=1
-NEON_FACEBOOK_JOBS=0
+NEON_FACEBOOK_JOBS=1
 NEON_TELEGRAM_JOBS=0
-POST_DEPLOY_ERROR_LEVEL_LOGS=0
-POST_DEPLOY_HTTP_5XX=0
+
+PROJECT_COST_POLICY=FREE_ONLY
+AUTOMATIC_PAID_FALLBACK=DENIED
 ```
 
 ## Nearest tasks
 
-1. Obtain separate owner approval for one bounded Facebook live canary and one bounded Telegram live canary.
-2. After approval only, disable probe-only mode in a controlled manner for the selected platform and run exactly one canary.
-3. Prove Neon durability, restart/replay, duplicate-start idempotency and zero paid fallback.
-4. Repeat for the second platform only after its separate owner approval.
-5. Close R3-E3 and R3-E4.
-6. Complete R3-F runtime parity acceptance.
-7. Complete R3-G restart-safe token continuity and operational hardening.
-8. Enter R3-H migration/publication readiness.
+1. Execute exactly one `media_telegram_start` for `https://t.me/techcrimes/12101`.
+2. Verify durable Telegram job, public Telegram retrieval and zero retrieval credits.
+3. Controlled-redeploy VoiceBridge on the validated head.
+4. Verify Telegram job/segments survive restart.
+5. Repeat the exact Telegram start once and require same job id, `reused=true`, no new provider work, and zero charge.
+6. Return E4 to `CONFIRMATION_PROBE_ONLY=true`.
+7. Close R3-E4.
+8. Complete R3-F runtime parity and R3-G OAuth restart acceptance.
+9. Enter R3-H migration/publication readiness.
 
 ## Infrastructure policy
 
@@ -142,4 +175,4 @@ HP_OMEN_LOCAL_DISK_AS_PROJECT_STORAGE=DENIED
 LOCAL_WORKTREES=TRANSIENT_ONLY
 ```
 
-Recovery authority: `CURRENT_HANDOFF.md` v18.9 + checkpoint 149.
+Recovery authority: `CURRENT_HANDOFF.md` v19.0 + checkpoint 154.
