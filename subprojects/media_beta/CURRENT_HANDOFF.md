@@ -1,25 +1,26 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 18.8
-Status: **ACTIVE_HANDOFF / R3-E1_PASS_COMPLETE / R3-E2_PASS_COMPLETE / R3-E3_ZERO_SIDE_EFFECT_CONFIRMATION_COMPLETE / R3-E4_CANCEL_PASS_ALLOW_ONCE_PENDING / R3-F_CI_PASS / R3-G_OAUTH_RUNTIME_ACTIVE / FREE_ONLY / PUBLICATION_HOLD**
+Version: 18.9
+Status: **ACTIVE_HANDOFF / R3-E1_PASS_COMPLETE / R3-E2_PASS_COMPLETE / R3-E3_ZERO_SIDE_EFFECT_CONFIRMATION_COMPLETE / R3-E4_ZERO_SIDE_EFFECT_CONFIRMATION_COMPLETE / R3-F_CI_PASS / R3-G_OAUTH_RUNTIME_ACTIVE / FREE_ONLY / LIVE_CANARY_APPROVAL_HOLD / PUBLICATION_HOLD**
 Date: 2026-09-20
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 148. R3-E1/E2 COMPLETE. R3-E3 Facebook zero-side-effect confirmation COMPLETE. R3-E4 Telegram: CI/deploy/OAuth/DCR/ChatGPT OAuth PASS; Cancel PASS; confirmation-probe-only=true; invocation_count=0; provider_work=false; Neon telegram_jobs=0. Наступний gate — E4 ChatGPT Allow-once. Реальні Facebook/Telegram live canaries HOLD до окремого owner approval. PROJECT_COST_POLICY=FREE_ONLY.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 149. R3-E1/E2 COMPLETE. R3-E3 Facebook і R3-E4 Telegram zero-side-effect confirmation COMPLETE: OAuth/ChatGPT OAuth/Cancel/Allow-once PASS; invocation_count=1 на кожному probe surface; provider_work=false; real_media_start=false; Neon facebook_jobs=0, telegram_jobs=0. Наступний gate — окремий owner approval для bounded live Facebook і Telegram canaries. PROJECT_COST_POLICY=FREE_ONLY.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v18.8.
-2. `148_R3E4_TELEGRAM_CHATGPT_CANCEL_PATH_PASS_2026_09_20.md`.
-3. `147_R3E4_CHATGPT_OAUTH_CONNECTED_ZERO_SIDE_EFFECT_2026_09_20.md`.
-4. `146_R3E3_FACEBOOK_CHATGPT_ALLOW_ONCE_ZERO_SIDE_EFFECT_PASS_2026_09_20.md`.
-5. `145_R3E3_FACEBOOK_CHATGPT_CANCEL_PATH_PASS_2026_09_20.md`.
-6. `144_R3E3_CHATGPT_OAUTH_CONNECTED_ZERO_SIDE_EFFECT_2026_09_20.md`.
-7. `143_E3_E4_DCR_RUNTIME_PREFLIGHT_PASS_2026_09_19.md`.
-8. `142_CI_E3_E4_DEPLOY_HEALTH_OAUTH_DISCOVERY_PASS_2026_09_19.md`.
-9. `02_ROADMAP.md` — v6.9.
-10. current PR #22 / PR #45 heads and current runtime evidence.
+1. `CURRENT_HANDOFF.md` — v18.9.
+2. `149_R3E4_TELEGRAM_CHATGPT_ALLOW_ONCE_ZERO_SIDE_EFFECT_PASS_2026_09_20.md`.
+3. `148_R3E4_TELEGRAM_CHATGPT_CANCEL_PATH_PASS_2026_09_20.md`.
+4. `147_R3E4_CHATGPT_OAUTH_CONNECTED_ZERO_SIDE_EFFECT_2026_09_20.md`.
+5. `146_R3E3_FACEBOOK_CHATGPT_ALLOW_ONCE_ZERO_SIDE_EFFECT_PASS_2026_09_20.md`.
+6. `145_R3E3_FACEBOOK_CHATGPT_CANCEL_PATH_PASS_2026_09_20.md`.
+7. `144_R3E3_CHATGPT_OAUTH_CONNECTED_ZERO_SIDE_EFFECT_2026_09_20.md`.
+8. `143_E3_E4_DCR_RUNTIME_PREFLIGHT_PASS_2026_09_19.md`.
+9. `142_CI_E3_E4_DEPLOY_HEALTH_OAUTH_DISCOVERY_PASS_2026_09_19.md`.
+10. `02_ROADMAP.md` — v6.9.
+11. current PR #22 / PR #45 heads and current runtime evidence.
 
 ## Repository / PR authority
 
@@ -29,7 +30,7 @@ branch=agent/krc-public-media-r3-integration
 PR=22
 state=OPEN / DRAFT / UNMERGED
 ci_validated_code_head=4c834382e18dfce1bea86dee26614a38a3428817
-latest_runtime_checkpoint=ebb87979fc3d13f42c0c5b1545a164c9b79e998a
+latest_runtime_checkpoint=056cea6b202349520bc0e9f0bda8091845443476
 
 VoiceBridge repository=kolemasakar/VoiceBridge
 branch=agent/krc-media-gemini-migration
@@ -50,7 +51,7 @@ R3_D=PASS
 R3_E1=PASS / COMPLETE
 R3_E2=PASS / COMPLETE
 R3_E3=CI_PASS / DEPLOY_PASS / CHATGPT_OAUTH_PASS / CANCEL_PASS / ALLOW_ONCE_PASS / ZERO_SIDE_EFFECT_CONFIRMATION_COMPLETE / LIVE_CANARY_HOLD
-R3_E4=CI_PASS / DEPLOY_PASS / CHATGPT_OAUTH_PASS / AUTHENTICATED_MCP_TRANSPORT_PASS / CANCEL_PASS / ALLOW_ONCE_PENDING
+R3_E4=CI_PASS / DEPLOY_PASS / CHATGPT_OAUTH_PASS / CANCEL_PASS / ALLOW_ONCE_PASS / ZERO_SIDE_EFFECT_CONFIRMATION_COMPLETE / LIVE_CANARY_HOLD
 R3_F=LOCAL_PASS / CI_PASS / RUNTIME_ACCEPTANCE_PENDING
 R3_G_OAUTH=DEPLOYED / DCR_PASS / E3_TOKEN_FLOW_PASS / E4_TOKEN_FLOW_PASS / TOKEN_RESTART_ACCEPTANCE_PENDING
 R3_H=HOLD
@@ -90,12 +91,14 @@ POST_OAUTH_AUTHORIZE=302
 POST_OAUTH_TOKEN=200
 AUTHENTICATED_POST_MCP=200
 CONFIRMATION_PROBE_ONLY=true
-CONFIRMATION_PROBE_INVOCATION_COUNT=0
+CONFIRMATION_PROBE_INVOCATION_COUNT=1
 PROVIDER_WORK=false
+PROVIDER_CHARGE=false
+REAL_MEDIA_START=false
 NEON_TELEGRAM_JOBS=0
 CANCEL_PATH=PASS
-BACKEND_INVOCATION_AFTER_DENY=0
-POST_CONNECT_ERROR_LEVEL_LOGS=0
+ALLOW_ONCE_PATH=PASS
+POST_APPROVE_ERROR_LEVEL_LOGS=0
 ```
 
 ## Current runtime audit
@@ -117,7 +120,7 @@ R3E4_SERVICE_ID=srv-danertv40ujc73bn9hog
 R3E4_HEALTH=PASS
 R3E4_SURFACE=r3e4_telegram_execution
 R3E4_CONFIRMATION_PROBE_ONLY=true
-R3E4_CONFIRMATION_PROBE_INVOCATIONS=0
+R3E4_CONFIRMATION_PROBE_INVOCATIONS=1
 R3E4_PROVIDER_WORK_STARTED=false
 ```
 
@@ -156,10 +159,10 @@ Paid Actions usage was not required or authorized.
 
 ## Next gate
 
-1. Repeat the bounded `media_telegram_start` request and validate Allow-once while `CONFIRMATION_PROBE_ONLY=true`.
-2. Confirm exactly one probe invocation, provider work=false and Neon telegram_jobs=0.
-3. After E3/E4 zero-side-effect confirmation acceptance is complete, request separate owner approval for each real live canary.
-4. Only after explicit approval, run bounded Facebook/Telegram live canaries and prove Neon persistence, restart/replay, duplicate-start idempotency and zero paid fallback.
+1. Obtain separate owner approval for one bounded Facebook live canary and one bounded Telegram live canary.
+2. Only after explicit approval, disable probe-only mode in a controlled manner and run one canary per platform.
+3. Prove Neon persistence, restart/replay, duplicate-start idempotency and zero paid fallback for each platform.
+4. Close R3-E3/R3-E4.
 5. Complete R3-F runtime parity and R3-G token-restart acceptance.
 6. Proceed to R3-H only after all prior gates pass.
 
@@ -180,4 +183,4 @@ R4=HOLD
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V18_8_R3E4_CANCEL_PASS_ALLOW_ONCE_PENDING_2026_09_20`
+`KRC_MEDIA_CURRENT_HANDOFF_V18_9_E3_E4_ZERO_SIDE_EFFECT_CONFIRMATION_COMPLETE_LIVE_APPROVAL_HOLD_2026_09_20`
