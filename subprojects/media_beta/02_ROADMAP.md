@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 6.9
-Status: **PLUGIN_FIRST / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_RUNTIME_STAGING / R3-E4_RUNTIME_STAGING / R3-F_CI_PASS / R3-G_OAUTH_DEPLOYED / FREE_ONLY / PUBLICATION_HOLD**
+Version: 7.0
+Status: **PLUGIN_FIRST / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_CONFIRMATION_COMPLETE / R3-E4_CONFIRMATION_COMPLETE / R3-F_CI_PASS / R3-G_OAUTH_RUNTIME_ACTIVE / FREE_ONLY / LIVE_CANARY_APPROVAL_HOLD / PUBLICATION_HOLD**
 Updated: 2026-09-19
 
 ## End state
@@ -31,15 +31,15 @@ R3-C 9-tool read-only binding                 PASS
 R3-D Consequential-action confirmation        PASS
 R3-E1 YouTube execution                       PASS / COMPLETE
 R3-E2 Instagram execution                     PASS / COMPLETE
-R3-E3 Facebook execution                      CI+DEPLOY_HEALTH+OAUTH_DISCOVERY PASS / AUTH CONFIRMATION PENDING
-R3-E4 Telegram execution                      CI+DEPLOY_HEALTH+OAUTH_DISCOVERY PASS / AUTH CONFIRMATION PENDING
+R3-E3 Facebook execution                      ZERO-SIDE-EFFECT CONFIRMATION COMPLETE / LIVE CANARY HOLD
+R3-E4 Telegram execution                      ZERO-SIDE-EFFECT CONFIRMATION COMPLETE / LIVE CANARY HOLD
 R3-F Full 13-operation parity                 LOCAL+CI PASS / RUNTIME ACCEPTANCE PENDING
 R3-G Private operational hardening            OAUTH DEPLOYED / DISCOVERY PASS / TOKEN RESTART ACCEPTANCE PENDING
 R3-H Migration/publication readiness          HOLD
 R4 Owner-approved cutover/publication         HOLD
 ```
 
-**Current position:** E3/E4 zero-side-effect staging runtimes are live on Render Free. CI and unauthenticated OAuth discovery are complete. The next boundary is secret-safe authenticated OAuth/MCP discovery and ChatGPT confirmation acceptance.
+**Current position:** E3/E4 zero-side-effect ChatGPT confirmation acceptance is complete, including OAuth connection, Cancel, and Allow-once paths. No real Facebook or Telegram provider work has occurred. The next boundary is separate owner approval for one bounded live canary per platform.
 
 ## Canonical contract
 
@@ -70,10 +70,10 @@ Accepted and healthy:
 
 Still pending acceptance:
 
-- authenticated OAuth/DCR + MCP discovery for E3/E4;
-- ChatGPT Cancel/Allow-once on E3/E4;
+- one separately authorized live Facebook canary;
+- one separately authorized live Telegram canary;
+- Neon persistence/restart/replay/idempotency for E3/E4;
 - restart-safe OAuth token continuity across restart;
-- live E3/E4 canaries, which require separate owner authorization;
 - R3-F runtime parity closure.
 
 ## CI state
@@ -98,6 +98,8 @@ The repositories are public and these standard GitHub-hosted Ubuntu jobs were no
 ```text
 E3_CONFIRMATION_PROBE_ONLY=true
 E4_CONFIRMATION_PROBE_ONLY=true
+E3_CONFIRMATION_PROBE_INVOCATIONS=1
+E4_CONFIRMATION_PROBE_INVOCATIONS=1
 E3_PROVIDER_WORK_STARTED=false
 E4_PROVIDER_WORK_STARTED=false
 NEON_MANAGED_JOBS=1
@@ -110,10 +112,10 @@ POST_DEPLOY_HTTP_5XX=0
 
 ## Nearest tasks
 
-1. Complete secret-safe authenticated OAuth/DCR and authenticated MCP discovery for E3/E4.
-2. Validate ChatGPT Cancel and Allow-once while confirmation-probe-only remains enabled.
-3. Obtain separate owner approval before any real Facebook or Telegram execution.
-4. After that approval only, run one bounded canary per platform and prove Neon durability, restart/replay, duplicate-start idempotency and zero paid fallback.
+1. Obtain separate owner approval for one bounded Facebook live canary and one bounded Telegram live canary.
+2. After approval only, disable probe-only mode in a controlled manner for the selected platform and run exactly one canary.
+3. Prove Neon durability, restart/replay, duplicate-start idempotency and zero paid fallback.
+4. Repeat for the second platform only after its separate owner approval.
 5. Close R3-E3 and R3-E4.
 6. Complete R3-F runtime parity acceptance.
 7. Complete R3-G restart-safe token continuity and operational hardening.
@@ -140,4 +142,4 @@ HP_OMEN_LOCAL_DISK_AS_PROJECT_STORAGE=DENIED
 LOCAL_WORKTREES=TRANSIENT_ONLY
 ```
 
-Recovery authority: `CURRENT_HANDOFF.md` v18.3 + checkpoint 142.
+Recovery authority: `CURRENT_HANDOFF.md` v18.9 + checkpoint 149.
