@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 7.2
-Status: **PLUGIN_FIRST / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_FACEBOOK_COMPLETE / R3-E4_FIRST_CANARY_BOUNDED_TERMINAL / REPLACEMENT_APPROVAL_HOLD / R3-F_CI_PASS / R3-G_OAUTH_RUNTIME_ACTIVE / FREE_ONLY / PUBLICATION_HOLD**
+Version: 7.3
+Status: **PLUGIN_FIRST / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_COMPLETE / R3-E4_COMPLETE / R3-F_RUNTIME_ACCEPTANCE_NEXT / R3-G_OAUTH_RUNTIME_ACTIVE / FREE_ONLY / PUBLICATION_HOLD**
 Updated: 2026-09-20
 
 ## End state
@@ -10,17 +10,16 @@ Build a production-grade private MEDIA surface for K-Research & Critic while pre
 
 The finished system must provide:
 
-- the canonical 13 MEDIA operations;
-- strict separation of 9 read operations and 4 consequential start operations;
-- isolated execution surfaces for YouTube, Instagram, Facebook and Telegram;
-- ChatGPT confirmation before each consequential start;
+- canonical 13 MEDIA operations;
+- 9 read operations and 4 consequential start operations;
+- isolated YouTube / Instagram / Facebook / Telegram execution surfaces;
+- confirmation before each consequential start;
 - server-side route-scoped credentials;
 - restart-safe OAuth/DCR;
 - Neon durable state;
 - restart replay and duplicate-start idempotency;
-- fail-closed behavior and no automatic paid fallback;
-- PROJECT_COST_POLICY=FREE_ONLY;
-- migration/publication readiness only after full parity and operational acceptance.
+- fail-closed FREE_ONLY provider policy;
+- migration/publication readiness only after runtime parity and operational hardening.
 
 ## Current roadmap position
 
@@ -32,14 +31,39 @@ R3-D Consequential-action confirmation        PASS
 R3-E1 YouTube execution                       PASS / COMPLETE
 R3-E2 Instagram execution                     PASS / COMPLETE
 R3-E3 Facebook execution                      PASS / COMPLETE
-R3-E4 Telegram execution                      FIRST LIVE CANARY BOUNDED TERMINAL / REPLACEMENT APPROVAL HOLD
-R3-F Full 13-operation parity                 LOCAL+CI PASS / RUNTIME ACCEPTANCE PENDING
+R3-E4 Telegram execution                      PASS / COMPLETE
+R3-F Full 13-operation parity                 LOCAL+CI PASS / RUNTIME ACCEPTANCE NEXT
 R3-G Private operational hardening            OAUTH ACTIVE / TOKEN RESTART ACCEPTANCE PENDING
 R3-H Migration/publication readiness          HOLD
 R4 Owner-approved cutover/publication         HOLD
 ```
 
-**Current position:** R3-E3 Facebook is fully accepted. R3-E4 Telegram completed a real FREE_ONLY public-web route canary, persisted a deterministic non-retryable `no spoken audio` terminal state, and passed restart durability with zero charge. E4 is back in probe-only mode. A preflighted speech-oriented replacement Telegram fixture is ready but requires a new explicit owner approval.
+## Accepted live evidence
+
+```text
+YouTube=COMPLETE
+Instagram=COMPLETE
+
+Facebook:
+  job_id=KRCM_2dbbe3ba-c2da-49c4-9941-f64b22630880
+  status=COMPLETED
+  retrieval_provider=cobalt
+  charge=0
+  restart_durability=PASS
+  duplicate_start_idempotency=PASS
+
+Telegram:
+  completed_job_id=KRCM_c1cbb41b-497d-472c-b6c2-10d1128b4eda
+  status=COMPLETED
+  retrieval_provider=telegram_public_web
+  charge=0
+  restart_durability=PASS
+  duplicate_start_idempotency=PASS
+  failed_content_fixture=KRCM_59d7bdc2-9ea0-4028-b8c6-dfe3f39828f9
+  failed_content_reason=no_spoken_audio
+```
+
+E3/E4 are returned to `CONFIRMATION_PROBE_ONLY=true`.
 
 ## Canonical contract
 
@@ -56,59 +80,6 @@ Execution operations:
 - `media_facebook_start`
 - `media_telegram_start`
 
-## Current runtime
-
-Accepted and healthy:
-
-- R3-E1 YouTube;
-- R3-E2 Instagram;
-- R3-E3 Facebook — COMPLETE;
-- VoiceBridge v0.6.0 on validated staging head;
-- E3/E4 route-scoped bearer isolation;
-- OCI Cobalt v11.7.1;
-- Neon Free durable backend.
-
-R3-E3 Facebook accepted evidence:
-
-```text
-job_id=KRCM_2dbbe3ba-c2da-49c4-9941-f64b22630880
-status=COMPLETED
-retrieval_provider=cobalt
-retrieval_credits_charged=0
-credits_charged=0
-restart_durability=PASS
-duplicate_start_idempotency=PASS
-duplicate_reused=true
-facebook_jobs=1
-current_E3_probe_only=true
-```
-
-R3-E4 Telegram current state:
-
-```text
-CHATGPT_OAUTH=PASS
-CANCEL=PASS
-ALLOW_ONCE_PROBE=PASS
-first_live_job=KRCM_59d7bdc2-9ea0-4028-b8c6-dfe3f39828f9
-first_live_status=FAILED
-first_live_error=STT_TRANSCRIPTION_FAILED/no_spoken_audio
-retrieval_provider=telegram_public_web
-retrieval_credits_charged=0
-credits_charged=0
-restart_durability=PASS
-current_E4_probe_only=true
-replacement_candidate=https://t.me/Ingiliz_tili_kanalim/731
-replacement_preflight=PASS
-replacement_owner_approval=PENDING
-```
-
-Still pending:
-
-- explicit owner approval for one replacement Telegram live canary;
-- a COMPLETED Telegram runtime job suitable for live duplicate-start idempotency acceptance;
-- R3-F runtime parity closure;
-- R3-G restart-safe OAuth token continuity.
-
 ## CI state
 
 ```text
@@ -124,39 +95,27 @@ VOICEBRIDGE_BROWSER_EXTENSION=PASS
 VOICEBRIDGE_REPOSITORY_DOCS=PASS
 ```
 
-The repositories are public and standard GitHub-hosted Ubuntu jobs ran successfully. Paid Actions usage remains denied and was not needed.
-
 ## Current safety invariant
 
 ```text
 E3_CONFIRMATION_PROBE_ONLY=true
-E3_PROVIDER_WORK_STARTED=false
-
 E4_CONFIRMATION_PROBE_ONLY=true
+E3_PROVIDER_WORK_STARTED=false
 E4_PROVIDER_WORK_STARTED=false
-E4_REPLACEMENT_LIVE_CANARY_AUTHORIZED=false
-
-NEON_TOTAL_JOBS=3
-NEON_INSTAGRAM_JOBS=1
-NEON_FACEBOOK_JOBS=1
-NEON_TELEGRAM_JOBS=1
-NEON_TELEGRAM_FAILED_JOBS=1
-
+ADDITIONAL_LIVE_MEDIA_STARTS=NO
 PROJECT_COST_POLICY=FREE_ONLY
 AUTOMATIC_PAID_FALLBACK=DENIED
 ```
 
 ## Nearest tasks
 
-1. Obtain explicit owner approval for the preflighted replacement Telegram canary `https://t.me/Ingiliz_tili_kanalim/731`.
-2. Arm E4 only after approval and warm VoiceBridge.
-3. Execute exactly one replacement `media_telegram_start`.
-4. If COMPLETED, verify Neon persistence and restart durability.
-5. Repeat the exact completed start once and require same job id, `reused=true`, no new provider work, and zero charge.
-6. Return E4 to `CONFIRMATION_PROBE_ONLY=true`.
-7. Close R3-E4.
-8. Complete R3-F runtime parity and R3-G OAuth restart acceptance.
-9. Enter R3-H migration/publication readiness.
+1. Complete R3-F runtime parity across the read-only surface and four isolated execution surfaces.
+2. Prove all 13 canonical operations are represented exactly as designed.
+3. Prove no execution tool leaks into the 9-tool read-only surface.
+4. Prove each E1/E2/E3/E4 surface exposes exactly its own start operation plus scoped non-execution support.
+5. Complete R3-G OAuth token continuity across controlled restart.
+6. Finish operational hardening evidence.
+7. Enter R3-H migration/publication readiness.
 
 ## Infrastructure policy
 
@@ -179,4 +138,4 @@ HP_OMEN_LOCAL_DISK_AS_PROJECT_STORAGE=DENIED
 LOCAL_WORKTREES=TRANSIENT_ONLY
 ```
 
-Recovery authority: `CURRENT_HANDOFF.md` v19.1 + checkpoint 155.
+Recovery authority: `CURRENT_HANDOFF.md` v19.2 + checkpoint 158.
