@@ -65,9 +65,10 @@ def _confirmation_probe_backend(
 
 
 def _binding(config: HttpConfig) -> VoiceBridgeBinding:
+    override_bearer = os.getenv(R3E3_VOICEBRIDGE_BEARER_OVERRIDE_ENV, "").strip()
     return VoiceBridgeBinding(
         base_url=config.voicebridge_base_url,
-        bearer_token=config.voicebridge_bearer,
+        bearer_token=override_bearer or config.voicebridge_bearer,
         timeout_seconds=config.voicebridge_timeout_seconds,
     )
 
