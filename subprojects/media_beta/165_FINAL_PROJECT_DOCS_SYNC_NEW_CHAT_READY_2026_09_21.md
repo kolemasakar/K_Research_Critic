@@ -1,0 +1,130 @@
+# KRC MEDIA — final project/docs sync before new-chat generator
+
+Date: 2026-09-21
+Status: **PROJECT_SYNC_COMPLETE / R4_READONLY_PREFLIGHT_COMPLETE / OWNER_CUTOVER_DECISION_PENDING / NEW_CHAT_READY**
+
+## Phase state
+
+```text
+R3_A_TO_H=COMPLETE
+R4_NON_UI_PREFLIGHT=COMPLETE
+R4_MANUAL_UI_PREFLIGHT=COMPLETE
+R4_READONLY_PREFLIGHT=PASS / COMPLETE
+R4_TECHNICAL_PREFLIGHT_DEBT=0
+R4_CUTOVER=HOLD / OWNER DECISION REQUIRED
+```
+
+## Manual UI result
+
+Checkpoint 164 accepted:
+
+```text
+GPT_IDENTITY=PASS
+GPT_EDITOR_ACCESS=PASS
+PUBLICATION_STATE=Published
+VISIBLE_AUDIENCE=Everyone
+SHARE_GPT_STORE_SURFACE=PASS
+PLUGIN_SURFACE=PASS
+PRIVATE_KRC_PLUGIN_INVENTORY=PASS
+INSTALL_ADD_CONTROL=PASS
+SKILLS_SURFACE=PASS
+MIGRATE_CONTROL=NOT_FOUND_IN_CURRENT_UI
+MUTATION_PERFORMED=NO
+```
+
+## Canonical documentation versions
+
+```text
+CURRENT_HANDOFF.md=v19.7
+02_ROADMAP.md=v7.8
+00_INDEX.md=v9.1
+06_DECISION_LOG.md=v5.1
+08_CHAT_HANDOFF.md=v6.1
+migration_candidate_README=SYNCED_AFTER_R4_PREFLIGHT
+```
+
+## Canonical checkpoints
+
+```text
+164_R4_MANUAL_UI_READONLY_PREFLIGHT_COMPLETE_OWNER_CUTOVER_DECISION_PENDING_2026_09_21.md
+163_R4_READONLY_PREFLIGHT_NON_UI_COMPLETE_UI_GATE_BLOCKED_2026_09_21.md
+162_R3H_READINESS_REVIEW_COMPLETE_R4_HOLD_2026_09_20.md
+161_R3G_OPERATIONAL_HARDENING_COMPLETE_2026_09_20.md
+159_R3F_FULL_13_OPERATION_RUNTIME_PARITY_PASS_2026_09_20.md
+```
+
+## Repository / PR state
+
+```text
+KRC repo=kolemasakar/K_Research_Critic
+KRC branch=agent/krc-public-media-r3-integration
+KRC branch head=3592cb9e53a7a2e14410f7b177b968fa6d851ca0
+KRC last validated code head=dbcebdff0201fd9240a7aeafa5f5d5dd46ca08f7
+KRC CI run=35485995871 PASS
+PR22=OPEN / DRAFT / UNMERGED
+
+VoiceBridge repo=kolemasakar/VoiceBridge
+VoiceBridge branch=agent/krc-media-gemini-migration
+VoiceBridge validated/deployed head=db9fb62c57fc731732f88ff5b417a0f15be178b6
+VoiceBridge CI run=35492121039 PASS
+PR45=OPEN / DRAFT / UNMERGED
+```
+
+Documentation-only KRC commits after the validated code head use `[skip ci]`.
+
+## Accepted runtime contract
+
+```text
+CORE_SKILL_EXACT_SNAPSHOT=PASS
+MEDIA_TOTAL_OPERATIONS=13
+READ_OPERATIONS=9
+EXECUTION_OPERATIONS=4
+CONTRACT_OPENAPI_PARITY=PASS
+R3C_READONLY_EXECUTION_LEAKAGE=0
+E1_E2_E3_E4_EXECUTION_ISOLATION=PASS
+OAUTH_REFRESH_RUNTIME=PASS
+E3_TO_VOICEBRIDGE_SCOPED_AUTH=PASS
+PROJECT_COST_POLICY=FREE_ONLY
+```
+
+## Safe runtime boundary
+
+```text
+E2_CONFIRMATION_PROBE_ONLY=true
+E3_CONFIRMATION_PROBE_ONLY=true
+E4_CONFIRMATION_PROBE_ONLY=true
+ADDITIONAL_LIVE_MEDIA_STARTS=NO
+```
+
+## Next-chat entry point
+
+The user will provide a separate transition generator after this sync checkpoint.
+
+The next chat must recover from:
+
+1. `CURRENT_HANDOFF.md` latest version;
+2. checkpoint 165;
+3. checkpoint 164;
+4. roadmap/index/decision/chat-handoff current versions;
+5. PR #22 / #45 current state.
+
+Before any R4 mutation, the new chat must present the exact cutover plan and rollback plan and obtain explicit owner approval.
+
+## Hard boundary
+
+```text
+PROJECT_COST_POLICY=FREE_ONLY
+R4_CUTOVER_AUTHORIZED=NO
+PUBLIC_GPT_MUTATION=NO
+PLUGIN_INSTALLATION_OR_CHANGE=NO
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING_CHANGE=NO
+MAIN_MUTATION=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+ADDITIONAL_LIVE_MEDIA_STARTS=NO
+```
+
+Terminal marker:
+
+`KRC_MEDIA_CHECKPOINT_165_FINAL_PROJECT_DOCS_SYNC_NEW_CHAT_READY_2026_09_21`
