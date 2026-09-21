@@ -152,4 +152,4 @@ R4=HOLD
 - `subprojects/media_beta/161_R3G_OPERATIONAL_HARDENING_COMPLETE_2026_09_20.md`
 - `subprojects/media_beta/02_ROADMAP.md`
 
-Public migration/cutover must remain separately owner-approved. Manual UI inspection confirmed the GPT identity, GPT Store/share controls, Plugin surface, private KRC plugin inventory, install/add controls and Skills surface. No explicit Migrate control was found in the current UI. Before any cutover, recover from checkpoint 164 in a fresh chat and obtain explicit owner approval.
+Public migration/cutover must remain separately owner-approved. Manual UI inspection confirmed the GPT identity, GPT Store/share controls, Plugin surface, private KRC plugin inventory, install/add controls and Skills surface. No explicit Migrate control was found in the current UI. Before any cutover, recover from CURRENT_HANDOFF v19.8 + checkpoint 165 in a fresh chat and obtain explicit owner approval.
