@@ -1,42 +1,24 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 19.5
-Status: **ACTIVE_HANDOFF / R3-E1_COMPLETE / R3-E2_COMPLETE / R3-E3_COMPLETE / R3-E4_COMPLETE / R3-F_COMPLETE / R3-G_COMPLETE / R3-H_COMPLETE / R4_OWNER_DECISION_HOLD / FREE_ONLY / PUBLICATION_HOLD**
-Date: 2026-09-20
+Version: 19.6
+Status: **ACTIVE_HANDOFF / R3_A_TO_H_COMPLETE / R4_READONLY_PREFLIGHT_PARTIAL_PASS / NON_UI_COMPLETE / ACCOUNT_UI_GATE_PENDING / FREE_ONLY / PUBLICATION_HOLD**
+Date: 2026-09-21
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 162. R3-E1/E2/E3/E4/F/G/H COMPLETE. Runtime 13-operation parity PASS; OAuth refresh continuity PASS; E3→VoiceBridge scoped auth PASS; managed-media TTL=3600 confirmed; private execution plugins follow Allow read actions + confirm changes. R4 is NOT authorized. PROJECT_COST_POLICY=FREE_ONLY. Re-inspect current account migration/install/share/publish controls before any cutover.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 163. R3-A..H COMPLETE. R4 non-UI read-only preflight COMPLETE. Core skill parity PASS, 13-tool parity PASS, live runtime health PASS, Plugin permissions PASS, CI PASS. Cloudflare blocked current account UI migration/install/share/publish inspection; mutation=NO. R4 cutover HOLD.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v19.5.
-2. `162_R3H_READINESS_REVIEW_COMPLETE_R4_HOLD_2026_09_20.md`.
-3. `161_R3G_OPERATIONAL_HARDENING_COMPLETE_2026_09_20.md`.
-4. `159_R3F_FULL_13_OPERATION_RUNTIME_PARITY_PASS_2026_09_20.md`.
-5. `158_R3E4_TELEGRAM_LIVE_ACCEPTANCE_COMPLETE_2026_09_20.md`.
-6. `153_R3E3_FACEBOOK_LIVE_ACCEPTANCE_COMPLETE_2026_09_20.md`.
-7. `02_ROADMAP.md`.
-8. current PR #22 / PR #45 heads and runtime evidence.
-
-## Repository / PR authority
-
-```text
-KRC repository=kolemasakar/K_Research_Critic
-branch=agent/krc-public-media-r3-integration
-PR=22
-state=OPEN / DRAFT / UNMERGED
-last_ci_validated_code_head=dbcebdff0201fd9240a7aeafa5f5d5dd46ca08f7
-docs_current_through=checkpoint_162
-
-VoiceBridge repository=kolemasakar/VoiceBridge
-branch=agent/krc-media-gemini-migration
-PR=45
-state=OPEN / DRAFT / UNMERGED
-ci_validated_and_deployed_head=db9fb62c57fc731732f88ff5b417a0f15be178b6
-ci_run=35492121039 PASS
-deploy=dep-dann2op42hec73f1s7s0 LIVE
-```
+1. `CURRENT_HANDOFF.md` — v19.6.
+2. `163_R4_READONLY_PREFLIGHT_NON_UI_COMPLETE_UI_GATE_BLOCKED_2026_09_21.md`.
+3. `162_R3H_READINESS_REVIEW_COMPLETE_R4_HOLD_2026_09_20.md`.
+4. `161_R3G_OPERATIONAL_HARDENING_COMPLETE_2026_09_20.md`.
+5. `159_R3F_FULL_13_OPERATION_RUNTIME_PARITY_PASS_2026_09_20.md`.
+6. `00_INDEX.md` — v9.0.
+7. `02_ROADMAP.md` — v7.7.
+8. `06_DECISION_LOG.md` — v5.0.
+9. `08_CHAT_HANDOFF.md` — v6.0.
 
 ## Phase state
 
@@ -45,105 +27,125 @@ R3_A=PASS
 R3_B=PASS
 R3_C=PASS
 R3_D=PASS
-R3_E1=PASS / COMPLETE
-R3_E2=PASS / COMPLETE
-R3_E3=PASS / COMPLETE
-R3_E4=PASS / COMPLETE
-R3_F=PASS / COMPLETE
-R3_G=PASS / COMPLETE
-R3_H=PASS / COMPLETE
-R4=HOLD / OWNER DECISION REQUIRED
+R3_E1=COMPLETE
+R3_E2=COMPLETE
+R3_E3=COMPLETE
+R3_E4=COMPLETE
+R3_F=COMPLETE
+R3_G=COMPLETE
+R3_H=COMPLETE
+
+R4_READONLY_PREFLIGHT=PARTIAL_PASS
+R4_NON_UI_PREFLIGHT=COMPLETE
+R4_ACCOUNT_UI_GATE=PENDING
+R4_CUTOVER=HOLD
 ```
 
-## Accepted runtime contract
+## Repository / PR authority
 
 ```text
+KRC:
+  repo=kolemasakar/K_Research_Critic
+  branch=agent/krc-public-media-r3-integration
+  PR=22
+  state=OPEN / DRAFT / UNMERGED
+  validated_code_head=dbcebdff0201fd9240a7aeafa5f5d5dd46ca08f7
+  CI=35485995871 PASS
+
+VoiceBridge:
+  repo=kolemasakar/VoiceBridge
+  branch=agent/krc-media-gemini-migration
+  PR=45
+  state=OPEN / DRAFT / UNMERGED
+  validated_deployed_head=db9fb62c57fc731732f88ff5b417a0f15be178b6
+  CI=35492121039 PASS
+  Render=LIVE
+```
+
+## Live runtime — 2026-09-21
+
+```text
+R3C=PASS / 9 tools / execution disabled
+E1=PASS / 1 execution / provider_work=false
+E2=PASS / confirmation_probe_only=true / provider_work=false
+E3=PASS / confirmation_probe_only=true / provider_work=false
+E4=PASS / confirmation_probe_only=true / provider_work=false
+VoiceBridge=PASS / version=0.6.0 / TTL=3600
+E3_SCOPED_AUTH_INTEGRITY=PASS
+RENDER_ERROR_LEVEL_LOGS_SINCE_2026_09_21T00:00Z=0
+```
+
+## Repository parity — 2026-09-21
+
+```text
+CORE_SKILL_EXACT_SNAPSHOT=PASS
+CORE_LENGTH=6570
+SKILL_SNAPSHOT_LENGTH=6570
+
+MEDIA_TOOL_COUNT=13
+UNIQUE_MEDIA_TOOL_COUNT=13
+OPENAPI_OPERATION_COUNT=13
+CONTRACT_OPERATION_COUNT=13
+CONTRACT_OPENAPI_MISSING=0
+CONTRACT_OPENAPI_EXTRA=0
 READ_OPERATIONS=9
 EXECUTION_OPERATIONS=4
-TOTAL_OPERATIONS=13
-READ_ONLY_EXECUTION_LEAKAGE=0
-
-E1_EXECUTION_TOOL=media_youtube_start
-E2_EXECUTION_TOOL=media_instagram_start
-E3_EXECUTION_TOOL=media_facebook_start
-E4_EXECUTION_TOOL=media_telegram_start
-OTHER_EXECUTION_TOOLS_PER_SURFACE=0
 ```
 
-## R3-G accepted evidence
+## Account Plugin evidence
 
 ```text
-DCR=PASS
-ACCESS_TOKEN_RESTART_CONTINUITY=PASS
-REFRESH_TOKEN_RESTART_CONTINUITY=PASS
-RUNTIME_REFRESH_AFTER_3600S_TTL=PASS
-CHATGPT_RECONNECT_REQUIRED=NO
-E3_TO_VOICEBRIDGE_ROUTE_AUTH=PASS
-VOICEBRIDGE_EFFECTIVE_R3E3_TOKEN_INTEGRITY=PASS
-MANAGED_MEDIA_JOB_TTL_SECONDS=3600
-POST_EXPIRY_404=EXPECTED
+MCP E3 Facebook 1=FOUND
+MCP E4 Telegram 1=FOUND
+GLOBAL_PERMISSION=Allow read actions
+APP_PERMISSION=Use my default
+CHANGES_REQUIRE_CONFIRMATION=true
 ```
 
-## R3-H accepted evidence
+## Cloud Browser account UI inspection
 
 ```text
-MIGRATION_CANDIDATE_DOCS_SYNC=PASS
-PR22_BODY_SYNC=PASS
-PR45_BODY_SYNC=PASS
-PRIVATE_PLUGIN_PERMISSION_REVIEW=PASS
-ROLLBACK_PLAN=READY
-R4_RELEASE_CHECKLIST=READY
-CURRENT_ACCOUNT_MIGRATION_UI_RECHECK=PENDING_R4
-SHARE_PERMISSION_RECHECK=PENDING_R4
-PUBLISH_PERMISSION_RECHECK=PENDING_R4
+RUN=COMPLETED
+MUTATION_PERFORMED=false
+BLOCKER=Cloudflare Verify you are human
+GPT_IDENTITY=UNKNOWN_UI_BLOCKED
+MIGRATION_CONTROL=UNKNOWN_UI_BLOCKED
+INSTALL_CONTROL=UNKNOWN_UI_BLOCKED
+SHARE_CONTROL=UNKNOWN_UI_BLOCKED
+PUBLISH_CONTROL=UNKNOWN_UI_BLOCKED
 ```
 
-Private execution-plugin permission model:
+No CAPTCHA bypass was attempted.
+
+## Remaining gate
+
+Only manual current-account UI verification remains before an owner cutover decision:
 
 ```text
-global=Allow read actions
-changes=confirm
-E3=Use my default
-E4=Use my default
+1. exact K-Research & Critic GPT identity
+2. current Migrate control/banner
+3. install permission/control
+4. share permission/control for intended audience
+5. publish permission/control if publication is required
 ```
 
-## Safety / cost
-
-```text
-PROJECT_COST_POLICY=FREE_ONLY
-E2_CONFIRMATION_PROBE_ONLY=true
-E3_CONFIRMATION_PROBE_ONLY=true
-E4_CONFIRMATION_PROBE_ONLY=true
-ADDITIONAL_LIVE_MEDIA_STARTS=NO
-PAID_PROVIDER_FALLBACK=DENIED
-PAID_ACTIONS_USAGE=DENIED
-```
-
-## Next gate — R4 owner cutover decision
-
-Before any state-changing migration/publication action:
-
-1. re-inspect the current account's actual migration/plugin setup surface;
-2. verify install/share/publish permissions for the intended audience;
-3. verify replacement Core skill and 13-tool scan;
-4. present exact cutover + rollback plan to owner;
-5. obtain explicit owner authorization.
-
-No R4 action is implied by this handoff.
+This inspection must be read-only. Stop before any Migrate/Install/Connect/Share/Publish action.
 
 ## Hard release boundary
 
 ```text
+PROJECT_COST_POLICY=FREE_ONLY
+R4_CUTOVER_AUTHORIZED=NO
 PUBLIC_GPT_MUTATION=NO
+PLUGIN_INSTALLATION=NO
 PLUGIN_PUBLICATION=NO
 PLUGIN_SHARING=NO
 MAIN_MUTATION=NO
 PR22_MERGE=NO
 PR45_MERGE=NO
 ADDITIONAL_LIVE_MEDIA_STARTS=NO
-R4=HOLD
 ```
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V19_5_R3H_COMPLETE_R4_OWNER_DECISION_HOLD_2026_09_20`
+`KRC_MEDIA_CURRENT_HANDOFF_V19_6_R4_NON_UI_PREFLIGHT_COMPLETE_UI_GATE_PENDING_2026_09_21`
