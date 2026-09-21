@@ -1,6 +1,6 @@
 # KRC Plugin Migration Candidate
 
-Status: **PRIVATE_MCP_IMPLEMENTATION_VALIDATED / R3-G_COMPLETE / R3-H_READINESS_REVIEW / PUBLICATION_HOLD**
+Status: **PRIVATE_MCP_IMPLEMENTATION_VALIDATED / R3-H_COMPLETE / R4_NON_UI_PREFLIGHT_COMPLETE / ACCOUNT_UI_GATE_PENDING / PUBLICATION_HOLD**
 
 This directory contains the repository-side migration candidate for moving K-Research & Critic from the retiring Custom GPT surface to the OpenAI Plugin model while preserving Core behavior and the accepted FREE_ONLY MEDIA contract.
 
@@ -21,7 +21,10 @@ R3_E3=COMPLETE
 R3_E4=COMPLETE
 R3_F=COMPLETE
 R3_G=COMPLETE
-R3_H=READINESS_REVIEW
+R3_H=COMPLETE
+R4_READONLY_PREFLIGHT=PARTIAL_PASS
+R4_NON_UI_PREFLIGHT=COMPLETE
+R4_ACCOUNT_UI_GATE=PENDING
 R4=HOLD
 ```
 
@@ -117,9 +120,9 @@ R3_G=COMPLETE
 
 Managed-media staging retention is currently 3600 seconds. Expired canary rows are purged by policy; post-expiry `MEDIA_TRANSCRIPT_NOT_FOUND` is expected.
 
-## R3-H boundary
+## R3-H / R4 preflight boundary
 
-R3-H is a **readiness review**, not a release.
+R3-H is complete. R4 non-UI read-only preflight is complete; current account UI migration/install/share/publish controls remain a manual read-only gate.
 
 Allowed work:
 
@@ -148,4 +151,4 @@ R4=HOLD
 - `subprojects/media_beta/161_R3G_OPERATIONAL_HARDENING_COMPLETE_2026_09_20.md`
 - `subprojects/media_beta/02_ROADMAP.md`
 
-Public migration/cutover must remain separately owner-approved.
+Public migration/cutover must remain separately owner-approved. Before any cutover, manually inspect the current account UI for the exact GPT identity and migration/install/share/publish controls without activating them.
