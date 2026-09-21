@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 5.0
-Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_READONLY_PREFLIGHT_NON_UI_COMPLETE / UI_GATE_PENDING / PUBLICATION_HOLD**
+Version: 5.1
+Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_READONLY_PREFLIGHT_COMPLETE / OWNER_CUTOVER_DECISION_PENDING / PUBLICATION_HOLD**
 Updated: 2026-09-21
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -94,29 +94,59 @@ R4=HOLD
 ```
 
 ### D064 — R4 non-UI read-only preflight accepted
-On 2026-09-21:
 ```text
 CORE_SKILL_PARITY=PASS
 MEDIA_13_TOOL_PARITY=PASS
 LIVE_RUNTIME_HEALTH=PASS
-RENDER_ERROR_LOGS=0
 PRIVATE_PLUGIN_EXISTENCE=PASS
-PRIVATE_PLUGIN_PERMISSION_MODEL=PASS
+PLUGIN_PERMISSION_MODEL=PASS
 CI=PASS
-ROLLBACK_PACKAGE=READY
+R4_NON_UI_PREFLIGHT=COMPLETE
 ```
 
+### D065 — Automated account UI inspection may fail closed
 Cloud Browser was blocked by Cloudflare human verification. No bypass was attempted and no mutation occurred.
 
+### D066 — Manual R4 account UI preflight accepted
+Manual screenshots on 2026-09-21 confirmed:
 ```text
-R4_READONLY_PREFLIGHT=PARTIAL_PASS
-R4_NON_UI_PREFLIGHT=COMPLETE
-R4_ACCOUNT_UI_GATE=PENDING
-R4_CUTOVER=HOLD
+GPT_NAME=K-Research & Critic
+GPT_IDENTITY=PASS
+GPT_EDITOR_ACCESS=PASS
+PUBLICATION_STATE=Published
+VISIBLE_AUDIENCE=Everyone
+
+SHARE_CONTROL=PASS
+GPT_STORE_SURFACE=PASS
+CATEGORY_CONTROL=PASS
+
+PLUGIN_SURFACE=PASS
+PRIVATE_KRC_PLUGIN_INVENTORY=PASS
+INSTALL_ADD_CONTROL=PASS
+
+SKILLS_SURFACE=PASS
+SKILLS_ADD_CONTROL=PASS
+
+MIGRATE_CONTROL=NOT_FOUND_IN_CURRENT_UI
 ```
 
-### D065 — Account UI gate cannot be inferred
-Migration/install/share/publish controls must be manually inspected read-only immediately before cutover. Availability must not be inferred from documentation or old screenshots.
+No state-changing UI action was performed.
+
+### D067 — R4 read-only preflight is complete
+Combined non-UI and manual UI evidence closes the technical preflight.
+```text
+R4_NON_UI_PREFLIGHT=COMPLETE
+R4_MANUAL_UI_PREFLIGHT=COMPLETE
+R4_READONLY_PREFLIGHT=PASS / COMPLETE
+R4_TECHNICAL_PREFLIGHT_DEBT=0
+R4_CUTOVER_AUTHORIZED=NO
+NEXT_GATE=OWNER_CUTOVER_DECISION_IN_FRESH_CHAT
+```
+
+### D068 — No explicit migration control is assumed
+No `Migrate` / `Перенести` control was found across the inspected GPT, editor, overflow, share, plugin, and skill surfaces.
+
+Future R4 work, if owner-authorized, must use the validated Plugin/Skill path actually present in the account and must not depend on an unobserved migration button.
 
 ### D054 — GitHub remains authoritative storage
 ```text
@@ -125,18 +155,21 @@ LOCAL_WORKTREE_USE=TRANSIENT_ONLY
 ```
 
 ## Canonical authority
-- `CURRENT_HANDOFF.md` v19.6
-- checkpoint 163
-- `02_ROADMAP.md` v7.7
-- `00_INDEX.md` v9.0
-- `08_CHAT_HANDOFF.md` v6.0
+
+- `CURRENT_HANDOFF.md` v19.7
+- checkpoint 164
+- `02_ROADMAP.md` v7.8
+- `00_INDEX.md` v9.1
+- `08_CHAT_HANDOFF.md` v6.1
 
 ## Hard boundary
+
 ```text
+PROJECT_COST_POLICY=FREE_ONLY
 PUBLIC_GPT_MUTATION=NO
-PLUGIN_INSTALLATION=NO
+PLUGIN_INSTALLATION_OR_CHANGE=NO
 PLUGIN_PUBLICATION=NO
-PLUGIN_SHARING=NO
+PLUGIN_SHARING_CHANGE=NO
 MAIN_MUTATION=NO
 PR22_MERGE=NO
 PR45_MERGE=NO
