@@ -1,6 +1,6 @@
 # KRC Plugin Migration Candidate
 
-Status: **PRIVATE_MCP_IMPLEMENTATION_VALIDATED / R3-H_COMPLETE / R4_NON_UI_PREFLIGHT_COMPLETE / ACCOUNT_UI_GATE_PENDING / PUBLICATION_HOLD**
+Status: **PRIVATE_MCP_IMPLEMENTATION_VALIDATED / R3-H_COMPLETE / R4_READONLY_PREFLIGHT_COMPLETE / OWNER_CUTOVER_DECISION_PENDING / PUBLICATION_HOLD**
 
 This directory contains the repository-side migration candidate for moving K-Research & Critic from the retiring Custom GPT surface to the OpenAI Plugin model while preserving Core behavior and the accepted FREE_ONLY MEDIA contract.
 
@@ -22,9 +22,10 @@ R3_E4=COMPLETE
 R3_F=COMPLETE
 R3_G=COMPLETE
 R3_H=COMPLETE
-R4_READONLY_PREFLIGHT=PARTIAL_PASS
 R4_NON_UI_PREFLIGHT=COMPLETE
-R4_ACCOUNT_UI_GATE=PENDING
+R4_MANUAL_UI_PREFLIGHT=COMPLETE
+R4_READONLY_PREFLIGHT=PASS / COMPLETE
+R4_TECHNICAL_PREFLIGHT_DEBT=0
 R4=HOLD
 ```
 
@@ -122,7 +123,7 @@ Managed-media staging retention is currently 3600 seconds. Expired canary rows a
 
 ## R3-H / R4 preflight boundary
 
-R3-H is complete. R4 non-UI read-only preflight is complete; current account UI migration/install/share/publish controls remain a manual read-only gate.
+R3-H is complete. R4 read-only preflight is also complete: non-UI validation plus manual current-account UI inspection.
 
 Allowed work:
 
@@ -151,4 +152,4 @@ R4=HOLD
 - `subprojects/media_beta/161_R3G_OPERATIONAL_HARDENING_COMPLETE_2026_09_20.md`
 - `subprojects/media_beta/02_ROADMAP.md`
 
-Public migration/cutover must remain separately owner-approved. Before any cutover, manually inspect the current account UI for the exact GPT identity and migration/install/share/publish controls without activating them.
+Public migration/cutover must remain separately owner-approved. Manual UI inspection confirmed the GPT identity, GPT Store/share controls, Plugin surface, private KRC plugin inventory, install/add controls and Skills surface. No explicit Migrate control was found in the current UI. Before any cutover, recover from checkpoint 164 in a fresh chat and obtain explicit owner approval.
