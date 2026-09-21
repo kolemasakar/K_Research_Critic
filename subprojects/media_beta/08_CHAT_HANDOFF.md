@@ -1,255 +1,123 @@
 # MEDIA BETA Chat Handoff
 
-Канонічна інструкція відновлення K-Research & Critic - MEDIA BETA у новому чаті.
+Канонічна інструкція відновлення K-Research & Critic MEDIA у новому чаті.
 
-Version: 5.2
-Status: ACTIVE_HANDOFF / CHECKPOINT_88 / R2_YOUTUBE_ACCEPTED / OCI_COBALT_LOCAL_PASS / INSTAGRAM_LOCAL_RETRIEVAL_PASS / PUBLIC_HTTPS_PENDING / R3_HOLD
-Checkpoint date: 2026-09-08
+Version: 6.0
+Status: **R3_A_TO_H_COMPLETE / R4_NON_UI_PREFLIGHT_COMPLETE / ACCOUNT_UI_GATE_PENDING / CUTOVER_HOLD**
+Checkpoint date: 2026-09-21
 
 ## Recovery command
 
-`recover KRC MEDIA BETA checkpoint 88 OCI Cobalt local Instagram retrieval pass public HTTPS pending 2026-09-08`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 163. R3-A..H COMPLETE. R4 non-UI read-only preflight COMPLETE; Cloudflare blocked account UI migration/install/share/publish inspection; mutation=NO. R4 cutover HOLD.`
 
 ## Mandatory recovery order
 
-1. `subprojects/media_beta/88_R2_OCI_COBALT_LOCAL_INSTAGRAM_RETRIEVAL_PASS_PUBLIC_HTTPS_PENDING_CHECKPOINT_2026_09_08.md`
-2. `docs/KRC_MEDIA_BETA_RECOVERY_POINTER.md`
-3. `subprojects/media_beta/00_INDEX.md`
-4. `subprojects/media_beta/02_ROADMAP.md`
-5. `subprojects/media_beta/06_DECISION_LOG.md`
-6. `gpt_store/media_r2_gemini_youtube_canary_manifest.yaml`
-7. `gpt_store/actions/media_public_free_openapi.yaml`
-8. `prompts/GPT_STORE_MEDIA_R2_GEMINI_YOUTUBE_CANARY_INSTRUCTIONS.md`
-9. current VoiceBridge branch / CI / PR #45 state
-10. current Render VoiceBridge + Cobalt state
-11. current OCI VM/network/firewall/Cobalt state
-12. current Neon durable state
-13. current private/public Builder state
+1. `subprojects/media_beta/CURRENT_HANDOFF.md`
+2. `subprojects/media_beta/163_R4_READONLY_PREFLIGHT_NON_UI_COMPLETE_UI_GATE_BLOCKED_2026_09_21.md`
+3. `subprojects/media_beta/162_R3H_READINESS_REVIEW_COMPLETE_R4_HOLD_2026_09_20.md`
+4. `subprojects/media_beta/161_R3G_OPERATIONAL_HARDENING_COMPLETE_2026_09_20.md`
+5. `subprojects/media_beta/00_INDEX.md`
+6. `subprojects/media_beta/02_ROADMAP.md`
+7. `subprojects/media_beta/06_DECISION_LOG.md`
+8. current PR #22 / PR #45 state
+9. current Render E1/E2/E3/E4/VoiceBridge health
+10. current account Plugin permissions
+11. current account migration/install/share/publish UI — manual read-only check only
 
-## Frozen product boundary
+## Current phase state
 
 ```text
-public KRC GPT:             already published / user-accessible / unchanged
-private KRC MEDIA BETA GPT: owner-only / canary package active
-future public identity:     same existing published KRC
+R3_A=PASS
+R3_B=PASS
+R3_C=PASS
+R3_D=PASS
+R3_E1=COMPLETE
+R3_E2=COMPLETE
+R3_E3=COMPLETE
+R3_E4=COMPLETE
+R3_F=COMPLETE
+R3_G=COMPLETE
+R3_H=COMPLETE
+
+R4_READONLY_PREFLIGHT=PARTIAL_PASS
+R4_NON_UI_PREFLIGHT=COMPLETE
+R4_ACCOUNT_UI_GATE=PENDING
+R4_CUTOVER=HOLD
 ```
 
-Critical invariant:
+## Current runtime baseline
 
 ```text
-MEDIA failure/unavailability -> MEDIA unavailable/fails closed
-Core KRC                    -> remains usable and accessible
+R3C=healthy / 9 read-only / execution disabled
+E1=healthy / 1 execution / other execution disabled
+E2=healthy / confirmation_probe_only=true
+E3=healthy / confirmation_probe_only=true
+E4=healthy / confirmation_probe_only=true
+VoiceBridge=healthy / v0.6.0 / TTL=3600
+Render error-level logs since 2026-09-21T00:00Z=0
 ```
 
-## Current VoiceBridge / Render state
+## Repository parity
 
 ```text
-VoiceBridge branch: agent/krc-media-gemini-migration
-VoiceBridge head: 68a39d9109455c3e9e69ffeb3a7456998f0620db
-latest known Validate on exact head: 34159780308 / SUCCESS
-PR #45: OPEN / DRAFT / UNMERGED / mergeable=true
-
-Render VoiceBridge service: voicebridge-krc-media-beta-kolemasakar
-configured branch: agent/krc-media-gemini-migration
-autoDeploy: no
-plan: free
-region: frankfurt
-live deploy: dep-dafhul0n74is73a3nncg
-live commit: 68a39d9109455c3e9e69ffeb3a7456998f0620db
+CORE_SKILL_EXACT_SNAPSHOT=PASS
+MEDIA_CONTRACT_OPENAPI_PARITY=PASS
+MEDIA_TOTAL_OPERATIONS=13
+MEDIA_READ_OPERATIONS=9
+MEDIA_EXECUTION_OPERATIONS=4
 ```
 
-Temporary diagnostic commits/branches remain evidence only and are not production runtime.
-
-## Current private Builder state
+## Current PR / CI authority
 
 ```text
-instructions version: 0.2.0-r2-gemini-youtube-canary
-Action schema version: 0.8.0-r2-gemini-youtube
-auth: Bearer API key
-Privacy Policy: docs/PRIVACY_POLICY.md / 2.2-candidate
-sharing: owner-only
+PR22=OPEN / DRAFT / UNMERGED
+KRC validated code head=dbcebdff0201fd9240a7aeafa5f5d5dd46ca08f7
+KRC CI run 35485995871=PASS
+
+PR45=OPEN / DRAFT / UNMERGED
+VoiceBridge validated/deployed code head=db9fb62c57fc731732f88ff5b417a0f15be178b6
+VoiceBridge CI run 35492121039=PASS
 ```
 
-Public KRC remains without MEDIA Action.
-
-## Accepted YouTube evidence
+## Current account/plugin evidence
 
 ```text
-capability read: PASS
-Gemini Free disclosure/consent before new provider work: PASS
-Gemini direct provider execution: PASS
-Neon durable completion: PASS
-provider_mode: youtube_gemini_direct
-provider_model: gemini-3.7-flash
-retrieval_provider: gemini_youtube_url
-retrieval credits: 0
-STT seconds: 0
-durable duplicate reuse: PASS
-new provider submission on reuse: NO
+MCP E3 Facebook 1=found
+MCP E4 Telegram 1=found
+global permission=Allow read actions
+changes=confirmation required
+app permission=Use my default
 ```
 
-## Historical Render Cobalt blocker
+## Remaining gate
 
-Old Render Free Cobalt remains present and currently configured until explicit cutover:
+Manual/read-only account UI inspection immediately before any cutover:
 
 ```text
-service: krc-cobalt-media-beta-kolemasakar
-service id: srv-da5ggq6k1f9s738j8d8g
-plan: free
-region: frankfurt
-status: not_suspended
-image: ghcr.io/imputnet/cobalt@sha256:63186dd68afd57ce3bb1f62cc4c139f5fa95b9c3e87a3cf5c6e4c7a570523f62
+KRC_GPT_IDENTITY
+MIGRATION_CONTROL
+INSTALL_PERMISSION
+SHARE_PERMISSION
+PUBLISH_PERMISSION
 ```
 
-Canonical checkpoint-87 blocker wording remains:
+Do not click Migrate/Install/Connect/Share/Publish during inspection.
 
-`Render Cobalt endpoint edge-level HTTP 429 / non-JSON blocker`
-
-No Render endpoint/environment variable was changed during the OCI local preflight.
-
-## OCI Cobalt current state
+## Hard boundary
 
 ```text
-instance: krc-cobalt-media-beta
-region: eu-frankfurt-1
-shape: VM.Standard.E2.1.Micro / Always Free-eligible
-public IPv4: 89.168.65.88
-private IPv4: 10.0.0.26
-OS: Ubuntu 24.04 Minimal x86_64
-Docker: 29.1.3
-Docker Compose: 2.40.3
-swap: 2 GiB
+PROJECT_COST_POLICY=FREE_ONLY
+PUBLIC_GPT_MUTATION=NO
+PLUGIN_INSTALLATION=NO
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING=NO
+MAIN_MUTATION=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+ADDITIONAL_LIVE_MEDIA_STARTS=NO
+R4_CUTOVER=HOLD
 ```
 
-Host/runtime hardening:
+Terminal marker:
 
-```text
-owner SSH source: 91.199.188.209/32
-iptables persistence: enabled
-Cobalt bind: 127.0.0.1:9000 only
-Cobalt public 9000: NO
-```
-
-Pinned Cobalt:
-
-```text
-image digest: sha256:63186dd68afd57ce3bb1f62cc4c139f5fa95b9c3e87a3cf5c6e4c7a570523f62
-version: 11.7.1
-commit: a636575b09de1fc55d9b8cd98cac88f5f2f16b42
-API_KEY_URL: file:///keys.json
-API_AUTH_REQUIRED: 1
-```
-
-Secret values are not stored in KRC docs/repository.
-
-## API-key gate - PASS
-
-```text
-without API key -> HTTP 400 / error.api.auth.key.missing
-with valid key + unsupported URL -> HTTP 400 / error.api.link.invalid
-Cobalt log -> api keys loaded successfully
-```
-
-## Instagram OCI local retrieval-only - PASS
-
-Test URL:
-
-`https://www.instagram.com/reel/DEAyVa4SF3E/`
-
-Evidence:
-
-```text
-authenticated POST -> HTTP 200
-status -> tunnel
-filename -> instagram_DEAyVa4SF3E_audio.mp3
-fresh tunnel download -> curl rc 0
-retrieved bytes -> 214560
-```
-
-This is a local retrieval-only acceptance. VoiceBridge/AssemblyAI live canary has not yet been run on the OCI endpoint.
-
-## OCI YouTube diagnostic control
-
-```text
-authenticated Cobalt control -> HTTP 400
-error.code -> error.api.youtube.login
-```
-
-Accepted YouTube remains Gemini direct. Before endpoint cutover, prove the Cobalt endpoint change cannot regress the Gemini-direct path or introduce a Cobalt fallback.
-
-## DNS / HTTPS state
-
-```text
-89-168-65-88.sslip.io -> 89.168.65.88 / PASS
-public HTTPS reverse proxy -> PENDING
-public TLS -> PENDING
-dedicated OCI NSG -> PENDING
-80/443 OCI + local firewall path -> PENDING
-Cobalt API_URL public HTTPS -> PENDING
-external authenticated POST/tunnel -> PENDING
-```
-
-Do not expose Cobalt port 9000 publicly.
-
-## API-key alignment before cutover
-
-A local OCI key was generated for preflight. The existing VoiceBridge `KRC_MEDIA_COBALT_API_KEY` was not exposed and has not been proven identical.
-
-Preferred continuation: align OCI Cobalt server-side to the existing VoiceBridge secret so the eventual VoiceBridge live change remains limited to `KRC_MEDIA_COBALT_ENDPOINT`.
-
-Do not paste the key into chat, GPT instructions, Action schema, repository, or documentation.
-
-## Current Neon state retained
-
-```text
-YouTube durable job: COMPLETED
-Instagram old Render-Cobalt job: FAILED
-krc_media_stt_charges rows: 0
-charged STT seconds: 0
-```
-
-No new VoiceBridge/AssemblyAI/Neon job was created by the OCI local retrieval-only probes.
-
-## Current gate state
-
-```text
-R0: PASS
-R1: COMPLETE
-R2: PARTIAL PASS
-    YouTube accepted
-    OCI Cobalt secure local runtime PASS
-    Instagram OCI local retrieval-only PASS
-    Instagram live canary PENDING
-    Facebook PENDING
-    Telegram PENDING
-    Core isolation PENDING
-R3: HOLD / NOT READY
-R4: HOLD
-```
-
-## Exact continuation point
-
-```text
-1. create/attach dedicated OCI NSG to krc-cobalt-vnic; do not modify shared default Security List
-2. add required TCP/80 + TCP/443 ingress
-3. add matching local firewall rules while preserving owner-only SSH and OCI instance-service rules
-4. deploy HTTPS reverse proxy/TLS for 89-168-65-88.sslip.io
-5. change Cobalt API_URL to public HTTPS base URL; keep 9000 loopback-only
-6. align OCI API key to existing VoiceBridge server-side key without exposing it
-7. external authenticated Instagram retrieval/tunnel preflight over HTTPS
-8. verify Gemini-direct YouTube regression protection
-9. only after PASS update KRC_MEDIA_COBALT_ENDPOINT
-10. repeat bounded Instagram live canary
-11. if PASS -> Facebook canary
-12. Telegram canary
-13. Render/Neon delta + no-paid-fallback verification
-14. forced MEDIA failure + Core KRC isolation regression
-15. if all PASS -> record full R2 PASS
-16. only then -> separate explicit R3 owner gate
-```
-
-Do not merge PR #45 and do not modify/update the public KRC GPT without separate explicit owner authorization.
-
-## Terminal marker
-
-`MEDIA_BETA_HANDOFF_V5_2_CHECKPOINT_88_OCI_COBALT_INSTAGRAM_LOCAL_PASS_PUBLIC_HTTPS_PENDING_R3_HOLD`
+`MEDIA_BETA_CHAT_HANDOFF_V6_0_R4_NON_UI_PREFLIGHT_COMPLETE_UI_GATE_PENDING_2026_09_21`
