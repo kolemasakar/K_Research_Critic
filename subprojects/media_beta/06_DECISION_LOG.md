@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 5.1
-Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_READONLY_PREFLIGHT_COMPLETE / OWNER_CUTOVER_DECISION_PENDING / PUBLICATION_HOLD**
+Version: 5.2
+Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_READONLY_PREFLIGHT_COMPLETE / PROJECT_SYNC_COMPLETE / NEW_CHAT_READY / OWNER_CUTOVER_DECISION_PENDING / PUBLICATION_HOLD**
 Updated: 2026-09-21
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -148,6 +148,15 @@ No `Migrate` / `Перенести` control was found across the inspected GPT, 
 
 Future R4 work, if owner-authorized, must use the validated Plugin/Skill path actually present in the account and must not depend on an unobserved migration button.
 
+### D069 — Final project/docs sync accepted
+Checkpoint 165 freezes the transition state before a new-chat generator is applied.
+```text
+PROJECT_SYNC_COMPLETE=YES
+R4_READONLY_PREFLIGHT=COMPLETE
+R4_CUTOVER_AUTHORIZED=NO
+NEW_CHAT_READY=YES
+CANONICAL_RECOVERY=CURRENT_HANDOFF_v19.8 + checkpoint_165
+```
 ### D054 — GitHub remains authoritative storage
 ```text
 AUTHORITATIVE_PROJECT_STATE=GITHUB_REPOSITORIES
@@ -156,11 +165,11 @@ LOCAL_WORKTREE_USE=TRANSIENT_ONLY
 
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v19.7
-- checkpoint 164
-- `02_ROADMAP.md` v7.8
-- `00_INDEX.md` v9.1
-- `08_CHAT_HANDOFF.md` v6.1
+- `CURRENT_HANDOFF.md` v19.8
+- checkpoint 165
+- `02_ROADMAP.md` v7.9
+- `00_INDEX.md` v9.2
+- `08_CHAT_HANDOFF.md` v6.2
 
 ## Hard boundary
 
