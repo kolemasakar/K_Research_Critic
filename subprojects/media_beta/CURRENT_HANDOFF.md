@@ -1,26 +1,27 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 19.7
-Status: **ACTIVE_HANDOFF / R3_A_TO_H_COMPLETE / R4_READONLY_PREFLIGHT_COMPLETE / OWNER_CUTOVER_DECISION_PENDING / FREE_ONLY / PUBLICATION_HOLD**
+Version: 19.8
+Status: **ACTIVE_HANDOFF / R3_A_TO_H_COMPLETE / R4_READONLY_PREFLIGHT_COMPLETE / PROJECT_SYNC_COMPLETE / NEW_CHAT_READY / OWNER_CUTOVER_DECISION_PENDING / FREE_ONLY / PUBLICATION_HOLD**
 Date: 2026-09-21
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 164. R3-A..H COMPLETE. R4 read-only preflight COMPLETE: non-UI + manual account UI. Core skill parity PASS, 13-tool parity PASS, runtime health PASS, Plugin inventory PASS, Skills surface PASS, GPT Store/share surface PASS. Explicit Migrate control was not found in current UI. No mutation performed. R4 cutover remains HOLD pending explicit owner decision in a fresh chat.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 165. R3-A..H COMPLETE. R4 read-only preflight COMPLETE: non-UI + manual account UI. Core skill parity PASS, 13-tool parity PASS, runtime health PASS, Plugin inventory PASS, Skills surface PASS, GPT Store/share surface PASS. Explicit Migrate control was not found in current UI. No mutation performed. R4 cutover remains HOLD pending explicit owner decision in a fresh chat.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v19.7.
-2. `164_R4_MANUAL_UI_READONLY_PREFLIGHT_COMPLETE_OWNER_CUTOVER_DECISION_PENDING_2026_09_21.md`.
-3. `163_R4_READONLY_PREFLIGHT_NON_UI_COMPLETE_UI_GATE_BLOCKED_2026_09_21.md`.
-4. `162_R3H_READINESS_REVIEW_COMPLETE_R4_HOLD_2026_09_20.md`.
-5. `161_R3G_OPERATIONAL_HARDENING_COMPLETE_2026_09_20.md`.
-6. `159_R3F_FULL_13_OPERATION_RUNTIME_PARITY_PASS_2026_09_20.md`.
-7. `00_INDEX.md`.
-8. `02_ROADMAP.md`.
-9. `06_DECISION_LOG.md`.
-10. `08_CHAT_HANDOFF.md`.
-11. current PR #22 / PR #45 state and live runtime evidence.
+1. `CURRENT_HANDOFF.md` — v19.8.
+2. `165_FINAL_PROJECT_DOCS_SYNC_NEW_CHAT_READY_2026_09_21.md`.
+3. `164_R4_MANUAL_UI_READONLY_PREFLIGHT_COMPLETE_OWNER_CUTOVER_DECISION_PENDING_2026_09_21.md`.
+4. `163_R4_READONLY_PREFLIGHT_NON_UI_COMPLETE_UI_GATE_BLOCKED_2026_09_21.md`.
+5. `162_R3H_READINESS_REVIEW_COMPLETE_R4_HOLD_2026_09_20.md`.
+6. `161_R3G_OPERATIONAL_HARDENING_COMPLETE_2026_09_20.md`.
+7. `159_R3F_FULL_13_OPERATION_RUNTIME_PARITY_PASS_2026_09_20.md`.
+8. `00_INDEX.md`.
+9. `02_ROADMAP.md`.
+10. `06_DECISION_LOG.md`.
+11. `08_CHAT_HANDOFF.md`.
+12. current PR #22 / PR #45 state and live runtime evidence.
 
 ## Phase state
 
@@ -225,4 +226,4 @@ ADDITIONAL_LIVE_MEDIA_STARTS=NO
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V19_7_R4_READONLY_PREFLIGHT_COMPLETE_OWNER_CUTOVER_DECISION_PENDING_2026_09_21`
+`KRC_MEDIA_CURRENT_HANDOFF_V19_8_PROJECT_SYNC_COMPLETE_NEW_CHAT_READY_2026_09_21`
