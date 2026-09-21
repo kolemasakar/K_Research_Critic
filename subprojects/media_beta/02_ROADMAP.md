@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 7.7
-Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_READONLY_PREFLIGHT_PARTIAL_PASS / NON_UI_COMPLETE / ACCOUNT_UI_GATE_PENDING / FREE_ONLY / PUBLICATION_HOLD**
+Version: 7.8
+Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_READONLY_PREFLIGHT_COMPLETE / OWNER_CUTOVER_DECISION_PENDING / FREE_ONLY / PUBLICATION_HOLD**
 Updated: 2026-09-21
 
 ## Current roadmap position
@@ -19,13 +19,15 @@ R3-F Full 13-operation parity                 PASS / COMPLETE
 R3-G Private operational hardening            PASS / COMPLETE
 R3-H Migration/publication readiness          PASS / COMPLETE
 
-R4 Read-only preflight                        PARTIAL PASS
-R4 Non-UI preflight                           COMPLETE
-R4 Current account UI gate                    PENDING
-R4 Cutover/publication                        HOLD
+R4 Non-UI read-only preflight                 COMPLETE
+R4 Manual account UI preflight                COMPLETE
+R4 Read-only preflight overall                PASS / COMPLETE
+R4 Cutover/publication                        HOLD / OWNER DECISION
 ```
 
-## R4 non-UI preflight accepted
+## R4 preflight accepted
+
+### Non-UI
 
 ```text
 CORE_SKILL_PARITY=PASS
@@ -40,44 +42,58 @@ VOICEBRIDGE_SCOPED_AUTH=PASS
 FREE_ONLY_POLICY=PASS
 CI=PASS
 ROLLBACK_PACKAGE=READY
-RENDER_CURRENT_ERROR_LOGS=0
 ```
 
-## Current account UI blocker
-
-Authenticated browser inspection was blocked by Cloudflare human verification. No bypass was attempted.
-
-Still unknown and requiring manual read-only verification:
+### Manual account UI
 
 ```text
-CURRENT_GPT_MIGRATION_CONTROL
-CURRENT_INSTALL_PERMISSION_UI
-CURRENT_SHARE_PERMISSION_UI
-CURRENT_PUBLISH_PERMISSION_UI
+GPT_IDENTITY=PASS
+GPT_EDITOR_ACCESS=PASS
+PUBLICATION_STATE=Published
+VISIBLE_AUDIENCE=Everyone
+
+SHARE_CONTROL=PASS
+GPT_STORE_SURFACE=PASS
+CATEGORY_CONTROL=PASS
+
+PLUGIN_SURFACE=PASS
+PRIVATE_PLUGIN_INVENTORY=PASS
+INSTALL_ADD_CONTROL=PASS
+
+SKILLS_SURFACE=PASS
+SKILLS_ADD_CONTROL=PASS
+
+MIGRATE_CONTROL=NOT_FOUND_IN_CURRENT_UI
 ```
 
-## Manual UI gate procedure
+No UI mutation was made during inspection.
 
-Immediately before any future cutover:
+## Current path decision
 
-1. Open the exact `K-Research & Critic` GPT/account settings manually.
-2. Confirm identity before inspecting controls.
-3. Record whether Migrate exists and its visible wording.
-4. Record install permission/control.
-5. Record share permission/control for the intended audience.
-6. Record publish permission/control if publication is required.
-7. Do not activate Migrate, Install, Connect, Share or Publish during this inspection.
-8. Return evidence to KRC and require a separate explicit owner cutover approval.
+The current account exposes the required Plugin and Skill surfaces directly. No explicit migration control was found.
 
-## Cutover remains unauthorized
+Therefore, if R4 is later authorized, the cutover plan must use the validated Plugin/Skill path actually present in the account, not depend on an unobserved `Migrate` button.
+
+## R4 cutover remains unauthorized
+
+Before any state-changing action:
+
+1. transition to a fresh chat;
+2. recover from `CURRENT_HANDOFF.md` v19.7 + checkpoint 164;
+3. present exact intended mutations;
+4. present rollback steps;
+5. obtain explicit owner cutover authorization;
+6. only then execute the separately approved R4 sequence.
+
+## Hard boundary
 
 ```text
 PROJECT_COST_POLICY=FREE_ONLY
 R4_CUTOVER_AUTHORIZED=NO
 PUBLIC_GPT_MUTATION=NO
-PLUGIN_INSTALLATION=NO
+PLUGIN_INSTALLATION_OR_CHANGE=NO
 PLUGIN_PUBLICATION=NO
-PLUGIN_SHARING=NO
+PLUGIN_SHARING_CHANGE=NO
 MAIN_MUTATION=NO
 PR22_MERGE=NO
 PR45_MERGE=NO
@@ -86,8 +102,8 @@ ADDITIONAL_LIVE_MEDIA_STARTS=NO
 
 ## Next state
 
-No further server-side or repository implementation is required for the current R4 preflight scope.
+**No technical preflight debt remains.**
 
-The next actionable gate is the manual current-account UI inspection. After that evidence is recorded, present the exact cutover/rollback plan and obtain explicit owner approval before any state-changing R4 action.
+The next phase is an owner cutover decision in a fresh chat. R4 mutation remains HOLD until that decision.
 
-Recovery authority: `CURRENT_HANDOFF.md` v19.6 + checkpoint 163.
+Recovery authority: `CURRENT_HANDOFF.md` v19.7 + checkpoint 164.
