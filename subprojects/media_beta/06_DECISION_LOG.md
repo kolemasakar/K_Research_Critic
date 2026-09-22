@@ -1,6 +1,6 @@
 # MEDIA BETA Decision Log
 
-Version: 5.6
+Version: 5.7
 Status: **ACTIVE / R3_A_TO_H_COMPLETE / R3C_OAUTH_RECOVERY_PASS / R4_PACKAGE_CORRECTED / E1_OAUTH_HARDENING_REQUIRED / PRIVATE_ASSEMBLY_REQUIRED / R4_CUTOVER_HOLD / PUBLICATION_HOLD**
 Updated: 2026-09-22
 
@@ -258,13 +258,32 @@ A4_PRIVATE_INSTALL=PENDING
 
 The R4 Candidate references five already registered ChatGPT apps through `.app.json`; no raw `mcp.json` is included. A repo-local marketplace entry was added for private testing. This does not authorize publication/share or R4-B.
 
+### D077 — A4 private install accepted
+
+Work completed the Personal / Local installation of `K-Research & Critic R4 Candidate` with one Skill and five registered app mappings.
+
+Real Work schema validation found and corrected only:
+- unsupported `required` fields in `.app.json`;
+- missing `interface.defaultPrompt`.
+
+Repository manifests were reconciled to that validated shape.
+
+```text
+A4_PRIVATE_INSTALL=PASS
+FINAL_VALIDATION_ERRORS=0
+PUBLICATION=NO
+SHARING=NO
+MEDIA_PROVIDER_WORK=NO
+A5=PENDING_NEW_CHAT
+```
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v20.2
-- checkpoint 169
-- `02_ROADMAP.md` v8.3
-- `00_INDEX.md` v9.6
-- `08_CHAT_HANDOFF.md` v6.6
+- `CURRENT_HANDOFF.md` v20.3
+- checkpoint 170
+- `02_ROADMAP.md` v8.4
+- `00_INDEX.md` v9.7
+- `08_CHAT_HANDOFF.md` v6.7
 
 ## Hard boundary
 
