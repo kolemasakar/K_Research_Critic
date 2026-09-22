@@ -10,14 +10,16 @@ sys.path.insert(0, str(ROOT))
 sys.dont_write_bytecode = True
 
 from plugins.krc_migration_candidate.mcp_canary.oauth import (
-    LEGACY_CHATGPT_CLIENT_ID,
-    LEGACY_CHATGPT_REDIRECT_URI,
+    LEGACY_CLIENT_ID_ENV,
+    LEGACY_REDIRECT_URI_ENV,
     READ_SCOPE,
     RestartSafeOAuthState,
     oauth_state_from_env,
 )
 
 CALLBACK = "https://chatgpt.example.test/oauth/callback"
+LEGACY_CLIENT_ID = "legacy-chatgpt-client"
+LEGACY_REDIRECT_URI = "https://chatgpt.example.test/connector/oauth/legacy"
 KEY = "restart-safe-oauth-signing-key-0123456789abcdef"
 
 
@@ -127,25 +129,33 @@ def test_restart_safe_oauth_wrong_signing_key_and_tamper_fail_closed() -> None:
 
 
 def test_restart_safe_oauth_allows_only_exact_legacy_chatgpt_pair() -> None:
-    state = RestartSafeOAuthState(KEY)
-    assert state.client_redirect_allowed(LEGACY_CHATGPT_CLIENT_ID, LEGACY_CHATGPT_REDIRECT_URI) is True
-    assert state.client_redirect_allowed(LEGACY_CHATGPT_CLIENT_ID, CALLBACK) is False
-    assert state.client_redirect_allowed("wrong-client", LEGACY_CHATGPT_REDIRECT_URI) is False
+    state = RestartSafeOAuthState(
+        KEY,
+        legacy_client_id=LEGACY_CLIENT_ID,
+        legacy_redirect_uri=LEGACY_REDIRECT_URI,
+    )
+    assert state.client_redirect_allowed(LEGACY_CLIENT_ID, LEGACY_REDIRECT_URI) is True
+    assert state.client_redirect_allowed(LEGACY_CLIENT_ID, CALLBACK) is False
+    assert state.client_redirect_allowed("wrong-client", LEGACY_REDIRECT_URI) is False
 
 
 def test_legacy_chatgpt_pair_upgrades_into_restart_safe_tokens() -> None:
     verifier = "legacy-chatgpt-pkce-verifier-abcdefghijklmnopqrstuvwxyz"
-    first_process = RestartSafeOAuthState(KEY)
+    first_process = RestartSafeOAuthState(
+        KEY,
+        legacy_client_id=LEGACY_CLIENT_ID,
+        legacy_redirect_uri=LEGACY_REDIRECT_URI,
+    )
     code = first_process.issue_code(
-        client_id=LEGACY_CHATGPT_CLIENT_ID,
-        redirect_uri=LEGACY_CHATGPT_REDIRECT_URI,
+        client_id=LEGACY_CLIENT_ID,
+        redirect_uri=LEGACY_REDIRECT_URI,
         code_challenge=_challenge(verifier),
         scope=READ_SCOPE,
     )
     issued = first_process.exchange_code(
         code=code,
-        client_id=LEGACY_CHATGPT_CLIENT_ID,
-        redirect_uri=LEGACY_CHATGPT_REDIRECT_URI,
+        client_id=LEGACY_CLIENT_ID,
+        redirect_uri=LEGACY_REDIRECT_URI,
         code_verifier=verifier,
     )
     assert issued is not None
@@ -156,7 +166,7 @@ def test_legacy_chatgpt_pair_upgrades_into_restart_safe_tokens() -> None:
     assert after_restart.access_allowed(access_token, READ_SCOPE) is True
     assert after_restart.refresh(
         refresh_token=refresh_token,
-        client_id=LEGACY_CHATGPT_CLIENT_ID,
+        client_id=LEGACY_CLIENT_ID,
     ) is not None
 
 
@@ -165,7 +175,11 @@ def test_restart_safe_oauth_factory_is_opt_in_and_validates_key(monkeypatch) -> 
     assert type(oauth_state_from_env()).__name__ == "OAuthState"
 
     monkeypatch.setenv("KRC_MCP_OAUTH_SIGNING_KEY", KEY)
-    assert isinstance(oauth_state_from_env(), RestartSafeOAuthState)
+    monkeypatch.setenv(LEGACY_CLIENT_ID_ENV, LEGACY_CLIENT_ID)
+    monkeypatch.setenv(LEGACY_REDIRECT_URI_ENV, LEGACY_REDIRECT_URI)
+    configured = oauth_state_from_env()
+    assert isinstance(configured, RestartSafeOAuthState)
+    assert configured.client_redirect_allowed(LEGACY_CLIENT_ID, LEGACY_REDIRECT_URI) is True
 
     monkeypatch.setenv("KRC_MCP_OAUTH_SIGNING_KEY", "short")
     try:
