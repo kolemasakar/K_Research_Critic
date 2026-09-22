@@ -35,7 +35,7 @@ def test_core_skill_has_valid_required_frontmatter() -> None:
     assert text.startswith("---\n")
     frontmatter_text = text.split("---\n", 2)[1]
     frontmatter = yaml.safe_load(frontmatter_text)
-    assert frontmatter["name"] == "krc_core"
+    assert frontmatter["name"] == "krc-core"
     assert isinstance(frontmatter["description"], str)
     assert frontmatter["description"].strip()
     assert len(frontmatter["description"]) <= 1024
