@@ -1,8 +1,8 @@
 # MEDIA BETA Decision Log
 
-Version: 5.2
-Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_READONLY_PREFLIGHT_COMPLETE / PROJECT_SYNC_COMPLETE / NEW_CHAT_READY / OWNER_CUTOVER_DECISION_PENDING / PUBLICATION_HOLD**
-Updated: 2026-09-21
+Version: 5.3
+Status: **ACTIVE / R3_A_TO_H_COMPLETE / R3C_OAUTH_RECOVERY_PASS / PLUGIN_INVENTORY_RECONCILED / R4_READONLY_PREFLIGHT_COMPLETE / PROJECT_SYNC_COMPLETE / OWNER_CUTOVER_DECISION_PENDING / PUBLICATION_HOLD**
+Updated: 2026-09-22
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
 
@@ -157,6 +157,36 @@ R4_CUTOVER_AUTHORIZED=NO
 NEW_CHAT_READY=YES
 CANONICAL_RECOVERY=CURRENT_HANDOFF_v19.8 + checkpoint_165
 ```
+### D070 — R3C OAuth recovery accepted without GitHub Actions
+
+GitHub Actions were unavailable and were not used as a current validation gate.
+
+```text
+R3C_RUNTIME_VALIDATED_HEAD=27585c0ce924c78529b90aaadbfbeee841d0d249
+R3C_RENDER_DEPLOY=dep-dap55aegekts73fr0960 / LIVE
+OAUTH_AUTHORIZE_GET=200
+OAUTH_AUTHORIZE_POST=302
+OAUTH_TOKEN_POST=200
+MEDIA_GET_CAPABILITIES=PASS
+R3C_TO_VOICEBRIDGE_BINDING=PASS
+GITHUB_ACTIONS_CURRENTLY_AVAILABLE=NO
+CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
+```
+
+The legacy OAuth bridge is limited to an exact configured client-id/callback pair and upgrades successful authorization into restart-safe signed tokens.
+
+### D071 — Plugin inventory drift warning closed
+
+```text
+PLUGIN_REQUIRED_SURFACES=PASS
+LEGACY_PLUGIN_ENTRIES=NOT_REQUIRED
+FUNCTIONAL_INVENTORY_DRIFT=NO
+RECOVERY_CONSISTENCY_WARNING=CLOSED
+REINSTALL_REQUIRED=NO
+```
+
+Checkpoint 164 remains a historical UI snapshot. Current accepted R3-B and R3-E2 surfaces are the newer R3B and Instagram-v5 connections. No Plugin install/remove/permission mutation was performed during reconciliation.
+
 ### D054 — GitHub remains authoritative storage
 ```text
 AUTHORITATIVE_PROJECT_STATE=GITHUB_REPOSITORIES
@@ -165,11 +195,11 @@ LOCAL_WORKTREE_USE=TRANSIENT_ONLY
 
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v19.8
-- checkpoint 165
-- `02_ROADMAP.md` v7.9
-- `00_INDEX.md` v9.2
-- `08_CHAT_HANDOFF.md` v6.2
+- `CURRENT_HANDOFF.md` v19.9
+- checkpoint 166
+- `02_ROADMAP.md` v8.0
+- `00_INDEX.md` v9.3
+- `08_CHAT_HANDOFF.md` v6.3
 
 ## Hard boundary
 
