@@ -1,17 +1,18 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 21.0
-Status: **ACTIVE_HANDOFF / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_PROPOSAL_READY / EXACT_AUDIENCE_APPROVAL_PENDING / FREE_ONLY / PUBLICATION_HOLD**
+Version: 21.1
+Status: **ACTIVE_HANDOFF / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_LINK_ONLY_PILOT_AUTHORIZED / R4_C_IN_PROGRESS / UI_AUTH_BLOCKED / ZERO_MUTATION / FREE_ONLY**
 Date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 177. R4-A/B COMPLETE; private replacement accepted. R4-C proposal prepared as non-destructive cutover. Exact audience approval is still required before any sharing/publication/user-switch mutation. Source public GPT remains published and unchanged; PR22/PR45 remain unmerged.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 178. R4-A/B COMPLETE; private replacement accepted. R4-C LINK_ONLY_PILOT explicitly authorized and IN PROGRESS. Resume only at C2 link-only share mutation. Current blocker: browser has no authenticated ChatGPT session/vault credentials and Cloudflare verification blocks Personal/Local Plugin UI. Zero state changes occurred. Source public GPT remains unchanged; PR22/PR45 unmerged.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v21.0.
-2. `177_R4C_CUTOVER_PROPOSAL_READY_EXACT_AUDIENCE_APPROVAL_PENDING_2026_09_22.md`.
+1. `CURRENT_HANDOFF.md` — v21.1.
+2. `178_R4C_LINK_ONLY_PILOT_AUTHORIZED_UI_AUTH_BLOCKED_ZERO_MUTATION_2026_09_22.md`.
+3. `177_R4C_CUTOVER_PROPOSAL_READY_EXACT_AUDIENCE_APPROVAL_PENDING_2026_09_22.md`.
 3. `176_R4B_PRIVATE_ACCEPTANCE_COMPLETE_B1_B2_B3_PASS_R4C_PENDING_AUTHORIZATION_2026_09_22.md`.
 3. `175_R4B_READONLY_429_LEAKAGE_FIXED_DEPLOY_LIVE_B2_FINAL_AUTH_RERUN_PENDING_2026_09_22.md`.
 4. `174_R4B_VOICEBRIDGE_COLD_START_429_DIAGNOSED_WAKE_PASS_B2_AUTH_RERUN_PENDING_2026_09_22.md`.
@@ -65,8 +66,10 @@ PRIVATE_REPLACEMENT_ACCEPTED=YES
 R4_USER_SWITCH_AUTHORIZED=NO
 R4_CUTOVER_READY=YES
 R4_C_PROPOSAL_READY=YES
-R4_C_EXACT_AUDIENCE_APPROVAL_PENDING=YES
-R4_CUTOVER=HOLD
+R4_C_AUTHORIZED=YES / LINK_ONLY_PILOT_ONLY
+R4_C=IN_PROGRESS
+R4_C_UI_AUTH_BLOCKED=YES
+R4_CUTOVER=NOT_COMPLETE
 ```
 
 ## Repository / PR authority
@@ -81,7 +84,7 @@ KRC:
   validation=Render exact-commit build + live OAuth/read-only runtime PASS
   GitHub_Actions=current unavailable / not used
   historical_CI_reference=35485995871 PASS
-  docs_current_through=checkpoint_177
+  docs_current_through=checkpoint_178
 
 VoiceBridge:
   repo=kolemasakar/VoiceBridge
@@ -227,15 +230,11 @@ R4_READONLY_PREFLIGHT=COMPLETE
 
 ## Next gate
 
-R4-C non-destructive cutover proposal is prepared in checkpoint 177. Before any sharing/publication/user-switch mutation, the owner must select the exact replacement audience:
+R4-C LINK_ONLY_PILOT is authorized and in progress.
 
-```text
-1=PRIVATE_OWNER_ONLY
-2=LINK_ONLY_PILOT
-3=PUBLIC_DISCOVERY
-```
+Resume only at C2 after an authenticated ChatGPT UI session is available and the Cloudflare verification is cleared. Then change only the replacement Plugin audience to exact link-only pilot access, verify the share link and final audience, and proceed to C3 access verification.
 
-Until that explicit selection, publication/share/user switch remain HOLD. The source public GPT remains unchanged and is the rollback anchor.
+If exact link-only sharing is not available, STOP before mutation.
 
 ## Hard release boundary
 
@@ -279,4 +278,4 @@ R4_CUTOVER=HOLD
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V21_0_R4C_PROPOSAL_READY_AUDIENCE_APPROVAL_PENDING_2026_09_22`
+`KRC_MEDIA_CURRENT_HANDOFF_V21_1_R4C_LINK_ONLY_AUTHORIZED_UI_AUTH_BLOCKED_2026_09_22`
