@@ -18,6 +18,8 @@ SUPPORTED_SCOPES = frozenset({READ_SCOPE, OFFLINE_SCOPE})
 AUTH_CODE_TTL_SECONDS = 300
 ACCESS_TOKEN_TTL_SECONDS = 3600
 REFRESH_TOKEN_TTL_SECONDS = 30 * 24 * 3600
+LEGACY_CHATGPT_CLIENT_ID = "LgEX80DQSiyMOhSAS8_u278sRsmha7lE"
+LEGACY_CHATGPT_REDIRECT_URI = "https://chatgpt.com/connector/oauth/pDYtqIhZWoFo"
 
 
 @dataclass(frozen=True)
@@ -199,6 +201,13 @@ class RestartSafeOAuthState(OAuthState):
         )
 
     def client_redirect_allowed(self, client_id: str, redirect_uri: str) -> bool:
+        # Migration bridge for the one ChatGPT DCR client that predates
+        # restart-safe signed registrations. Keep this fail-closed: both the
+        # public client identifier and callback URI must match exactly.
+        if hmac.compare_digest(client_id, LEGACY_CHATGPT_CLIENT_ID) and hmac.compare_digest(
+            redirect_uri, LEGACY_CHATGPT_REDIRECT_URI
+        ):
+            return True
         payload = self._decode(client_id, "client")
         if payload is None:
             return False
