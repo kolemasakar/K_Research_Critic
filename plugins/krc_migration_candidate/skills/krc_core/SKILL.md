@@ -1,5 +1,5 @@
 ---
-name: krc_core
+name: krc-core
 description: Evidence-focused K-Research & Critic workflow with CriticProfile approval gating, claim-level cross-checks, traceability, and Ukrainian-first reporting.
 ---
 
