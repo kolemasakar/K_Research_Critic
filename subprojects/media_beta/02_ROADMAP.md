@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 8.3
-Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_IN_PROGRESS / A1_A2_A3_PASS / A4_PACKAGE_READY / PRIVATE_INSTALL_PENDING / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
+Version: 8.4
+Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_IN_PROGRESS / A0_A1_A2_A3_PASS / A4_PRIVATE_INSTALL_PASS / A5_NEW_CHAT_PENDING / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
 Updated: 2026-09-22
 
 ## Current roadmap position
@@ -45,6 +45,19 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 ```
 
 No MEDIA execution tool was invoked during this recovery.
+
+## R4-A progress — checkpoint 170
+
+```text
+A0=PASS
+A1=PASS
+A2=PASS
+A3=PASS
+A4 package=PASS
+A4 private install=PASS
+A5=PENDING / NEW CHAT REQUIRED
+A6=PENDING
+```
 
 ## R4-A progress — checkpoint 169
 
@@ -159,7 +172,7 @@ Therefore, if R4 is later authorized, the cutover plan must use the validated Pl
 Before any state-changing action:
 
 1. transition to a fresh chat;
-2. recover from `CURRENT_HANDOFF.md` v20.2 + checkpoint 169;
+2. recover from `CURRENT_HANDOFF.md` v20.3 + checkpoint 170;
 3. present exact intended mutations;
 4. present rollback steps;
 5. obtain explicit owner cutover authorization;
@@ -186,4 +199,4 @@ ADDITIONAL_LIVE_MEDIA_STARTS=NO
 
 The next phase is an owner cutover decision in a fresh chat. R4 mutation remains HOLD until that decision.
 
-Recovery authority: `CURRENT_HANDOFF.md` v20.2 + checkpoint 169.
+Recovery authority: `CURRENT_HANDOFF.md` v20.3 + checkpoint 170.
