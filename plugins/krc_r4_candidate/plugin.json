@@ -27,9 +27,11 @@
           "Read",
           "Write"
         ],
-        "repositoryURL": "https://github.com/kolemasakar/K_Research_Critic",
-        "defaultPrompt": "Use the K-Research & Critic Core workflow. Keep the CriticProfile approval gate and use MEDIA tools only within their confirmed permission and consent boundaries."
+        "defaultPrompt": "Use the K-Research & Critic Core workflow. Keep the CriticProfile approval gate and use MEDIA tools only within their confirmed permission and consent boundaries.",
+        "websiteURL": "https://github.com/kolemasakar/K_Research_Critic",
+        "privacyPolicyURL": "https://github.com/kolemasakar/K_Research_Critic/blob/agent/krc-public-media-r3-integration/docs/PRIVACY_POLICY.md"
       }
     }
-  }
+  },
+  "homepage": "https://github.com/kolemasakar/K_Research_Critic"
 }
