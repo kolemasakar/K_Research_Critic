@@ -18,8 +18,8 @@ SUPPORTED_SCOPES = frozenset({READ_SCOPE, OFFLINE_SCOPE})
 AUTH_CODE_TTL_SECONDS = 300
 ACCESS_TOKEN_TTL_SECONDS = 3600
 REFRESH_TOKEN_TTL_SECONDS = 30 * 24 * 3600
-LEGACY_CHATGPT_CLIENT_ID = "LgEX80DQSiyMOhSAS8_u278sRsmha7lE"
-LEGACY_CHATGPT_REDIRECT_URI = "https://chatgpt.com/connector/oauth/pDYtqIhZWoFo"
+LEGACY_CLIENT_ID_ENV = "KRC_MCP_LEGACY_CLIENT_ID"
+LEGACY_REDIRECT_URI_ENV = "KRC_MCP_LEGACY_REDIRECT_URI"
 
 
 @dataclass(frozen=True)
@@ -146,11 +146,23 @@ class RestartSafeOAuthState(OAuthState):
 
     _PREFIX = "krc1"
 
-    def __init__(self, signing_key: str) -> None:
+    def __init__(
+        self,
+        signing_key: str,
+        *,
+        legacy_client_id: str | None = None,
+        legacy_redirect_uri: str | None = None,
+    ) -> None:
         if len(signing_key) < 32:
             raise ValueError("oauth_signing_key_too_short")
+        if bool(legacy_client_id) != bool(legacy_redirect_uri):
+            raise ValueError("legacy_oauth_pair_incomplete")
+        if legacy_redirect_uri and not _valid_redirect_uri(legacy_redirect_uri):
+            raise ValueError("invalid_legacy_redirect_uri")
         super().__init__()
         self._key = signing_key.encode("utf-8")
+        self._legacy_client_id = legacy_client_id
+        self._legacy_redirect_uri = legacy_redirect_uri
 
     @staticmethod
     def _b64encode(value: bytes) -> str:
@@ -204,8 +216,11 @@ class RestartSafeOAuthState(OAuthState):
         # Migration bridge for the one ChatGPT DCR client that predates
         # restart-safe signed registrations. Keep this fail-closed: both the
         # public client identifier and callback URI must match exactly.
-        if hmac.compare_digest(client_id, LEGACY_CHATGPT_CLIENT_ID) and hmac.compare_digest(
-            redirect_uri, LEGACY_CHATGPT_REDIRECT_URI
+        if (
+            self._legacy_client_id
+            and self._legacy_redirect_uri
+            and hmac.compare_digest(client_id, self._legacy_client_id)
+            and hmac.compare_digest(redirect_uri, self._legacy_redirect_uri)
         ):
             return True
         payload = self._decode(client_id, "client")
@@ -284,7 +299,13 @@ def oauth_state_from_env() -> OAuthState:
     signing_key = os.getenv("KRC_MCP_OAUTH_SIGNING_KEY", "").strip()
     if not signing_key:
         return OAuthState()
-    return RestartSafeOAuthState(signing_key)
+    legacy_client_id = os.getenv(LEGACY_CLIENT_ID_ENV, "").strip() or None
+    legacy_redirect_uri = os.getenv(LEGACY_REDIRECT_URI_ENV, "").strip() or None
+    return RestartSafeOAuthState(
+        signing_key,
+        legacy_client_id=legacy_client_id,
+        legacy_redirect_uri=legacy_redirect_uri,
+    )
 
 
 GLOBAL_OAUTH_STATE = oauth_state_from_env()
