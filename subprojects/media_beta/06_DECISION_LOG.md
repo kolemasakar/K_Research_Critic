@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 6.7
-Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_LOCAL_MARKETPLACE_PILOT_AUTHORIZED / PILOT_BUNDLE_READY / TESTER_APP_ACCESS_GATE_PENDING**
+Version: 6.8
+Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION / SOURCE_PUBLIC_GPT_PRODUCTION**
 Updated: 2026-09-22
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -427,7 +427,7 @@ R4-C may now be proposed but remains separately gated:
 ```text
 R4_CUTOVER_READY=YES
 R4_C_AUTHORIZED=NO
-R4_CUTOVER=HOLD
+R4_CUTOVER=PAUSED
 SOURCE_PUBLIC_GPT_UNCHANGED=YES
 PUBLICATION=NO
 SHARING_CHANGE=NO
@@ -562,13 +562,39 @@ PR22_MERGE=NO
 PR45_MERGE=NO
 ```
 
+### D088 — R4-C paused pending supported ChatGPT distribution
+
+Owner accepted pausing the user-facing R4-C cutover.
+
+The Local Marketplace/Codex pilot is retained only as an optional developer/test artifact and is no longer a required release gate.
+
+```text
+R4_C=PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION
+CURRENT_PRODUCTION_ENTRY_POINT=EXISTING_PUBLIC_K_RESEARCH_AND_CRITIC_GPT
+LOCAL_MARKETPLACE_PILOT=OPTIONAL / NOT_REQUIRED
+TRIGGER_1=NATIVE_MIGRATION_AVAILABLE_IN_PLUS_ACCOUNT
+TRIGGER_2=SUPPORTED_PLUGIN_DISTRIBUTION_TO_ORDINARY_CHATGPT_USERS
+```
+
+The accepted R4 replacement remains migration-ready. The existing public GPT stays published and unchanged as production entry point and rollback anchor.
+
+```text
+PUBLIC_GPT_MUTATION=NO
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING_CHANGE=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+MEDIA_STARTS=0
+PROVIDER_WORK=0
+```
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v21.3
-- checkpoint 180
-- `02_ROADMAP.md` v9.4
-- `00_INDEX.md` v10.7
-- `08_CHAT_HANDOFF.md` v7.7
+- `CURRENT_HANDOFF.md` v21.4
+- checkpoint 181
+- `02_ROADMAP.md` v9.5
+- `00_INDEX.md` v10.8
+- `08_CHAT_HANDOFF.md` v7.8
 
 ## Hard boundary
 
@@ -582,5 +608,5 @@ MAIN_MUTATION=NO
 PR22_MERGE=NO
 PR45_MERGE=NO
 ADDITIONAL_LIVE_MEDIA_STARTS=NO
-R4_CUTOVER=HOLD
+R4_CUTOVER=PAUSED
 ```
