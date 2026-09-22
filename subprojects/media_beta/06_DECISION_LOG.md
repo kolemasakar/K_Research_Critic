@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 6.5
-Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_LINK_ONLY_PILOT_AUTHORIZED / R4_C_IN_PROGRESS / UI_AUTH_BLOCKED / ZERO_MUTATION**
+Version: 6.6
+Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_IN_PROGRESS / WEB_LINK_ONLY_PATH_UNAVAILABLE / DISTRIBUTION_DECISION_PENDING / ZERO_MUTATION**
 Updated: 2026-09-22
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -514,13 +514,29 @@ e3e6cd2a-5a55-4011-9079-7cda4d17c6e7
 ea2a4b56-dd91-4415-aab3-bceb9ba6134e
 ```
 
+### D086 — Personal Plus web surface cannot perform link-only sharing for the local marketplace Candidate
+
+Manual UI evidence confirmed that the top-right `+` control opens the standalone MCP plugin creation form, not management for the existing local marketplace package. Searching Personal plugins for `K-Research & Critic R4 Candidate` returns no result.
+
+Current OpenAI documentation distinguishes local marketplace plugins from workspace-shared plugins. Link-based plugin sharing is a managed-workspace capability; the current personal Plus web surface does not expose that control for the local Candidate.
+
+```text
+R4_C_LINK_ONLY_PILOT_INTENT=YES
+WEB_LINK_ONLY_CONTROL=UNAVAILABLE
+STATE_CHANGES=0
+SOURCE_PUBLIC_GPT_UNCHANGED=YES
+```
+
+Supported next mechanisms require a fresh owner decision:
+A local marketplace pilot; B managed workspace link pilot; C public directory.
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v21.1
-- checkpoint 178
-- `02_ROADMAP.md` v9.2
-- `00_INDEX.md` v10.5
-- `08_CHAT_HANDOFF.md` v7.5
+- `CURRENT_HANDOFF.md` v21.2
+- checkpoint 179
+- `02_ROADMAP.md` v9.3
+- `00_INDEX.md` v10.6
+- `08_CHAT_HANDOFF.md` v7.6
 
 ## Hard boundary
 
