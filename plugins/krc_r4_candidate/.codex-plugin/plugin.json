@@ -16,6 +16,7 @@
     "capabilities": [
       "Read",
       "Write"
-    ]
+    ],
+    "defaultPrompt": "Use the K-Research & Critic Core workflow. Keep the CriticProfile approval gate and use MEDIA tools only within their confirmed permission and consent boundaries."
   }
 }
