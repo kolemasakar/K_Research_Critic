@@ -152,4 +152,20 @@ R4=HOLD
 - `subprojects/media_beta/161_R3G_OPERATIONAL_HARDENING_COMPLETE_2026_09_20.md`
 - `subprojects/media_beta/02_ROADMAP.md`
 
-Public migration/cutover must remain separately owner-approved. Manual UI inspection confirmed the GPT identity, GPT Store/share controls, Plugin surface, private KRC plugin inventory, install/add controls and Skills surface. No explicit Migrate control was found in the current UI. Before any cutover, recover from CURRENT_HANDOFF v19.8 + checkpoint 165 in a fresh chat and obtain explicit owner approval.
+Public migration/cutover must remain separately owner-approved. Manual UI inspection confirmed the GPT identity, GPT Store/share controls, Plugin surface, private KRC plugin inventory, install/add controls and Skills surface. No explicit Migrate control was found in the current UI. Before any cutover, recover from CURRENT_HANDOFF v19.9 + checkpoint 166; GitHub Actions are currently unavailable, so use the recorded exact-commit Render/live read-only validation and obtain explicit owner approval.
+
+
+## R3C OAuth recovery after checkpoint 165
+
+```text
+R3C_OAUTH_RECOVERY=PASS
+R3C_RUNTIME_VALIDATED_HEAD=27585c0ce924c78529b90aaadbfbeee841d0d249
+MEDIA_GET_CAPABILITIES=PASS
+PLUGIN_REQUIRED_SURFACES=PASS
+RECOVERY_CONSISTENCY_WARNING=CLOSED
+GITHUB_ACTIONS_CURRENTLY_AVAILABLE=NO
+CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
+R4_CUTOVER=HOLD
+```
+
+Canonical recovery is now `CURRENT_HANDOFF.md` v19.9 + checkpoint 166.
