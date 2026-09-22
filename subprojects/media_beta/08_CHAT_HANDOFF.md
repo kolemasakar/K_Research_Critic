@@ -2,13 +2,13 @@
 
 Канонічна інструкція відновлення K-Research & Critic MEDIA у новому чаті.
 
-Version: 7.7
-Status: **R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_LOCAL_MARKETPLACE_PILOT_AUTHORIZED / PILOT_BUNDLE_READY / TESTER_APP_ACCESS_GATE_PENDING**
+Version: 7.8
+Status: **R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION / SOURCE_PUBLIC_GPT_PRODUCTION**
 Checkpoint date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 180. R4-A/B COMPLETE. R4-C LOCAL_MARKETPLACE_PILOT authorized. Bundle KRC_R4_LOCAL_PILOT_2026-09-22.zip ready, SHA256 e6cf16718183b3403179798b3e0ef7d5e5dfa703c1b160d6bfc16a56afea9868. Next: one tester installs it and reports marketplace/plugin/Core Skill plus 5/5 referenced app availability. Stop if any app unavailable. No *_start/provider/publication/public GPT mutation/PR merge.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 181. R4-A/B COMPLETE; private replacement accepted. R4-C is PAUSED pending native migration in Plus or supported Plugin distribution to ordinary ChatGPT users. Existing public GPT remains production entry point and rollback anchor. Local marketplace pilot is optional, not required. No PR merge, publication/share change, or MEDIA starts.`
 
 ## Mandatory recovery order
 
@@ -117,32 +117,29 @@ R4_A_PRIVATE_ASSEMBLY=PASS / COMPLETE
 R4_B_PRIVATE_ACCEPTANCE=PASS / COMPLETE
 R4_B_B4=OPTIONAL / NOT_RUN
 PRIVATE_REPLACEMENT_ACCEPTED=YES
-R4_C_USER_SWITCH_PUBLICATION=READY TO PROPOSE / NOT AUTHORIZED
+R4_C_USER_SWITCH_PUBLICATION=PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION
 SOURCE_PUBLIC_GPT=UNCHANGED
 R4_CUTOVER_READY=YES
 ```
 
 ## Next gate
 
-Give the bounded local marketplace bundle to one tester using ChatGPT Desktop or Codex local marketplace support.
+No active R4-C execution gate.
 
-Return only the installation/access preflight:
+Wait for one of:
 
 ```text
-tester_environment=<OS + product/version>
-marketplace_visible=PASS|FAIL
-plugin_install=PASS|FAIL
-core_skill=PASS|FAIL
-app_availability=5/5 or blocked app list
+TRIGGER_1=NATIVE_MIGRATION_AVAILABLE_IN_PLUS_ACCOUNT
+TRIGGER_2=SUPPORTED_PLUGIN_DISTRIBUTION_TO_ORDINARY_CHATGPT_USERS
 ```
 
-If app availability is below 5/5, STOP. Do not create replacement apps or run MEDIA execution.
+When a trigger appears, verify current OpenAI documentation and the owner's actual account UI before resuming. Revalidate only what product/schema drift makes necessary.
 
 ## Hard boundary
 
 ```text
 PROJECT_COST_POLICY=FREE_ONLY
-R4_CUTOVER_AUTHORIZED=NO
+R4_CUTOVER_AUTHORIZED=NO / PAUSED
 PUBLIC_GPT_MUTATION=NO
 PLUGIN_INSTALLATION_OR_CHANGE=NO
 PLUGIN_PUBLICATION=NO
@@ -166,4 +163,4 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 
 Terminal marker:
 
-`MEDIA_BETA_CHAT_HANDOFF_V7_7_R4C_LOCAL_PILOT_BUNDLE_READY_APP_ACCESS_GATE_PENDING_2026_09_22`
+`MEDIA_BETA_CHAT_HANDOFF_V7_8_R4C_PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION_2026_09_22`
