@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 9.5
-Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION / SOURCE_PUBLIC_GPT_PRODUCTION / FREE_ONLY**
+Version: 9.6
+Status: **R3_9_UNIFIED_KRC_GPT_ACTIVE / ROUTING_CONTRACT_READY / STAGING_MANIFEST_READY / STATIC_PASS / PUBLIC_GPT_UNCHANGED / R4_C_PAUSED / FREE_ONLY**
 Updated: 2026-09-22
 
 ## Current roadmap position
@@ -25,9 +25,26 @@ R4 Read-only preflight overall                PASS / COMPLETE
 R4 Package                                  READY
 R4-A Private assembly                       PASS / COMPLETE
 R4-B Private acceptance                     PASS / COMPLETE
-R4-C User switch/publication                IN PROGRESS / LOCAL MARKETPLACE PILOT / BUNDLE READY / TESTER APP ACCESS GATE
-R4 Cutover                                  HOLD
+R4-C User switch/publication                PAUSED / WAIT FOR SUPPORTED CHATGPT DISTRIBUTION
+R4 Cutover                                  PAUSED
 ```
+
+## R3.9 Unified KRC GPT — checkpoint 182
+
+```text
+R3_9=ACTIVE
+ROUTING_CONTRACT=contracts/krc_unified_media_routing.yaml
+STAGING_MANIFEST=gpt_store/unified_r39_manifest.yaml
+NEW_STATIC_TESTS=tests/test_krc_unified_r39.py
+CORE_UNCHANGED=PASS
+CORE_PLUS_MEDIA_ADDENDUM_CHARS=7404/8000
+MEDIA_OPS=9 read + 4 execution = 13
+R4_APP_IDS=5 / unchanged
+PUBLIC_GPT_MUTATION=NO
+R4_C=PAUSED
+```
+
+Next: exact-branch regression/runtime validation, then prepare an exact Builder delta. No public GPT mutation before that gate.
 
 ## Recovery delta — 2026-09-22
 
@@ -343,4 +360,4 @@ ADDITIONAL_LIVE_MEDIA_STARTS=NO
 
 **R4-B is COMPLETE.** B1/B2/B3 passed; B4 was optional and not run. The private replacement is accepted. R4-C is ready to propose but remains HOLD pending separate owner authorization.
 
-Recovery authority: `CURRENT_HANDOFF.md` v21.4 + checkpoint 181.
+Recovery authority: `CURRENT_HANDOFF.md` v21.5 + checkpoint 182.
