@@ -1,16 +1,16 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 21.3
-Status: **ACTIVE_HANDOFF / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_LOCAL_MARKETPLACE_PILOT_AUTHORIZED / PILOT_BUNDLE_READY / TESTER_APP_ACCESS_GATE_PENDING / FREE_ONLY**
+Version: 21.4
+Status: **ACTIVE_HANDOFF / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION / SOURCE_PUBLIC_GPT_PRODUCTION / FREE_ONLY**
 Date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 180. R4-A/B COMPLETE. R4-C LOCAL_MARKETPLACE_PILOT explicitly authorized. Pilot bundle KRC_R4_LOCAL_PILOT_2026-09-22.zip is ready (SHA256 e6cf16718183b3403179798b3e0ef7d5e5dfa703c1b160d6bfc16a56afea9868). Next gate: one tester installs the local marketplace and reports marketplace/plugin/Core Skill plus 5/5 referenced app availability. No *_start/provider/publication/public GPT mutation/PR merge.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 181. R4-A/B COMPLETE; private replacement accepted. R4-C is PAUSED pending either native migration in the Plus account or supported Plugin distribution to ordinary ChatGPT users. Existing public K-Research & Critic GPT remains production entry point and rollback anchor. Local marketplace pilot is optional, not a required gate. No PR merge, no publication/share change, no MEDIA starts.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v21.3.
+1. `CURRENT_HANDOFF.md` — v21.4.
 2. `180_R4C_LOCAL_MARKETPLACE_PILOT_AUTHORIZED_BUNDLE_READY_APP_ACCESS_GATE_PENDING_2026_09_22.md`.
 3. `179_R4C_LINK_ONLY_WEB_PATH_UNAVAILABLE_LOCAL_MARKETPLACE_DISTRIBUTION_DECISION_PENDING_2026_09_22.md`.
 3. `178_R4C_LINK_ONLY_PILOT_AUTHORIZED_UI_AUTH_BLOCKED_ZERO_MUTATION_2026_09_22.md`.
@@ -86,7 +86,7 @@ KRC:
   validation=Render exact-commit build + live OAuth/read-only runtime PASS
   GitHub_Actions=current unavailable / not used
   historical_CI_reference=35485995871 PASS
-  docs_current_through=checkpoint_180
+  docs_current_through=checkpoint_181
 
 VoiceBridge:
   repo=kolemasakar/VoiceBridge
@@ -232,24 +232,22 @@ R4_READONLY_PREFLIGHT=COMPLETE
 
 ## Next gate
 
-R4-C LOCAL_MARKETPLACE_PILOT is authorized. Pilot bundle is ready.
+R4-C is intentionally PAUSED.
 
-First pilot gate:
+Resume only when one of these real product triggers is confirmed on the owner's actual ChatGPT account/use case:
 
 ```text
-marketplace_visible
-plugin_install
-core_skill
-referenced_app_availability=5/5
+TRIGGER_1=NATIVE_MIGRATION_AVAILABLE_IN_PLUS_ACCOUNT
+TRIGGER_2=SUPPORTED_PLUGIN_DISTRIBUTION_TO_ORDINARY_CHATGPT_USERS
 ```
 
-If any referenced app is unavailable to the tester account, STOP without substituting apps or changing IDs. No MEDIA execution is required at this gate.
+The Local Marketplace/Codex pilot is no longer a required release gate. Preserve the accepted R4 replacement and continue production through the existing public GPT.
 
 ## Hard release boundary
 
 ```text
 PROJECT_COST_POLICY=FREE_ONLY
-R4_CUTOVER_AUTHORIZED=NO
+R4_CUTOVER_AUTHORIZED=NO / PAUSED
 PUBLIC_GPT_MUTATION=NO
 PLUGIN_INSTALLATION_OR_CHANGE=NO
 PLUGIN_PUBLICATION=NO
@@ -281,10 +279,10 @@ R4_B_B4=OPTIONAL / NOT_RUN
 PRIVATE_REPLACEMENT_ACCEPTED=YES
 VOICEBRIDGE_VALIDATED_DEPLOYED_HEAD=174174aae0635736f05d812094b555544623270c
 R4_CUTOVER_READY=YES
-R4_C_AUTHORIZED=NO
-R4_CUTOVER=HOLD
+R4_C_AUTHORIZED=PAUSED
+R4_CUTOVER=PAUSED
 ```
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V21_3_R4C_LOCAL_PILOT_BUNDLE_READY_APP_ACCESS_GATE_PENDING_2026_09_22`
+`KRC_MEDIA_CURRENT_HANDOFF_V21_4_R4C_PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION_2026_09_22`
