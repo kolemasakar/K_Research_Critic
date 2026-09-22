@@ -152,7 +152,7 @@ R4=HOLD
 - `subprojects/media_beta/161_R3G_OPERATIONAL_HARDENING_COMPLETE_2026_09_20.md`
 - `subprojects/media_beta/02_ROADMAP.md`
 
-Public migration/cutover must remain separately owner-approved. Manual UI inspection confirmed the GPT identity, GPT Store/share controls, Plugin surface, private KRC plugin inventory, install/add controls and Skills surface. No explicit Migrate control was found in the current UI. Before any cutover, recover from CURRENT_HANDOFF v20.0 + checkpoint 167; GitHub Actions are currently unavailable, so use the recorded exact-commit Render/live read-only validation and obtain explicit owner approval.
+Public migration/cutover must remain separately owner-approved. Manual UI inspection confirmed the GPT identity, GPT Store/share controls, Plugin surface, private KRC plugin inventory, install/add controls and Skills surface. No explicit Migrate control was found in the current UI. Before any cutover, recover from CURRENT_HANDOFF v20.1 + checkpoint 168; GitHub Actions are currently unavailable, so use the recorded exact-commit Render/live read-only validation and obtain explicit owner approval.
 
 
 ## R3C OAuth recovery after checkpoint 165
@@ -168,7 +168,7 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 R4_CUTOVER=HOLD
 ```
 
-Canonical recovery is now `CURRENT_HANDOFF.md` v20.0 + checkpoint 167.
+Canonical recovery is now `CURRENT_HANDOFF.md` v20.1 + checkpoint 168.
 
 
 ## R4 staged package
@@ -184,3 +184,15 @@ R4_CUTOVER_READY=NO
 ```
 
 Checkpoint 167 is the current execution authority for future R4 work.
+
+
+## R4-A corrected ordering
+
+```text
+E1_RESTART_SAFE_OAUTH_REQUIRED_BEFORE_RECONNECT=YES
+R4_A_SEQUENCE_167=SUPERSEDED_BY_168
+R4_A_FIRST_MUTATION=E1_OAUTH_HARDENING
+R4_A_AUTHORIZED=NO
+```
+
+Checkpoint 168 is the current execution authority for R4-A.
