@@ -153,3 +153,15 @@ def test_r39_action_schema_preserves_bearer_auth_and_free_only_server() -> None:
     assert policy["paid_retrieval_fallback"] is False
     assert policy["paid_stt_fallback"] is False
     assert policy["paid_proxy_fallback"] is False
+
+
+def test_r39_action_descriptions_fit_builder_limit() -> None:
+    schema = load_yaml(R39_OPENAPI)
+    for route, path_item in schema["paths"].items():
+        for method in ("get", "post", "put", "patch", "delete"):
+            operation = path_item.get(method)
+            if not operation:
+                continue
+            description = operation.get("description")
+            if description is not None:
+                assert len(description) <= 300, (operation.get("operationId"), len(description))
