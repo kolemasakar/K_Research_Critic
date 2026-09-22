@@ -1,0 +1,35 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "k-research-critic-r4-candidate",
+  "version": "0.1.0",
+  "description": "Private K-Research & Critic R4 candidate combining the evidence-focused Core skill with the accepted KRC MEDIA registered app surfaces.",
+  "author": {
+    "name": "K-Research & Critic"
+  },
+  "repository": "https://github.com/kolemasakar/K_Research_Critic",
+  "keywords": [
+    "research",
+    "critique",
+    "verification",
+    "media",
+    "evidence"
+  ],
+  "extensions": {
+    "com.openai": {
+      "apps": "./.app.json",
+      "interface": {
+        "displayName": "K-Research & Critic R4 Candidate",
+        "shortDescription": "Evidence-focused research and MEDIA workflows",
+        "longDescription": "Private R4 candidate for K-Research & Critic, combining the Core CriticProfile workflow with the accepted read-only and consequential MEDIA app surfaces.",
+        "developerName": "K-Research & Critic",
+        "category": "Productivity",
+        "capabilities": [
+          "Read",
+          "Write"
+        ],
+        "repositoryURL": "https://github.com/kolemasakar/K_Research_Critic",
+        "defaultPrompt": "Use the K-Research & Critic Core workflow. Keep the CriticProfile approval gate and use MEDIA tools only within their confirmed permission and consent boundaries."
+      }
+    }
+  }
+}
