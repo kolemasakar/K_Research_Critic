@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 9.2
-Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_LINK_ONLY_PILOT_AUTHORIZED / R4_C_IN_PROGRESS / UI_AUTH_BLOCKED / ZERO_MUTATION / FREE_ONLY**
+Version: 9.3
+Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_IN_PROGRESS / WEB_LINK_ONLY_PATH_UNAVAILABLE / DISTRIBUTION_DECISION_PENDING / ZERO_MUTATION / FREE_ONLY**
 Updated: 2026-09-22
 
 ## Current roadmap position
@@ -25,7 +25,7 @@ R4 Read-only preflight overall                PASS / COMPLETE
 R4 Package                                  READY
 R4-A Private assembly                       PASS / COMPLETE
 R4-B Private acceptance                     PASS / COMPLETE
-R4-C User switch/publication                IN PROGRESS / LINK_ONLY_PILOT AUTHORIZED / UI AUTH BLOCKED
+R4-C User switch/publication                IN PROGRESS / WEB LINK-ONLY UNAVAILABLE / DISTRIBUTION DECISION PENDING
 R4 Cutover                                  HOLD
 ```
 
@@ -45,6 +45,17 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 ```
 
 No MEDIA execution tool was invoked during this recovery.
+
+## R4-C distribution correction — checkpoint 179
+
+```text
+current_account=PERSONAL_PLUS
+candidate_type=LOCAL_MARKETPLACE_PACKAGE
+web_link_only_control=NOT_AVAILABLE
+plus_control=NEW_MCP_PLUGIN_FORM_ONLY
+state_changes=0
+next_decision=A local marketplace pilot | B managed workspace link pilot | C public directory
+```
 
 ## R4-C link-only pilot — checkpoint 178
 
@@ -309,4 +320,4 @@ ADDITIONAL_LIVE_MEDIA_STARTS=NO
 
 **R4-B is COMPLETE.** B1/B2/B3 passed; B4 was optional and not run. The private replacement is accepted. R4-C is ready to propose but remains HOLD pending separate owner authorization.
 
-Recovery authority: `CURRENT_HANDOFF.md` v21.1 + checkpoint 178.
+Recovery authority: `CURRENT_HANDOFF.md` v21.2 + checkpoint 179.
