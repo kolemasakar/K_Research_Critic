@@ -357,6 +357,18 @@ CURRENT_VALIDATION=
   + account Plugin/Skill UI verification
 ```
 
+## Canonical documentation sync
+
+```text
+CURRENT_HANDOFF.md=v20.1
+02_ROADMAP.md=v8.2
+00_INDEX.md=v9.5
+06_DECISION_LOG.md=v5.5
+08_CHAT_HANDOFF.md=v6.5
+migration_candidate_README=SYNCED
+PROJECT_SYNC_COMPLETE=YES
+```
+
 ## Current result
 
 ```text
