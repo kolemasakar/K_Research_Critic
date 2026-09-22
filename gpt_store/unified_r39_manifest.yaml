@@ -10,6 +10,7 @@ product:
 instructions:
   core: prompts/GPT_STORE_INSTRUCTIONS.md
   media_addendum: prompts/GPT_STORE_MEDIA_R3_PUBLIC_ADDENDUM.md
+  builder_artifact: prompts/GPT_STORE_UNIFIED_R39_INSTRUCTIONS.md
   routing_contract: contracts/krc_unified_media_routing.yaml
   core_text_must_remain_byte_identical: true
 
@@ -19,7 +20,7 @@ capabilities:
   media_action_required_for_unified_runtime: true
 
 media_action:
-  schema: gpt_store/actions/media_public_r3_openapi.yaml
+  schema: gpt_store/actions/media_public_r39_openapi.yaml
   operation_count: 13
   read_only_operations: 9
   execution_operations: 4
