@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 6.9
-Status: **ACTIVE / R3_9_UNIFIED_KRC_GPT_ACTIVE / ROUTING_CONTRACT_READY / STATIC_PASS / PUBLIC_GPT_UNCHANGED / R4_C_PAUSED**
+Version: 6.10
+Status: **ACTIVE / R3_9_UNIFIED_KRC_GPT_ACTIVE / 91_TESTS_PASS / NATIVE_MIGRATION_TRIGGER_CONFIRMED / PRIVATE_STAGING_NEXT / PUBLIC_GPT_UNCHANGED / R4_C_DEFERRED**
 Updated: 2026-09-22
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -627,13 +627,43 @@ The current GPT Action is treated as a transport adapter only. At future Plugin 
 
 Full pytest/runtime acceptance has not yet been run for R3.9; GitHub Actions are unavailable and the current local execution container could not resolve github.com.
 
+### D090 — Native Plugin migration trigger confirmed; R3.9 private-first staging required before public mutation
+
+Owner UI now exposes native migration to Plugin and shows a displayed deadline of 2026-12-11.
+
+Decision:
+
+```text
+TRIGGER_1=NATIVE_MIGRATION_AVAILABLE_IN_PLUS_ACCOUNT / CONFIRMED
+NATIVE_MIGRATION_EXECUTION=DEFERRED
+R4_C=DEFERRED_UNTIL_R39_UNIFIED_ACCEPTANCE
+```
+
+R3.9 exact selected regression suite passed:
+
+```text
+91 passed
+0 failed
+```
+
+A dedicated R3.9 Action schema now preserves the custom-GPT confirmation boundary:
+
+```text
+9 read-only operations -> non-consequential
+4 execution starts -> consequential
+```
+
+An exact Builder instructions artifact was also created at 7404/8000 characters.
+
+Next staging target is the existing private `K-Research & Critic - MEDIA BETA`. The public GPT remains unchanged until private smoke acceptance.
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v21.5
-- checkpoint 182
-- `02_ROADMAP.md` v9.6
-- `00_INDEX.md` v10.9
-- `08_CHAT_HANDOFF.md` v7.9
+- `CURRENT_HANDOFF.md` v21.6
+- checkpoint 183
+- `02_ROADMAP.md` v9.7
+- `00_INDEX.md` v10.10
+- `08_CHAT_HANDOFF.md` v7.10
 
 ## Hard boundary
 
