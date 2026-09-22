@@ -10,7 +10,7 @@ purpose: >-
 canonical_sources:
   core: prompts/GPT_STORE_INSTRUCTIONS.md
   current_gpt_media_addendum: prompts/GPT_STORE_MEDIA_R3_PUBLIC_ADDENDUM.md
-  action_schema: gpt_store/actions/media_public_r3_openapi.yaml
+  action_schema: gpt_store/actions/media_public_r39_openapi.yaml
   plugin_tools: plugins/krc_migration_candidate/contracts/media_tools.yaml
   plugin_adapter: plugins/krc_migration_candidate/contracts/media_adapter.yaml
   r4_candidate_apps: plugins/krc_r4_candidate/.app.json
