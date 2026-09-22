@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 5.7
-Status: **ACTIVE / R3_A_TO_H_COMPLETE / R3C_OAUTH_RECOVERY_PASS / R4_PACKAGE_CORRECTED / E1_OAUTH_HARDENING_REQUIRED / PRIVATE_ASSEMBLY_REQUIRED / R4_CUTOVER_HOLD / PUBLICATION_HOLD**
+Version: 5.8
+Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / A5_PASS / A6_COMPLETE / R4_B_PENDING_AUTHORIZATION / R4_CUTOVER_HOLD / PUBLICATION_HOLD**
 Updated: 2026-09-22
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -277,13 +277,39 @@ MEDIA_PROVIDER_WORK=NO
 A5=PENDING_NEW_CHAT
 ```
 
+### D078 — R4-A private assembly accepted and stopped at A6
+
+A5 in the fresh chat verified the assembled private R4 Candidate without executing any MEDIA start operation or provider work.
+
+```text
+PLUGIN_VISIBLE=PASS
+CORE_SKILL_BOUND=PASS
+SKILL_COUNT=1
+REGISTERED_APP_COUNT=5
+READ_OPERATIONS=9
+EXECUTION_OPERATIONS=4
+TOTAL_OPERATIONS=13
+READ_ONLY_EXECUTION_LEAKAGE=0
+FREE_ONLY=PASS
+SOURCE_PUBLIC_GPT_UNCHANGED=YES
+PUBLICATION=NO
+SHARING=NO
+A5=PASS
+A6=COMPLETE
+R4_A=COMPLETE
+R4_B_AUTHORIZED=NO
+R4_C_AUTHORIZED=NO
+```
+
+A permitted read-only `media_get_capabilities` probe returned HTTP 429/retryable; no provider work was started. This is recorded as a runtime probe warning, not as execution leakage or a package parity failure.
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v20.3
-- checkpoint 170
-- `02_ROADMAP.md` v8.4
-- `00_INDEX.md` v9.7
-- `08_CHAT_HANDOFF.md` v6.7
+- `CURRENT_HANDOFF.md` v20.4
+- checkpoint 171
+- `02_ROADMAP.md` v8.5
+- `00_INDEX.md` v9.8
+- `08_CHAT_HANDOFF.md` v6.8
 
 ## Hard boundary
 
