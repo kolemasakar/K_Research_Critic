@@ -10,6 +10,8 @@ sys.path.insert(0, str(ROOT))
 sys.dont_write_bytecode = True
 
 from plugins.krc_migration_candidate.mcp_canary.oauth import (
+    LEGACY_CHATGPT_CLIENT_ID,
+    LEGACY_CHATGPT_REDIRECT_URI,
     READ_SCOPE,
     RestartSafeOAuthState,
     oauth_state_from_env,
@@ -122,6 +124,40 @@ def test_restart_safe_oauth_wrong_signing_key_and_tamper_fail_closed() -> None:
 
     tampered_access = access_token[:-1] + ("A" if access_token[-1] != "A" else "B")
     assert original.access_allowed(tampered_access, READ_SCOPE) is False
+
+
+def test_restart_safe_oauth_allows_only_exact_legacy_chatgpt_pair() -> None:
+    state = RestartSafeOAuthState(KEY)
+    assert state.client_redirect_allowed(LEGACY_CHATGPT_CLIENT_ID, LEGACY_CHATGPT_REDIRECT_URI) is True
+    assert state.client_redirect_allowed(LEGACY_CHATGPT_CLIENT_ID, CALLBACK) is False
+    assert state.client_redirect_allowed("wrong-client", LEGACY_CHATGPT_REDIRECT_URI) is False
+
+
+def test_legacy_chatgpt_pair_upgrades_into_restart_safe_tokens() -> None:
+    verifier = "legacy-chatgpt-pkce-verifier-abcdefghijklmnopqrstuvwxyz"
+    first_process = RestartSafeOAuthState(KEY)
+    code = first_process.issue_code(
+        client_id=LEGACY_CHATGPT_CLIENT_ID,
+        redirect_uri=LEGACY_CHATGPT_REDIRECT_URI,
+        code_challenge=_challenge(verifier),
+        scope=READ_SCOPE,
+    )
+    issued = first_process.exchange_code(
+        code=code,
+        client_id=LEGACY_CHATGPT_CLIENT_ID,
+        redirect_uri=LEGACY_CHATGPT_REDIRECT_URI,
+        code_verifier=verifier,
+    )
+    assert issued is not None
+    access_token, refresh_token, _, scope = issued
+    assert scope == READ_SCOPE
+
+    after_restart = RestartSafeOAuthState(KEY)
+    assert after_restart.access_allowed(access_token, READ_SCOPE) is True
+    assert after_restart.refresh(
+        refresh_token=refresh_token,
+        client_id=LEGACY_CHATGPT_CLIENT_ID,
+    ) is not None
 
 
 def test_restart_safe_oauth_factory_is_opt_in_and_validates_key(monkeypatch) -> None:
