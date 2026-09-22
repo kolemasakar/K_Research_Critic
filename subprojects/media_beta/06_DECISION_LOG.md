@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 6.0
-Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / B1_PASS / B2_BLOCKED_VOICEBRIDGE_429 / B3_PASS / R4_CUTOVER_HOLD / PUBLICATION_HOLD**
+Version: 6.1
+Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / B1_PASS / B2_429_REMEDIATED / B2_AUTH_RERUN_PENDING / B3_PASS / R4_CUTOVER_HOLD / PUBLICATION_HOLD**
 Updated: 2026-09-22
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -345,13 +345,34 @@ R4_C_AUTHORIZED=NO
 
 Decision: diagnose and minimally remediate only the shared read-only 429 path, then repeat B2 only. B1/B3 remain accepted unless remediation changes their governed components.
 
+### D081 — VoiceBridge 429 root cause accepted as Render free-service cold start
+
+Checkpoint 166 already documented the same sequence: retryable 429 while VoiceBridge was cold/asleep, initial health wake 503, then health 200 and successful read-only invocation.
+
+Checkpoint 174 reproduced that sequence. During the B2 failure window R3C received the Candidate MCP calls with HTTP 200, while VoiceBridge had no corresponding request logs or HTTP metrics. Direct health wake returned 503 twice; Render then emitted `service_started` at 2026-09-22T16:46:28Z and health returned 200.
+
+After wake, all nine canonical MEDIA route paths returned the expected authentication boundary 401 when probed without credentials, with zero 429 responses.
+
+```text
+ROOT_CAUSE=RENDER_FREE_SERVICE_COLD_START
+CODE_CHANGE_REQUIRED=NO
+CONFIG_CHANGE_REQUIRED=NO
+REMEDIATION=READ_ONLY_HEALTH_WAKE
+POST_WAKE_HEALTH=200
+POST_WAKE_429_COUNT=0
+AUTH_BOUNDARY_PRESERVED=PASS
+B2_AUTHENTICATED_CANDIDATE_RERUN=PENDING
+```
+
+Direct unauthenticated probes do not count as B2 functional PASS. The remaining acceptance step is to repeat only B2 through the authenticated private Candidate while VoiceBridge is awake.
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v20.6
-- checkpoint 173
-- `02_ROADMAP.md` v8.7
-- `00_INDEX.md` v10.0
-- `08_CHAT_HANDOFF.md` v7.0
+- `CURRENT_HANDOFF.md` v20.7
+- checkpoint 174
+- `02_ROADMAP.md` v8.8
+- `00_INDEX.md` v10.1
+- `08_CHAT_HANDOFF.md` v7.1
 
 ## Hard boundary
 
