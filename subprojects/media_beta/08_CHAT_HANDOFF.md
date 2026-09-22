@@ -2,28 +2,29 @@
 
 Канонічна інструкція відновлення K-Research & Critic MEDIA у новому чаті.
 
-Version: 6.3
-Status: **R3_A_TO_H_COMPLETE / R3C_OAUTH_RECOVERY_PASS / PLUGIN_INVENTORY_RECONCILED / R4_READONLY_PREFLIGHT_COMPLETE / PROJECT_SYNC_COMPLETE / OWNER_CUTOVER_DECISION_PENDING / CUTOVER_HOLD**
+Version: 6.4
+Status: **R3_A_TO_H_COMPLETE / R3C_OAUTH_RECOVERY_PASS / R4_PACKAGE_READY / PRIVATE_ASSEMBLY_REQUIRED / CUTOVER_HOLD**
 Checkpoint date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 166. R3-A..H COMPLETE. R3C OAuth recovery PASS; media_get_capabilities live PASS; Plugin inventory warning CLOSED. GitHub Actions unavailable: use exact-commit Render/live read-only validation. R4 cutover HOLD pending explicit owner decision.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 167. R3-A..H COMPLETE. R3C OAuth recovery PASS. R4 cutover+rollback package READY, але R4-A private assembly NOT AUTHORIZED. GitHub Actions unavailable. Наступна state-changing дія — лише після окремого owner approval для R4-A.`
 
 ## Mandatory recovery order
 
-1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v19.9
-2. `subprojects/media_beta/166_R3C_OAUTH_RECOVERY_PLUGIN_INVENTORY_RECONCILED_NO_ACTIONS_VALIDATION_2026_09_22.md`
-3. `subprojects/media_beta/165_FINAL_PROJECT_DOCS_SYNC_NEW_CHAT_READY_2026_09_21.md`
-4. `subprojects/media_beta/164_R4_MANUAL_UI_READONLY_PREFLIGHT_COMPLETE_OWNER_CUTOVER_DECISION_PENDING_2026_09_21.md`
-5. `subprojects/media_beta/163_R4_READONLY_PREFLIGHT_NON_UI_COMPLETE_UI_GATE_BLOCKED_2026_09_21.md`
-6. `subprojects/media_beta/162_R3H_READINESS_REVIEW_COMPLETE_R4_HOLD_2026_09_20.md`
-7. `subprojects/media_beta/161_R3G_OPERATIONAL_HARDENING_COMPLETE_2026_09_20.md`
-8. `subprojects/media_beta/00_INDEX.md` — v9.3
-9. `subprojects/media_beta/02_ROADMAP.md` — v8.0
-10. `subprojects/media_beta/06_DECISION_LOG.md` — v5.3
-11. current PR #22 / PR #45 state
-12. current Render R3C/E1/E2/E3/E4/VoiceBridge health
+1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v20.0
+2. `subprojects/media_beta/167_R4_EXACT_CUTOVER_ROLLBACK_PACKAGE_READY_PRIVATE_ASSEMBLY_FIRST_2026_09_22.md`
+3. `subprojects/media_beta/166_R3C_OAUTH_RECOVERY_PLUGIN_INVENTORY_RECONCILED_NO_ACTIONS_VALIDATION_2026_09_22.md`
+4. `subprojects/media_beta/165_FINAL_PROJECT_DOCS_SYNC_NEW_CHAT_READY_2026_09_21.md`
+5. `subprojects/media_beta/164_R4_MANUAL_UI_READONLY_PREFLIGHT_COMPLETE_OWNER_CUTOVER_DECISION_PENDING_2026_09_21.md`
+6. `subprojects/media_beta/163_R4_READONLY_PREFLIGHT_NON_UI_COMPLETE_UI_GATE_BLOCKED_2026_09_21.md`
+7. `subprojects/media_beta/162_R3H_READINESS_REVIEW_COMPLETE_R4_HOLD_2026_09_20.md`
+8. `subprojects/media_beta/161_R3G_OPERATIONAL_HARDENING_COMPLETE_2026_09_20.md`
+9. `subprojects/media_beta/00_INDEX.md` — v9.4
+10. `subprojects/media_beta/02_ROADMAP.md` — v8.1
+11. `subprojects/media_beta/06_DECISION_LOG.md` — v5.4
+12. current PR #22 / PR #45 state
+13. current Render R3C/E1/E2/E3/E4/VoiceBridge health
 
 ## Current phase state
 
@@ -99,13 +100,25 @@ changes=confirmation required
 app permission=Use my default
 ```
 
+## R4 package state
+
+```text
+R4_CUTOVER_PACKAGE=READY
+R4_ROLLBACK_PACKAGE=READY
+R4_A_PRIVATE_ASSEMBLY=REQUIRED / NOT_AUTHORIZED
+R4_B_PRIVATE_ACCEPTANCE=NOT_AUTHORIZED
+R4_C_USER_SWITCH_PUBLICATION=NOT_AUTHORIZED
+SOURCE_PUBLIC_GPT=UNCHANGED
+R4_CUTOVER_READY=NO
+```
+
 ## Next gate
 
 Start a fresh chat before the first R4 mutation.
 
 The new chat must:
 
-1. recover from CURRENT_HANDOFF v19.9 + checkpoint 166;
+1. recover from CURRENT_HANDOFF v20.0 + checkpoint 167;
 2. confirm the intended Plugin/Skill cutover path;
 3. show exact state-changing actions before executing them;
 4. show rollback steps;
@@ -140,4 +153,4 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 
 Terminal marker:
 
-`MEDIA_BETA_CHAT_HANDOFF_V6_3_OAUTH_RECOVERY_INVENTORY_RECONCILED_2026_09_22`
+`MEDIA_BETA_CHAT_HANDOFF_V6_4_R4_PACKAGE_READY_PRIVATE_ASSEMBLY_UNAUTHORIZED_2026_09_22`
