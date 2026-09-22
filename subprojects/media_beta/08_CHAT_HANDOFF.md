@@ -2,13 +2,13 @@
 
 Канонічна інструкція відновлення K-Research & Critic MEDIA у новому чаті.
 
-Version: 6.6
-Status: **R3_A_TO_H_COMPLETE / R4_A_IN_PROGRESS / A1_A2_A3_PASS / A4_PACKAGE_READY / PRIVATE_INSTALL_PENDING / CUTOVER_HOLD**
+Version: 6.7
+Status: **R3_A_TO_H_COMPLETE / R4_A_IN_PROGRESS / A0_A1_A2_A3_PASS / A4_PRIVATE_INSTALL_PASS / A5_NEW_CHAT_PENDING / CUTOVER_HOLD**
 Checkpoint date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 169. R4-A IN PROGRESS: A1/A2/A3 PASS, A4 package STATIC PASS, private Candidate install pending. GitHub Actions unavailable. R4-B/R4-C NOT AUTHORIZED.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 170. R4-A IN PROGRESS: A0/A1/A2/A3 PASS, A4 private install PASS. A5 має виконуватись у новому чаті лише як non-execution verification. GitHub Actions unavailable. R4-B/R4-C NOT AUTHORIZED.`
 
 ## Mandatory recovery order
 
@@ -107,7 +107,8 @@ app permission=Use my default
 R4_CUTOVER_PACKAGE=READY / CORRECTED
 A1_A2_A3=PASS
 A4_PACKAGE_STATIC_VALIDATION=PASS
-A4_PRIVATE_INSTALL_PENDING=YES
+A4_PRIVATE_INSTALL=PASS
+A5_PRIVATE_ASSEMBLY_VERIFICATION=PENDING_NEW_CHAT
 E1_RESTART_SAFE_OAUTH_REQUIRED_BEFORE_RECONNECT=YES
 R4_A_SEQUENCE_167=SUPERSEDED_BY_168
 R4_ROLLBACK_PACKAGE=READY
@@ -124,7 +125,7 @@ Start a fresh chat before the first R4 mutation.
 
 The new chat must:
 
-1. recover from CURRENT_HANDOFF v20.2 + checkpoint 169;
+1. recover from CURRENT_HANDOFF v20.3 + checkpoint 170;
 2. confirm the intended Plugin/Skill cutover path;
 3. show exact state-changing actions before executing them;
 4. show rollback steps;
@@ -159,4 +160,4 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 
 Terminal marker:
 
-`MEDIA_BETA_CHAT_HANDOFF_V6_6_R4A_PACKAGE_READY_PRIVATE_INSTALL_PENDING_2026_09_22`
+`MEDIA_BETA_CHAT_HANDOFF_V6_7_R4A_A4_PRIVATE_INSTALL_PASS_A5_NEW_CHAT_PENDING_2026_09_22`
