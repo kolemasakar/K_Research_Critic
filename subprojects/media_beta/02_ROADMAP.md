@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 9.6
-Status: **R3_9_UNIFIED_KRC_GPT_ACTIVE / ROUTING_CONTRACT_READY / STAGING_MANIFEST_READY / STATIC_PASS / PUBLIC_GPT_UNCHANGED / R4_C_PAUSED / FREE_ONLY**
+Version: 9.7
+Status: **R3_9_UNIFIED_KRC_GPT_ACTIVE / EXACT_VALIDATION_91_PASS / NATIVE_MIGRATION_TRIGGER_CONFIRMED / PRIVATE_MEDIA_BETA_STAGING_NEXT / PUBLIC_GPT_UNCHANGED / R4_C_DEFERRED / FREE_ONLY**
 Updated: 2026-09-22
 
 ## Current roadmap position
@@ -25,8 +25,25 @@ R4 Read-only preflight overall                PASS / COMPLETE
 R4 Package                                  READY
 R4-A Private assembly                       PASS / COMPLETE
 R4-B Private acceptance                     PASS / COMPLETE
-R4-C User switch/publication                PAUSED / WAIT FOR SUPPORTED CHATGPT DISTRIBUTION
+R4-C Native Plugin migration                AVAILABLE / DEFERRED UNTIL R3.9 ACCEPTANCE
 R4 Cutover                                  PAUSED
+```
+
+## R3.9 exact validation and private staging — checkpoint 183
+
+```text
+SELECTED_REGRESSION_TESTS=91
+PASS=91
+FAIL=0
+R39_ACTION_SCHEMA=media_public_r39_openapi.yaml
+ACTION_BOUNDARY=9 non-consequential + 4 consequential
+BUILDER_INSTRUCTIONS=GPT_STORE_UNIFIED_R39_INSTRUCTIONS.md
+BUILDER_CHARS=7404/8000
+NATIVE_MIGRATION_PLUS=AVAILABLE
+DISPLAYED_DEADLINE=2026-12-11
+R4_C=DEFERRED_UNTIL_R39_UNIFIED_ACCEPTANCE
+NEXT=PRIVATE MEDIA BETA STAGING
+PUBLIC_GPT_MUTATION=NO
 ```
 
 ## R3.9 Unified KRC GPT — checkpoint 182
@@ -360,4 +377,4 @@ ADDITIONAL_LIVE_MEDIA_STARTS=NO
 
 **R4-B is COMPLETE.** B1/B2/B3 passed; B4 was optional and not run. The private replacement is accepted. R4-C is ready to propose but remains HOLD pending separate owner authorization.
 
-Recovery authority: `CURRENT_HANDOFF.md` v21.5 + checkpoint 182.
+Recovery authority: `CURRENT_HANDOFF.md` v21.6 + checkpoint 183.
