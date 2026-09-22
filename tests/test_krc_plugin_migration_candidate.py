@@ -30,6 +30,17 @@ def openapi_operations() -> dict[str, tuple[str, str]]:
     return operations
 
 
+def test_core_skill_has_valid_required_frontmatter() -> None:
+    text = SKILL.read_text(encoding="utf-8")
+    assert text.startswith("---\n")
+    frontmatter_text = text.split("---\n", 2)[1]
+    frontmatter = yaml.safe_load(frontmatter_text)
+    assert frontmatter["name"] == "krc_core"
+    assert isinstance(frontmatter["description"], str)
+    assert frontmatter["description"].strip()
+    assert len(frontmatter["description"]) <= 1024
+
+
 def test_core_skill_snapshot_is_exact_canonical_core() -> None:
     text = SKILL.read_text(encoding="utf-8")
     begin = "<!-- BEGIN KRC CORE EXACT SNAPSHOT -->\n"
