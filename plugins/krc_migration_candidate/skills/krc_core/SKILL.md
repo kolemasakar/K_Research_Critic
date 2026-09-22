@@ -1,3 +1,8 @@
+---
+name: krc_core
+description: Evidence-focused K-Research & Critic workflow with CriticProfile approval gating, claim-level cross-checks, traceability, and Ukrainian-first reporting.
+---
+
 # K-Research & Critic Core Skill — Migration Candidate
 
 Status: EXACT_CORE_SNAPSHOT / DESIGN_ONLY / NOT_DEPLOYED
