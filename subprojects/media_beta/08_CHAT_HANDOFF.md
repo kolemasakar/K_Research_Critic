@@ -2,13 +2,13 @@
 
 Канонічна інструкція відновлення K-Research & Critic MEDIA у новому чаті.
 
-Version: 7.6
-Status: **R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_IN_PROGRESS / WEB_LINK_ONLY_PATH_UNAVAILABLE / DISTRIBUTION_DECISION_PENDING / ZERO_MUTATION**
+Version: 7.7
+Status: **R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_LOCAL_MARKETPLACE_PILOT_AUTHORIZED / PILOT_BUNDLE_READY / TESTER_APP_ACCESS_GATE_PENDING**
 Checkpoint date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 179. R4-A/B COMPLETE. R4-C bounded pilot intent remains, but the current personal Plus web surface has no link-only sharing control for the local marketplace Candidate; + is new MCP plugin creation only. Zero mutation. Choose A local marketplace pilot, B managed workspace link pilot, or C public directory.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 180. R4-A/B COMPLETE. R4-C LOCAL_MARKETPLACE_PILOT authorized. Bundle KRC_R4_LOCAL_PILOT_2026-09-22.zip ready, SHA256 e6cf16718183b3403179798b3e0ef7d5e5dfa703c1b160d6bfc16a56afea9868. Next: one tester installs it and reports marketplace/plugin/Core Skill plus 5/5 referenced app availability. Stop if any app unavailable. No *_start/provider/publication/public GPT mutation/PR merge.`
 
 ## Mandatory recovery order
 
@@ -124,15 +124,19 @@ R4_CUTOVER_READY=YES
 
 ## Next gate
 
-Choose the supported distribution mechanism:
+Give the bounded local marketplace bundle to one tester using ChatGPT Desktop or Codex local marketplace support.
+
+Return only the installation/access preflight:
 
 ```text
-A=LOCAL_MARKETPLACE_PILOT
-B=MANAGED_WORKSPACE_LINK_PILOT
-C=PUBLIC_DIRECTORY
+tester_environment=<OS + product/version>
+marketplace_visible=PASS|FAIL
+plugin_install=PASS|FAIL
+core_skill=PASS|FAIL
+app_availability=5/5 or blocked app list
 ```
 
-Do not create a new MCP plugin merely to imitate the local Candidate. Until selection, preserve zero mutation and keep the source GPT unchanged.
+If app availability is below 5/5, STOP. Do not create replacement apps or run MEDIA execution.
 
 ## Hard boundary
 
@@ -162,4 +166,4 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 
 Terminal marker:
 
-`MEDIA_BETA_CHAT_HANDOFF_V7_6_R4C_WEB_LINK_ONLY_UNAVAILABLE_DISTRIBUTION_DECISION_PENDING_2026_09_22`
+`MEDIA_BETA_CHAT_HANDOFF_V7_7_R4C_LOCAL_PILOT_BUNDLE_READY_APP_ACCESS_GATE_PENDING_2026_09_22`
