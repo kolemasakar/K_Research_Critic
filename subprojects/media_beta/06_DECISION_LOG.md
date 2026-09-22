@@ -1,6 +1,6 @@
 # MEDIA BETA Decision Log
 
-Version: 5.5
+Version: 5.6
 Status: **ACTIVE / R3_A_TO_H_COMPLETE / R3C_OAUTH_RECOVERY_PASS / R4_PACKAGE_CORRECTED / E1_OAUTH_HARDENING_REQUIRED / PRIVATE_ASSEMBLY_REQUIRED / R4_CUTOVER_HOLD / PUBLICATION_HOLD**
 Updated: 2026-09-22
 
@@ -245,13 +245,26 @@ R4_A_AUTHORIZED=NO
 
 No E1 redeploy, reconnect, Plugin installation, Skill installation, provider work, publication or source-GPT mutation was performed during this review.
 
+### D076 — R4-A private package assembly accepted through static gate
+
+```text
+A1_E1_RESTART_SAFE_OAUTH=PASS
+A1_RESTART_CONTINUITY=PASS
+A2_E1_PRIVATE_CONNECTION=PASS
+A3_CORE_SKILL_PRIVATE_INSTALL=PASS
+A4_PACKAGE_STATIC_VALIDATION=PASS
+A4_PRIVATE_INSTALL=PENDING
+```
+
+The R4 Candidate references five already registered ChatGPT apps through `.app.json`; no raw `mcp.json` is included. A repo-local marketplace entry was added for private testing. This does not authorize publication/share or R4-B.
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v20.1
-- checkpoint 168
-- `02_ROADMAP.md` v8.2
-- `00_INDEX.md` v9.5
-- `08_CHAT_HANDOFF.md` v6.5
+- `CURRENT_HANDOFF.md` v20.2
+- checkpoint 169
+- `02_ROADMAP.md` v8.3
+- `00_INDEX.md` v9.6
+- `08_CHAT_HANDOFF.md` v6.6
 
 ## Hard boundary
 
