@@ -2,24 +2,24 @@
 
 Канонічна інструкція відновлення K-Research & Critic MEDIA у новому чаті.
 
-Version: 7.4
-Status: **R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_PROPOSAL_READY / EXACT_AUDIENCE_APPROVAL_PENDING / CUTOVER_HOLD**
+Version: 7.5
+Status: **R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_LINK_ONLY_PILOT_AUTHORIZED / R4_C_IN_PROGRESS / UI_AUTH_BLOCKED / ZERO_MUTATION**
 Checkpoint date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 177. R4-A/B COMPLETE; private replacement accepted. R4-C non-destructive cutover proposal is ready. Before any sharing/publication/user-switch mutation choose exact audience: 1 PRIVATE_OWNER_ONLY, 2 LINK_ONLY_PILOT, or 3 PUBLIC_DISCOVERY. Source public GPT stays published/unchanged; PR22/PR45 remain unmerged.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 178. R4-A/B COMPLETE; private replacement accepted. R4-C LINK_ONLY_PILOT is explicitly authorized and IN PROGRESS. Resume only at C2. Current blocker: no authenticated ChatGPT browser session or configured ChatGPT vault credentials, plus Cloudflare verification; zero state changes occurred. Source public GPT unchanged; PR22/PR45 unmerged.`
 
 ## Mandatory recovery order
 
-1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v21.0
-2. `subprojects/media_beta/177_R4C_CUTOVER_PROPOSAL_READY_EXACT_AUDIENCE_APPROVAL_PENDING_2026_09_22.md`
-3. `subprojects/media_beta/176_R4B_PRIVATE_ACCEPTANCE_COMPLETE_B1_B2_B3_PASS_R4C_PENDING_AUTHORIZATION_2026_09_22.md`
-4. `subprojects/media_beta/175_R4B_READONLY_429_LEAKAGE_FIXED_DEPLOY_LIVE_B2_FINAL_AUTH_RERUN_PENDING_2026_09_22.md`
+1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v21.1
+2. `subprojects/media_beta/178_R4C_LINK_ONLY_PILOT_AUTHORIZED_UI_AUTH_BLOCKED_ZERO_MUTATION_2026_09_22.md`
+3. `subprojects/media_beta/177_R4C_CUTOVER_PROPOSAL_READY_EXACT_AUDIENCE_APPROVAL_PENDING_2026_09_22.md`
+4. `subprojects/media_beta/176_R4B_PRIVATE_ACCEPTANCE_COMPLETE_B1_B2_B3_PASS_R4C_PENDING_AUTHORIZATION_2026_09_22.md`
 5. `subprojects/media_beta/167_R4_EXACT_CUTOVER_ROLLBACK_PACKAGE_READY_PRIVATE_ASSEMBLY_FIRST_2026_09_22.md`
-6. `subprojects/media_beta/00_INDEX.md` — v10.4
-7. `subprojects/media_beta/02_ROADMAP.md` — v9.1
-8. `subprojects/media_beta/06_DECISION_LOG.md` — v6.4
+6. `subprojects/media_beta/00_INDEX.md` — v10.5
+7. `subprojects/media_beta/02_ROADMAP.md` — v9.2
+8. `subprojects/media_beta/06_DECISION_LOG.md` — v6.5
 9. current PR #22 / PR #45 state
 10. current Render R3C/E1/E2/E3/E4/VoiceBridge health
 
@@ -124,15 +124,17 @@ R4_CUTOVER_READY=YES
 
 ## Next gate
 
-R4-C proposal is ready. Owner must select the exact replacement audience before any state-changing sharing/publication/user-switch action:
+R4-C LINK_ONLY_PILOT is authorized. Resume only at C2 after an authenticated ChatGPT UI session is available and Cloudflare verification is cleared.
 
-```text
-1=PRIVATE_OWNER_ONLY
-2=LINK_ONLY_PILOT
-3=PUBLIC_DISCOVERY
-```
+Then:
 
-Until selection, source public GPT remains unchanged and publication/share/user switch remain HOLD.
+1. open Personal/Local management for `K-Research & Critic R4 Candidate`;
+2. select exact link-only audience;
+3. save and capture the share link;
+4. verify the final audience is link-only and not public discovery;
+5. proceed to C3 access verification.
+
+If exact link-only sharing is absent, STOP before mutation.
 
 ## Hard boundary
 
@@ -162,4 +164,4 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 
 Terminal marker:
 
-`MEDIA_BETA_CHAT_HANDOFF_V7_4_R4C_PROPOSAL_READY_AUDIENCE_APPROVAL_PENDING_2026_09_22`
+`MEDIA_BETA_CHAT_HANDOFF_V7_5_R4C_LINK_ONLY_AUTHORIZED_UI_AUTH_BLOCKED_2026_09_22`
