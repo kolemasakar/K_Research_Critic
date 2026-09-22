@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 5.8
-Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / A5_PASS / A6_COMPLETE / R4_B_PENDING_AUTHORIZATION / R4_CUTOVER_HOLD / PUBLICATION_HOLD**
+Version: 5.9
+Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / STATIC_REGRESSION_PASS / LIVE_CANDIDATE_RESELECT_REQUIRED / R4_CUTOVER_HOLD / PUBLICATION_HOLD**
 Updated: 2026-09-22
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -303,13 +303,36 @@ R4_C_AUTHORIZED=NO
 
 A permitted read-only `media_get_capabilities` probe returned HTTP 429/retryable; no provider work was started. This is recorded as a runtime probe warning, not as execution leakage or a package parity failure.
 
+### D079 — R4-B authorized; static regression PASS; live Candidate reselect required
+
+Owner authorized R4-B Private Acceptance after R4-A completion.
+
+Repository/contract checks passed for Core snapshot/fixtures, risk and cross-check floors, claim ledger, traceability, language, checkpoint recovery, media/core isolation, model-agnostic behavior, 13-operation parity, consequential annotations, and FREE_ONLY fail-closed policy.
+
+The active turn then stopped exposing the Personal/Local Candidate KRC tool namespaces. Direct orchestration therefore failed before MCP/provider/backend invocation. This is treated fail-closed and must not be replaced by unrelated public/global plugin results.
+
+```text
+R4_B_AUTHORIZED=YES
+R4_B=IN_PROGRESS
+B1_REPOSITORY_FIXTURE_REGRESSION=PASS
+B1_LIVE_CANDIDATE_BEHAVIOR=PENDING
+B2_LIVE_READONLY_REGRESSION=BLOCKED_PENDING_CANDIDATE_RESELECT
+B3_CONTRACT_SCAN=PASS
+B3_LIVE_CANDIDATE_VISIBILITY_SCAN=PENDING
+B4_LIVE_EXECUTION=NOT_PERFORMED
+PROVIDER_WORK_STARTED=false
+ADDITIONAL_LIVE_MEDIA_STARTS=0
+PRIVATE_REPLACEMENT_ACCEPTED=NO
+R4_C_AUTHORIZED=NO
+```
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v20.4
-- checkpoint 171
-- `02_ROADMAP.md` v8.5
-- `00_INDEX.md` v9.8
-- `08_CHAT_HANDOFF.md` v6.8
+- `CURRENT_HANDOFF.md` v20.5
+- checkpoint 172
+- `02_ROADMAP.md` v8.6
+- `00_INDEX.md` v9.9
+- `08_CHAT_HANDOFF.md` v6.9
 
 ## Hard boundary
 
