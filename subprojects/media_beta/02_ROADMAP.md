@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 8.8
-Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / B1_PASS / B2_429_REMEDIATED / B2_AUTH_RERUN_PENDING / B3_PASS / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
+Version: 8.9
+Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / B1_PASS / B2_READONLY_429_FIX_DEPLOYED / B2_FINAL_AUTH_RERUN_PENDING / B3_PASS / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
 Updated: 2026-09-22
 
 ## Current roadmap position
@@ -24,7 +24,7 @@ R4 Manual account UI preflight                COMPLETE
 R4 Read-only preflight overall                PASS / COMPLETE
 R4 Package                                  READY
 R4-A Private assembly                       PASS / COMPLETE
-R4-B Private acceptance                     IN PROGRESS / B1 PASS / B2 429 REMEDIATED / AUTH RERUN PENDING / B3 PASS
+R4-B Private acceptance                     IN PROGRESS / B1 PASS / READ-ONLY 429 FIX LIVE / FINAL B2 AUTH RERUN PENDING / B3 PASS
 R4-C User switch/publication                NOT AUTHORIZED
 R4 Cutover                                  HOLD
 ```
@@ -45,6 +45,23 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 ```
 
 No MEDIA execution tool was invoked during this recovery.
+
+## R4-B read-only admission fix — checkpoint 175
+
+```text
+B1=PASS
+B3=PASS
+remaining_non_youtube_429_root_cause=read-only routes consumed provider admission budget
+fix=read-only managed routes bypass provider admission
+provider-start rate/concurrency guards=PRESERVED
+VoiceBridge exact deployed SHA=174174aae0635736f05d812094b555544623270c
+Render deploy=dep-dapb6f3m8hqs7395ntj0
+deploy_status=LIVE
+post_deploy_health=200
+B2_FINAL_AUTHENTICATED_RERUN=PENDING
+```
+
+For missing/expired jobs, authenticated `MEDIA_TRANSCRIPT_NOT_FOUND / 404 / retryable=false` is valid read semantics and does not require a new provider start.
 
 ## R4-B VoiceBridge remediation — checkpoint 174
 
@@ -164,8 +181,8 @@ R4_A6=COMPLETE
 R4_B_AUTHORIZED=YES
 R4_B=IN_PROGRESS
 R4_B_B1=PASS
-R4_B_B2_429_REMEDIATION=PASS
-R4_B_B2_AUTHENTICATED_CANDIDATE_RERUN=PENDING
+R4_B_B2_READONLY_429_FIX=DEPLOYED_LIVE
+R4_B_B2_FINAL_AUTHENTICATED_RERUN=PENDING
 R4_B_B3=PASS
 R4_CUTOVER_READY=NO
 ```
@@ -241,6 +258,6 @@ ADDITIONAL_LIVE_MEDIA_STARTS=NO
 
 ## Next state
 
-**R4-B is IN PROGRESS.** B1/B3 passed. The VoiceBridge 429 blocker was diagnosed as Render free-service cold start and cleared by read-only health wake. Only the authenticated Candidate B2 rerun remains. R4-C remains HOLD.
+**R4-B is IN PROGRESS.** B1/B3 passed. Cold-start 429 was cleared, and the separate managed read-only admission leakage was fixed/deployed LIVE. Only the final authenticated Candidate B2 rerun remains; require zero infrastructure 429. R4-C remains HOLD.
 
-Recovery authority: `CURRENT_HANDOFF.md` v20.7 + checkpoint 174.
+Recovery authority: `CURRENT_HANDOFF.md` v20.8 + checkpoint 175.
