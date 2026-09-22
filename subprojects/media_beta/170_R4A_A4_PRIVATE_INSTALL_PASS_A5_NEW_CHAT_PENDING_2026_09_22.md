@@ -135,6 +135,17 @@ MAIN_MUTATION=NO
 GITHUB_ACTIONS_CURRENTLY_AVAILABLE=NO
 ```
 
+## Canonical documentation sync
+
+```text
+CURRENT_HANDOFF.md=v20.3
+02_ROADMAP.md=v8.4
+00_INDEX.md=v9.7
+06_DECISION_LOG.md=v5.7
+08_CHAT_HANDOFF.md=v6.7
+PROJECT_SYNC_COMPLETE=YES
+```
+
 ## Next gate
 
 Open a new chat with the installed private `K-Research & Critic R4 Candidate` Plugin and perform A5 visibility/permission/parity verification only.
