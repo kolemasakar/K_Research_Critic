@@ -1,17 +1,18 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 20.6
-Status: **ACTIVE_HANDOFF / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / B1_PASS / B2_BLOCKED_VOICEBRIDGE_429 / B3_PASS / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
+Version: 20.7
+Status: **ACTIVE_HANDOFF / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / B1_PASS / B2_429_REMEDIATED / B2_AUTH_CANDIDATE_RERUN_PENDING / B3_PASS / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
 Date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 173. R4-B IN PROGRESS: B1 PASS, B2 BLOCKED_BY_VOICEBRIDGE_429 after all 9 read-only operations returned retryable HTTP 429, B3 PASS. Diagnose/remediate only the shared read-only 429 path, then repeat only B2. No *_start/provider/publication/share/public GPT mutation/PR merge.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 174. R4-B IN PROGRESS: B1 PASS, B3 PASS. VoiceBridge 429 root cause confirmed as Render free-service cold start; health wake remediation PASS; post-wake all 9 route paths return auth-boundary 401 instead of 429. Repeat only authenticated Candidate B2 while service is awake. No *_start/provider/publication/share/public GPT mutation/PR merge.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v20.6.
-2. `173_R4B_B1_PASS_B2_BLOCKED_429_B3_PASS_2026_09_22.md`.
+1. `CURRENT_HANDOFF.md` — v20.7.
+2. `174_R4B_VOICEBRIDGE_COLD_START_429_DIAGNOSED_WAKE_PASS_B2_AUTH_RERUN_PENDING_2026_09_22.md`.
+3. `173_R4B_B1_PASS_B2_BLOCKED_429_B3_PASS_2026_09_22.md`.
 3. `172_R4B_STARTED_STATIC_REGRESSION_PASS_LIVE_CANDIDATE_RESELECT_REQUIRED_2026_09_22.md`.
 3. `171_R4A_COMPLETE_A5_PASS_A6_STOP_R4B_PENDING_AUTHORIZATION_2026_09_22.md`.
 3. `170_R4A_A4_PRIVATE_INSTALL_PASS_A5_NEW_CHAT_PENDING_2026_09_22.md`.
@@ -60,7 +61,8 @@ R4_A6_STOP_CHECKPOINT=COMPLETE
 R4_PRIVATE_ACCEPTANCE_AUTHORIZED=YES
 R4_B=IN_PROGRESS
 R4_B_B1=PASS
-R4_B_B2=BLOCKED_BY_VOICEBRIDGE_429
+R4_B_B2_429_REMEDIATION=PASS
+R4_B_B2_AUTHENTICATED_CANDIDATE_RERUN=PENDING
 R4_B_B3=PASS
 R4_USER_SWITCH_AUTHORIZED=NO
 R4_CUTOVER_READY=NO
@@ -79,7 +81,7 @@ KRC:
   validation=Render exact-commit build + live OAuth/read-only runtime PASS
   GitHub_Actions=current unavailable / not used
   historical_CI_reference=35485995871 PASS
-  docs_current_through=checkpoint_173
+  docs_current_through=checkpoint_174
 
 VoiceBridge:
   repo=kolemasakar/VoiceBridge
@@ -227,9 +229,7 @@ R4_READONLY_PREFLIGHT=COMPLETE
 
 Checkpoint 167 defines three separately authorized stages: R4-A private assembly, R4-B private acceptance, R4-C optional user switch/publication.
 
-R4-B is authorized and in progress. B1 and B3 passed on the live Candidate. B2 is blocked because all nine read-only operations returned the same retryable VoiceBridge HTTP 429.
-
-Next: diagnose and minimally remediate the shared read-only 429 path, then repeat only B2. Do not execute any MEDIA `*_start`, provider work, publication/share, public GPT mutation, or PR merge.
+R4-B is authorized and in progress. B1 and B3 passed. The B2 infrastructure blocker was diagnosed as Render free-service cold start and remediated by a read-only health wake; no code/config mutation was required. The remaining gate is only the authenticated Candidate B2 rerun while VoiceBridge is awake. Do not execute any MEDIA `*_start`, provider work, publication/share, public GPT mutation, or PR merge.
 
 ## Hard release boundary
 
@@ -270,4 +270,4 @@ R4_CUTOVER_READY=NO
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V20_6_R4B_B1_PASS_B2_BLOCKED_429_B3_PASS_2026_09_22`
+`KRC_MEDIA_CURRENT_HANDOFF_V20_7_R4B_B2_429_REMEDIATED_AUTH_RERUN_PENDING_2026_09_22`
