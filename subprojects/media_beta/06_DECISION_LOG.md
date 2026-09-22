@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 6.1
-Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / B1_PASS / B2_429_REMEDIATED / B2_AUTH_RERUN_PENDING / B3_PASS / R4_CUTOVER_HOLD / PUBLICATION_HOLD**
+Version: 6.2
+Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / B1_PASS / B2_READONLY_429_FIX_DEPLOYED / B2_FINAL_AUTH_RERUN_PENDING / B3_PASS / R4_CUTOVER_HOLD / PUBLICATION_HOLD**
 Updated: 2026-09-22
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -366,13 +366,41 @@ B2_AUTHENTICATED_CANDIDATE_RERUN=PENDING
 
 Direct unauthenticated probes do not count as B2 functional PASS. The remaining acceptance step is to repeat only B2 through the authenticated private Candidate while VoiceBridge is awake.
 
+### D082 — Managed read-only 429 leakage fixed without weakening FREE_ONLY
+
+Authenticated B2 showed that the cold-start blocker was cleared, but rapid non-YouTube read-only calls still returned retryable 429 after a successful preflight.
+
+Root cause was `PublicMediaAdmissionController`: it applied provider admission rate/concurrency controls to every authenticated `/api/v1/media/managed/*` request, including preflight, lookup, status, and segments.
+
+The minimal remediation restricts provider admission to the only route that can start provider work:
+
+```text
+POST /api/v1/media/managed/transcriptions
+```
+
+Read-only managed routes bypass provider admission and continue through their normal authentication/read handlers. FREE_ONLY, start-route rate limits, and concurrency limits remain intact.
+
+```text
+VoiceBridge code commit=eda6fce7236eaa3d119864236078fbe45e5379f3
+VoiceBridge deployed head=174174aae0635736f05d812094b555544623270c
+Render deploy=dep-dapb6f3m8hqs7395ntj0
+deploy_status=LIVE
+typescript_build=PASS
+post_deploy_health=200
+PR45=OPEN / DRAFT / UNMERGED
+```
+
+YouTube `lookup/status/segments` 404 responses are not infrastructure failures when they represent `MEDIA_TRANSCRIPT_NOT_FOUND / retryable=false` for missing or expired jobs. Runtime retention is 3600 seconds. B2 acceptance therefore evaluates expected authenticated read semantics, not an all-2xx requirement.
+
+The remaining gate is one final authenticated Candidate B2 rerun with zero infrastructure 429 and zero execution/provider starts.
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v20.7
-- checkpoint 174
-- `02_ROADMAP.md` v8.8
-- `00_INDEX.md` v10.1
-- `08_CHAT_HANDOFF.md` v7.1
+- `CURRENT_HANDOFF.md` v20.8
+- checkpoint 175
+- `02_ROADMAP.md` v8.9
+- `00_INDEX.md` v10.2
+- `08_CHAT_HANDOFF.md` v7.2
 
 ## Hard boundary
 
