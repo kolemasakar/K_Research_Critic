@@ -2,18 +2,19 @@
 
 Канонічна інструкція відновлення K-Research & Critic MEDIA у новому чаті.
 
-Version: 7.1
-Status: **R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / B1_PASS / B2_429_REMEDIATED / B2_AUTH_RERUN_PENDING / B3_PASS / CUTOVER_HOLD**
+Version: 7.2
+Status: **R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / B1_PASS / B2_READONLY_429_FIX_DEPLOYED / B2_FINAL_AUTH_RERUN_PENDING / B3_PASS / CUTOVER_HOLD**
 Checkpoint date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 174. R4-B IN PROGRESS: B1 PASS, B3 PASS. VoiceBridge 429 root cause = Render free-service cold start; health wake remediation PASS; post-wake all 9 route paths reached auth boundary with zero 429. Repeat only authenticated Candidate B2 while VoiceBridge is awake. No *_start/provider/publication/share/public GPT mutation/PR merge.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 175. R4-B IN PROGRESS: B1 PASS, B3 PASS. Managed read-only 429 leakage fixed and deployed LIVE at VoiceBridge SHA 174174aae0635736f05d812094b555544623270c. Repeat only final authenticated Candidate B2; require 0 infrastructure 429. Missing/expired lookup/status/segments may return MEDIA_TRANSCRIPT_NOT_FOUND / 404 / retryable=false. No *_start/provider/publication/share/public GPT mutation/PR merge.`
 
 ## Mandatory recovery order
 
-1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v20.7
-2. `subprojects/media_beta/174_R4B_VOICEBRIDGE_COLD_START_429_DIAGNOSED_WAKE_PASS_B2_AUTH_RERUN_PENDING_2026_09_22.md`
+1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v20.8
+2. `subprojects/media_beta/175_R4B_READONLY_429_LEAKAGE_FIXED_DEPLOY_LIVE_B2_FINAL_AUTH_RERUN_PENDING_2026_09_22.md`
+3. `subprojects/media_beta/174_R4B_VOICEBRIDGE_COLD_START_429_DIAGNOSED_WAKE_PASS_B2_AUTH_RERUN_PENDING_2026_09_22.md`
 3. `subprojects/media_beta/173_R4B_B1_PASS_B2_BLOCKED_429_B3_PASS_2026_09_22.md`
 3. `subprojects/media_beta/172_R4B_STARTED_STATIC_REGRESSION_PASS_LIVE_CANDIDATE_RESELECT_REQUIRED_2026_09_22.md`
 3. `subprojects/media_beta/171_R4A_COMPLETE_A5_PASS_A6_STOP_R4B_PENDING_AUTHORIZATION_2026_09_22.md`
@@ -128,7 +129,7 @@ R4_CUTOVER_READY=NO
 
 ## Next gate
 
-Explicitly select `@K-Research & Critic R4 Candidate` while VoiceBridge is awake and repeat only B2: all nine read-only MEDIA operations. B1/B3 remain accepted because no governed code/config was changed. No `*_start`, provider work, publication/share, public GPT mutation, or PR merge.
+Explicitly select `@K-Research & Critic R4 Candidate` and repeat only final B2: all nine authenticated read-only MEDIA operations. Acceptance requires zero infrastructure 429; missing/expired lookup/status/segments may legitimately return `MEDIA_TRANSCRIPT_NOT_FOUND / 404 / retryable=false`. B1/B3 remain accepted. No `*_start`, provider work, publication/share, public GPT mutation, or PR merge.
 
 ## Hard boundary
 
@@ -158,4 +159,4 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 
 Terminal marker:
 
-`MEDIA_BETA_CHAT_HANDOFF_V7_1_R4B_B2_429_REMEDIATED_AUTH_RERUN_PENDING_2026_09_22`
+`MEDIA_BETA_CHAT_HANDOFF_V7_2_R4B_READONLY_429_FIX_LIVE_FINAL_B2_RERUN_PENDING_2026_09_22`
