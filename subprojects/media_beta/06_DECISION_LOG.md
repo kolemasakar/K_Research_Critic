@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 6.4
-Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_PROPOSAL_READY / EXACT_AUDIENCE_APPROVAL_PENDING / PUBLICATION_HOLD**
+Version: 6.5
+Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_LINK_ONLY_PILOT_AUTHORIZED / R4_C_IN_PROGRESS / UI_AUTH_BLOCKED / ZERO_MUTATION**
 Updated: 2026-09-22
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -471,13 +471,56 @@ USER_SWITCH=NO
 
 Checkpoint 177 is the canonical proposal/approval gate.
 
+### D085 — R4-C LINK_ONLY_PILOT authorized; browser UI blocked before mutation
+
+Owner explicitly selected audience option 2:
+
+```text
+R4_C_AUDIENCE=LINK_ONLY_PILOT
+R4_C_AUTHORIZED=YES
+```
+
+Two ChatGPT browser attempts were made. The first used the browser profile session; the second also enabled credential-vault recovery.
+
+Both stopped before Personal/Local Plugin management because:
+
+```text
+authenticated_ChatGPT_session=false
+configured_ChatGPT_vault_credentials=false
+Cloudflare_human_verification=blocking
+personal_plugin_management_reached=false
+```
+
+No state-changing control was reached and no mutation occurred:
+
+```text
+PLUGIN_AUDIENCE_CHANGE=NO
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING_CHANGE=NO
+PUBLIC_DISCOVERY=NO
+SOURCE_PUBLIC_GPT_MUTATION=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+MEDIA_STARTS=0
+PROVIDER_WORK=0
+```
+
+R4-C remains authorized only for LINK_ONLY_PILOT and resumes at C2 once an authenticated ChatGPT UI session is available.
+
+Browser run references:
+
+```text
+e3e6cd2a-5a55-4011-9079-7cda4d17c6e7
+ea2a4b56-dd91-4415-aab3-bceb9ba6134e
+```
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v21.0
-- checkpoint 177
-- `02_ROADMAP.md` v9.1
-- `00_INDEX.md` v10.4
-- `08_CHAT_HANDOFF.md` v7.4
+- `CURRENT_HANDOFF.md` v21.1
+- checkpoint 178
+- `02_ROADMAP.md` v9.2
+- `00_INDEX.md` v10.5
+- `08_CHAT_HANDOFF.md` v7.5
 
 ## Hard boundary
 
