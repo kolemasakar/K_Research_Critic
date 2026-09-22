@@ -193,6 +193,18 @@ AUTHORITATIVE_PROJECT_STATE=GITHUB_REPOSITORIES
 LOCAL_WORKTREE_USE=TRANSIENT_ONLY
 ```
 
+### D072 — Checkpoint 166 canonical sync accepted
+
+```text
+PROJECT_SYNC_COMPLETE=YES
+CANONICAL_RECOVERY=CURRENT_HANDOFF_v19.9 + checkpoint_166
+GITHUB_ACTIONS_CURRENTLY_AVAILABLE=NO
+CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
+R4_CUTOVER_AUTHORIZED=NO
+```
+
+This supersedes checkpoint 165 as the current recovery entry point while preserving checkpoint 165 as historical evidence.
+
 ## Canonical authority
 
 - `CURRENT_HANDOFF.md` v19.9
