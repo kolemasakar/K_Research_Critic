@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -213,3 +215,20 @@ def test_restart_safe_oauth_expired_tokens_fail_closed() -> None:
     )
     assert state.access_allowed(expired_access, READ_SCOPE) is False
     assert state.refresh(refresh_token=expired_refresh, client_id=client_id) is None
+
+
+def test_restart_safe_oauth_module_import_with_legacy_env_succeeds() -> None:
+    env = os.environ.copy()
+    env["KRC_MCP_OAUTH_SIGNING_KEY"] = KEY
+    env[LEGACY_CLIENT_ID_ENV] = LEGACY_CLIENT_ID
+    env[LEGACY_REDIRECT_URI_ENV] = LEGACY_REDIRECT_URI
+    result = subprocess.run(
+        [sys.executable, "-c", "import plugins.krc_migration_candidate.mcp_canary.oauth as o; print(type(o.GLOBAL_OAUTH_STATE).__name__)"],
+        cwd=ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == "RestartSafeOAuthState"
