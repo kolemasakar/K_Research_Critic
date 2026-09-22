@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 6.2
-Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / B1_PASS / B2_READONLY_429_FIX_DEPLOYED / B2_FINAL_AUTH_RERUN_PENDING / B3_PASS / R4_CUTOVER_HOLD / PUBLICATION_HOLD**
+Version: 6.3
+Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_READY_NOT_AUTHORIZED / PUBLICATION_HOLD**
 Updated: 2026-09-22
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -394,13 +394,54 @@ YouTube `lookup/status/segments` 404 responses are not infrastructure failures w
 
 The remaining gate is one final authenticated Candidate B2 rerun with zero infrastructure 429 and zero execution/provider starts.
 
+### D083 — R4-B private acceptance complete
+
+The final authenticated Candidate B2 rerun after checkpoint 175 attempted all nine read-only MEDIA operations and satisfied the accepted read semantics for every operation.
+
+```text
+operations_attempted=9/9
+accepted_pass=9
+accepted_fail=0
+infrastructure_HTTP_429=0
+execution_start_calls=0
+provider_work=0
+```
+
+Successful preflight/capability reads returned HTTP 200. Missing or expired lookup/status/segments returned the accepted negative read result `MEDIA_TRANSCRIPT_NOT_FOUND / HTTP 404 / retryable=false`. No provider execution was used to create fresh jobs.
+
+Checkpoint 167 defines B4 as optional. Therefore R4-B acceptance is satisfied by B1/B2/B3 plus the confirmation and FREE_ONLY boundaries:
+
+```text
+CORE_REGRESSION=PASS
+MEDIA_READONLY_REGRESSION=PASS
+13_OPERATION_SCAN=PASS
+EXECUTION_CONFIRMATION_BOUNDARY=PASS
+FREE_ONLY_FAIL_CLOSED=PASS
+B4=OPTIONAL / NOT_RUN
+PRIVATE_REPLACEMENT_ACCEPTED=YES
+R4_B=COMPLETE
+```
+
+R4-C may now be proposed but remains separately gated:
+
+```text
+R4_CUTOVER_READY=YES
+R4_C_AUTHORIZED=NO
+R4_CUTOVER=HOLD
+SOURCE_PUBLIC_GPT_UNCHANGED=YES
+PUBLICATION=NO
+SHARING_CHANGE=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+```
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v20.8
-- checkpoint 175
-- `02_ROADMAP.md` v8.9
-- `00_INDEX.md` v10.2
-- `08_CHAT_HANDOFF.md` v7.2
+- `CURRENT_HANDOFF.md` v20.9
+- checkpoint 176
+- `02_ROADMAP.md` v9.0
+- `00_INDEX.md` v10.3
+- `08_CHAT_HANDOFF.md` v7.3
 
 ## Hard boundary
 
