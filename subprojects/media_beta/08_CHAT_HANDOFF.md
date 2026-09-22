@@ -2,13 +2,13 @@
 
 Канонічна інструкція відновлення K-Research & Critic MEDIA у новому чаті.
 
-Version: 7.5
-Status: **R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_LINK_ONLY_PILOT_AUTHORIZED / R4_C_IN_PROGRESS / UI_AUTH_BLOCKED / ZERO_MUTATION**
+Version: 7.6
+Status: **R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_IN_PROGRESS / WEB_LINK_ONLY_PATH_UNAVAILABLE / DISTRIBUTION_DECISION_PENDING / ZERO_MUTATION**
 Checkpoint date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 178. R4-A/B COMPLETE; private replacement accepted. R4-C LINK_ONLY_PILOT is explicitly authorized and IN PROGRESS. Resume only at C2. Current blocker: no authenticated ChatGPT browser session or configured ChatGPT vault credentials, plus Cloudflare verification; zero state changes occurred. Source public GPT unchanged; PR22/PR45 unmerged.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 179. R4-A/B COMPLETE. R4-C bounded pilot intent remains, but the current personal Plus web surface has no link-only sharing control for the local marketplace Candidate; + is new MCP plugin creation only. Zero mutation. Choose A local marketplace pilot, B managed workspace link pilot, or C public directory.`
 
 ## Mandatory recovery order
 
@@ -124,17 +124,15 @@ R4_CUTOVER_READY=YES
 
 ## Next gate
 
-R4-C LINK_ONLY_PILOT is authorized. Resume only at C2 after an authenticated ChatGPT UI session is available and Cloudflare verification is cleared.
+Choose the supported distribution mechanism:
 
-Then:
+```text
+A=LOCAL_MARKETPLACE_PILOT
+B=MANAGED_WORKSPACE_LINK_PILOT
+C=PUBLIC_DIRECTORY
+```
 
-1. open Personal/Local management for `K-Research & Critic R4 Candidate`;
-2. select exact link-only audience;
-3. save and capture the share link;
-4. verify the final audience is link-only and not public discovery;
-5. proceed to C3 access verification.
-
-If exact link-only sharing is absent, STOP before mutation.
+Do not create a new MCP plugin merely to imitate the local Candidate. Until selection, preserve zero mutation and keep the source GPT unchanged.
 
 ## Hard boundary
 
@@ -164,4 +162,4 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 
 Terminal marker:
 
-`MEDIA_BETA_CHAT_HANDOFF_V7_5_R4C_LINK_ONLY_AUTHORIZED_UI_AUTH_BLOCKED_2026_09_22`
+`MEDIA_BETA_CHAT_HANDOFF_V7_6_R4C_WEB_LINK_ONLY_UNAVAILABLE_DISTRIBUTION_DECISION_PENDING_2026_09_22`
