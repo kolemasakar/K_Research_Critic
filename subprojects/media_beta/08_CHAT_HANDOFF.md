@@ -2,27 +2,28 @@
 
 Канонічна інструкція відновлення K-Research & Critic MEDIA у новому чаті.
 
-Version: 6.2
-Status: **R3_A_TO_H_COMPLETE / R4_READONLY_PREFLIGHT_COMPLETE / PROJECT_SYNC_COMPLETE / NEW_CHAT_READY / OWNER_CUTOVER_DECISION_PENDING / CUTOVER_HOLD**
-Checkpoint date: 2026-09-21
+Version: 6.3
+Status: **R3_A_TO_H_COMPLETE / R3C_OAUTH_RECOVERY_PASS / PLUGIN_INVENTORY_RECONCILED / R4_READONLY_PREFLIGHT_COMPLETE / PROJECT_SYNC_COMPLETE / OWNER_CUTOVER_DECISION_PENDING / CUTOVER_HOLD**
+Checkpoint date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 165. R3-A..H COMPLETE. R4 read-only preflight COMPLETE: non-UI + manual current-account UI. GPT identity/share/GPT Store/Plugin inventory/Skills PASS. Explicit Migrate control was not found. No mutation performed. R4 cutover HOLD pending explicit owner decision.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 166. R3-A..H COMPLETE. R3C OAuth recovery PASS; media_get_capabilities live PASS; Plugin inventory warning CLOSED. GitHub Actions unavailable: use exact-commit Render/live read-only validation. R4 cutover HOLD pending explicit owner decision.`
 
 ## Mandatory recovery order
 
-1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v19.8
-2. `subprojects/media_beta/165_FINAL_PROJECT_DOCS_SYNC_NEW_CHAT_READY_2026_09_21.md`
-3. `subprojects/media_beta/164_R4_MANUAL_UI_READONLY_PREFLIGHT_COMPLETE_OWNER_CUTOVER_DECISION_PENDING_2026_09_21.md`
-4. `subprojects/media_beta/163_R4_READONLY_PREFLIGHT_NON_UI_COMPLETE_UI_GATE_BLOCKED_2026_09_21.md`
-5. `subprojects/media_beta/162_R3H_READINESS_REVIEW_COMPLETE_R4_HOLD_2026_09_20.md`
-6. `subprojects/media_beta/161_R3G_OPERATIONAL_HARDENING_COMPLETE_2026_09_20.md`
-7. `subprojects/media_beta/00_INDEX.md` — v9.2
-8. `subprojects/media_beta/02_ROADMAP.md` — v7.9
-9. `subprojects/media_beta/06_DECISION_LOG.md` — v5.2
-10. current PR #22 / PR #45 state
-11. current Render E1/E2/E3/E4/VoiceBridge health
+1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v19.9
+2. `subprojects/media_beta/166_R3C_OAUTH_RECOVERY_PLUGIN_INVENTORY_RECONCILED_NO_ACTIONS_VALIDATION_2026_09_22.md`
+3. `subprojects/media_beta/165_FINAL_PROJECT_DOCS_SYNC_NEW_CHAT_READY_2026_09_21.md`
+4. `subprojects/media_beta/164_R4_MANUAL_UI_READONLY_PREFLIGHT_COMPLETE_OWNER_CUTOVER_DECISION_PENDING_2026_09_21.md`
+5. `subprojects/media_beta/163_R4_READONLY_PREFLIGHT_NON_UI_COMPLETE_UI_GATE_BLOCKED_2026_09_21.md`
+6. `subprojects/media_beta/162_R3H_READINESS_REVIEW_COMPLETE_R4_HOLD_2026_09_20.md`
+7. `subprojects/media_beta/161_R3G_OPERATIONAL_HARDENING_COMPLETE_2026_09_20.md`
+8. `subprojects/media_beta/00_INDEX.md` — v9.3
+9. `subprojects/media_beta/02_ROADMAP.md` — v8.0
+10. `subprojects/media_beta/06_DECISION_LOG.md` — v5.3
+11. current PR #22 / PR #45 state
+12. current Render R3C/E1/E2/E3/E4/VoiceBridge health
 
 ## Current phase state
 
@@ -38,7 +39,7 @@ R4_CUTOVER=HOLD / OWNER DECISION REQUIRED
 ## Current runtime baseline
 
 ```text
-R3C=healthy / 9 read-only / execution disabled
+R3C=healthy / OAuth recovery PASS / 9 read-only / execution disabled
 E1=healthy / 1 execution / other execution disabled
 E2=healthy / confirmation_probe_only=true
 E3=healthy / confirmation_probe_only=true
@@ -56,16 +57,19 @@ MEDIA_READ_OPERATIONS=9
 MEDIA_EXECUTION_OPERATIONS=4
 ```
 
-## Current PR / CI authority
+## Current PR / validation authority
 
 ```text
 PR22=OPEN / DRAFT / UNMERGED
-KRC validated code head=dbcebdff0201fd9240a7aeafa5f5d5dd46ca08f7
-KRC CI run 35485995871=PASS
+KRC exact runtime validated head=27585c0ce924c78529b90aaadbfbeee841d0d249
+KRC validation=Render exact-commit build + live OAuth/read-only runtime PASS
+GitHub Actions=current unavailable / not used
+KRC historical CI run 35485995871=PASS (reference only)
 
 PR45=OPEN / DRAFT / UNMERGED
 VoiceBridge validated/deployed code head=db9fb62c57fc731732f88ff5b417a0f15be178b6
-VoiceBridge CI run 35492121039=PASS
+GitHub Actions=current unavailable / not used
+VoiceBridge historical CI run 35492121039=PASS (reference only)
 ```
 
 ## Manual account UI evidence
@@ -101,7 +105,7 @@ Start a fresh chat before the first R4 mutation.
 
 The new chat must:
 
-1. recover from CURRENT_HANDOFF v19.8 + checkpoint 165;
+1. recover from CURRENT_HANDOFF v19.9 + checkpoint 166;
 2. confirm the intended Plugin/Skill cutover path;
 3. show exact state-changing actions before executing them;
 4. show rollback steps;
@@ -123,6 +127,17 @@ PR45_MERGE=NO
 ADDITIONAL_LIVE_MEDIA_STARTS=NO
 ```
 
+## Recovery delta
+
+```text
+R3C_OAUTH_RECOVERY=PASS
+MEDIA_GET_CAPABILITIES=PASS
+PLUGIN_REQUIRED_SURFACES=PASS
+RECOVERY_CONSISTENCY_WARNING=CLOSED
+GITHUB_ACTIONS_CURRENTLY_AVAILABLE=NO
+CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
+```
+
 Terminal marker:
 
-`MEDIA_BETA_CHAT_HANDOFF_V6_2_PROJECT_SYNC_COMPLETE_NEW_CHAT_READY_2026_09_21`
+`MEDIA_BETA_CHAT_HANDOFF_V6_3_OAUTH_RECOVERY_INVENTORY_RECONCILED_2026_09_22`
