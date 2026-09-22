@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 9.1
-Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_PROPOSAL_READY / EXACT_AUDIENCE_APPROVAL_PENDING / FREE_ONLY / PUBLICATION_HOLD**
+Version: 9.2
+Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_LINK_ONLY_PILOT_AUTHORIZED / R4_C_IN_PROGRESS / UI_AUTH_BLOCKED / ZERO_MUTATION / FREE_ONLY**
 Updated: 2026-09-22
 
 ## Current roadmap position
@@ -25,7 +25,7 @@ R4 Read-only preflight overall                PASS / COMPLETE
 R4 Package                                  READY
 R4-A Private assembly                       PASS / COMPLETE
 R4-B Private acceptance                     PASS / COMPLETE
-R4-C User switch/publication                PROPOSAL READY / EXACT AUDIENCE APPROVAL PENDING
+R4-C User switch/publication                IN PROGRESS / LINK_ONLY_PILOT AUTHORIZED / UI AUTH BLOCKED
 R4 Cutover                                  HOLD
 ```
 
@@ -45,6 +45,20 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 ```
 
 No MEDIA execution tool was invoked during this recovery.
+
+## R4-C link-only pilot — checkpoint 178
+
+```text
+R4_C_AUDIENCE=LINK_ONLY_PILOT
+R4_C_AUTHORIZED=YES
+C0_ROLLBACK_ANCHOR_FREEZE=PASS
+C1_AUDIENCE_SELECTION=PASS
+C2_LINK_ONLY_SHARE_MUTATION=BLOCKED_BEFORE_MUTATION
+C3_ACCESS_VERIFICATION=PENDING
+C4_USER_SWITCH=PENDING
+UI_AUTH_BLOCKER=OPEN
+ZERO_STATE_CHANGES=YES
+```
 
 ## R4-C proposal — checkpoint 177
 
@@ -295,4 +309,4 @@ ADDITIONAL_LIVE_MEDIA_STARTS=NO
 
 **R4-B is COMPLETE.** B1/B2/B3 passed; B4 was optional and not run. The private replacement is accepted. R4-C is ready to propose but remains HOLD pending separate owner authorization.
 
-Recovery authority: `CURRENT_HANDOFF.md` v21.0 + checkpoint 177.
+Recovery authority: `CURRENT_HANDOFF.md` v21.1 + checkpoint 178.
