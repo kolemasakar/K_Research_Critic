@@ -1,19 +1,20 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 20.1
-Status: **ACTIVE_HANDOFF / R3_A_TO_H_COMPLETE / R3C_OAUTH_RECOVERY_PASS / R4_PACKAGE_CORRECTED / E1_OAUTH_HARDENING_REQUIRED / PRIVATE_ASSEMBLY_REQUIRED / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
+Version: 20.2
+Status: **ACTIVE_HANDOFF / R3_A_TO_H_COMPLETE / R4_A_IN_PROGRESS / A1_A2_A3_PASS / A4_PACKAGE_READY / PRIVATE_INSTALL_PENDING / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
 Date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 168. R3-A..H COMPLETE. R3C OAuth recovery PASS. R4 staged architecture з checkpoint 167 збережена, але R4-A sequence виправлена: E1 restart-safe OAuth hardening ОБОВ'ЯЗКОВИЙ до E1 reconnect. GitHub Actions недоступні. R4-A ще НЕ авторизований.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 169. R4-A authorized/in progress: A0 PASS, A1 E1 restart-safe OAuth PASS, A2 E1 private connection/restart continuity PASS, A3 krc-core private Skill PASS, A4 package STATIC PASS; private Candidate install ще pending. GitHub Actions недоступні. R4-B/R4-C не авторизовані.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v20.1.
-2. `168_R4_PACKAGE_CORRECTED_E1_RESTART_SAFE_OAUTH_BEFORE_RECONNECT_2026_09_22.md`.
-3. `167_R4_EXACT_CUTOVER_ROLLBACK_PACKAGE_READY_PRIVATE_ASSEMBLY_FIRST_2026_09_22.md`.
-4. `166_R3C_OAUTH_RECOVERY_PLUGIN_INVENTORY_RECONCILED_NO_ACTIONS_VALIDATION_2026_09_22.md`.
+1. `CURRENT_HANDOFF.md` — v20.2.
+2. `169_R4A_A1_A2_A3_PASS_A4_PACKAGE_READY_PRIVATE_INSTALL_PENDING_2026_09_22.md`.
+3. `168_R4_PACKAGE_CORRECTED_E1_RESTART_SAFE_OAUTH_BEFORE_RECONNECT_2026_09_22.md`.
+4. `167_R4_EXACT_CUTOVER_ROLLBACK_PACKAGE_READY_PRIVATE_ASSEMBLY_FIRST_2026_09_22.md`.
+5. `166_R3C_OAUTH_RECOVERY_PLUGIN_INVENTORY_RECONCILED_NO_ACTIONS_VALIDATION_2026_09_22.md`.
 5. `165_FINAL_PROJECT_DOCS_SYNC_NEW_CHAT_READY_2026_09_21.md`.
 6. `164_R4_MANUAL_UI_READONLY_PREFLIGHT_COMPLETE_OWNER_CUTOVER_DECISION_PENDING_2026_09_21.md`.
 7. `163_R4_READONLY_PREFLIGHT_NON_UI_COMPLETE_UI_GATE_BLOCKED_2026_09_21.md`.
@@ -221,7 +222,7 @@ The next state-changing action is **R4-A private assembly only**, and it remains
 
 The new chat must:
 
-1. recover from this handoff + checkpoint 168;
+1. recover from this handoff + checkpoint 169;
 2. verify the intended R4 cutover plan;
 3. show exact mutations and rollback steps;
 4. obtain explicit owner authorization;
@@ -260,4 +261,4 @@ R4_CUTOVER_READY=NO
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V20_1_R4_PACKAGE_CORRECTED_E1_OAUTH_FIRST_2026_09_22`
+`KRC_MEDIA_CURRENT_HANDOFF_V20_2_R4A_PACKAGE_READY_PRIVATE_INSTALL_PENDING_2026_09_22`
