@@ -9,6 +9,8 @@ ROUTING = ROOT / "contracts" / "krc_unified_media_routing.yaml"
 STAGING = ROOT / "gpt_store" / "unified_r39_manifest.yaml"
 TOOLS = ROOT / "plugins" / "krc_migration_candidate" / "contracts" / "media_tools.yaml"
 R4_APPS = ROOT / "plugins" / "krc_r4_candidate" / ".app.json"
+R39_OPENAPI = ROOT / "gpt_store" / "actions" / "media_public_r39_openapi.yaml"
+UNIFIED = ROOT / "prompts" / "GPT_STORE_UNIFIED_R39_INSTRUCTIONS.md"
 
 
 def load_yaml(path: Path) -> dict:
@@ -109,3 +111,45 @@ def test_r39_staging_does_not_authorize_public_mutation_or_resume_r4c() -> None:
     routing = load_yaml(ROUTING)["release_boundary"]
     assert routing["public_gpt_mutation"] == "HOLD_UNTIL_R39_REPOSITORY_ACCEPTANCE"
     assert routing["r4_c_resume"] == "DENIED"
+
+
+def test_r39_builder_artifact_is_exact_core_plus_media_addendum() -> None:
+    expected = CORE.read_text(encoding="utf-8").rstrip() + "\n\n" + ADDENDUM.read_text(encoding="utf-8").strip() + "\n"
+    actual = UNIFIED.read_text(encoding="utf-8")
+    assert actual == expected
+    assert len(actual.rstrip()) <= 8000
+
+
+def test_r39_action_schema_has_exact_confirmation_boundary() -> None:
+    schema = load_yaml(R39_OPENAPI)
+    operations = {}
+    for route, path_item in schema["paths"].items():
+        for method in ("get", "post", "put", "patch", "delete"):
+            operation = path_item.get(method)
+            if operation and operation.get("operationId"):
+                operations[operation["operationId"]] = operation["x-openai-isConsequential"]
+
+    expected_execution = {
+        "startPublicGeminiYoutubeTranscription",
+        "startPublicInstagramCobaltTranscription",
+        "startPublicFacebookCobaltTranscription",
+        "startPublicTelegramTranscription",
+    }
+    assert len(operations) == 13
+    assert {op for op, consequential in operations.items() if consequential is True} == expected_execution
+    assert sum(value is False for value in operations.values()) == 9
+
+    tools = load_yaml(TOOLS)["tools"]
+    assert set(operations) == {tool["source_operation_id"] for tool in tools}
+
+
+def test_r39_action_schema_preserves_bearer_auth_and_free_only_server() -> None:
+    schema = load_yaml(R39_OPENAPI)
+    assert schema["security"] == [{"bearerAuth": []}]
+    auth = schema["components"]["securitySchemes"]["bearerAuth"]
+    assert auth == {"type": "http", "scheme": "bearer"}
+    assert schema["servers"] == [{"url": "https://voicebridge-krc-media-beta-kolemasakar.onrender.com"}]
+    policy = schema["x-krc-free-only-policy"]
+    assert policy["paid_retrieval_fallback"] is False
+    assert policy["paid_stt_fallback"] is False
+    assert policy["paid_proxy_fallback"] is False
