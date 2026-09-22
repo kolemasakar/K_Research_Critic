@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 6.8
-Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION / SOURCE_PUBLIC_GPT_PRODUCTION**
+Version: 6.9
+Status: **ACTIVE / R3_9_UNIFIED_KRC_GPT_ACTIVE / ROUTING_CONTRACT_READY / STATIC_PASS / PUBLIC_GPT_UNCHANGED / R4_C_PAUSED**
 Updated: 2026-09-22
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -588,13 +588,52 @@ MEDIA_STARTS=0
 PROVIDER_WORK=0
 ```
 
+### D089 — R3.9 Unified KRC GPT approved; Core remains authority and MEDIA becomes evidence acquisition layer
+
+Owner approved the interim unification of KRC and KRC MEDIA before Plugin cutover.
+
+The architecture is deliberately non-monolithic:
+
+```text
+one_user_facing_product=K-Research & Critic
+core_authority=prompts/GPT_STORE_INSTRUCTIONS.md
+media_role=evidence_acquisition_layer
+media_backend_merge_required=false
+voicebridge_business_logic_change_required=false
+future_plugin_semantics_must_match=true
+```
+
+Created:
+
+```text
+contracts/krc_unified_media_routing.yaml
+gpt_store/unified_r39_manifest.yaml
+tests/test_krc_unified_r39.py
+```
+
+Static readback:
+
+```text
+CORE_UNCHANGED=PASS
+CORE_PLUS_MEDIA_ADDENDUM=7404/8000
+MEDIA_OPS=9 read + 4 execution = 13
+R4_APP_COUNT=5 / IDs unchanged
+FREE_ONLY=PASS
+PUBLIC_GPT_MUTATION=NO
+R4_C=PAUSED
+```
+
+The current GPT Action is treated as a transport adapter only. At future Plugin migration, the transport may be removed/replaced by R3C/E1-E4 apps without changing routing, consent, retry, evidence, or FREE_ONLY semantics.
+
+Full pytest/runtime acceptance has not yet been run for R3.9; GitHub Actions are unavailable and the current local execution container could not resolve github.com.
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v21.4
-- checkpoint 181
-- `02_ROADMAP.md` v9.5
-- `00_INDEX.md` v10.8
-- `08_CHAT_HANDOFF.md` v7.8
+- `CURRENT_HANDOFF.md` v21.5
+- checkpoint 182
+- `02_ROADMAP.md` v9.6
+- `00_INDEX.md` v10.9
+- `08_CHAT_HANDOFF.md` v7.9
 
 ## Hard boundary
 
