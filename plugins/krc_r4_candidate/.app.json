@@ -1,0 +1,24 @@
+{
+  "apps": {
+    "krc-media-readonly": {
+      "id": "asdk_app_6aaaf8ca113c8191a4ac53f8793833a4",
+      "required": true
+    },
+    "krc-youtube": {
+      "id": "asdk_app_6ab26b061fb4819180fa096638f1e4df",
+      "required": true
+    },
+    "krc-instagram": {
+      "id": "asdk_app_6aaeae197c9081918b90e46f5bb09615",
+      "required": true
+    },
+    "krc-facebook": {
+      "id": "asdk_app_6aaf262767d8819199146dc84b8e1ee8",
+      "required": true
+    },
+    "krc-telegram": {
+      "id": "asdk_app_6aaf292e653481918c75767dea004c5c",
+      "required": true
+    }
+  }
+}
