@@ -1,0 +1,21 @@
+{
+  "name": "k-research-critic-r4-candidate",
+  "version": "0.1.0",
+  "description": "Private K-Research & Critic R4 candidate.",
+  "author": {
+    "name": "K-Research & Critic"
+  },
+  "apps": "./.app.json",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "K-Research & Critic R4 Candidate",
+    "shortDescription": "Evidence-focused research and MEDIA workflows",
+    "longDescription": "Private R4 candidate combining the KRC Core workflow with accepted KRC MEDIA app surfaces.",
+    "developerName": "K-Research & Critic",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ]
+  }
+}
