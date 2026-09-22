@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 8.4
-Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_IN_PROGRESS / A0_A1_A2_A3_PASS / A4_PRIVATE_INSTALL_PASS / A5_NEW_CHAT_PENDING / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
+Version: 8.5
+Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / A5_PASS / A6_COMPLETE / R4_B_PENDING_AUTHORIZATION / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
 Updated: 2026-09-22
 
 ## Current roadmap position
@@ -23,8 +23,8 @@ R4 Non-UI read-only preflight                 COMPLETE
 R4 Manual account UI preflight                COMPLETE
 R4 Read-only preflight overall                PASS / COMPLETE
 R4 Package                                  READY
-R4-A Private assembly                       REQUIRED / NOT AUTHORIZED
-R4-B Private acceptance                     NOT AUTHORIZED
+R4-A Private assembly                       PASS / COMPLETE
+R4-B Private acceptance                     PENDING / NOT AUTHORIZED
 R4-C User switch/publication                NOT AUTHORIZED
 R4 Cutover                                  HOLD
 ```
@@ -46,7 +46,7 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 
 No MEDIA execution tool was invoked during this recovery.
 
-## R4-A progress — checkpoint 170
+## R4-A completion — checkpoint 171
 
 ```text
 A0=PASS
@@ -55,8 +55,10 @@ A2=PASS
 A3=PASS
 A4 package=PASS
 A4 private install=PASS
-A5=PENDING / NEW CHAT REQUIRED
-A6=PENDING
+A5 private assembly verification=PASS
+A6 STOP checkpoint=COMPLETE
+R4_A=COMPLETE
+R4_B=NOT_AUTHORIZED
 ```
 
 ## R4-A progress — checkpoint 169
@@ -112,8 +114,10 @@ R4_C=OPTIONAL_USER_SWITCH_PUBLICATION / NOT_AUTHORIZED
 ```text
 R4_CUTOVER_PACKAGE=READY
 R4_ROLLBACK_PACKAGE=READY
-R4_PRIVATE_ASSEMBLY_REQUIRED=YES
-R4_PRIVATE_ASSEMBLY_AUTHORIZED=NO
+R4_A=COMPLETE
+R4_A5=PASS
+R4_A6=COMPLETE
+R4_B_AUTHORIZED=NO
 R4_CUTOVER_READY=NO
 ```
 
@@ -169,14 +173,13 @@ Therefore, if R4 is later authorized, the cutover plan must use the validated Pl
 
 ## R4 cutover remains unauthorized
 
-Before any state-changing action:
+Before R4-B:
 
-1. transition to a fresh chat;
-2. recover from `CURRENT_HANDOFF.md` v20.3 + checkpoint 170;
-3. present exact intended mutations;
-4. present rollback steps;
-5. obtain explicit owner cutover authorization;
-6. only then execute the separately approved R4 sequence.
+1. recover from `CURRENT_HANDOFF.md` v20.4 + checkpoint 171;
+2. present the exact private-acceptance regression scope;
+3. preserve FREE_ONLY and the unchanged source public GPT;
+4. obtain separate explicit owner authorization;
+5. keep MEDIA execution, publication/share, public GPT mutation, and PR merge outside scope unless separately authorized.
 
 ## Hard boundary
 
@@ -195,8 +198,8 @@ ADDITIONAL_LIVE_MEDIA_STARTS=NO
 
 ## Next state
 
-**No technical preflight debt remains.**
+**R4-A is complete.**
 
-The next phase is an owner cutover decision in a fresh chat. R4 mutation remains HOLD until that decision.
+The next phase is **R4-B Private Acceptance / regression validation**, pending separate owner authorization. R4-C and public cutover remain HOLD.
 
-Recovery authority: `CURRENT_HANDOFF.md` v20.3 + checkpoint 170.
+Recovery authority: `CURRENT_HANDOFF.md` v20.4 + checkpoint 171.
