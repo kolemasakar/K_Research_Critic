@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 5.3
-Status: **ACTIVE / R3_A_TO_H_COMPLETE / R3C_OAUTH_RECOVERY_PASS / PLUGIN_INVENTORY_RECONCILED / R4_READONLY_PREFLIGHT_COMPLETE / PROJECT_SYNC_COMPLETE / OWNER_CUTOVER_DECISION_PENDING / PUBLICATION_HOLD**
+Version: 5.4
+Status: **ACTIVE / R3_A_TO_H_COMPLETE / R3C_OAUTH_RECOVERY_PASS / R4_PACKAGE_READY / PRIVATE_ASSEMBLY_REQUIRED / R4_CUTOVER_HOLD / PUBLICATION_HOLD**
 Updated: 2026-09-22
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -205,13 +205,38 @@ R4_CUTOVER_AUTHORIZED=NO
 
 This supersedes checkpoint 165 as the current recovery entry point while preserving checkpoint 165 as historical evidence.
 
+### D073 — R4 staged cutover/rollback package accepted
+
+Checkpoint 167 defines the exact mutation and rollback order without authorizing execution.
+
+```text
+R4_PATH=PRIVATE_ASSEMBLY -> PRIVATE_ACCEPTANCE -> OPTIONAL_USER_SWITCH
+R4_A_PRIVATE_ASSEMBLY_AUTHORIZED=NO
+R4_B_PRIVATE_ACCEPTANCE_AUTHORIZED=NO
+R4_C_USER_SWITCH_AUTHORIZED=NO
+
+SOURCE_PUBLIC_GPT=KEEP_UNCHANGED
+BUILTIN_MIGRATION_CONTROL=NOT_FOUND / NOT_USED
+ROLLBACK_ANCHOR=EXISTING_PUBLIC_GPT
+
+R4_CUTOVER_PACKAGE=READY
+R4_ROLLBACK_PACKAGE=READY
+R4_CUTOVER_READY=NO
+```
+
+R4-A requires a private KRC Core Skill, restoration of the E1 YouTube private MCP connection, and assembly of the private replacement Plugin. No new MEDIA execution is implicitly authorized.
+
+### D074 — Public cutover is non-destructive by default
+
+Because no built-in migration control is available in the inspected account UI, the default future R4-C plan does not delete, edit, or unpublish the existing K-Research & Critic GPT. Replacement sharing/publication and any later source-GPT retirement are separate owner decisions.
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v19.9
-- checkpoint 166
-- `02_ROADMAP.md` v8.0
-- `00_INDEX.md` v9.3
-- `08_CHAT_HANDOFF.md` v6.3
+- `CURRENT_HANDOFF.md` v20.0
+- checkpoint 167
+- `02_ROADMAP.md` v8.1
+- `00_INDEX.md` v9.4
+- `08_CHAT_HANDOFF.md` v6.4
 
 ## Hard boundary
 
