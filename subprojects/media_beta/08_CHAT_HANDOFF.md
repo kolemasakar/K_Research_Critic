@@ -2,36 +2,29 @@
 
 Канонічна інструкція відновлення K-Research & Critic MEDIA у новому чаті.
 
-Version: 7.2
-Status: **R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / B1_PASS / B2_READONLY_429_FIX_DEPLOYED / B2_FINAL_AUTH_RERUN_PENDING / B3_PASS / CUTOVER_HOLD**
+Version: 7.3
+Status: **R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_READY_NOT_AUTHORIZED / CUTOVER_HOLD**
 Checkpoint date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 175. R4-B IN PROGRESS: B1 PASS, B3 PASS. Managed read-only 429 leakage fixed and deployed LIVE at VoiceBridge SHA 174174aae0635736f05d812094b555544623270c. Repeat only final authenticated Candidate B2; require 0 infrastructure 429. Missing/expired lookup/status/segments may return MEDIA_TRANSCRIPT_NOT_FOUND / 404 / retryable=false. No *_start/provider/publication/share/public GPT mutation/PR merge.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 176. R4-A COMPLETE. R4-B COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED=YES: B1 PASS, B2 authenticated read-only 9/9 PASS with 0 infrastructure 429 and no provider work, B3 PASS; B4 optional/not run. R4-C is READY TO PROPOSE but NOT AUTHORIZED. No publication/share/public GPT mutation/PR merge.`
 
 ## Mandatory recovery order
 
-1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v20.8
-2. `subprojects/media_beta/175_R4B_READONLY_429_LEAKAGE_FIXED_DEPLOY_LIVE_B2_FINAL_AUTH_RERUN_PENDING_2026_09_22.md`
-3. `subprojects/media_beta/174_R4B_VOICEBRIDGE_COLD_START_429_DIAGNOSED_WAKE_PASS_B2_AUTH_RERUN_PENDING_2026_09_22.md`
-3. `subprojects/media_beta/173_R4B_B1_PASS_B2_BLOCKED_429_B3_PASS_2026_09_22.md`
-3. `subprojects/media_beta/172_R4B_STARTED_STATIC_REGRESSION_PASS_LIVE_CANDIDATE_RESELECT_REQUIRED_2026_09_22.md`
-3. `subprojects/media_beta/171_R4A_COMPLETE_A5_PASS_A6_STOP_R4B_PENDING_AUTHORIZATION_2026_09_22.md`
-3. `subprojects/media_beta/170_R4A_A4_PRIVATE_INSTALL_PASS_A5_NEW_CHAT_PENDING_2026_09_22.md`
-4. `subprojects/media_beta/168_R4_PACKAGE_CORRECTED_E1_RESTART_SAFE_OAUTH_BEFORE_RECONNECT_2026_09_22.md`
-3. `subprojects/media_beta/167_R4_EXACT_CUTOVER_ROLLBACK_PACKAGE_READY_PRIVATE_ASSEMBLY_FIRST_2026_09_22.md`
-4. `subprojects/media_beta/166_R3C_OAUTH_RECOVERY_PLUGIN_INVENTORY_RECONCILED_NO_ACTIONS_VALIDATION_2026_09_22.md`
-5. `subprojects/media_beta/165_FINAL_PROJECT_DOCS_SYNC_NEW_CHAT_READY_2026_09_21.md`
-6. `subprojects/media_beta/164_R4_MANUAL_UI_READONLY_PREFLIGHT_COMPLETE_OWNER_CUTOVER_DECISION_PENDING_2026_09_21.md`
-7. `subprojects/media_beta/163_R4_READONLY_PREFLIGHT_NON_UI_COMPLETE_UI_GATE_BLOCKED_2026_09_21.md`
-8. `subprojects/media_beta/162_R3H_READINESS_REVIEW_COMPLETE_R4_HOLD_2026_09_20.md`
-9. `subprojects/media_beta/161_R3G_OPERATIONAL_HARDENING_COMPLETE_2026_09_20.md`
-10. `subprojects/media_beta/00_INDEX.md` — v9.5
-11. `subprojects/media_beta/02_ROADMAP.md` — v8.2
-12. `subprojects/media_beta/06_DECISION_LOG.md` — v5.5
-13. current PR #22 / PR #45 state
-14. current Render R3C/E1/E2/E3/E4/VoiceBridge health
+1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v20.9
+2. `subprojects/media_beta/176_R4B_PRIVATE_ACCEPTANCE_COMPLETE_B1_B2_B3_PASS_R4C_PENDING_AUTHORIZATION_2026_09_22.md`
+3. `subprojects/media_beta/175_R4B_READONLY_429_LEAKAGE_FIXED_DEPLOY_LIVE_B2_FINAL_AUTH_RERUN_PENDING_2026_09_22.md`
+4. `subprojects/media_beta/174_R4B_VOICEBRIDGE_COLD_START_429_DIAGNOSED_WAKE_PASS_B2_AUTH_RERUN_PENDING_2026_09_22.md`
+5. `subprojects/media_beta/173_R4B_B1_PASS_B2_BLOCKED_429_B3_PASS_2026_09_22.md`
+6. `subprojects/media_beta/172_R4B_STARTED_STATIC_REGRESSION_PASS_LIVE_CANDIDATE_RESELECT_REQUIRED_2026_09_22.md`
+7. `subprojects/media_beta/171_R4A_COMPLETE_A5_PASS_A6_STOP_R4B_PENDING_AUTHORIZATION_2026_09_22.md`
+8. `subprojects/media_beta/167_R4_EXACT_CUTOVER_ROLLBACK_PACKAGE_READY_PRIVATE_ASSEMBLY_FIRST_2026_09_22.md`
+9. `subprojects/media_beta/00_INDEX.md` — v10.3
+10. `subprojects/media_beta/02_ROADMAP.md` — v9.0
+11. `subprojects/media_beta/06_DECISION_LOG.md` — v6.3
+12. current PR #22 / PR #45 state
+13. current Render R3C/E1/E2/E3/E4/VoiceBridge health
 
 ## Current phase state
 
@@ -41,6 +34,9 @@ R4_NON_UI_PREFLIGHT=COMPLETE
 R4_MANUAL_UI_PREFLIGHT=COMPLETE
 R4_READONLY_PREFLIGHT=PASS / COMPLETE
 R4_TECHNICAL_PREFLIGHT_DEBT=0
+R4_B=COMPLETE
+PRIVATE_REPLACEMENT_ACCEPTED=YES
+R4_CUTOVER_READY=YES
 R4_CUTOVER=HOLD / OWNER DECISION REQUIRED
 ```
 
@@ -75,7 +71,7 @@ GitHub Actions=current unavailable / not used
 KRC historical CI run 35485995871=PASS (reference only)
 
 PR45=OPEN / DRAFT / UNMERGED
-VoiceBridge validated/deployed code head=db9fb62c57fc731732f88ff5b417a0f15be178b6
+VoiceBridge validated/deployed code head=174174aae0635736f05d812094b555544623270c
 GitHub Actions=current unavailable / not used
 VoiceBridge historical CI run 35492121039=PASS (reference only)
 ```
@@ -121,15 +117,21 @@ E1_RESTART_SAFE_OAUTH_REQUIRED_BEFORE_RECONNECT=YES
 R4_A_SEQUENCE_167=SUPERSEDED_BY_168
 R4_ROLLBACK_PACKAGE=READY
 R4_A_PRIVATE_ASSEMBLY=PASS / COMPLETE
-R4_B_PRIVATE_ACCEPTANCE=PENDING / NOT_AUTHORIZED
-R4_C_USER_SWITCH_PUBLICATION=NOT_AUTHORIZED
+R4_B_PRIVATE_ACCEPTANCE=PASS / COMPLETE
+R4_B_B4=OPTIONAL / NOT_RUN
+PRIVATE_REPLACEMENT_ACCEPTED=YES
+R4_C_USER_SWITCH_PUBLICATION=READY TO PROPOSE / NOT AUTHORIZED
 SOURCE_PUBLIC_GPT=UNCHANGED
-R4_CUTOVER_READY=NO
+R4_CUTOVER_READY=YES
 ```
 
 ## Next gate
 
-Explicitly select `@K-Research & Critic R4 Candidate` and repeat only final B2: all nine authenticated read-only MEDIA operations. Acceptance requires zero infrastructure 429; missing/expired lookup/status/segments may legitimately return `MEDIA_TRANSCRIPT_NOT_FOUND / 404 / retryable=false`. B1/B3 remain accepted. No `*_start`, provider work, publication/share, public GPT mutation, or PR merge.
+R4-B is complete. R4-C optional user switch/publication is now ready to propose but remains separately authorized.
+
+Before any R4-C mutation, present the exact target audience/share/publication plan and rollback sequence and obtain explicit owner approval. The existing public GPT remains unchanged.
+
+No `*_start`, provider work, publication/share, public GPT mutation, main mutation, or PR merge is authorized by R4-B completion.
 
 ## Hard boundary
 
@@ -159,4 +161,4 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 
 Terminal marker:
 
-`MEDIA_BETA_CHAT_HANDOFF_V7_2_R4B_READONLY_429_FIX_LIVE_FINAL_B2_RERUN_PENDING_2026_09_22`
+`MEDIA_BETA_CHAT_HANDOFF_V7_3_R4B_COMPLETE_PRIVATE_REPLACEMENT_ACCEPTED_R4C_PENDING_AUTHORIZATION_2026_09_22`
