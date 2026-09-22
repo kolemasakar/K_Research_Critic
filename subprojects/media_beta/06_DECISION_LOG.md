@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 5.4
-Status: **ACTIVE / R3_A_TO_H_COMPLETE / R3C_OAUTH_RECOVERY_PASS / R4_PACKAGE_READY / PRIVATE_ASSEMBLY_REQUIRED / R4_CUTOVER_HOLD / PUBLICATION_HOLD**
+Version: 5.5
+Status: **ACTIVE / R3_A_TO_H_COMPLETE / R3C_OAUTH_RECOVERY_PASS / R4_PACKAGE_CORRECTED / E1_OAUTH_HARDENING_REQUIRED / PRIVATE_ASSEMBLY_REQUIRED / R4_CUTOVER_HOLD / PUBLICATION_HOLD**
 Updated: 2026-09-22
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -230,13 +230,28 @@ R4-A requires a private KRC Core Skill, restoration of the E1 YouTube private MC
 
 Because no built-in migration control is available in the inspected account UI, the default future R4-C plan does not delete, edit, or unpublish the existing K-Research & Critic GPT. Replacement sharing/publication and any later source-GPT retirement are separate owner decisions.
 
+### D075 — E1 restart-safe OAuth is mandatory before reconnect
+
+Read-only inspection established that the accepted live E1 commit `88cdc465...` still uses process-memory `OAuthState`, while the accepted recovery code at `27585c0...` contains `RestartSafeOAuthState`.
+
+Therefore:
+
+```text
+E1_RESTART_SAFE_OAUTH_REQUIRED_BEFORE_RECONNECT=YES
+R4_A_SEQUENCE_167=SUPERSEDED_BY_168
+R4_A_FIRST_MUTATION=E1_OAUTH_HARDENING
+R4_A_AUTHORIZED=NO
+```
+
+No E1 redeploy, reconnect, Plugin installation, Skill installation, provider work, publication or source-GPT mutation was performed during this review.
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v20.0
-- checkpoint 167
-- `02_ROADMAP.md` v8.1
-- `00_INDEX.md` v9.4
-- `08_CHAT_HANDOFF.md` v6.4
+- `CURRENT_HANDOFF.md` v20.1
+- checkpoint 168
+- `02_ROADMAP.md` v8.2
+- `00_INDEX.md` v9.5
+- `08_CHAT_HANDOFF.md` v6.5
 
 ## Hard boundary
 
