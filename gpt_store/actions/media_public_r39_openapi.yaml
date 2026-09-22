@@ -96,12 +96,9 @@ paths:
       operationId: startPublicGeminiYoutubeTranscription
       summary: Process a public YouTube video with Gemini Free
       description: >-
-        Starts Gemini Developer API Free Tier direct URL processing only after
-        explicit user acknowledgement of the Free Tier data-use boundary.
-        YouTube never falls back to Cobalt, AssemblyAI, Supadata, cookies/login,
-        paid proxy, or paid Gemini. Repeated start after a FAILED free-only job
-        creates a fresh deterministic retry job; paid or charge-uncertain replay
-        remains blocked by backend policy.
+        Starts free-tier Gemini processing after explicit user acknowledgement.
+        No paid or alternate-provider fallback is allowed. Reuses durable state
+        when safe; failed free-only jobs require a new explicit retry request.
       x-openai-isConsequential: true
       requestBody:
         required: true
@@ -241,11 +238,9 @@ paths:
       operationId: startPublicFacebookCobaltTranscription
       summary: Retrieve and transcribe a public Facebook video
       description: >-
-        Uses self-hosted Cobalt video+audio retrieval, then server-side ffmpeg
-        extraction/normalization to mono PCM WAV 16 kHz, then AssemblyAI
-        universal-2. No only-audio Cobalt request is used for the accepted
-        Facebook route. No paid/Supadata/ScrapeCreators fallback is allowed.
-        A FAILED free-only job may be started again as a fresh deterministic job.
+        Starts the free Facebook route: Cobalt video+audio retrieval, server-side
+        ffmpeg normalization, then AssemblyAI. No paid retrieval/STT/proxy fallback
+        is allowed; unavailable free retrieval fails closed.
       x-openai-isConsequential: true
       requestBody:
         required: true
