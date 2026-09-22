@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 9.3
-Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_IN_PROGRESS / WEB_LINK_ONLY_PATH_UNAVAILABLE / DISTRIBUTION_DECISION_PENDING / ZERO_MUTATION / FREE_ONLY**
+Version: 9.4
+Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_LOCAL_MARKETPLACE_PILOT_AUTHORIZED / PILOT_BUNDLE_READY / TESTER_APP_ACCESS_GATE_PENDING / FREE_ONLY**
 Updated: 2026-09-22
 
 ## Current roadmap position
@@ -25,7 +25,7 @@ R4 Read-only preflight overall                PASS / COMPLETE
 R4 Package                                  READY
 R4-A Private assembly                       PASS / COMPLETE
 R4-B Private acceptance                     PASS / COMPLETE
-R4-C User switch/publication                IN PROGRESS / WEB LINK-ONLY UNAVAILABLE / DISTRIBUTION DECISION PENDING
+R4-C User switch/publication                IN PROGRESS / LOCAL MARKETPLACE PILOT / BUNDLE READY / TESTER APP ACCESS GATE
 R4 Cutover                                  HOLD
 ```
 
@@ -45,6 +45,17 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 ```
 
 No MEDIA execution tool was invoked during this recovery.
+
+## R4-C local marketplace pilot — checkpoint 180
+
+```text
+R4_C_DISTRIBUTION=LOCAL_MARKETPLACE_PILOT
+PILOT_BUNDLE_READY=YES
+ZIP_SHA256=e6cf16718183b3403179798b3e0ef7d5e5dfa703c1b160d6bfc16a56afea9868
+NEXT_GATE=marketplace + plugin + Core Skill + 5/5 app availability
+MEDIA_STARTS=0
+PROVIDER_WORK=0
+```
 
 ## R4-C distribution correction — checkpoint 179
 
@@ -320,4 +331,4 @@ ADDITIONAL_LIVE_MEDIA_STARTS=NO
 
 **R4-B is COMPLETE.** B1/B2/B3 passed; B4 was optional and not run. The private replacement is accepted. R4-C is ready to propose but remains HOLD pending separate owner authorization.
 
-Recovery authority: `CURRENT_HANDOFF.md` v21.2 + checkpoint 179.
+Recovery authority: `CURRENT_HANDOFF.md` v21.3 + checkpoint 180.
