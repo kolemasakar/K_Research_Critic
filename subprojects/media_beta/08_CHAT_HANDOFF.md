@@ -2,18 +2,19 @@
 
 Канонічна інструкція відновлення K-Research & Critic MEDIA у новому чаті.
 
-Version: 6.8
-Status: **R3_A_TO_H_COMPLETE / R4_A_COMPLETE / A5_PASS / A6_COMPLETE / R4_B_PENDING_AUTHORIZATION / CUTOVER_HOLD**
+Version: 6.9
+Status: **R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / STATIC_REGRESSION_PASS / LIVE_CANDIDATE_RESELECT_REQUIRED / CUTOVER_HOLD**
 Checkpoint date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 171. R4-A COMPLETE: A0-A5 PASS, A6 STOP checkpoint COMPLETE. Наступна фаза R4-B Private Acceptance, але вона NOT AUTHORIZED. FREE_ONLY; source public GPT unchanged; publication/share/PR merge remain NO.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 172. R4-A COMPLETE. R4-B AUTHORIZED / IN PROGRESS: static repository regression PASS; live Candidate B1/B2/B3 pending and requires explicit Personal/Local Candidate re-selection. No *_start/provider/publication/share/public GPT mutation/PR merge.`
 
 ## Mandatory recovery order
 
-1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v20.4
-2. `subprojects/media_beta/171_R4A_COMPLETE_A5_PASS_A6_STOP_R4B_PENDING_AUTHORIZATION_2026_09_22.md`
+1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v20.5
+2. `subprojects/media_beta/172_R4B_STARTED_STATIC_REGRESSION_PASS_LIVE_CANDIDATE_RESELECT_REQUIRED_2026_09_22.md`
+3. `subprojects/media_beta/171_R4A_COMPLETE_A5_PASS_A6_STOP_R4B_PENDING_AUTHORIZATION_2026_09_22.md`
 3. `subprojects/media_beta/170_R4A_A4_PRIVATE_INSTALL_PASS_A5_NEW_CHAT_PENDING_2026_09_22.md`
 4. `subprojects/media_beta/168_R4_PACKAGE_CORRECTED_E1_RESTART_SAFE_OAUTH_BEFORE_RECONNECT_2026_09_22.md`
 3. `subprojects/media_beta/167_R4_EXACT_CUTOVER_ROLLBACK_PACKAGE_READY_PRIVATE_ASSEMBLY_FIRST_2026_09_22.md`
@@ -125,15 +126,7 @@ R4_CUTOVER_READY=NO
 
 ## Next gate
 
-R4-A is complete. The next phase is **R4-B Private Acceptance / regression validation**.
-
-Before R4-B:
-
-1. recover from CURRENT_HANDOFF v20.4 + checkpoint 171;
-2. present the exact private-acceptance regression scope;
-3. preserve FREE_ONLY and the unchanged source public GPT;
-4. obtain separate explicit owner authorization;
-5. do not run any MEDIA `*_start`, publication/share, public GPT mutation, or PR merge unless separately authorized.
+R4-B is already authorized and in progress. Explicitly reselect `@K-Research & Critic R4 Candidate`, recover checkpoint 172, and run only pending live Candidate B1/B2/B3 checks. No new R4-B authorization is required. Do not run any MEDIA `*_start`, provider work, publication/share, public GPT mutation, or PR merge.
 
 ## Hard boundary
 
@@ -163,4 +156,4 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 
 Terminal marker:
 
-`MEDIA_BETA_CHAT_HANDOFF_V6_8_R4A_COMPLETE_A5_PASS_A6_COMPLETE_R4B_PENDING_AUTHORIZATION_2026_09_22`
+`MEDIA_BETA_CHAT_HANDOFF_V6_9_R4B_IN_PROGRESS_STATIC_PASS_LIVE_CANDIDATE_RESELECT_REQUIRED_2026_09_22`
