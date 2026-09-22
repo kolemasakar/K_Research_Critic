@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 8.9
-Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / B1_PASS / B2_READONLY_429_FIX_DEPLOYED / B2_FINAL_AUTH_RERUN_PENDING / B3_PASS / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
+Version: 9.0
+Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_READY_NOT_AUTHORIZED / FREE_ONLY / PUBLICATION_HOLD**
 Updated: 2026-09-22
 
 ## Current roadmap position
@@ -24,8 +24,8 @@ R4 Manual account UI preflight                COMPLETE
 R4 Read-only preflight overall                PASS / COMPLETE
 R4 Package                                  READY
 R4-A Private assembly                       PASS / COMPLETE
-R4-B Private acceptance                     IN PROGRESS / B1 PASS / READ-ONLY 429 FIX LIVE / FINAL B2 AUTH RERUN PENDING / B3 PASS
-R4-C User switch/publication                NOT AUTHORIZED
+R4-B Private acceptance                     PASS / COMPLETE
+R4-C User switch/publication                READY TO PROPOSE / NOT AUTHORIZED
 R4 Cutover                                  HOLD
 ```
 
@@ -45,6 +45,26 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 ```
 
 No MEDIA execution tool was invoked during this recovery.
+
+## R4-B completion — checkpoint 176
+
+```text
+B1=PASS
+B2=PASS
+B3=PASS
+B4=OPTIONAL / NOT_RUN
+CORE_REGRESSION=PASS
+MEDIA_READONLY_REGRESSION=PASS
+13_OPERATION_SCAN=PASS
+EXECUTION_CONFIRMATION_BOUNDARY=PASS
+FREE_ONLY_FAIL_CLOSED=PASS
+PRIVATE_REPLACEMENT_ACCEPTED=YES
+R4_B=COMPLETE
+R4_CUTOVER_READY=YES
+R4_C_AUTHORIZED=NO
+```
+
+R4-C may now be proposed, but no publication/share or source-GPT mutation is authorized.
 
 ## R4-B read-only admission fix — checkpoint 175
 
@@ -179,12 +199,14 @@ R4_A=COMPLETE
 R4_A5=PASS
 R4_A6=COMPLETE
 R4_B_AUTHORIZED=YES
-R4_B=IN_PROGRESS
+R4_B=COMPLETE
 R4_B_B1=PASS
-R4_B_B2_READONLY_429_FIX=DEPLOYED_LIVE
-R4_B_B2_FINAL_AUTHENTICATED_RERUN=PENDING
+R4_B_B2=PASS
 R4_B_B3=PASS
-R4_CUTOVER_READY=NO
+R4_B_B4=OPTIONAL / NOT_RUN
+PRIVATE_REPLACEMENT_ACCEPTED=YES
+R4_CUTOVER_READY=YES
+R4_C_AUTHORIZED=NO
 ```
 
 ## R4 preflight accepted
@@ -239,7 +261,7 @@ Therefore, if R4 is later authorized, the cutover plan must use the validated Pl
 
 ## R4 cutover remains unauthorized
 
-R4-B has started. Resume pending live Candidate checks only after explicitly reselecting the Personal/Local `K-Research & Critic R4 Candidate` surface. Preserve FREE_ONLY; no MEDIA execution, publication/share, public GPT mutation, or PR merge.
+R4-B is complete and the private replacement is accepted. R4-C is ready to propose but remains unauthorized. Preserve FREE_ONLY; no publication/share, public GPT mutation, additional MEDIA execution, or PR merge without separate explicit approval.
 
 ## Hard boundary
 
@@ -258,6 +280,6 @@ ADDITIONAL_LIVE_MEDIA_STARTS=NO
 
 ## Next state
 
-**R4-B is IN PROGRESS.** B1/B3 passed. Cold-start 429 was cleared, and the separate managed read-only admission leakage was fixed/deployed LIVE. Only the final authenticated Candidate B2 rerun remains; require zero infrastructure 429. R4-C remains HOLD.
+**R4-B is COMPLETE.** B1/B2/B3 passed; B4 was optional and not run. The private replacement is accepted. R4-C is ready to propose but remains HOLD pending separate owner authorization.
 
-Recovery authority: `CURRENT_HANDOFF.md` v20.8 + checkpoint 175.
+Recovery authority: `CURRENT_HANDOFF.md` v20.9 + checkpoint 176.
