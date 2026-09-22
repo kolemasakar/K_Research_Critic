@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 5.9
-Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / STATIC_REGRESSION_PASS / LIVE_CANDIDATE_RESELECT_REQUIRED / R4_CUTOVER_HOLD / PUBLICATION_HOLD**
+Version: 6.0
+Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / B1_PASS / B2_BLOCKED_VOICEBRIDGE_429 / B3_PASS / R4_CUTOVER_HOLD / PUBLICATION_HOLD**
 Updated: 2026-09-22
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -326,13 +326,32 @@ PRIVATE_REPLACEMENT_ACCEPTED=NO
 R4_C_AUTHORIZED=NO
 ```
 
+### D080 — R4-B live Candidate: B1 PASS / B2 blocked by VoiceBridge 429 / B3 PASS
+
+Owner-provided live Candidate evidence confirms all 13 canonical operations are visible, B1 live Core behavior passes, and B3 visibility/confirmation scan passes. All nine B2 read-only operations reached the live path but returned the same retryable VoiceBridge HTTP 429.
+
+```text
+B1=PASS
+B2=BLOCKED_BY_VOICEBRIDGE_429
+B3=PASS
+ALL_9_READONLY_ATTEMPTED=true
+COMMON_ERROR=voicebridge_http_error / HTTP 429 / retryable=true
+READ_ONLY_EXECUTION_LEAKAGE=0
+EXECUTION_TOOLS_CALLED=0
+PROVIDER_WORK_STARTED=false
+R4_B_OVERALL=NOT_COMPLETE
+R4_C_AUTHORIZED=NO
+```
+
+Decision: diagnose and minimally remediate only the shared read-only 429 path, then repeat B2 only. B1/B3 remain accepted unless remediation changes their governed components.
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v20.5
-- checkpoint 172
-- `02_ROADMAP.md` v8.6
-- `00_INDEX.md` v9.9
-- `08_CHAT_HANDOFF.md` v6.9
+- `CURRENT_HANDOFF.md` v20.6
+- checkpoint 173
+- `02_ROADMAP.md` v8.7
+- `00_INDEX.md` v10.0
+- `08_CHAT_HANDOFF.md` v7.0
 
 ## Hard boundary
 
