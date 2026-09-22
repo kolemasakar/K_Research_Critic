@@ -2,18 +2,20 @@
 
 Канонічна інструкція відновлення K-Research & Critic MEDIA у новому чаті.
 
-Version: 6.7
-Status: **R3_A_TO_H_COMPLETE / R4_A_IN_PROGRESS / A0_A1_A2_A3_PASS / A4_PRIVATE_INSTALL_PASS / A5_NEW_CHAT_PENDING / CUTOVER_HOLD**
+Version: 6.8
+Status: **R3_A_TO_H_COMPLETE / R4_A_COMPLETE / A5_PASS / A6_COMPLETE / R4_B_PENDING_AUTHORIZATION / CUTOVER_HOLD**
 Checkpoint date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 170. R4-A IN PROGRESS: A0/A1/A2/A3 PASS, A4 private install PASS. A5 має виконуватись у новому чаті лише як non-execution verification. GitHub Actions unavailable. R4-B/R4-C NOT AUTHORIZED.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 171. R4-A COMPLETE: A0-A5 PASS, A6 STOP checkpoint COMPLETE. Наступна фаза R4-B Private Acceptance, але вона NOT AUTHORIZED. FREE_ONLY; source public GPT unchanged; publication/share/PR merge remain NO.`
 
 ## Mandatory recovery order
 
-1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v20.1
-2. `subprojects/media_beta/168_R4_PACKAGE_CORRECTED_E1_RESTART_SAFE_OAUTH_BEFORE_RECONNECT_2026_09_22.md`
+1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v20.4
+2. `subprojects/media_beta/171_R4A_COMPLETE_A5_PASS_A6_STOP_R4B_PENDING_AUTHORIZATION_2026_09_22.md`
+3. `subprojects/media_beta/170_R4A_A4_PRIVATE_INSTALL_PASS_A5_NEW_CHAT_PENDING_2026_09_22.md`
+4. `subprojects/media_beta/168_R4_PACKAGE_CORRECTED_E1_RESTART_SAFE_OAUTH_BEFORE_RECONNECT_2026_09_22.md`
 3. `subprojects/media_beta/167_R4_EXACT_CUTOVER_ROLLBACK_PACKAGE_READY_PRIVATE_ASSEMBLY_FIRST_2026_09_22.md`
 4. `subprojects/media_beta/166_R3C_OAUTH_RECOVERY_PLUGIN_INVENTORY_RECONCILED_NO_ACTIONS_VALIDATION_2026_09_22.md`
 5. `subprojects/media_beta/165_FINAL_PROJECT_DOCS_SYNC_NEW_CHAT_READY_2026_09_21.md`
@@ -108,12 +110,14 @@ R4_CUTOVER_PACKAGE=READY / CORRECTED
 A1_A2_A3=PASS
 A4_PACKAGE_STATIC_VALIDATION=PASS
 A4_PRIVATE_INSTALL=PASS
-A5_PRIVATE_ASSEMBLY_VERIFICATION=PENDING_NEW_CHAT
+A5_PRIVATE_ASSEMBLY_VERIFICATION=PASS
+A6_STOP_CHECKPOINT=COMPLETE
+R4_A=COMPLETE
 E1_RESTART_SAFE_OAUTH_REQUIRED_BEFORE_RECONNECT=YES
 R4_A_SEQUENCE_167=SUPERSEDED_BY_168
 R4_ROLLBACK_PACKAGE=READY
-R4_A_PRIVATE_ASSEMBLY=REQUIRED / NOT_AUTHORIZED
-R4_B_PRIVATE_ACCEPTANCE=NOT_AUTHORIZED
+R4_A_PRIVATE_ASSEMBLY=PASS / COMPLETE
+R4_B_PRIVATE_ACCEPTANCE=PENDING / NOT_AUTHORIZED
 R4_C_USER_SWITCH_PUBLICATION=NOT_AUTHORIZED
 SOURCE_PUBLIC_GPT=UNCHANGED
 R4_CUTOVER_READY=NO
@@ -121,16 +125,15 @@ R4_CUTOVER_READY=NO
 
 ## Next gate
 
-Start a fresh chat before the first R4 mutation.
+R4-A is complete. The next phase is **R4-B Private Acceptance / regression validation**.
 
-The new chat must:
+Before R4-B:
 
-1. recover from CURRENT_HANDOFF v20.3 + checkpoint 170;
-2. confirm the intended Plugin/Skill cutover path;
-3. show exact state-changing actions before executing them;
-4. show rollback steps;
-5. obtain explicit owner cutover approval;
-6. keep PR #22/#45 unmerged until separately approved.
+1. recover from CURRENT_HANDOFF v20.4 + checkpoint 171;
+2. present the exact private-acceptance regression scope;
+3. preserve FREE_ONLY and the unchanged source public GPT;
+4. obtain separate explicit owner authorization;
+5. do not run any MEDIA `*_start`, publication/share, public GPT mutation, or PR merge unless separately authorized.
 
 ## Hard boundary
 
@@ -160,4 +163,4 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 
 Terminal marker:
 
-`MEDIA_BETA_CHAT_HANDOFF_V6_7_R4A_A4_PRIVATE_INSTALL_PASS_A5_NEW_CHAT_PENDING_2026_09_22`
+`MEDIA_BETA_CHAT_HANDOFF_V6_8_R4A_COMPLETE_A5_PASS_A6_COMPLETE_R4B_PENDING_AUTHORIZATION_2026_09_22`
