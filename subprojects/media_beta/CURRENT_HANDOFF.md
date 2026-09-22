@@ -1,17 +1,18 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 20.9
-Status: **ACTIVE_HANDOFF / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_READY_NOT_AUTHORIZED / FREE_ONLY / PUBLICATION_HOLD**
+Version: 21.0
+Status: **ACTIVE_HANDOFF / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_PROPOSAL_READY / EXACT_AUDIENCE_APPROVAL_PENDING / FREE_ONLY / PUBLICATION_HOLD**
 Date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 176. R4-A COMPLETE. R4-B COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED=YES: B1 PASS, B2 authenticated read-only 9/9 PASS with 0 infrastructure 429 and no provider work, B3 PASS; B4 optional/not run. R4-C is now READY TO PROPOSE but NOT AUTHORIZED. No publication/share/public GPT mutation/PR merge.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 177. R4-A/B COMPLETE; private replacement accepted. R4-C proposal prepared as non-destructive cutover. Exact audience approval is still required before any sharing/publication/user-switch mutation. Source public GPT remains published and unchanged; PR22/PR45 remain unmerged.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v20.9.
-2. `176_R4B_PRIVATE_ACCEPTANCE_COMPLETE_B1_B2_B3_PASS_R4C_PENDING_AUTHORIZATION_2026_09_22.md`.
+1. `CURRENT_HANDOFF.md` — v21.0.
+2. `177_R4C_CUTOVER_PROPOSAL_READY_EXACT_AUDIENCE_APPROVAL_PENDING_2026_09_22.md`.
+3. `176_R4B_PRIVATE_ACCEPTANCE_COMPLETE_B1_B2_B3_PASS_R4C_PENDING_AUTHORIZATION_2026_09_22.md`.
 3. `175_R4B_READONLY_429_LEAKAGE_FIXED_DEPLOY_LIVE_B2_FINAL_AUTH_RERUN_PENDING_2026_09_22.md`.
 4. `174_R4B_VOICEBRIDGE_COLD_START_429_DIAGNOSED_WAKE_PASS_B2_AUTH_RERUN_PENDING_2026_09_22.md`.
 5. `173_R4B_B1_PASS_B2_BLOCKED_429_B3_PASS_2026_09_22.md`.
@@ -63,6 +64,8 @@ R4_B_B4=OPTIONAL / NOT_RUN
 PRIVATE_REPLACEMENT_ACCEPTED=YES
 R4_USER_SWITCH_AUTHORIZED=NO
 R4_CUTOVER_READY=YES
+R4_C_PROPOSAL_READY=YES
+R4_C_EXACT_AUDIENCE_APPROVAL_PENDING=YES
 R4_CUTOVER=HOLD
 ```
 
@@ -78,7 +81,7 @@ KRC:
   validation=Render exact-commit build + live OAuth/read-only runtime PASS
   GitHub_Actions=current unavailable / not used
   historical_CI_reference=35485995871 PASS
-  docs_current_through=checkpoint_176
+  docs_current_through=checkpoint_177
 
 VoiceBridge:
   repo=kolemasakar/VoiceBridge
@@ -224,11 +227,15 @@ R4_READONLY_PREFLIGHT=COMPLETE
 
 ## Next gate
 
-R4-B private acceptance is complete and the private replacement is accepted.
+R4-C non-destructive cutover proposal is prepared in checkpoint 177. Before any sharing/publication/user-switch mutation, the owner must select the exact replacement audience:
 
-R4-C optional user switch/publication may now be proposed, but remains **NOT AUTHORIZED**. Before any R4-C mutation, present the exact audience/share/publication plan and rollback steps and obtain separate explicit owner approval.
+```text
+1=PRIVATE_OWNER_ONLY
+2=LINK_ONLY_PILOT
+3=PUBLIC_DISCOVERY
+```
 
-The existing public GPT remains unchanged. No publication/share, public GPT mutation, main mutation, PR merge, or additional live MEDIA start is authorized by R4-B completion.
+Until that explicit selection, publication/share/user switch remain HOLD. The source public GPT remains unchanged and is the rollback anchor.
 
 ## Hard release boundary
 
@@ -272,4 +279,4 @@ R4_CUTOVER=HOLD
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V20_9_R4B_COMPLETE_PRIVATE_REPLACEMENT_ACCEPTED_R4C_PENDING_AUTHORIZATION_2026_09_22`
+`KRC_MEDIA_CURRENT_HANDOFF_V21_0_R4C_PROPOSAL_READY_AUDIENCE_APPROVAL_PENDING_2026_09_22`
