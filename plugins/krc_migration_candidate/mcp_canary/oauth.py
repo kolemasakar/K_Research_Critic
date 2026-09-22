@@ -22,6 +22,13 @@ LEGACY_CLIENT_ID_ENV = "KRC_MCP_LEGACY_CLIENT_ID"
 LEGACY_REDIRECT_URI_ENV = "KRC_MCP_LEGACY_REDIRECT_URI"
 
 
+def _valid_redirect_uri(uri: str) -> bool:
+    parsed = urlsplit(uri)
+    if parsed.scheme == "https" and bool(parsed.netloc):
+        return True
+    return parsed.scheme == "http" and parsed.hostname in {"127.0.0.1", "localhost"}
+
+
 @dataclass(frozen=True)
 class OAuthResponse:
     status: int
@@ -309,13 +316,6 @@ def oauth_state_from_env() -> OAuthState:
 
 
 GLOBAL_OAUTH_STATE = oauth_state_from_env()
-
-
-def _valid_redirect_uri(uri: str) -> bool:
-    parsed = urlsplit(uri)
-    if parsed.scheme == "https" and bool(parsed.netloc):
-        return True
-    return parsed.scheme == "http" and parsed.hostname in {"127.0.0.1", "localhost"}
 
 
 def _redirect_origin(uri: str) -> str:
