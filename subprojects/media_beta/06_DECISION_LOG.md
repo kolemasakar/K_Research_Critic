@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 6.6
-Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_IN_PROGRESS / WEB_LINK_ONLY_PATH_UNAVAILABLE / DISTRIBUTION_DECISION_PENDING / ZERO_MUTATION**
+Version: 6.7
+Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_LOCAL_MARKETPLACE_PILOT_AUTHORIZED / PILOT_BUNDLE_READY / TESTER_APP_ACCESS_GATE_PENDING**
 Updated: 2026-09-22
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -530,13 +530,45 @@ SOURCE_PUBLIC_GPT_UNCHANGED=YES
 Supported next mechanisms require a fresh owner decision:
 A local marketplace pilot; B managed workspace link pilot; C public directory.
 
+### D087 — Local marketplace pilot selected and bounded bundle prepared
+
+Owner selected the supported R4-C distribution mechanism:
+
+```text
+R4_C_DISTRIBUTION=LOCAL_MARKETPLACE_PILOT
+PUBLIC_DISCOVERY=NO
+MANAGED_WORKSPACE_LINK=NO
+```
+
+A clean local marketplace bundle was prepared without changing plugin architecture or app mappings:
+
+```text
+KRC_R4_LOCAL_PILOT_2026-09-22.zip
+SHA256=e6cf16718183b3403179798b3e0ef7d5e5dfa703c1b160d6bfc16a56afea9868
+marketplace=krc-r4-local
+plugin=k-research-critic-r4-candidate
+skills=1
+registered_apps=5
+```
+
+OpenAI plugin documentation confirms that local marketplace installation does not create or grant access to referenced existing apps. Therefore the first external-pilot gate is 5/5 app availability in the tester account. A blocked app stops the pilot; app IDs must not be substituted.
+
+```text
+MEDIA_STARTS=0
+PROVIDER_WORK=0
+PUBLICATION=NO
+SOURCE_PUBLIC_GPT_MUTATION=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+```
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v21.2
-- checkpoint 179
-- `02_ROADMAP.md` v9.3
-- `00_INDEX.md` v10.6
-- `08_CHAT_HANDOFF.md` v7.6
+- `CURRENT_HANDOFF.md` v21.3
+- checkpoint 180
+- `02_ROADMAP.md` v9.4
+- `00_INDEX.md` v10.7
+- `08_CHAT_HANDOFF.md` v7.7
 
 ## Hard boundary
 
