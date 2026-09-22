@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 8.5
-Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / A5_PASS / A6_COMPLETE / R4_B_PENDING_AUTHORIZATION / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
+Version: 8.6
+Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / STATIC_REGRESSION_PASS / LIVE_CANDIDATE_RESELECT_REQUIRED / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
 Updated: 2026-09-22
 
 ## Current roadmap position
@@ -24,7 +24,7 @@ R4 Manual account UI preflight                COMPLETE
 R4 Read-only preflight overall                PASS / COMPLETE
 R4 Package                                  READY
 R4-A Private assembly                       PASS / COMPLETE
-R4-B Private acceptance                     PENDING / NOT AUTHORIZED
+R4-B Private acceptance                     IN PROGRESS / STATIC PASS / LIVE RESELECT REQUIRED
 R4-C User switch/publication                NOT AUTHORIZED
 R4 Cutover                                  HOLD
 ```
@@ -45,6 +45,19 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 ```
 
 No MEDIA execution tool was invoked during this recovery.
+
+## R4-B progress — checkpoint 172
+
+```text
+R4_B_AUTHORIZED=YES
+B1 repository fixture regression=PASS
+B1 live Candidate behavior=PENDING
+B2 nine read-only live regression=BLOCKED / Candidate reselect required
+B3 contract scan=PASS
+B3 live Candidate visibility=PENDING
+B4 live execution=NOT PERFORMED
+R4_C=NOT AUTHORIZED
+```
 
 ## R4-A completion — checkpoint 171
 
@@ -117,7 +130,9 @@ R4_ROLLBACK_PACKAGE=READY
 R4_A=COMPLETE
 R4_A5=PASS
 R4_A6=COMPLETE
-R4_B_AUTHORIZED=NO
+R4_B_AUTHORIZED=YES
+R4_B=IN_PROGRESS
+R4_B_LIVE_CANDIDATE_RESELECT_REQUIRED=YES
 R4_CUTOVER_READY=NO
 ```
 
@@ -173,13 +188,7 @@ Therefore, if R4 is later authorized, the cutover plan must use the validated Pl
 
 ## R4 cutover remains unauthorized
 
-Before R4-B:
-
-1. recover from `CURRENT_HANDOFF.md` v20.4 + checkpoint 171;
-2. present the exact private-acceptance regression scope;
-3. preserve FREE_ONLY and the unchanged source public GPT;
-4. obtain separate explicit owner authorization;
-5. keep MEDIA execution, publication/share, public GPT mutation, and PR merge outside scope unless separately authorized.
+R4-B has started. Resume pending live Candidate checks only after explicitly reselecting the Personal/Local `K-Research & Critic R4 Candidate` surface. Preserve FREE_ONLY; no MEDIA execution, publication/share, public GPT mutation, or PR merge.
 
 ## Hard boundary
 
@@ -198,8 +207,6 @@ ADDITIONAL_LIVE_MEDIA_STARTS=NO
 
 ## Next state
 
-**R4-A is complete.**
+**R4-B is IN PROGRESS.** Static repository/contract regression passed; live Candidate B1/B2/B3 remains pending due tool-surface re-selection requirement. R4-C remains HOLD.
 
-The next phase is **R4-B Private Acceptance / regression validation**, pending separate owner authorization. R4-C and public cutover remain HOLD.
-
-Recovery authority: `CURRENT_HANDOFF.md` v20.4 + checkpoint 171.
+Recovery authority: `CURRENT_HANDOFF.md` v20.5 + checkpoint 172.
