@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 8.6
-Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / STATIC_REGRESSION_PASS / LIVE_CANDIDATE_RESELECT_REQUIRED / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
+Version: 8.7
+Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / B1_PASS / B2_BLOCKED_VOICEBRIDGE_429 / B3_PASS / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
 Updated: 2026-09-22
 
 ## Current roadmap position
@@ -24,7 +24,7 @@ R4 Manual account UI preflight                COMPLETE
 R4 Read-only preflight overall                PASS / COMPLETE
 R4 Package                                  READY
 R4-A Private assembly                       PASS / COMPLETE
-R4-B Private acceptance                     IN PROGRESS / STATIC PASS / LIVE RESELECT REQUIRED
+R4-B Private acceptance                     IN PROGRESS / B1 PASS / B2 429 BLOCKED / B3 PASS
 R4-C User switch/publication                NOT AUTHORIZED
 R4 Cutover                                  HOLD
 ```
@@ -45,6 +45,22 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 ```
 
 No MEDIA execution tool was invoked during this recovery.
+
+## R4-B live Candidate — checkpoint 173
+
+```text
+B1=PASS
+B2=BLOCKED_BY_VOICEBRIDGE_429
+B3=PASS
+all_9_readonly_attempted=true
+common_http_status=429
+retryable=true
+execution_tools_called=0
+provider_work_started=false
+R4_B_OVERALL=NOT_COMPLETE
+```
+
+Next gate: read-only 429 diagnosis/remediation on shared VoiceBridge path, then repeat only B2.
 
 ## R4-B progress — checkpoint 172
 
@@ -132,7 +148,9 @@ R4_A5=PASS
 R4_A6=COMPLETE
 R4_B_AUTHORIZED=YES
 R4_B=IN_PROGRESS
-R4_B_LIVE_CANDIDATE_RESELECT_REQUIRED=YES
+R4_B_B1=PASS
+R4_B_B2=BLOCKED_BY_VOICEBRIDGE_429
+R4_B_B3=PASS
 R4_CUTOVER_READY=NO
 ```
 
@@ -207,6 +225,6 @@ ADDITIONAL_LIVE_MEDIA_STARTS=NO
 
 ## Next state
 
-**R4-B is IN PROGRESS.** Static repository/contract regression passed; live Candidate B1/B2/B3 remains pending due tool-surface re-selection requirement. R4-C remains HOLD.
+**R4-B is IN PROGRESS.** B1 and B3 passed; B2 is blocked by a shared retryable VoiceBridge HTTP 429 across all nine read-only operations. R4-C remains HOLD.
 
-Recovery authority: `CURRENT_HANDOFF.md` v20.5 + checkpoint 172.
+Recovery authority: `CURRENT_HANDOFF.md` v20.6 + checkpoint 173.
