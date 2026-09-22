@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 6.3
-Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_READY_NOT_AUTHORIZED / PUBLICATION_HOLD**
+Version: 6.4
+Status: **ACTIVE / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_PROPOSAL_READY / EXACT_AUDIENCE_APPROVAL_PENDING / PUBLICATION_HOLD**
 Updated: 2026-09-22
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -435,13 +435,49 @@ PR22_MERGE=NO
 PR45_MERGE=NO
 ```
 
+### D084 — R4-C non-destructive cutover proposal prepared
+
+After R4-B completion, the exact R4-C contract from checkpoint 167 was recovered.
+
+R4-C remains a separate final owner decision. The preferred cutover is non-destructive:
+
+```text
+SOURCE_PUBLIC_GPT=KEEP PUBLISHED / UNCHANGED
+ROLLBACK_ANCHOR=EXISTING_PUBLIC_GPT
+PR22_MERGE=NO
+PR45_MERGE=NO
+NEW_MEDIA_STARTS=NO
+PROVIDER_WORK=NO
+```
+
+Before any replacement sharing/publication/user-switch mutation, the owner must select one exact audience:
+
+```text
+1=PRIVATE_OWNER_ONLY
+2=LINK_ONLY_PILOT
+3=PUBLIC_DISCOVERY
+```
+
+No audience is inferred from the generic instruction to continue.
+
+Until an exact audience is selected:
+
+```text
+R4_C_AUTHORIZED=NO
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING_CHANGE=NO
+USER_SWITCH=NO
+```
+
+Checkpoint 177 is the canonical proposal/approval gate.
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v20.9
-- checkpoint 176
-- `02_ROADMAP.md` v9.0
-- `00_INDEX.md` v10.3
-- `08_CHAT_HANDOFF.md` v7.3
+- `CURRENT_HANDOFF.md` v21.0
+- checkpoint 177
+- `02_ROADMAP.md` v9.1
+- `00_INDEX.md` v10.4
+- `08_CHAT_HANDOFF.md` v7.4
 
 ## Hard boundary
 
