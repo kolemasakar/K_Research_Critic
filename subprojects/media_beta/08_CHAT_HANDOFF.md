@@ -2,29 +2,26 @@
 
 Канонічна інструкція відновлення K-Research & Critic MEDIA у новому чаті.
 
-Version: 7.3
-Status: **R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_READY_NOT_AUTHORIZED / CUTOVER_HOLD**
+Version: 7.4
+Status: **R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_PROPOSAL_READY / EXACT_AUDIENCE_APPROVAL_PENDING / CUTOVER_HOLD**
 Checkpoint date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 176. R4-A COMPLETE. R4-B COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED=YES: B1 PASS, B2 authenticated read-only 9/9 PASS with 0 infrastructure 429 and no provider work, B3 PASS; B4 optional/not run. R4-C is READY TO PROPOSE but NOT AUTHORIZED. No publication/share/public GPT mutation/PR merge.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 177. R4-A/B COMPLETE; private replacement accepted. R4-C non-destructive cutover proposal is ready. Before any sharing/publication/user-switch mutation choose exact audience: 1 PRIVATE_OWNER_ONLY, 2 LINK_ONLY_PILOT, or 3 PUBLIC_DISCOVERY. Source public GPT stays published/unchanged; PR22/PR45 remain unmerged.`
 
 ## Mandatory recovery order
 
-1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v20.9
-2. `subprojects/media_beta/176_R4B_PRIVATE_ACCEPTANCE_COMPLETE_B1_B2_B3_PASS_R4C_PENDING_AUTHORIZATION_2026_09_22.md`
-3. `subprojects/media_beta/175_R4B_READONLY_429_LEAKAGE_FIXED_DEPLOY_LIVE_B2_FINAL_AUTH_RERUN_PENDING_2026_09_22.md`
-4. `subprojects/media_beta/174_R4B_VOICEBRIDGE_COLD_START_429_DIAGNOSED_WAKE_PASS_B2_AUTH_RERUN_PENDING_2026_09_22.md`
-5. `subprojects/media_beta/173_R4B_B1_PASS_B2_BLOCKED_429_B3_PASS_2026_09_22.md`
-6. `subprojects/media_beta/172_R4B_STARTED_STATIC_REGRESSION_PASS_LIVE_CANDIDATE_RESELECT_REQUIRED_2026_09_22.md`
-7. `subprojects/media_beta/171_R4A_COMPLETE_A5_PASS_A6_STOP_R4B_PENDING_AUTHORIZATION_2026_09_22.md`
-8. `subprojects/media_beta/167_R4_EXACT_CUTOVER_ROLLBACK_PACKAGE_READY_PRIVATE_ASSEMBLY_FIRST_2026_09_22.md`
-9. `subprojects/media_beta/00_INDEX.md` — v10.3
-10. `subprojects/media_beta/02_ROADMAP.md` — v9.0
-11. `subprojects/media_beta/06_DECISION_LOG.md` — v6.3
-12. current PR #22 / PR #45 state
-13. current Render R3C/E1/E2/E3/E4/VoiceBridge health
+1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v21.0
+2. `subprojects/media_beta/177_R4C_CUTOVER_PROPOSAL_READY_EXACT_AUDIENCE_APPROVAL_PENDING_2026_09_22.md`
+3. `subprojects/media_beta/176_R4B_PRIVATE_ACCEPTANCE_COMPLETE_B1_B2_B3_PASS_R4C_PENDING_AUTHORIZATION_2026_09_22.md`
+4. `subprojects/media_beta/175_R4B_READONLY_429_LEAKAGE_FIXED_DEPLOY_LIVE_B2_FINAL_AUTH_RERUN_PENDING_2026_09_22.md`
+5. `subprojects/media_beta/167_R4_EXACT_CUTOVER_ROLLBACK_PACKAGE_READY_PRIVATE_ASSEMBLY_FIRST_2026_09_22.md`
+6. `subprojects/media_beta/00_INDEX.md` — v10.4
+7. `subprojects/media_beta/02_ROADMAP.md` — v9.1
+8. `subprojects/media_beta/06_DECISION_LOG.md` — v6.4
+9. current PR #22 / PR #45 state
+10. current Render R3C/E1/E2/E3/E4/VoiceBridge health
 
 ## Current phase state
 
@@ -127,11 +124,15 @@ R4_CUTOVER_READY=YES
 
 ## Next gate
 
-R4-B is complete. R4-C optional user switch/publication is now ready to propose but remains separately authorized.
+R4-C proposal is ready. Owner must select the exact replacement audience before any state-changing sharing/publication/user-switch action:
 
-Before any R4-C mutation, present the exact target audience/share/publication plan and rollback sequence and obtain explicit owner approval. The existing public GPT remains unchanged.
+```text
+1=PRIVATE_OWNER_ONLY
+2=LINK_ONLY_PILOT
+3=PUBLIC_DISCOVERY
+```
 
-No `*_start`, provider work, publication/share, public GPT mutation, main mutation, or PR merge is authorized by R4-B completion.
+Until selection, source public GPT remains unchanged and publication/share/user switch remain HOLD.
 
 ## Hard boundary
 
@@ -161,4 +162,4 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 
 Terminal marker:
 
-`MEDIA_BETA_CHAT_HANDOFF_V7_3_R4B_COMPLETE_PRIVATE_REPLACEMENT_ACCEPTED_R4C_PENDING_AUTHORIZATION_2026_09_22`
+`MEDIA_BETA_CHAT_HANDOFF_V7_4_R4C_PROPOSAL_READY_AUDIENCE_APPROVAL_PENDING_2026_09_22`
