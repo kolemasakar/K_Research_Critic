@@ -434,6 +434,18 @@ Until Actions return, use:
 
 Historical CI remains reference evidence only.
 
+## Canonical documentation sync
+
+```text
+CURRENT_HANDOFF.md=v20.0
+02_ROADMAP.md=v8.1
+00_INDEX.md=v9.4
+06_DECISION_LOG.md=v5.4
+08_CHAT_HANDOFF.md=v6.4
+migration_candidate_README=SYNCED
+PROJECT_SYNC_COMPLETE=YES
+```
+
 ## Current gate result
 
 ```text
