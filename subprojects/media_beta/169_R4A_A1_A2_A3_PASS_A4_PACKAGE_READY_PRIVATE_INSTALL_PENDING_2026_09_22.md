@@ -285,6 +285,17 @@ R4_C_AUTHORIZED=NO
 R4_CUTOVER=HOLD
 ```
 
+## Canonical documentation sync
+
+```text
+CURRENT_HANDOFF.md=v20.2
+02_ROADMAP.md=v8.3
+00_INDEX.md=v9.6
+06_DECISION_LOG.md=v5.6
+08_CHAT_HANDOFF.md=v6.6
+PROJECT_SYNC_COMPLETE=YES
+```
+
 ## Next gate
 
 Install the already assembled R4 Candidate privately through a supported local/personal marketplace path, then execute A5 private assembly verification.
