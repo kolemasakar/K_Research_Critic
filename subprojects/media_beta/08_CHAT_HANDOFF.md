@@ -2,13 +2,13 @@
 
 Канонічна інструкція відновлення K-Research & Critic MEDIA у новому чаті.
 
-Version: 7.8
-Status: **R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION / SOURCE_PUBLIC_GPT_PRODUCTION**
+Version: 7.9
+Status: **R3_9_UNIFIED_KRC_GPT_ACTIVE / ROUTING_CONTRACT_READY / STAGING_MANIFEST_READY / STATIC_PASS / PUBLIC_GPT_UNCHANGED / R4_C_PAUSED**
 Checkpoint date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 181. R4-A/B COMPLETE; private replacement accepted. R4-C is PAUSED pending native migration in Plus or supported Plugin distribution to ordinary ChatGPT users. Existing public GPT remains production entry point and rollback anchor. Local marketplace pilot is optional, not required. No PR merge, publication/share change, or MEDIA starts.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 182. R3.9 Unified KRC GPT ACTIVE. Core remains authoritative; MEDIA is evidence acquisition; routing contract/staging manifest/static guards are ready. Public GPT is still unchanged. R4-C remains PAUSED. Continue with R3.9 exact-branch regression/runtime validation before preparing/applying any Builder delta.`
 
 ## Mandatory recovery order
 
@@ -124,16 +124,21 @@ R4_CUTOVER_READY=YES
 
 ## Next gate
 
-No active R4-C execution gate.
-
-Wait for one of:
+Validate R3.9 on the exact branch:
 
 ```text
-TRIGGER_1=NATIVE_MIGRATION_AVAILABLE_IN_PLUS_ACCOUNT
-TRIGGER_2=SUPPORTED_PLUGIN_DISTRIBUTION_TO_ORDINARY_CHATGPT_USERS
+R39_CORE_REGRESSION
+R39_UNIFIED_ROUTING_TESTS
+R39_13_OPERATION_PARITY
+R39_FREE_ONLY_FAIL_CLOSED
+R39_EXECUTION_CONFIRMATION_BOUNDARY
+R39_MEDIA_FAILURE_ISOLATION
+R39_FUTURE_PLUGIN_MAPPING_PARITY
 ```
 
-When a trigger appears, verify current OpenAI documentation and the owner's actual account UI before resuming. Revalidate only what product/schema drift makes necessary.
+After PASS, prepare the exact Builder delta for the existing public GPT. Do not mutate the public GPT before this gate.
+
+R4-C stays paused and does not need to be resumed for R3.9.
 
 ## Hard boundary
 
@@ -163,4 +168,4 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 
 Terminal marker:
 
-`MEDIA_BETA_CHAT_HANDOFF_V7_8_R4C_PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION_2026_09_22`
+`MEDIA_BETA_CHAT_HANDOFF_V7_9_R39_UNIFIED_ACTIVE_STATIC_PASS_PUBLIC_GPT_UNCHANGED_2026_09_22`
