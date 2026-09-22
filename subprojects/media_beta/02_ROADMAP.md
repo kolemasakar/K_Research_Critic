@@ -1,8 +1,8 @@
 # MEDIA BETA Roadmap
 
-Version: 7.9
-Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_READONLY_PREFLIGHT_COMPLETE / PROJECT_SYNC_COMPLETE / NEW_CHAT_READY / OWNER_CUTOVER_DECISION_PENDING / FREE_ONLY / PUBLICATION_HOLD**
-Updated: 2026-09-21
+Version: 8.0
+Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R3C_OAUTH_RECOVERY_PASS / PLUGIN_INVENTORY_RECONCILED / R4_READONLY_PREFLIGHT_COMPLETE / PROJECT_SYNC_COMPLETE / OWNER_CUTOVER_DECISION_PENDING / FREE_ONLY / PUBLICATION_HOLD**
+Updated: 2026-09-22
 
 ## Current roadmap position
 
@@ -25,6 +25,23 @@ R4 Read-only preflight overall                PASS / COMPLETE
 R4 Cutover/publication                        HOLD / OWNER DECISION
 ```
 
+## Recovery delta — 2026-09-22
+
+```text
+R3C_OAUTH_RECOVERY=PASS
+R3C_RUNTIME_HEAD=27585c0ce924c78529b90aaadbfbeee841d0d249
+R3C_RENDER_DEPLOY=dep-dap55aegekts73fr0960 / LIVE
+MEDIA_GET_CAPABILITIES=PASS
+R3C_TO_VOICEBRIDGE_BINDING=PASS
+PLUGIN_REQUIRED_SURFACES=PASS
+FUNCTIONAL_INVENTORY_DRIFT=NO
+RECOVERY_CONSISTENCY_WARNING=CLOSED
+GITHUB_ACTIONS_CURRENTLY_AVAILABLE=NO
+CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
+```
+
+No MEDIA execution tool was invoked during this recovery.
+
 ## R4 preflight accepted
 
 ### Non-UI
@@ -40,7 +57,8 @@ PLUGIN_PERMISSION_MODEL=PASS
 OAUTH_HARDENING=PASS
 VOICEBRIDGE_SCOPED_AUTH=PASS
 FREE_ONLY_POLICY=PASS
-CI=PASS
+GITHUB_ACTIONS_CURRENTLY_AVAILABLE=NO
+CURRENT_VALIDATION=PASS / exact-commit Render + live read-only runtime
 ROLLBACK_PACKAGE=READY
 ```
 
@@ -79,7 +97,7 @@ Therefore, if R4 is later authorized, the cutover plan must use the validated Pl
 Before any state-changing action:
 
 1. transition to a fresh chat;
-2. recover from `CURRENT_HANDOFF.md` v19.7 + checkpoint 164;
+2. recover from `CURRENT_HANDOFF.md` v19.9 + checkpoint 166;
 3. present exact intended mutations;
 4. present rollback steps;
 5. obtain explicit owner cutover authorization;
@@ -106,4 +124,4 @@ ADDITIONAL_LIVE_MEDIA_STARTS=NO
 
 The next phase is an owner cutover decision in a fresh chat. R4 mutation remains HOLD until that decision.
 
-Recovery authority: `CURRENT_HANDOFF.md` v19.8 + checkpoint 165.
+Recovery authority: `CURRENT_HANDOFF.md` v19.9 + checkpoint 166.
