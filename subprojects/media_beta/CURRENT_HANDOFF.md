@@ -6,7 +6,7 @@ Date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 183. R3.9 Unified KRC GPT ACTIVE; exact selected regression suite 91/91 PASS. Plus account now exposes native 'Перенести в плагін' with displayed deadline 2026-12-11, but migration is deferred until R3.9 acceptance. Next: stage exact Unified instructions + R3.9 Action schema on private K-Research & Critic - MEDIA BETA, keep bearer auth unchanged, run zero-provider-work smoke. Public GPT remains unchanged.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 183. R3.9 Unified KRC GPT ACTIVE; selected exact-branch regression 91/91 PASS. Plus account exposes native migration to Plugin with displayed deadline 2026-12-11, but migration is deferred until R3.9 acceptance. Next: stage exact Unified instructions and R3.9 Action schema on private K-Research & Critic - MEDIA BETA, keep current connection settings unchanged, run zero-provider-work smoke. Public GPT remains unchanged.`
 
 ## Canonical current authority
 
@@ -70,6 +70,7 @@ R3_9_UNIFIED_ROUTING_CONTRACT=READY
 R3_9_STAGING_MANIFEST=READY
 R3_9_STATIC_READBACK=PASS
 R3_9_SELECTED_PYTEST=91/91 PASS
+R3_9_PRIVATE_STAGING_NEXT=YES
 R3_9_PRIVATE_STAGING_NEXT=YES
 R3_9_PUBLIC_GPT_MUTATION=NO
 ```
@@ -238,20 +239,10 @@ Private-first R3.9 Builder staging:
 TARGET=K-Research & Critic - MEDIA BETA
 INSTRUCTIONS=prompts/GPT_STORE_UNIFIED_R39_INSTRUCTIONS.md
 ACTION_SCHEMA=gpt_store/actions/media_public_r39_openapi.yaml
-AUTH=KEEP EXISTING BEARER / DO NOT EXPOSE
 SHARING=PRIVATE
 ```
 
-Then run zero-provider-work smoke:
-
-```text
-CORE_GATE
-MEDIA_PREAPPROVAL_BLOCK
-READONLY_BOUNDARY
-EXECUTION_CONFIRMATION_PROMPT + CANCEL
-FREE_ONLY
-MEDIA_FAILURE_ISOLATION
-```
+Then run zero-provider-work smoke for Core gate, MEDIA preapproval block, read-only boundary, execution confirmation prompt with cancellation, FREE_ONLY, and MEDIA failure isolation.
 
 Public GPT remains unchanged until this staging gate passes. Native Plugin migration is available but deferred.
 
