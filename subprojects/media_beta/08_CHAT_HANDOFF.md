@@ -2,13 +2,13 @@
 
 Канонічна інструкція відновлення K-Research & Critic MEDIA у новому чаті.
 
-Version: 7.9
-Status: **R3_9_UNIFIED_KRC_GPT_ACTIVE / ROUTING_CONTRACT_READY / STAGING_MANIFEST_READY / STATIC_PASS / PUBLIC_GPT_UNCHANGED / R4_C_PAUSED**
+Version: 7.10
+Status: **R3_9_UNIFIED_KRC_GPT_ACTIVE / 91_TESTS_PASS / NATIVE_MIGRATION_TRIGGER_CONFIRMED / PRIVATE_MEDIA_BETA_STAGING_NEXT / PUBLIC_GPT_UNCHANGED / R4_C_DEFERRED**
 Checkpoint date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 182. R3.9 Unified KRC GPT ACTIVE. Core remains authoritative; MEDIA is evidence acquisition; routing contract/staging manifest/static guards are ready. Public GPT is still unchanged. R4-C remains PAUSED. Continue with R3.9 exact-branch regression/runtime validation before preparing/applying any Builder delta.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 183. R3.9 Unified KRC GPT ACTIVE; exact selected regression 91/91 PASS. Native Plus migration to Plugin is now visible but deferred until R3.9 acceptance. Next stage the exact Unified Builder instructions and R3.9 Action schema on private K-Research & Critic - MEDIA BETA, keep it private, then run zero-provider-work smoke. Public GPT remains unchanged.`
 
 ## Mandatory recovery order
 
@@ -124,21 +124,30 @@ R4_CUTOVER_READY=YES
 
 ## Next gate
 
-Validate R3.9 on the exact branch:
+Private staging on `K-Research & Critic - MEDIA BETA`.
+
+Use:
 
 ```text
-R39_CORE_REGRESSION
-R39_UNIFIED_ROUTING_TESTS
-R39_13_OPERATION_PARITY
-R39_FREE_ONLY_FAIL_CLOSED
-R39_EXECUTION_CONFIRMATION_BOUNDARY
-R39_MEDIA_FAILURE_ISOLATION
-R39_FUTURE_PLUGIN_MAPPING_PARITY
+prompts/GPT_STORE_UNIFIED_R39_INSTRUCTIONS.md
+gpt_store/actions/media_public_r39_openapi.yaml
 ```
 
-After PASS, prepare the exact Builder delta for the existing public GPT. Do not mutate the public GPT before this gate.
+Keep existing connection settings and private sharing.
 
-R4-C stays paused and does not need to be resumed for R3.9.
+Smoke only:
+
+```text
+CORE_GATE
+MEDIA_PREAPPROVAL_BLOCK
+READONLY_BOUNDARY
+EXECUTION_CONFIRMATION_PROMPT + CANCEL
+FREE_ONLY
+MEDIA_FAILURE_ISOLATION
+PROVIDER_WORK=0
+```
+
+Only after PASS prepare the identical public GPT delta. Native Plugin migration remains deferred until the unified public GPT is accepted.
 
 ## Hard boundary
 
@@ -168,4 +177,4 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 
 Terminal marker:
 
-`MEDIA_BETA_CHAT_HANDOFF_V7_9_R39_UNIFIED_ACTIVE_STATIC_PASS_PUBLIC_GPT_UNCHANGED_2026_09_22`
+`MEDIA_BETA_CHAT_HANDOFF_V7_10_R39_91_PASS_NATIVE_MIGRATION_CONFIRMED_PRIVATE_STAGING_NEXT_2026_09_22`
