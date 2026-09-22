@@ -1,17 +1,18 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 20.4
-Status: **ACTIVE_HANDOFF / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / A5_PASS / A6_STOP_CHECKPOINT_COMPLETE / R4_B_PENDING_AUTHORIZATION / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
+Version: 20.5
+Status: **ACTIVE_HANDOFF / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / STATIC_REGRESSION_PASS / LIVE_CANDIDATE_RESELECT_REQUIRED / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
 Date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 171. R4-A COMPLETE: A0-A5 PASS, A6 STOP checkpoint COMPLETE. R4-B Private Acceptance is next but NOT AUTHORIZED. FREE_ONLY; source public GPT unchanged; publication/share/PR merge remain NO.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 172. R4-A COMPLETE. R4-B AUTHORIZED / IN PROGRESS: repository Core regression PASS and contract scan PASS; pending live Candidate B1/B2/B3 requires explicit Personal/Local Candidate re-selection. No *_start/provider/publication/share/public GPT mutation/PR merge.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v20.4.
-2. `171_R4A_COMPLETE_A5_PASS_A6_STOP_R4B_PENDING_AUTHORIZATION_2026_09_22.md`.
+1. `CURRENT_HANDOFF.md` — v20.5.
+2. `172_R4B_STARTED_STATIC_REGRESSION_PASS_LIVE_CANDIDATE_RESELECT_REQUIRED_2026_09_22.md`.
+3. `171_R4A_COMPLETE_A5_PASS_A6_STOP_R4B_PENDING_AUTHORIZATION_2026_09_22.md`.
 3. `170_R4A_A4_PRIVATE_INSTALL_PASS_A5_NEW_CHAT_PENDING_2026_09_22.md`.
 4. `169_R4A_A1_A2_A3_PASS_A4_PACKAGE_READY_PRIVATE_INSTALL_PENDING_2026_09_22.md`.
 4. `168_R4_PACKAGE_CORRECTED_E1_RESTART_SAFE_OAUTH_BEFORE_RECONNECT_2026_09_22.md`.
@@ -55,7 +56,10 @@ R4_ROLLBACK_PACKAGE=READY
 R4_PRIVATE_ASSEMBLY=COMPLETE
 R4_A5_PRIVATE_ASSEMBLY_VERIFICATION=PASS
 R4_A6_STOP_CHECKPOINT=COMPLETE
-R4_PRIVATE_ACCEPTANCE_AUTHORIZED=NO
+R4_PRIVATE_ACCEPTANCE_AUTHORIZED=YES
+R4_B=IN_PROGRESS
+R4_B_STATIC_REGRESSION=PASS
+R4_B_LIVE_CANDIDATE_RESELECT_REQUIRED=YES
 R4_USER_SWITCH_AUTHORIZED=NO
 R4_CUTOVER_READY=NO
 R4_CUTOVER=HOLD
@@ -73,7 +77,7 @@ KRC:
   validation=Render exact-commit build + live OAuth/read-only runtime PASS
   GitHub_Actions=current unavailable / not used
   historical_CI_reference=35485995871 PASS
-  docs_current_through=checkpoint_171
+  docs_current_through=checkpoint_172
 
 VoiceBridge:
   repo=kolemasakar/VoiceBridge
@@ -221,15 +225,9 @@ R4_READONLY_PREFLIGHT=COMPLETE
 
 Checkpoint 167 defines three separately authorized stages: R4-A private assembly, R4-B private acceptance, R4-C optional user switch/publication.
 
-R4-A is complete. The next phase is **R4-B Private Acceptance / regression validation**, and it remains unauthorized.
+R4-B is authorized and in progress. Repository/static checks passed, but live Candidate B1/B2/B3 are pending because the Personal/Local Candidate tools are not exposed in the active turn.
 
-Before R4-B:
-
-1. recover from this handoff + checkpoint 171;
-2. preserve FREE_ONLY and the unchanged source public GPT;
-3. present the exact R4-B regression scope;
-4. obtain separate explicit owner authorization;
-5. perform no MEDIA execution, publication/share, public GPT mutation, or PR merge unless separately authorized.
+Resume by explicitly reselecting `@K-Research & Critic R4 Candidate`, recover checkpoint 172, and execute only the pending live Candidate checks. Do not execute any MEDIA `*_start`, provider work, publication/share, public GPT mutation, or PR merge.
 
 ## Hard release boundary
 
@@ -260,10 +258,12 @@ R4_CUTOVER_PACKAGE=READY
 R4_A=COMPLETE
 R4_A5=PASS
 R4_A6=COMPLETE
-R4_B_AUTHORIZED=NO
+R4_B_AUTHORIZED=YES
+R4_B=IN_PROGRESS
+R4_B_LIVE_CANDIDATE_RESELECT_REQUIRED=YES
 R4_CUTOVER_READY=NO
 ```
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V20_4_R4A_COMPLETE_A5_PASS_A6_COMPLETE_R4B_PENDING_AUTHORIZATION_2026_09_22`
+`KRC_MEDIA_CURRENT_HANDOFF_V20_5_R4B_IN_PROGRESS_STATIC_PASS_LIVE_CANDIDATE_RESELECT_REQUIRED_2026_09_22`
