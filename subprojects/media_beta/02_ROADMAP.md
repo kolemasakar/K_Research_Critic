@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 8.1
-Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R3C_OAUTH_RECOVERY_PASS / R4_PACKAGE_READY / PRIVATE_ASSEMBLY_REQUIRED / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
+Version: 8.2
+Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R3C_OAUTH_RECOVERY_PASS / R4_PACKAGE_CORRECTED / E1_OAUTH_HARDENING_REQUIRED / PRIVATE_ASSEMBLY_REQUIRED / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
 Updated: 2026-09-22
 
 ## Current roadmap position
@@ -45,6 +45,23 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 ```
 
 No MEDIA execution tool was invoked during this recovery.
+
+## R4-A corrected ordering — checkpoint 168
+
+```text
+A0 read-only freeze/preflight
+A1 E1 restart-safe OAuth hardening
+A1 acceptance incl. restart continuity
+A2 restore private E1 ChatGPT Plugin connection
+A3 create/install private KRC Core Skill
+A4 assemble private R4 Candidate Plugin
+A5 private assembly verification
+A6 STOP / checkpoint
+
+R4_A_SEQUENCE_167=SUPERSEDED_BY_168
+E1_RESTART_SAFE_OAUTH_REQUIRED_BEFORE_RECONNECT=YES
+R4_A_AUTHORIZED=NO
+```
 
 ## R4 staged execution plan — checkpoint 167
 
@@ -128,7 +145,7 @@ Therefore, if R4 is later authorized, the cutover plan must use the validated Pl
 Before any state-changing action:
 
 1. transition to a fresh chat;
-2. recover from `CURRENT_HANDOFF.md` v20.0 + checkpoint 167;
+2. recover from `CURRENT_HANDOFF.md` v20.1 + checkpoint 168;
 3. present exact intended mutations;
 4. present rollback steps;
 5. obtain explicit owner cutover authorization;
@@ -155,4 +172,4 @@ ADDITIONAL_LIVE_MEDIA_STARTS=NO
 
 The next phase is an owner cutover decision in a fresh chat. R4 mutation remains HOLD until that decision.
 
-Recovery authority: `CURRENT_HANDOFF.md` v20.0 + checkpoint 167.
+Recovery authority: `CURRENT_HANDOFF.md` v20.1 + checkpoint 168.
