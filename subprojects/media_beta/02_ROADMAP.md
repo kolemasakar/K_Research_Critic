@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 8.0
-Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R3C_OAUTH_RECOVERY_PASS / PLUGIN_INVENTORY_RECONCILED / R4_READONLY_PREFLIGHT_COMPLETE / PROJECT_SYNC_COMPLETE / OWNER_CUTOVER_DECISION_PENDING / FREE_ONLY / PUBLICATION_HOLD**
+Version: 8.1
+Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R3C_OAUTH_RECOVERY_PASS / R4_PACKAGE_READY / PRIVATE_ASSEMBLY_REQUIRED / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
 Updated: 2026-09-22
 
 ## Current roadmap position
@@ -22,7 +22,11 @@ R3-H Migration/publication readiness          PASS / COMPLETE
 R4 Non-UI read-only preflight                 COMPLETE
 R4 Manual account UI preflight                COMPLETE
 R4 Read-only preflight overall                PASS / COMPLETE
-R4 Cutover/publication                        HOLD / OWNER DECISION
+R4 Package                                  READY
+R4-A Private assembly                       REQUIRED / NOT AUTHORIZED
+R4-B Private acceptance                     NOT AUTHORIZED
+R4-C User switch/publication                NOT AUTHORIZED
+R4 Cutover                                  HOLD
 ```
 
 ## Recovery delta — 2026-09-22
@@ -41,6 +45,33 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 ```
 
 No MEDIA execution tool was invoked during this recovery.
+
+## R4 staged execution plan — checkpoint 167
+
+```text
+R4_A=PRIVATE_ASSEMBLY / NOT_AUTHORIZED
+  A1=create/install private KRC Core Skill
+  A2=restore private E1 YouTube MCP connection
+  A3=assemble private K-Research & Critic R4 Candidate Plugin
+
+R4_B=PRIVATE_ACCEPTANCE / NOT_AUTHORIZED
+  Core regression
+  nine read-only MEDIA operations
+  13-operation visibility/permission scan
+  no new *_start without separate explicit consent
+
+R4_C=OPTIONAL_USER_SWITCH_PUBLICATION / NOT_AUTHORIZED
+  source GPT stays unchanged by default
+  replacement audience/share is a separate approval
+```
+
+```text
+R4_CUTOVER_PACKAGE=READY
+R4_ROLLBACK_PACKAGE=READY
+R4_PRIVATE_ASSEMBLY_REQUIRED=YES
+R4_PRIVATE_ASSEMBLY_AUTHORIZED=NO
+R4_CUTOVER_READY=NO
+```
 
 ## R4 preflight accepted
 
@@ -97,7 +128,7 @@ Therefore, if R4 is later authorized, the cutover plan must use the validated Pl
 Before any state-changing action:
 
 1. transition to a fresh chat;
-2. recover from `CURRENT_HANDOFF.md` v19.9 + checkpoint 166;
+2. recover from `CURRENT_HANDOFF.md` v20.0 + checkpoint 167;
 3. present exact intended mutations;
 4. present rollback steps;
 5. obtain explicit owner cutover authorization;
@@ -124,4 +155,4 @@ ADDITIONAL_LIVE_MEDIA_STARTS=NO
 
 The next phase is an owner cutover decision in a fresh chat. R4 mutation remains HOLD until that decision.
 
-Recovery authority: `CURRENT_HANDOFF.md` v19.9 + checkpoint 166.
+Recovery authority: `CURRENT_HANDOFF.md` v20.0 + checkpoint 167.
