@@ -1,17 +1,18 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 21.1
-Status: **ACTIVE_HANDOFF / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_LINK_ONLY_PILOT_AUTHORIZED / R4_C_IN_PROGRESS / UI_AUTH_BLOCKED / ZERO_MUTATION / FREE_ONLY**
+Version: 21.2
+Status: **ACTIVE_HANDOFF / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_LINK_ONLY_PILOT_INTENT / WEB_LINK_ONLY_PATH_UNAVAILABLE / DISTRIBUTION_DECISION_PENDING / ZERO_MUTATION / FREE_ONLY**
 Date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 178. R4-A/B COMPLETE; private replacement accepted. R4-C LINK_ONLY_PILOT explicitly authorized and IN PROGRESS. Resume only at C2 link-only share mutation. Current blocker: browser has no authenticated ChatGPT session/vault credentials and Cloudflare verification blocks Personal/Local Plugin UI. Zero state changes occurred. Source public GPT remains unchanged; PR22/PR45 unmerged.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 179. R4-A/B COMPLETE. R4-C bounded pilot intent remains, but the current personal Plus web surface does not expose link-only sharing for the local marketplace Candidate. The + control is only new MCP plugin creation. Zero mutation. Decide supported distribution mechanism: A local marketplace pilot, B managed workspace link pilot, or C public directory with separate authorization.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v21.1.
-2. `178_R4C_LINK_ONLY_PILOT_AUTHORIZED_UI_AUTH_BLOCKED_ZERO_MUTATION_2026_09_22.md`.
+1. `CURRENT_HANDOFF.md` — v21.2.
+2. `179_R4C_LINK_ONLY_WEB_PATH_UNAVAILABLE_LOCAL_MARKETPLACE_DISTRIBUTION_DECISION_PENDING_2026_09_22.md`.
+3. `178_R4C_LINK_ONLY_PILOT_AUTHORIZED_UI_AUTH_BLOCKED_ZERO_MUTATION_2026_09_22.md`.
 3. `177_R4C_CUTOVER_PROPOSAL_READY_EXACT_AUDIENCE_APPROVAL_PENDING_2026_09_22.md`.
 3. `176_R4B_PRIVATE_ACCEPTANCE_COMPLETE_B1_B2_B3_PASS_R4C_PENDING_AUTHORIZATION_2026_09_22.md`.
 3. `175_R4B_READONLY_429_LEAKAGE_FIXED_DEPLOY_LIVE_B2_FINAL_AUTH_RERUN_PENDING_2026_09_22.md`.
@@ -84,7 +85,7 @@ KRC:
   validation=Render exact-commit build + live OAuth/read-only runtime PASS
   GitHub_Actions=current unavailable / not used
   historical_CI_reference=35485995871 PASS
-  docs_current_through=checkpoint_178
+  docs_current_through=checkpoint_179
 
 VoiceBridge:
   repo=kolemasakar/VoiceBridge
@@ -230,11 +231,17 @@ R4_READONLY_PREFLIGHT=COMPLETE
 
 ## Next gate
 
-R4-C LINK_ONLY_PILOT is authorized and in progress.
+The exact web link-only control is unavailable on the current personal Plus surface for the local marketplace Candidate. Do not create a new MCP plugin and do not substitute another distribution path automatically.
 
-Resume only at C2 after an authenticated ChatGPT UI session is available and the Cloudflare verification is cleared. Then change only the replacement Plugin audience to exact link-only pilot access, verify the share link and final audience, and proceed to C3 access verification.
+Owner decision required:
 
-If exact link-only sharing is not available, STOP before mutation.
+```text
+A=LOCAL_MARKETPLACE_PILOT
+B=MANAGED_WORKSPACE_LINK_PILOT
+C=PUBLIC_DIRECTORY
+```
+
+Until selected, R4-C remains in progress with zero mutation and the source public GPT unchanged.
 
 ## Hard release boundary
 
@@ -278,4 +285,4 @@ R4_CUTOVER=HOLD
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V21_1_R4C_LINK_ONLY_AUTHORIZED_UI_AUTH_BLOCKED_2026_09_22`
+`KRC_MEDIA_CURRENT_HANDOFF_V21_2_R4C_WEB_LINK_ONLY_UNAVAILABLE_DISTRIBUTION_DECISION_PENDING_2026_09_22`
