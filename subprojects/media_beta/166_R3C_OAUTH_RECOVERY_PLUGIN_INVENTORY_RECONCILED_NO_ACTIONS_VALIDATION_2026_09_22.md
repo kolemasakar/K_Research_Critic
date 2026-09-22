@@ -1,7 +1,7 @@
 # KRC MEDIA — R3C OAuth recovery + Plugin inventory reconciliation + no-Actions validation checkpoint
 
 Date: 2026-09-22  
-Status: **AUTHORITATIVE CHECKPOINT / R3C_OAUTH_RECOVERY_PASS / READONLY_RUNTIME_PASS / PLUGIN_INVENTORY_DRIFT_CLOSED / DOC_SYNC_IN_PROGRESS / R4_CUTOVER_HOLD**
+Status: **AUTHORITATIVE CHECKPOINT / R3C_OAUTH_RECOVERY_PASS / READONLY_RUNTIME_PASS / PLUGIN_INVENTORY_DRIFT_CLOSED / DOC_SYNC_COMPLETE / R4_CUTOVER_HOLD**
 
 ## Scope
 
@@ -226,9 +226,23 @@ PR45_MERGE=NO
 ADDITIONAL_LIVE_MEDIA_STARTS=NO
 ```
 
+## Canonical documentation synchronized
+
+```text
+CURRENT_HANDOFF.md=v19.9
+02_ROADMAP.md=v8.0
+00_INDEX.md=v9.3
+06_DECISION_LOG.md=v5.3
+08_CHAT_HANDOFF.md=v6.3
+migration_candidate_README=SYNCED
+PROJECT_SYNC_COMPLETE=YES
+```
+
+Exact-commit comparison from the validated runtime head `27585c0ce924c78529b90aaadbfbeee841d0d249` through the documentation sync showed only Markdown/documentation files; no runtime source file changed after the accepted live validation.
+
 ## Next gate
 
-Synchronize the canonical documentation to this checkpoint. After synchronization, R4 remains on HOLD until a separate explicit owner cutover decision with an exact mutation and rollback package.
+R4 remains on HOLD until a separate explicit owner cutover decision with an exact mutation and rollback package. GitHub Actions must not be assumed available for that gate.
 
 Terminal marker:
 
