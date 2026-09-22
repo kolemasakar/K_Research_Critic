@@ -2,18 +2,19 @@
 
 Канонічна інструкція відновлення K-Research & Critic MEDIA у новому чаті.
 
-Version: 6.9
-Status: **R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / STATIC_REGRESSION_PASS / LIVE_CANDIDATE_RESELECT_REQUIRED / CUTOVER_HOLD**
+Version: 7.0
+Status: **R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_IN_PROGRESS / B1_PASS / B2_BLOCKED_VOICEBRIDGE_429 / B3_PASS / CUTOVER_HOLD**
 Checkpoint date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 172. R4-A COMPLETE. R4-B AUTHORIZED / IN PROGRESS: static repository regression PASS; live Candidate B1/B2/B3 pending and requires explicit Personal/Local Candidate re-selection. No *_start/provider/publication/share/public GPT mutation/PR merge.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 173. R4-B IN PROGRESS: B1 PASS, B2 BLOCKED_BY_VOICEBRIDGE_429 across all 9 read-only operations, B3 PASS. Diagnose/remediate only the shared read-only 429 path, then repeat only B2. No *_start/provider/publication/share/public GPT mutation/PR merge.`
 
 ## Mandatory recovery order
 
-1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v20.5
-2. `subprojects/media_beta/172_R4B_STARTED_STATIC_REGRESSION_PASS_LIVE_CANDIDATE_RESELECT_REQUIRED_2026_09_22.md`
+1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v20.6
+2. `subprojects/media_beta/173_R4B_B1_PASS_B2_BLOCKED_429_B3_PASS_2026_09_22.md`
+3. `subprojects/media_beta/172_R4B_STARTED_STATIC_REGRESSION_PASS_LIVE_CANDIDATE_RESELECT_REQUIRED_2026_09_22.md`
 3. `subprojects/media_beta/171_R4A_COMPLETE_A5_PASS_A6_STOP_R4B_PENDING_AUTHORIZATION_2026_09_22.md`
 3. `subprojects/media_beta/170_R4A_A4_PRIVATE_INSTALL_PASS_A5_NEW_CHAT_PENDING_2026_09_22.md`
 4. `subprojects/media_beta/168_R4_PACKAGE_CORRECTED_E1_RESTART_SAFE_OAUTH_BEFORE_RECONNECT_2026_09_22.md`
@@ -126,7 +127,7 @@ R4_CUTOVER_READY=NO
 
 ## Next gate
 
-R4-B is already authorized and in progress. Explicitly reselect `@K-Research & Critic R4 Candidate`, recover checkpoint 172, and run only pending live Candidate B1/B2/B3 checks. No new R4-B authorization is required. Do not run any MEDIA `*_start`, provider work, publication/share, public GPT mutation, or PR merge.
+Diagnose and minimally remediate the shared VoiceBridge 429 affecting the nine read-only B2 operations, then repeat only B2. B1 and B3 remain accepted unless the remediation changes their governed components. No `*_start`, provider work, publication/share, public GPT mutation, or PR merge.
 
 ## Hard boundary
 
@@ -156,4 +157,4 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 
 Terminal marker:
 
-`MEDIA_BETA_CHAT_HANDOFF_V6_9_R4B_IN_PROGRESS_STATIC_PASS_LIVE_CANDIDATE_RESELECT_REQUIRED_2026_09_22`
+`MEDIA_BETA_CHAT_HANDOFF_V7_0_R4B_B1_PASS_B2_BLOCKED_429_B3_PASS_2026_09_22`
