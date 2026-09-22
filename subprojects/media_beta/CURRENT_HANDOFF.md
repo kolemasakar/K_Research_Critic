@@ -1,18 +1,19 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 20.2
-Status: **ACTIVE_HANDOFF / R3_A_TO_H_COMPLETE / R4_A_IN_PROGRESS / A1_A2_A3_PASS / A4_PACKAGE_READY / PRIVATE_INSTALL_PENDING / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
+Version: 20.3
+Status: **ACTIVE_HANDOFF / R3_A_TO_H_COMPLETE / R4_A_IN_PROGRESS / A0_A1_A2_A3_PASS / A4_PRIVATE_INSTALL_PASS / A5_NEW_CHAT_PENDING / R4_CUTOVER_HOLD / FREE_ONLY / PUBLICATION_HOLD**
 Date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 169. R4-A authorized/in progress: A0 PASS, A1 E1 restart-safe OAuth PASS, A2 E1 private connection/restart continuity PASS, A3 krc-core private Skill PASS, A4 package STATIC PASS; private Candidate install ще pending. GitHub Actions недоступні. R4-B/R4-C не авторизовані.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 170. R4-A IN PROGRESS: A0/A1/A2/A3 PASS, A4 private install PASS через Personal/Local marketplace; real Work validation errors=0 після мінімальних schema fixes. A5 має виконуватись у НОВОМУ ЧАТІ лише як non-execution verification. GitHub Actions недоступні. R4-B/R4-C NOT AUTHORIZED.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v20.2.
-2. `169_R4A_A1_A2_A3_PASS_A4_PACKAGE_READY_PRIVATE_INSTALL_PENDING_2026_09_22.md`.
-3. `168_R4_PACKAGE_CORRECTED_E1_RESTART_SAFE_OAUTH_BEFORE_RECONNECT_2026_09_22.md`.
+1. `CURRENT_HANDOFF.md` — v20.3.
+2. `170_R4A_A4_PRIVATE_INSTALL_PASS_A5_NEW_CHAT_PENDING_2026_09_22.md`.
+3. `169_R4A_A1_A2_A3_PASS_A4_PACKAGE_READY_PRIVATE_INSTALL_PENDING_2026_09_22.md`.
+4. `168_R4_PACKAGE_CORRECTED_E1_RESTART_SAFE_OAUTH_BEFORE_RECONNECT_2026_09_22.md`.
 4. `167_R4_EXACT_CUTOVER_ROLLBACK_PACKAGE_READY_PRIVATE_ASSEMBLY_FIRST_2026_09_22.md`.
 5. `166_R3C_OAUTH_RECOVERY_PLUGIN_INVENTORY_RECONCILED_NO_ACTIONS_VALIDATION_2026_09_22.md`.
 5. `165_FINAL_PROJECT_DOCS_SYNC_NEW_CHAT_READY_2026_09_21.md`.
@@ -222,7 +223,7 @@ The next state-changing action is **R4-A private assembly only**, and it remains
 
 The new chat must:
 
-1. recover from this handoff + checkpoint 169;
+1. recover from this handoff + checkpoint 170;
 2. verify the intended R4 cutover plan;
 3. show exact mutations and rollback steps;
 4. obtain explicit owner authorization;
@@ -261,4 +262,4 @@ R4_CUTOVER_READY=NO
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V20_2_R4A_PACKAGE_READY_PRIVATE_INSTALL_PENDING_2026_09_22`
+`KRC_MEDIA_CURRENT_HANDOFF_V20_3_R4A_A4_PRIVATE_INSTALL_PASS_A5_NEW_CHAT_PENDING_2026_09_22`
