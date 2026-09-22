@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 9.4
-Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_LOCAL_MARKETPLACE_PILOT_AUTHORIZED / PILOT_BUNDLE_READY / TESTER_APP_ACCESS_GATE_PENDING / FREE_ONLY**
+Version: 9.5
+Status: **PLUGIN_FIRST / R3_A_TO_H_COMPLETE / R4_A_COMPLETE / R4_B_COMPLETE / PRIVATE_REPLACEMENT_ACCEPTED / R4_C_PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION / SOURCE_PUBLIC_GPT_PRODUCTION / FREE_ONLY**
 Updated: 2026-09-22
 
 ## Current roadmap position
@@ -45,6 +45,18 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 ```
 
 No MEDIA execution tool was invoked during this recovery.
+
+## R4-C pause decision — checkpoint 181
+
+```text
+R4_C=PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION
+CURRENT_PRODUCTION_ENTRY_POINT=EXISTING_PUBLIC_GPT
+LOCAL_MARKETPLACE_PILOT=OPTIONAL / NOT_REQUIRED
+TRIGGER_1=NATIVE_MIGRATION_AVAILABLE_IN_PLUS_ACCOUNT
+TRIGGER_2=SUPPORTED_PLUGIN_DISTRIBUTION_TO_ORDINARY_CHATGPT_USERS
+```
+
+Do not spend further implementation effort on Node/Codex/local pilot solely to achieve the end-user cutover. Re-check product support when either trigger appears.
 
 ## R4-C local marketplace pilot — checkpoint 180
 
@@ -110,7 +122,7 @@ FREE_ONLY_FAIL_CLOSED=PASS
 PRIVATE_REPLACEMENT_ACCEPTED=YES
 R4_B=COMPLETE
 R4_CUTOVER_READY=YES
-R4_C_AUTHORIZED=NO
+R4_C_AUTHORIZED=PAUSED
 ```
 
 R4-C may now be proposed, but no publication/share or source-GPT mutation is authorized.
@@ -236,7 +248,7 @@ R4_B=PRIVATE_ACCEPTANCE / NOT_AUTHORIZED
   13-operation visibility/permission scan
   no new *_start without separate explicit consent
 
-R4_C=OPTIONAL_USER_SWITCH_PUBLICATION / NOT_AUTHORIZED
+R4_C=PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION
   source GPT stays unchanged by default
   replacement audience/share is a separate approval
 ```
@@ -255,7 +267,7 @@ R4_B_B3=PASS
 R4_B_B4=OPTIONAL / NOT_RUN
 PRIVATE_REPLACEMENT_ACCEPTED=YES
 R4_CUTOVER_READY=YES
-R4_C_AUTHORIZED=NO
+R4_C_AUTHORIZED=PAUSED
 ```
 
 ## R4 preflight accepted
@@ -316,7 +328,7 @@ R4-B is complete and the private replacement is accepted. R4-C is ready to propo
 
 ```text
 PROJECT_COST_POLICY=FREE_ONLY
-R4_CUTOVER_AUTHORIZED=NO
+R4_CUTOVER_AUTHORIZED=NO / PAUSED
 PUBLIC_GPT_MUTATION=NO
 PLUGIN_INSTALLATION_OR_CHANGE=NO
 PLUGIN_PUBLICATION=NO
@@ -331,4 +343,4 @@ ADDITIONAL_LIVE_MEDIA_STARTS=NO
 
 **R4-B is COMPLETE.** B1/B2/B3 passed; B4 was optional and not run. The private replacement is accepted. R4-C is ready to propose but remains HOLD pending separate owner authorization.
 
-Recovery authority: `CURRENT_HANDOFF.md` v21.3 + checkpoint 180.
+Recovery authority: `CURRENT_HANDOFF.md` v21.4 + checkpoint 181.
