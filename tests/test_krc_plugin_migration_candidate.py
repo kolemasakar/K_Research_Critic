@@ -354,9 +354,11 @@ def test_adapter_selects_proven_remote_mcp_without_live_binding() -> None:
     assert backend["render_change_required_for_r3a"] is False
 
 
-def test_candidate_does_not_guess_final_plugin_or_mcp_packaging() -> None:
+def test_migration_candidate_tracks_validated_private_mcp_without_guessing_final_plugin_packaging() -> None:
     readme = README.read_text(encoding="utf-8")
-    assert "DESIGN_ONLY / NOT_INSTALLABLE / NOT_DEPLOYED" in readme
+    assert "PRIVATE_MCP_IMPLEMENTATION_VALIDATED" in readme
+    assert "R3-H_COMPLETE" in readme
+    assert "PUBLICATION_HOLD" in readme
     assert not (CANDIDATE / "mcp.json").exists()
     assert not (CANDIDATE / ".mcp.json").exists()
     assert not (CANDIDATE / ".app.json").exists()
