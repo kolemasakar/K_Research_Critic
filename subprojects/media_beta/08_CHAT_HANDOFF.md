@@ -2,13 +2,13 @@
 
 Канонічна інструкція відновлення K-Research & Critic MEDIA у новому чаті.
 
-Version: 7.10
-Status: **R3_9_UNIFIED_KRC_GPT_ACTIVE / 91_TESTS_PASS / NATIVE_MIGRATION_TRIGGER_CONFIRMED / PRIVATE_MEDIA_BETA_STAGING_NEXT / PUBLIC_GPT_UNCHANGED / R4_C_DEFERRED**
+Version: 7.11
+Status: **R3_9_UNIFIED_KRC_GPT_ACTIVE / PRIVATE_STAGING_ACCEPTED / S1_TO_S4_PASS / 92_TESTS_PASS / NATIVE_PLUGIN_MIGRATION_AVAILABLE / PUBLIC_GPT_UNCHANGED / PUBLIC_ROLLBACK_SNAPSHOT_NEXT / PROJECT_FROZEN_FOR_HANDOFF**
 Checkpoint date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 183. R3.9 Unified KRC GPT ACTIVE; exact selected regression 91/91 PASS. Native Plus migration to Plugin is now visible but deferred until R3.9 acceptance. Next stage the exact Unified Builder instructions and R3.9 Action schema on private K-Research & Critic - MEDIA BETA, keep it private, then run zero-provider-work smoke. Public GPT remains unchanged.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 192. R3.9 Unified KRC GPT ACTIVE; private MEDIA BETA staging ACCEPTED; S1-S4 PASS; selected regression 92/92 PASS. Native Plus migration to Plugin is visible but deferred. Public K-Research & Critic remains unchanged. Next gate is PUBLIC_GPT_ROLLBACK_BASELINE_SNAPSHOT before any public Builder mutation. Do not reuse the exposed staging credential as production; use a fresh production credential at public activation. Await/execute the owner's transition generator first.`
 
 ## Mandatory recovery order
 
@@ -87,7 +87,7 @@ PLUGIN_SURFACE=PASS
 PRIVATE_KRC_PLUGIN_INVENTORY=PASS
 INSTALL_ADD_CONTROL=PASS
 SKILLS_SURFACE=PASS
-MIGRATE_CONTROL=NOT_FOUND_IN_CURRENT_UI
+MIGRATE_CONTROL=AVAILABLE / owner UI confirmed 2026-09-23
 ```
 
 ## Current account/plugin evidence
@@ -117,43 +117,37 @@ R4_A_PRIVATE_ASSEMBLY=PASS / COMPLETE
 R4_B_PRIVATE_ACCEPTANCE=PASS / COMPLETE
 R4_B_B4=OPTIONAL / NOT_RUN
 PRIVATE_REPLACEMENT_ACCEPTED=YES
-R4_C_USER_SWITCH_PUBLICATION=PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION
+R4_C_USER_SWITCH_PUBLICATION=NATIVE_MIGRATION_AVAILABLE / DEFERRED UNTIL PUBLIC UNIFIED ACCEPTANCE
 SOURCE_PUBLIC_GPT=UNCHANGED
 R4_CUTOVER_READY=YES
 ```
 
 ## Next gate
 
-Private staging on `K-Research & Critic - MEDIA BETA`.
+Project state is frozen pending the owner's transition generator.
 
-Use:
-
-```text
-prompts/GPT_STORE_UNIFIED_R39_INSTRUCTIONS.md
-gpt_store/actions/media_public_r39_openapi.yaml
-```
-
-Keep existing connection settings and private sharing.
-
-Smoke only:
+After bootstrap transition:
 
 ```text
-CORE_GATE
-MEDIA_PREAPPROVAL_BLOCK
-READONLY_BOUNDARY
-EXECUTION_CONFIRMATION_PROMPT + CANCEL
-FREE_ONLY
-MEDIA_FAILURE_ISOLATION
-PROVIDER_WORK=0
+RESUME_FROM=CHECKPOINT_192_R39_PRIVATE_STAGING_ACCEPTED
+NEXT_GATE=PUBLIC_GPT_ROLLBACK_BASELINE_SNAPSHOT
 ```
 
-Only after PASS prepare the identical public GPT delta. Native Plugin migration remains deferred until the unified public GPT is accepted.
+Capture the current public GPT before mutation:
+
+- Instructions;
+- Knowledge;
+- capabilities;
+- Actions/auth state;
+- sharing/publication state.
+
+Then prepare the exact public R3.9 Builder delta. Keep the existing public GPT as rollback anchor. Use a fresh production Action credential; do not promote the staging credential. Native Plugin migration is available but remains deferred until unified public GPT smoke acceptance.
 
 ## Hard boundary
 
 ```text
 PROJECT_COST_POLICY=FREE_ONLY
-R4_CUTOVER_AUTHORIZED=NO / PAUSED
+R4_CUTOVER_AUTHORIZED=NO / DEFERRED
 PUBLIC_GPT_MUTATION=NO
 PLUGIN_INSTALLATION_OR_CHANGE=NO
 PLUGIN_PUBLICATION=NO
@@ -177,4 +171,4 @@ CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 
 Terminal marker:
 
-`MEDIA_BETA_CHAT_HANDOFF_V7_10_R39_91_PASS_NATIVE_MIGRATION_CONFIRMED_PRIVATE_STAGING_NEXT_2026_09_22`
+`MEDIA_BETA_CHAT_HANDOFF_V7_11_R39_PRIVATE_STAGING_ACCEPTED_PUBLIC_ROLLBACK_SNAPSHOT_NEXT_2026_09_23`
