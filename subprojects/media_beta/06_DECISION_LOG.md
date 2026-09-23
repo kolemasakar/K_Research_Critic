@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 6.10
-Status: **ACTIVE / R3_9_UNIFIED_KRC_GPT_ACTIVE / 91_TESTS_PASS / NATIVE_MIGRATION_TRIGGER_CONFIRMED / PRIVATE_STAGING_NEXT / PUBLIC_GPT_UNCHANGED / R4_C_DEFERRED**
+Version: 6.11
+Status: **ACTIVE / R3_9_UNIFIED_KRC_GPT_ACTIVE / PRIVATE_STAGING_ACCEPTED / S1_TO_S4_PASS / 92_TESTS_PASS / NATIVE_PLUGIN_MIGRATION_AVAILABLE / PUBLIC_GPT_UNCHANGED / PROJECT_FROZEN_FOR_HANDOFF**
 Updated: 2026-09-22
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -427,7 +427,7 @@ R4-C may now be proposed but remains separately gated:
 ```text
 R4_CUTOVER_READY=YES
 R4_C_AUTHORIZED=NO
-R4_CUTOVER=PAUSED
+R4_CUTOVER=DEFERRED
 SOURCE_PUBLIC_GPT_UNCHANGED=YES
 PUBLICATION=NO
 SHARING_CHANGE=NO
@@ -657,13 +657,46 @@ An exact Builder instructions artifact was also created at 7404/8000 characters.
 
 Next staging target is the existing private `K-Research & Critic - MEDIA BETA`. The public GPT remains unchanged until private smoke acceptance.
 
+### D091 — Unified R3.9 private staging accepted; public rollout requires rollback snapshot and fresh production credential
+
+Private `K-Research & Critic - MEDIA BETA` staging passed the complete bounded smoke:
+
+```text
+S1_CORE_GATE=PASS
+S2_MEDIA_PREAPPROVAL_GATE=PASS
+S3_READONLY_AND_GEMINI_CONSENT_BOUNDARY=PASS
+S4_CONSEQUENTIAL_CONFIRMATION_BOUNDARY=PASS
+SELECTED_REGRESSION_TESTS=92/92 PASS
+FREE_ONLY=PASS
+PROVIDER_WORK_DURING_S4=0
+```
+
+Action transport/auth was repaired using a dedicated R3.9 server-side credential and validated with `getPublicMediaCapabilities`.
+
+Native account migration to Plugin is now visibly available. Earlier `MIGRATE_CONTROL=NOT_FOUND` evidence is superseded by owner UI evidence showing `Перенести в плагін` and the displayed 2026-12-11 deadline.
+
+Decision:
+
+```text
+PRIVATE_STAGING_ACCEPTED=YES
+PUBLIC_GPT_MUTATION=NO
+NEXT_GATE=PUBLIC_GPT_ROLLBACK_BASELINE_SNAPSHOT
+NATIVE_PLUGIN_MIGRATION=AVAILABLE / DEFERRED
+STAGING_CREDENTIAL_PROMOTION_TO_PUBLIC=FORBIDDEN
+PUBLIC_ACTIVATION_REQUIRES_FRESH_PRODUCTION_CREDENTIAL=YES
+```
+
+The staging credential was exposed during interactive setup, so it must not become the long-term public production credential. The credential value is not stored in repository documentation.
+
+Project is frozen at checkpoint 192 pending the owner's transition generator.
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v21.6
-- checkpoint 183
-- `02_ROADMAP.md` v9.7
-- `00_INDEX.md` v10.10
-- `08_CHAT_HANDOFF.md` v7.10
+- `CURRENT_HANDOFF.md` v21.7
+- checkpoint 192
+- `02_ROADMAP.md` v9.8
+- `00_INDEX.md` v10.11
+- `08_CHAT_HANDOFF.md` v7.11
 
 ## Hard boundary
 
@@ -677,5 +710,5 @@ MAIN_MUTATION=NO
 PR22_MERGE=NO
 PR45_MERGE=NO
 ADDITIONAL_LIVE_MEDIA_STARTS=NO
-R4_CUTOVER=PAUSED
+R4_CUTOVER=DEFERRED
 ```
