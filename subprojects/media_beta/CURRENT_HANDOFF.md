@@ -1,17 +1,19 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 21.6
-Status: **ACTIVE_HANDOFF / R3_9_UNIFIED_KRC_GPT_ACTIVE / EXACT_VALIDATION_91_PASS / NATIVE_MIGRATION_TRIGGER_CONFIRMED / PRIVATE_MEDIA_BETA_STAGING_NEXT / PUBLIC_GPT_UNCHANGED / R4_C_DEFERRED_UNTIL_R39_ACCEPTANCE / FREE_ONLY**
+Version: 21.7
+Status: **ACTIVE_HANDOFF / R3_9_UNIFIED_KRC_GPT_ACTIVE / PRIVATE_STAGING_ACCEPTED / S1_TO_S4_PASS / 92_TESTS_PASS / NATIVE_PLUGIN_MIGRATION_AVAILABLE / PUBLIC_GPT_UNCHANGED / PUBLIC_ROLLBACK_SNAPSHOT_NEXT / PROJECT_FROZEN_FOR_HANDOFF / FREE_ONLY**
 Date: 2026-09-22
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 183. R3.9 Unified KRC GPT ACTIVE; selected exact-branch regression 91/91 PASS. Plus account exposes native migration to Plugin with displayed deadline 2026-12-11, but migration is deferred until R3.9 acceptance. Next: stage exact Unified instructions and R3.9 Action schema on private K-Research & Critic - MEDIA BETA, keep current connection settings unchanged, run zero-provider-work smoke. Public GPT remains unchanged.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 192. R3.9 Unified KRC GPT ACTIVE; private MEDIA BETA staging ACCEPTED; S1-S4 PASS; selected regression 92/92 PASS; native Plus migration to Plugin is visible but deferred. Public K-Research & Critic remains unchanged. Next gate: capture the complete public GPT rollback baseline before any public Builder mutation. Do not reuse the exposed staging credential as production; create a fresh production credential only when public activation is authorized.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v21.6.
-2. `183_R39_EXACT_VALIDATION_91_PASS_NATIVE_MIGRATION_TRIGGER_CONFIRMED_PRIVATE_STAGING_PACKAGE_READY_2026_09_22.md`.
+1. `CURRENT_HANDOFF.md` — v21.7.
+2. `192_R39_PRIVATE_STAGING_ACCEPTED_PROJECT_FROZEN_DOCS_SYNCED_AWAIT_TRANSITION_GENERATOR_2026_09_23.md`.
+3. `191_R39_PRIVATE_STAGING_ACCEPTANCE_PASS_READY_FOR_PUBLIC_GPT_ROLLBACK_SNAPSHOT_2026_09_23.md`.
+4. `183_R39_EXACT_VALIDATION_91_PASS_NATIVE_MIGRATION_TRIGGER_CONFIRMED_PRIVATE_STAGING_PACKAGE_READY_2026_09_22.md`.
 3. `182_R39_UNIFIED_KRC_GPT_ROUTING_CONTRACT_STAGING_READY_STATIC_PASS_PUBLIC_GPT_UNCHANGED_2026_09_22.md`.
 3. `181_R4C_PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION_2026_09_22.md`.
 4. `180_R4C_LOCAL_MARKETPLACE_PILOT_AUTHORIZED_BUNDLE_READY_APP_ACCESS_GATE_PENDING_2026_09_22.md`.
@@ -60,18 +62,18 @@ R4_B_B4=OPTIONAL / NOT_RUN
 PRIVATE_REPLACEMENT_ACCEPTED=YES
 R4_USER_SWITCH_AUTHORIZED=NO
 R4_CUTOVER_READY=YES
-R4_C=DEFERRED_UNTIL_R39_UNIFIED_ACCEPTANCE
+R4_C=NATIVE_MIGRATION_AVAILABLE_DEFERRED_UNTIL_PUBLIC_UNIFIED_ACCEPTANCE
 R4_C_NATIVE_MIGRATION_TRIGGER=CONFIRMED
-R4_C_AUTHORIZED=DEFERRED
+R4_C_AUTHORIZED=DEFERRED_UNTIL_PUBLIC_UNIFIED_ACCEPTANCE
 R4_CUTOVER=NOT_COMPLETE
 
 R3_9=ACTIVE
 R3_9_UNIFIED_ROUTING_CONTRACT=READY
 R3_9_STAGING_MANIFEST=READY
 R3_9_STATIC_READBACK=PASS
-R3_9_SELECTED_PYTEST=91/91 PASS
-R3_9_PRIVATE_STAGING_NEXT=YES
-R3_9_PRIVATE_STAGING_NEXT=YES
+R3_9_SELECTED_PYTEST=92/92 PASS
+R3_9_PRIVATE_STAGING=ACCEPTED
+R3_9_PRIVATE_STAGING=ACCEPTED
 R3_9_PUBLIC_GPT_MUTATION=NO
 ```
 
@@ -233,18 +235,24 @@ R4_READONLY_PREFLIGHT=COMPLETE
 
 ## Next gate
 
-Private-first R3.9 Builder staging:
+Project is frozen for transition handoff.
+
+After the next-chat bootstrap is generated, resume with:
 
 ```text
-TARGET=K-Research & Critic - MEDIA BETA
-INSTRUCTIONS=prompts/GPT_STORE_UNIFIED_R39_INSTRUCTIONS.md
-ACTION_SCHEMA=gpt_store/actions/media_public_r39_openapi.yaml
-SHARING=PRIVATE
+RESUME_FROM=CHECKPOINT_192_R39_PRIVATE_STAGING_ACCEPTED
+NEXT_GATE=PUBLIC_GPT_ROLLBACK_BASELINE_SNAPSHOT
 ```
 
-Then run zero-provider-work smoke for Core gate, MEDIA preapproval block, read-only boundary, execution confirmation prompt with cancellation, FREE_ONLY, and MEDIA failure isolation.
+Capture the current public `K-Research & Critic` baseline before any mutation:
 
-Public GPT remains unchanged until this staging gate passes. Native Plugin migration is available but deferred.
+- Instructions;
+- Knowledge;
+- capabilities;
+- Actions/auth state;
+- sharing/publication state.
+
+Then prepare the exact R3.9 public Builder delta. The staging credential must not be promoted to public production; use a fresh production credential when public activation is authorized. Native Plugin migration remains available but deferred until the unified public GPT passes smoke acceptance.
 
 ## Hard release boundary
 
@@ -283,10 +291,10 @@ PRIVATE_REPLACEMENT_ACCEPTED=YES
 VOICEBRIDGE_VALIDATED_DEPLOYED_HEAD=174174aae0635736f05d812094b555544623270c
 R4_CUTOVER_READY=YES
 R4_C_NATIVE_MIGRATION_TRIGGER=CONFIRMED
-R4_C_AUTHORIZED=DEFERRED
+R4_C_AUTHORIZED=DEFERRED_UNTIL_PUBLIC_UNIFIED_ACCEPTANCE
 R4_CUTOVER=DEFERRED
 ```
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V21_6_R39_91_PASS_NATIVE_MIGRATION_CONFIRMED_PRIVATE_STAGING_NEXT_2026_09_22`
+`KRC_MEDIA_CURRENT_HANDOFF_V21_7_R39_PRIVATE_STAGING_ACCEPTED_PUBLIC_ROLLBACK_SNAPSHOT_NEXT_2026_09_23`
