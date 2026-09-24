@@ -1,12 +1,12 @@
 # KRC MEDIA — CURRENT HANDOFF
 
 Version: 22.9
-Status: **ACTIVE_HANDOFF / DIRECT_R3C_PASS / UNDERLYING_APP_HEALTHY / PLUGIN_ROUTING_UNRESOLVED / EXPLICIT_IN_PLUGIN_APP_CALL_NEXT / ZERO_PROVIDER**
+Status: **ACTIVE_HANDOFF / DIRECT_R3C_PASS / PLUGIN_APP_EXPOSURE_PASS / ROUTING_PRIORITY_FIX_APPLIED / PRIVATE_RESMOKE_NEXT / ZERO_PROVIDER / FREE_ONLY**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 207. Direct @KRC MCP R3C Readonly media_get_capabilities now PASS after VoiceBridge wake: configured=true, FREE_ONLY preserved, provider_work=0. Underlying R3C App/auth/MCP/VoiceBridge are healthy. Private Plugin S3 still used TinyFish only. Next gate: in a fresh private Plugin Chat explicitly request only media_get_capabilities via KRC MCP R3C Readonly, forbidding TinyFish/web, to distinguish app exposure from model routing.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 208. Direct R3C capabilities PASS and explicit R3C call inside private Plugin PASS, proving bundled App exposure is healthy. Failed S3 root cause is routing/tool-selection priority. Private Plugin updated to 0.19.4+routingfix.20260924 / release pluginrel_6ab578661cbc81918222878502316a6c with mandatory KRC MEDIA-first routing and no TinyFish/web substitution before actual KRC read-only attempt. Apps 5/5 unchanged, provider_work=0. Next gate: fresh Chat re-smoke S2/S3.`
 
 ## Canonical current authority
 
