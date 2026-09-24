@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 9.10
-Status: **R3_9_PUBLIC_GPT_ACCEPTED / NATIVE_MIGRATION_PREFLIGHT_PASS / CUSTOM_ACTIONS_NOT_TRANSFERRED / MEDIA_REBIND_PREBUILD_NEXT / FREE_ONLY**
+Version: 9.11
+Status: **R3_9_PUBLIC_GPT_ACCEPTED / NATIVE_MIGRATION_PREFLIGHT_PASS / MEDIA_REBIND_PREBUILD_PASS / FIVE_APPS_FOUND / NATIVE_MIGRATION_EXECUTION_DECISION_NEXT / FREE_ONLY**
 Updated: 2026-09-24
 
 ## Current roadmap position
@@ -25,9 +25,26 @@ R4 Read-only preflight overall                PASS / COMPLETE
 R4 Package                                  READY
 R4-A Private assembly                       PASS / COMPLETE
 R4-B Private acceptance                     PASS / COMPLETE
-R4-C Native Plugin migration                PREFLIGHT PASS / MEDIA REBIND PREBUILD
-R4 Cutover                                  HOLD / REBIND PREBUILD BEFORE MIGRATION
+R4-C Native Plugin migration                PREFLIGHT PASS / REBIND PREBUILD PASS
+R4 Cutover                                  OWNER MIGRATION EXECUTION DECISION NEXT
 ```
+
+## MEDIA rebind prebuild PASS — checkpoint 195
+
+```text
+FIVE_CANONICAL_APPS_FOUND=5/5
+APP_IDS_UNCHANGED=PASS
+R3C_READ_SURFACE=AVAILABLE
+E1_YOUTUBE_EXECUTION_SURFACE=AVAILABLE
+E2_INSTAGRAM_EXECUTION_SURFACE=AVAILABLE
+E3_FACEBOOK_EXECUTION_SURFACE=AVAILABLE
+E4_TELEGRAM_EXECUTION_SURFACE=AVAILABLE
+PERMISSION_BASELINE=ALLOW_READ_ACTIONS
+STATIC_MEDIA_CONTRACT=9 read + 4 execution = 13
+FINAL_NATIVE_MIGRATION_EXECUTION=NOT_AUTHORIZED
+```
+
+Next gate is an explicit owner decision whether to execute native migration. If approved, the resulting private Plugin must be inspected and rebound to the five canonical Apps before any cutover/distribution decision.
 
 ## Native migration preflight PASS — checkpoint 194
 
