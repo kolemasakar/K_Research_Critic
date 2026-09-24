@@ -1,12 +1,12 @@
 # KRC MEDIA — CURRENT HANDOFF
 
 Version: 22.9
-Status: **ACTIVE_HANDOFF / CHAT_APP_RUNTIME_UNAVAILABLE / PACKAGE_VALID / DIRECT_APPS_HEALTHY / WORK_MODE_CANONICAL_TEST_NEXT / ZERO_PROVIDER / FREE_ONLY**
+Status: **ACTIVE_HANDOFF / WORK_MODE_APP_EXPOSURE_PASS / R3C_REACHED / VOICEBRIDGE_429_COLD_EDGE / VOICEBRIDGE_WOKEN / ZERO_PROVIDER / RETRY_NEXT**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 212. On private Plugin 0.19.6+portable.20260924, Chat-mode Skill correctly attempted KRC MEDIA but media_youtube_preflight/lookup/get_capabilities returned UNAVAILABLE_IN_RUNTIME; R3C/E1 server requests remained zero. Direct R3C App invocation passes, package/app mappings validate, and app permissions resolve. OpenAI's current personal MCP-plugin quickstart uses ChatGPT Work as the canonical test surface. Next gate: fresh Work-mode S2/S3 retest on 0.19.6. No further manifest/app mutation until that test.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 213. Canonical Work-mode test on private Plugin 0.19.6+portable.20260924 proved bundled App exposure: R3C oauth/token=200 and POST /mcp=200 twice; E1 requests=0. The test failed only at downstream VoiceBridge HTTP 429 while the service was cold/asleep. VoiceBridge was then woken with GET /api/v1/health=200; provider_work=0. Next gate: repeat Work-mode S2/S3 once after wake, stop at Gemini consent/confirmation boundary.`
 
 ## Canonical current authority
 
