@@ -115,14 +115,14 @@ KRC:
   validation=Render exact-commit build + live OAuth/read-only runtime PASS
   GitHub_Actions=current unavailable / not used
   historical_CI_reference=35485995871 PASS
-  docs_current_through=checkpoint_181
+  docs_current_through=checkpoint_193
 
 VoiceBridge:
   repo=kolemasakar/VoiceBridge
   branch=agent/krc-media-gemini-migration
   PR=45
   state=OPEN / DRAFT / UNMERGED
-  validated_deployed_code_head=174174aae0635736f05d812094b555544623270c
+  validated_deployed_code_head=fc6a967911c5c2a549df065762a185fc5f6c900b
   GitHub_Actions=current unavailable / not used
   historical_CI_reference=35492121039 PASS
   Render=LIVE
@@ -222,22 +222,18 @@ SKILLS_ADD_CONTROL=PRESENT
 
 ### Migration
 
-No explicit `Migrate` / `Перенести` control was found on:
-
-- GPT main page;
-- Configure page;
-- lower Configure controls;
-- GPT overflow menu;
-- Share/GPT Store dialog;
-- Plugins;
-- Personal/Created-by-me Plugins;
-- Skills.
+Live owner UI now exposes the native migration control:
 
 ```text
-MIGRATION_CONTROL=NOT_FOUND_IN_CURRENT_UI
+MIGRATION_CONTROL=AVAILABLE
+MIGRATION_LABEL=Перенести в плагін
+DISPLAYED_DEADLINE=2026-12-11
+PUBLIC_R39_ACCEPTED=YES
+NATIVE_PLUGIN_MIGRATION_PREFLIGHT=AUTHORIZED
+NATIVE_PLUGIN_MIGRATION_EXECUTION=NO
 ```
 
-Do not assume a hidden migration control exists. If R4 is later authorized, use the validated Plugin/Skill path that is actually available.
+Earlier `MIGRATION_CONTROL=NOT_FOUND` observations are historical and superseded. The next step is read-only inspection of the native migration flow; do not complete migration during preflight.
 
 ## R4 preflight result
 
