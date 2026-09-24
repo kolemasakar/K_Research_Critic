@@ -25,7 +25,7 @@ PROVIDER_WORK_DURING_PUBLIC_SMOKE=0
 FREE_ONLY=PASS
 NATIVE_PLUGIN_MIGRATION=AVAILABLE
 PUBLIC_PRIVACY_POLICY_ACTIVE_BRANCH=READY
-LIVE_BUILDER_PRIVACY_URL_RECONCILIATION=PENDING
+LIVE_BUILDER_PRIVACY_URL_RECONCILIATION=PASS
 NATIVE_PLUGIN_MIGRATION_EXECUTION=NOT_STARTED
 ```
 
@@ -144,12 +144,12 @@ PROVIDER_WORK=0
 
 The prerequisite that previously blocked native migration — accepted Unified R3.9 on the existing public GPT — is now satisfied.
 
-A final P0 metadata reconciliation remains: update the live Builder Privacy Policy URL from the stale `main` candidate document to the active branch Version 2.3 policy. After that, the next phase is deliberately limited to **read-only native migration preflight**.
+The final P0 metadata reconciliation is complete: the live Builder Privacy Policy URL now points to the active branch Version 2.3 policy, and the GPT was republished in GPT Store. The next phase is deliberately limited to **read-only native migration preflight**.
 
 ```text
 R4_C_NATIVE_MIGRATION_TRIGGER=CONFIRMED
 PUBLIC_R39_ACCEPTED=YES
-NATIVE_PLUGIN_MIGRATION_PREFLIGHT=AUTHORIZED_AFTER_PRIVACY_URL_RECONCILIATION
+NATIVE_PLUGIN_MIGRATION_PREFLIGHT=AUTHORIZED
 NATIVE_PLUGIN_MIGRATION_EXECUTION=NO
 PLUGIN_PUBLICATION=NO
 PLUGIN_SHARING_CHANGE=NO
@@ -193,8 +193,7 @@ NEW_MEDIA_PROVIDER_WORK=NO
 
 ```text
 RESUME_FROM=CHECKPOINT_193_R39_PUBLIC_GPT_ACCEPTED
-NEXT_GATE=PUBLIC_PRIVACY_POLICY_URL_RECONCILIATION
-AFTER_GATE=NATIVE_PLUGIN_MIGRATION_PREFLIGHT_READONLY
+NEXT_GATE=NATIVE_PLUGIN_MIGRATION_PREFLIGHT_READONLY
 ```
 
 Terminal marker:
