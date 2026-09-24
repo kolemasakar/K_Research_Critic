@@ -1,12 +1,12 @@
 # KRC MEDIA — CURRENT HANDOFF
 
 Version: 21.8
-Status: **ACTIVE_HANDOFF / R3_9_PUBLIC_GPT_ACCEPTED / PUBLIC_SMOKE_S1_TO_S4_PASS / PRODUCTION_AUTH_PASS / ROLLBACK_BASELINE_CAPTURED / NATIVE_PLUGIN_MIGRATION_PREFLIGHT_NEXT / FREE_ONLY**
+Status: **ACTIVE_HANDOFF / R3_9_PUBLIC_GPT_ACCEPTED / PUBLIC_SMOKE_S1_TO_S4_PASS / PRODUCTION_AUTH_PASS / ROLLBACK_BASELINE_CAPTURED / PRIVACY_URL_RECONCILIATION_PENDING / NATIVE_PLUGIN_MIGRATION_PREFLIGHT_NEXT / FREE_ONLY**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 193. Unified R3.9 public K-Research & Critic is PUBLISHED and ACCEPTED; public smoke S1-S4 PASS; fresh public-production R3.9 bearer auth PASS; rollback baseline captured; provider work during public smoke=0. Next gate: read-only native Перенести в плагін preflight. Keep the accepted public GPT published as rollback anchor; do not execute migration, publish/share Plugin, merge PR #22/#45, or start new MEDIA provider work during preflight.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 193. Unified R3.9 public K-Research & Critic is PUBLISHED and ACCEPTED; public smoke S1-S4 PASS; fresh public-production R3.9 bearer auth PASS; rollback baseline captured; provider work during public smoke=0. Next gate: repoint the live Builder Privacy Policy URL to the active branch Version 2.3 policy; after that, read-only native Перенести в плагін preflight. Keep the accepted public GPT published as rollback anchor; do not execute migration, publish/share Plugin, merge PR #22/#45, or start new MEDIA provider work during preflight.`
 
 ## Canonical current authority
 
@@ -96,7 +96,9 @@ S4_CONFIRMATION_CANCELLED=PASS
 START_HTTP_REQUEST_DURING_S4=0
 PROVIDER_WORK_DURING_PUBLIC_SMOKE=0
 FREE_ONLY=PASS
-NATIVE_PLUGIN_MIGRATION_PREFLIGHT=NEXT
+PUBLIC_PRIVACY_POLICY_ACTIVE_BRANCH=READY
+LIVE_BUILDER_PRIVACY_URL_RECONCILIATION=PENDING
+NATIVE_PLUGIN_MIGRATION_PREFLIGHT=AFTER_PRIVACY_URL_RECONCILIATION
 ```
 
 Public production Action authentication uses a fresh dedicated R3.9 credential. The private staging credential was not promoted. Secret values are not stored in documentation.
@@ -261,10 +263,11 @@ Resume with:
 
 ```text
 RESUME_FROM=CHECKPOINT_193_R39_PUBLIC_GPT_ACCEPTED
-NEXT_GATE=NATIVE_PLUGIN_MIGRATION_PREFLIGHT_READONLY
+NEXT_GATE=PUBLIC_PRIVACY_POLICY_URL_RECONCILIATION
+AFTER_GATE=NATIVE_PLUGIN_MIGRATION_PREFLIGHT_READONLY
 ```
 
-Open the native **Перенести в плагін** flow only for read-only preflight/inspection first. Do not complete migration until the proposed native Plugin structure, permissions, app/action mapping, sharing defaults, rollback implications and semantic parity are inspected and accepted.
+First repoint the live Builder Privacy Policy URL to the active branch Version 2.3 policy and republish that metadata change. Then open the native **Перенести в плагін** flow only for read-only preflight/inspection. Do not complete migration until the proposed native Plugin structure, permissions, app/action mapping, sharing defaults, rollback implications and semantic parity are inspected and accepted.
 
 Keep the current public `K-Research & Critic` published as the rollback anchor.
 
