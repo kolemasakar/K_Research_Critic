@@ -1,17 +1,18 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 22.0
-Status: **ACTIVE_HANDOFF / R3_9_PUBLIC_GPT_ACCEPTED / NATIVE_MIGRATION_PREFLIGHT_PASS / MEDIA_REBIND_PREBUILD_PASS / FIVE_APPS_FOUND / NATIVE_MIGRATION_EXECUTION_DECISION_NEXT / FREE_ONLY**
+Version: 22.1
+Status: **ACTIVE_HANDOFF / R3_9_PUBLIC_GPT_ACCEPTED / NATIVE_MIGRATION_PREFLIGHT_PASS / MEDIA_REBIND_PREBUILD_PASS / NATIVE_MIGRATION_EXECUTION_AUTHORIZED / UI_EXECUTION_PENDING / FREE_ONLY**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 195. Public Unified R3.9 remains PUBLISHED/EDITABLE and accepted. Native migration preflight PASS. MEDIA_REBIND_PREBUILD PASS: all five canonical Apps R3C/E1/E2/E3/E4 are currently FOUND, IDs unchanged, permission baseline=Allow read actions, static 9 read + 4 execution contract preserved. Native migration has NOT been executed. Next gate: explicit NATIVE_PLUGIN_MIGRATION_EXECUTION_DECISION. No Plugin publication/share, PR #22/#45 merge, main mutation, or provider work.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 196. Native Plugin migration execution is explicitly AUTHORIZED by owner; UI confirmation has not yet been captured. Preconditions: public R3.9 accepted, P1 preflight PASS, MEDIA_REBIND_PREBUILD PASS, five canonical Apps FOUND. Next gate: complete native migration in UI, capture resulting private Plugin, then rebind R3C/E1/E2/E3/E4 and run private zero-provider smoke. No Plugin publication/share, PR merges, main mutation, or provider work.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v22.0.
-2. `195_MEDIA_REBIND_PREBUILD_PASS_NATIVE_MIGRATION_EXECUTION_DECISION_NEXT_2026_09_24.md`.
+1. `CURRENT_HANDOFF.md` — v22.1.
+2. `196_NATIVE_PLUGIN_MIGRATION_EXECUTION_AUTHORIZED_PENDING_UI_2026_09_24.md`.
+3. `195_MEDIA_REBIND_PREBUILD_PASS_NATIVE_MIGRATION_EXECUTION_DECISION_NEXT_2026_09_24.md`.
 3. `194_NATIVE_PLUGIN_MIGRATION_PREFLIGHT_PASS_MEDIA_REBIND_PREBUILD_NEXT_2026_09_24.md`.
 3. `193_R39_PUBLIC_GPT_ACCEPTED_NATIVE_PLUGIN_MIGRATION_PREFLIGHT_NEXT_2026_09_24.md`.
 3. `192_R39_PRIVATE_STAGING_ACCEPTED_PROJECT_FROZEN_DOCS_SYNCED_AWAIT_TRANSITION_GENERATOR_2026_09_23.md`.
