@@ -1,12 +1,12 @@
 # KRC MEDIA — CURRENT HANDOFF
 
 Version: 22.9
-Status: **ACTIVE_HANDOFF / FRESH_E1_RETRY_EXECUTED / UPSTREAM_HTTP503_EXPOSED / DIAGNOSTIC_FIX_PROVEN / READONLY_LOOKUP_NEXT / FREE_ONLY**
+Status: **ACTIVE_HANDOFF / HTTP503_RETRYABLE_CONFIRMED / INTERACTIONS_ERROR_CODE_FIX_DEPLOYED / NO_NEW_PROVIDER_RETRY / FREE_ONLY**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 218. Fresh explicitly authorized E1 retry in Work mode created FAILED job KRCM_d4545ce4-0971-408e-ae13-bcb01d4433ca. New diagnostics exposed provider_http_status=503, error.code=GEMINI_YOUTUBE_FAILED, zero transcript, zero charged credits, no paid fallback. R3C and E1 MCP calls reached 200, so Plugin/Work/MCP routing is healthy and failure is isolated to Gemini provider response. Next gate: read-only media_youtube_lookup to capture provider_error_status and error.retryable; no new provider retry.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 219. Read-only lookup of fresh job KRCM_d4545ce4-0971-408e-ae13-bcb01d4433ca confirms provider_http_status=503, error.retryable=true, zero charged credits, canonical YouTube URL, no paid fallback. provider_error_status=null exposed a diagnostic schema mismatch: current Gemini Interactions errors use error.code, not legacy error.status. VoiceBridge PR #53 merged and deploy dep-daqp1iou01pc73fgjb00 is LIVE at d3873bf13e60c4932ab08cae449c924051be4a37; new field provider_error_code is now persisted. Targeted tests 9/9 PASS. No new Gemini retry after deploy. Next gate: wait or obtain fresh explicit consent for one controlled retry.`
 
 ## Canonical current authority
 
