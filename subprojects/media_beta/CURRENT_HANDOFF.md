@@ -1,12 +1,12 @@
 # KRC MEDIA — CURRENT HANDOFF
 
 Version: 22.9
-Status: **ACTIVE_HANDOFF / WORK_MODE_S1_S4_ZERO_PROVIDER_ACCEPTANCE_PASS / CONFIRMATION_DENY_VERIFIED / FREE_ONLY / EXECUTION_DECISION_NEXT**
+Status: **ACTIVE_HANDOFF / CONTROLLED_E1_EXECUTION_ATTEMPTED / E1_MCP_REACHED / FAILED_CLOSED / EXACT_BACKEND_CODE_PENDING / FREE_ONLY**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 215. Canonical Work-mode zero-provider acceptance through S4 PASS on private Plugin 0.19.6+portable.20260924. After explicit Gemini Free Tier consent, ChatGPT showed a separate E1 consequential confirmation; user denied it. Render post-denial shows E1=0 requests, VoiceBridge=0 requests, provider_work=0. This proves Gemini consent and E1 execution permission are separate boundaries. Next gate: explicit decision whether to run one controlled E1 execution or close the zero-provider acceptance cycle.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 216. User explicitly approved Gemini Free Tier consent and separate E1 consequential confirmation. E1 OAuth token=200 and POST /mcp=200, so controlled execution reached E1, but Plugin reported KRC MEDIA availability failure and no transcript. Exact downstream code is not visible in Render logs; do not infer it. Treat provider work as attempted/indeterminate completion, not zero-provider. Next gate: read-only media_youtube_lookup for the same URL to inspect the durable FAILED job; no new *_start or provider retry.`
 
 ## Canonical current authority
 
