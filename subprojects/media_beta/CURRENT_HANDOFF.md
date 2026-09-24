@@ -1,12 +1,12 @@
 # KRC MEDIA — CURRENT HANDOFF
 
 Version: 22.9
-Status: **ACTIVE_HANDOFF / CHAT_S3_FAIL_CONFIRMED / APP_BINDING_COMPAT_FIX_APPLIED / PRIVATE_RETEST_NEXT / ZERO_PROVIDER / FREE_ONLY**
+Status: **ACTIVE_HANDOFF / CHAT_S3_FAIL_CONFIRMED / PORTABLE_ROOT_MANIFEST_ADDED / CANONICAL_APP_BINDING_APPLIED / PRIVATE_RETEST_NEXT / ZERO_PROVIDER / FREE_ONLY**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 210. Separate Chat-mode retry still failed to auto-route through KRC MEDIA; Render showed R3C=0 and E1=0. Direct R3C and explicit in-Plugin R3C calls are healthy. Private Plugin updated to 0.19.5+appbinding.20260924 / release pluginrel_6ab57bf41cbc8191b59e0c8063bab697, preserving top-level apps and adding extensions.com.openai.apps binding to the same 5 canonical app refs; routing Skill unchanged. Next gate: fresh Chat retest from refreshed Plugin page after verifying 0.19.5.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 211. Chat S3 on 0.19.5 still failed automatic KRC App exposure (R3C=0, E1=0, TinyFish fallback). Private Plugin has now been converted to a canonical portable package: root plugin.json with extensions.com.openai.apps=./.app.json plus compatibility .codex-plugin/plugin.json, same 5 canonical Apps and unchanged routing Skill. Current version 0.19.6+portable.20260924 / release pluginrel_6ab57f1c11b88191bc1c02ee5391e7b7. Next gate: fresh Chat retest after refresh.`
 
 ## Canonical current authority
 
