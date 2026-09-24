@@ -158,19 +158,38 @@ PUBLIC_GPT_UNPUBLISH_OR_DELETE=NO
 
 The preflight must inspect what the native **Перенести в плагін** flow proposes to migrate before any final migration confirmation.
 
+## OpenAI migration behavior verified 2026-09-24
+
+Current OpenAI migration documentation establishes these product semantics:
+
+```text
+GPT_INSTRUCTIONS -> PLUGIN_SKILL
+KNOWLEDGE_FILES -> PLUGIN_REFERENCE_FILES
+CONNECTED_APPS -> PLUGIN_APPS
+SELECTED_MODEL -> NOT_TRANSFERRED
+CUSTOM_ACTIONS -> NOT_TRANSFERRED
+MIGRATED_PLUGIN_INITIAL_SHARING -> PRIVATE
+SOURCE_GPT_AFTER_COMPLETED_MIGRATION -> USABLE_UNTIL_RETIREMENT / READ_ONLY
+EXISTING_GPT_CONVERSATIONS -> NOT_TRANSFERRED
+```
+
+Project implication: the accepted public R3.9 GPT currently depends on a custom Action schema for its 13 MEDIA operations. Those operations must not be assumed to migrate. Native migration preflight therefore inspects the generated Skill/reference/app surface and migration details, but **must stop before final migration confirmation**. The MEDIA integration must later be rebuilt/rebound through the accepted R3C/E1-E4 app/MCP path or another explicitly reviewed supported replacement.
+
+The source public GPT remains an operational fallback until retirement, but after completed migration it would no longer be editable. This makes final migration confirmation a separate irreversible-enough gate requiring owner authorization.
+
 ## P1 preflight acceptance requirements
 
 Verify, without completing migration:
 
 1. migrated product identity;
 2. Core/Skill instruction semantics;
-3. Apps/Actions generated or referenced by the migration;
-4. preservation of the 13-operation MEDIA contract;
+3. Apps generated or referenced by the migration, with explicit confirmation that custom Actions are not transferred;
+4. identify the required post-migration replacement path for the 13-operation MEDIA contract;
 5. preservation of the consequential confirmation boundary;
 6. FREE_ONLY and fail-closed semantics;
 7. sharing/publication defaults;
-8. whether the source public GPT remains available;
-9. rollback implications;
+8. verify the source public GPT would remain usable but become read-only after completed migration;
+9. rollback/fallback implications of that read-only transition;
 10. any automatic schema or permission transformation.
 
 Stop on any semantic drift or if migration cannot be inspected without immediately mutating the public/Plugin state.
