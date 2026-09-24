@@ -1,17 +1,18 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 22.2
-Status: **ACTIVE_HANDOFF / NATIVE_PLUGIN_MIGRATION_COMPLETE / PRIVATE_PLUGIN_CREATED / GENERATED_SKILL_PRESENT / APPS_EMPTY / GENERATED_SKILL_PARITY_NEXT / FREE_ONLY**
+Version: 22.3
+Status: **ACTIVE_HANDOFF / NATIVE_PLUGIN_MIGRATION_COMPLETE / GENERATED_SKILL_SOURCE_PARITY_PASS / PLUGIN_TRANSPORT_WORDING_REVISE / APPS_EMPTY / FREE_ONLY**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 197. Native migration COMPLETE: private K-Research & Critic Plugin created successfully; generated Skill present; Apps attached=0; custom Actions did not transfer as expected. Plugin version 0.19.1+bundle.537edef6e9b2291f8ee718897254ce9b. Next gate: inspect generated Skill parity before attaching R3C/E1/E2/E3/E4. No Plugin publication/share, provider work, PR merges, or main mutation.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 198. Native Plugin migration COMPLETE. Generated Skill source fidelity to public Unified R3.9=PASS, but Plugin-native semantic review found two legacy Custom Action transport phrases that require minimal normalization before Apps are attached. Apps attached=0. Next gate: change only those two transport lines, then attach canonical R3C/E1/E2/E3/E4. No publication/share, provider work, PR merges, or main mutation.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v22.2.
-2. `197_NATIVE_PLUGIN_MIGRATION_COMPLETE_PRIVATE_PLUGIN_CREATED_SKILL_PRESENT_APPS_EMPTY_2026_09_24.md`.
+1. `CURRENT_HANDOFF.md` — v22.3.
+2. `198_GENERATED_SKILL_SOURCE_PARITY_PASS_PLUGIN_TRANSPORT_WORDING_REVISE_NEXT_2026_09_24.md`.
+3. `197_NATIVE_PLUGIN_MIGRATION_COMPLETE_PRIVATE_PLUGIN_CREATED_SKILL_PRESENT_APPS_EMPTY_2026_09_24.md`.
 3. `196_NATIVE_PLUGIN_MIGRATION_EXECUTION_AUTHORIZED_PENDING_UI_2026_09_24.md`.
 3. `195_MEDIA_REBIND_PREBUILD_PASS_NATIVE_MIGRATION_EXECUTION_DECISION_NEXT_2026_09_24.md`.
 3. `194_NATIVE_PLUGIN_MIGRATION_PREFLIGHT_PASS_MEDIA_REBIND_PREBUILD_NEXT_2026_09_24.md`.
