@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 9.9
-Status: **R3_9_PUBLIC_GPT_ACCEPTED / PUBLIC_SMOKE_S1_TO_S4_PASS / PRODUCTION_AUTH_PASS / ROLLBACK_BASELINE_CAPTURED / PRIVACY_URL_RECONCILIATION_PASS / NATIVE_PLUGIN_MIGRATION_PREFLIGHT_NEXT / FREE_ONLY**
+Version: 9.10
+Status: **R3_9_PUBLIC_GPT_ACCEPTED / NATIVE_MIGRATION_PREFLIGHT_PASS / CUSTOM_ACTIONS_NOT_TRANSFERRED / MEDIA_REBIND_PREBUILD_NEXT / FREE_ONLY**
 Updated: 2026-09-24
 
 ## Current roadmap position
@@ -25,9 +25,24 @@ R4 Read-only preflight overall                PASS / COMPLETE
 R4 Package                                  READY
 R4-A Private assembly                       PASS / COMPLETE
 R4-B Private acceptance                     PASS / COMPLETE
-R4-C Native Plugin migration                PREFLIGHT READY / PUBLIC R3.9 ACCEPTED
-R4 Cutover                                  PREFLIGHT ONLY / MIGRATION EXECUTION NOT STARTED
+R4-C Native Plugin migration                PREFLIGHT PASS / MEDIA REBIND PREBUILD
+R4 Cutover                                  HOLD / REBIND PREBUILD BEFORE MIGRATION
 ```
+
+## Native migration preflight PASS — checkpoint 194
+
+Live migration dialog confirmed:
+
+```text
+INSTRUCTIONS_AND_FILES=NO_PROBLEMS_DETECTED
+CUSTOM_ACTIONS=UNSUPPORTED
+PLUGIN_INITIAL_VISIBILITY=PRIVATE
+PUBLIC_PLUGIN_SHARING=UNAVAILABLE
+SOURCE_GPT_AFTER_MIGRATION=READ_ONLY
+FINAL_MIGRATION_EXECUTION=NO
+```
+
+Next phase is MEDIA rebind prebuild using the already validated five-app R4 mapping. Final migration remains separately gated.
 
 ## Native Plugin migration semantics — verified current OpenAI behavior
 
