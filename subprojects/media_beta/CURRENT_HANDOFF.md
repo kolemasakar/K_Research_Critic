@@ -1,12 +1,12 @@
 # KRC MEDIA — CURRENT HANDOFF
 
 Version: 22.9
-Status: **ACTIVE_HANDOFF / CONTROLLED_E1_EXECUTION_ATTEMPTED / E1_MCP_REACHED / FAILED_CLOSED / EXACT_BACKEND_CODE_PENDING / FREE_ONLY**
+Status: **ACTIVE_HANDOFF / GEMINI_FAILED_JOB_CONFIRMED / DIAGNOSTIC_FIX_DEPLOYED / FRESH_RETRY_AUTHORIZATION_REQUIRED / FREE_ONLY**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 216. User explicitly approved Gemini Free Tier consent and separate E1 consequential confirmation. E1 OAuth token=200 and POST /mcp=200, so controlled execution reached E1, but Plugin reported KRC MEDIA availability failure and no transcript. Exact downstream code is not visible in Render logs; do not infer it. Treat provider work as attempted/indeterminate completion, not zero-provider. Next gate: read-only media_youtube_lookup for the same URL to inspect the durable FAILED job; no new *_start or provider retry.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 217. Controlled E1 job KRCM_3d55d447-f32d-4d3b-8584-8030abc202e3 is durable FAILED with GEMINI_YOUTUBE_FAILED and zero charged credits. Old retryable=false was caused by adapter loss of upstream diagnostics. VoiceBridge PR #52 merged to deployed branch and Render deploy dep-daqolgek1f9s73ctv8pg is LIVE at commit 1e729ad8a7efc3bd3710510574ba24dd777ebea6; health=200. New code preserves provider_http_status/provider_error_status/retryability and canonicalizes youtu.be share URLs. Validation 269/269 PASS. No retry after deployment. Next gate requires explicit fresh user authorization for one new E1 attempt.`
 
 ## Canonical current authority
 
