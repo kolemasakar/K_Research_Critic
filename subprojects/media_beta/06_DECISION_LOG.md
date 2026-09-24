@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 6.16
-Status: **ACTIVE / NATIVE_PLUGIN_MIGRATION_COMPLETE / PRIVATE_PLUGIN_CREATED / GENERATED_SKILL_PRESENT / APPS_EMPTY / GENERATED_SKILL_PARITY_NEXT / FREE_ONLY**
+Version: 6.17
+Status: **ACTIVE / NATIVE_PLUGIN_MIGRATION_COMPLETE / GENERATED_SKILL_SOURCE_PARITY_PASS / PLUGIN_TRANSPORT_WORDING_REVISE / APPS_EMPTY / FREE_ONLY**
 Updated: 2026-09-24
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -928,12 +928,38 @@ PROVIDER_WORK=NO
 
 Only after generated Skill parity passes may the five canonical Apps be attached.
 
+### D100 — Migrated Skill source fidelity PASS; normalize two legacy Action transport phrases before app rebind
+
+The full generated `skills/instructions/SKILL.md` supplied from the migrated Plugin was compared with the canonical public Unified R3.9 instructions.
+
+```text
+CORE_BODY_PARITY=PASS
+MEDIA_ADDENDUM_BODY_PARITY=PASS
+SOURCE_MIGRATION_FIDELITY=PASS
+```
+
+However, the migrated public-GPT wording still contains two Custom Action transport assumptions:
+
+```text
+use the MEDIA Action
+send the required gemini_free_consent object
+```
+
+The Plugin architecture uses KRC MEDIA Apps/MCP tools and the adapter-defined consent boundary. Decision: change only those two lines to transport-neutral app/tool wording before attaching the five canonical Apps.
+
+```text
+PLUGIN_NATIVE_SEMANTIC_PARITY=REVISE
+CORE_DRIFT=NO
+BUSINESS_LOGIC_DRIFT=NO
+APP_ATTACHMENT=HOLD
+```
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v22.2
-- checkpoint 197
-- `02_ROADMAP.md` v9.13
-- `00_INDEX.md` v10.16
+- `CURRENT_HANDOFF.md` v22.3
+- checkpoint 198
+- `02_ROADMAP.md` v9.14
+- `00_INDEX.md` v10.17
 - `08_CHAT_HANDOFF.md` v7.11
 
 ## Hard boundary
