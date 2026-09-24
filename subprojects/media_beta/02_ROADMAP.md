@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 9.14
-Status: **NATIVE_PLUGIN_MIGRATION_COMPLETE / GENERATED_SKILL_SOURCE_PARITY_PASS / PLUGIN_TRANSPORT_WORDING_REVISE / APPS_EMPTY / FREE_ONLY**
+Version: 9.15
+Status: **NATIVE_PLUGIN_MIGRATION_COMPLETE / TRANSPORT_NORMALIZATION_PASS / PRIVATE_PLUGIN_UPDATED / APPS_EMPTY / FIVE_APP_REBIND_NEXT / FREE_ONLY**
 Updated: 2026-09-24
 
 ## Current roadmap position
@@ -26,8 +26,23 @@ R4 Package                                  READY
 R4-A Private assembly                       PASS / COMPLETE
 R4-B Private acceptance                     PASS / COMPLETE
 R4-C Native Plugin migration                PREFLIGHT PASS / REBIND PREBUILD PASS
-R4 Cutover                                  NATIVE MIGRATION COMPLETE / TRANSPORT NORMALIZATION + APP REBIND NEXT
+R4 Cutover                                  TRANSPORT NORMALIZATION PASS / FIVE-APP REBIND NEXT
 ```
+
+## Plugin transport normalization PASS — checkpoint 199
+
+```text
+plugin_id=plugin_bb3595f295708191a3f9e145ba1ff2d5
+version=0.19.2+transportfix.20260924
+release=pluginrel_6ab563faebe48191ac77f4df8c705581
+scope=USER
+discoverability=PRIVATE
+two_transport_lines=UPDATED
+apps_attached=0
+provider_work=0
+```
+
+Next: attach the five canonical Apps, verify 13-operation parity, then run private zero-provider smoke.
 
 ## Generated Skill source parity PASS — checkpoint 198
 
