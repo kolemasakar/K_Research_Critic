@@ -1,17 +1,18 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 22.8
-Status: **ACTIVE_HANDOFF / FIVE_APP_RUNTIME_READY / E2_RECONNECT_PASS / PRIVATE_PLUGIN / ZERO_PROVIDER_SMOKE_NEXT / FREE_ONLY**
+Version: 22.9
+Status: **ACTIVE_HANDOFF / PRIVATE_S1_PASS / PRIVATE_S2_PASS / PRIVATE_S3_MEDIA_ROUTING_FAIL / KRC_RUNTIME_NOT_REACHED / ZERO_PROVIDER / DIAGNOSTIC_NEXT**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 203. Private Plugin five-App runtime is ready. E2 reconnect PASS: UI Primary підключено; server OAuth trace GET authorize=200, POST authorize=302, POST token=200; provider_work_started=false. Next gate: private zero-provider smoke mirroring public S1-S4, deny the first consequential execution confirmation. No publication/share, provider work, PR merges, or main mutation.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 204. Private Plugin Chat smoke: S1 Core gate PASS, S2 MEDIA preapproval gate PASS, S3 FAIL. After profile approval the Plugin reported KRC MEDIA tools unavailable and fell back to non-KRC/public web research. Render correlation shows zero R3C and zero E1 requests in the smoke window, so failure is before KRC backend: Plugin/App tool exposure, selection, or client-side connection/routing. Provider work=0. Next gate: inspect the two ChatGPT tool-call traces from failed S3. No Plugin/app mutation until trace is identified.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v22.8.
-2. `203_E2_RECONNECT_PASS_PRIVATE_PLUGIN_ZERO_PROVIDER_SMOKE_NEXT_2026_09_24.md`.
+1. `CURRENT_HANDOFF.md` — v22.9.
+2. `204_PRIVATE_PLUGIN_S3_MEDIA_ROUTING_FAIL_KRC_TOOLS_NOT_REACHED_DIAGNOSTIC_NEXT_2026_09_24.md`.
+3. `203_E2_RECONNECT_PASS_PRIVATE_PLUGIN_ZERO_PROVIDER_SMOKE_NEXT_2026_09_24.md`.
 3. `202_E2_OAUTH_LEGACY_BRIDGE_REMEDIATION_PASS_RECONNECT_RETRY_NEXT_2026_09_24.md`.
 3. `201_FIVE_APPS_UI_RENDER_PASS_E2_RECONNECT_PENDING_2026_09_24.md`.
 3. `200_FIVE_CANONICAL_APPS_REBOUND_PRIVATE_PLUGIN_VERIFY_UI_NEXT_2026_09_24.md`.
