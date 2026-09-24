@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 6.13
-Status: **ACTIVE / R3_9_PUBLIC_GPT_ACCEPTED / NATIVE_MIGRATION_PREFLIGHT_PASS / CUSTOM_ACTIONS_NOT_TRANSFERRED / MEDIA_REBIND_PREBUILD_NEXT / FREE_ONLY**
+Version: 6.14
+Status: **ACTIVE / R3_9_PUBLIC_GPT_ACCEPTED / NATIVE_MIGRATION_PREFLIGHT_PASS / MEDIA_REBIND_PREBUILD_PASS / FIVE_APPS_FOUND / NATIVE_MIGRATION_EXECUTION_DECISION_NEXT / FREE_ONLY**
 Updated: 2026-09-24
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -850,12 +850,42 @@ PLUGIN_SHARING_CHANGE=NO
 PROVIDER_WORK=NO
 ```
 
+### D097 — MEDIA rebind prebuild PASS; five canonical Apps currently available
+
+Account-level read-only permission lookup resolved all five canonical R4 app IDs successfully:
+
+```text
+R3C KRC MCP R3C Readonly=FOUND
+E1 KRC MCP R3E1 YouTube Sentinel=FOUND
+E2 KRC MCP R3E2 Instagram Sentinel-v5=FOUND
+E3 MCP E3 Facebook 1=FOUND
+E4 MCP E4 Telegram 1=FOUND
+```
+
+Each currently inherits the account default:
+
+```text
+permission=Allow read actions
+read_without_ask=YES
+changes_require_confirmation=YES
+```
+
+The repository contract continues to map 9 non-execution operations to the read surface and exactly one execution start to each E1-E4 surface.
+
+```text
+MEDIA_REBIND_PREBUILD=PASS
+FIVE_APPS_CURRENTLY_AVAILABLE=5/5
+STATIC_13_OPERATION_PARITY=PASS
+FINAL_NATIVE_MIGRATION_EXECUTION=NOT_AUTHORIZED
+NEXT=NATIVE_PLUGIN_MIGRATION_EXECUTION_DECISION
+```
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v21.9
-- checkpoint 194
-- `02_ROADMAP.md` v9.10
-- `00_INDEX.md` v10.13
+- `CURRENT_HANDOFF.md` v22.0
+- checkpoint 195
+- `02_ROADMAP.md` v9.11
+- `00_INDEX.md` v10.14
 - `08_CHAT_HANDOFF.md` v7.11
 
 ## Hard boundary
