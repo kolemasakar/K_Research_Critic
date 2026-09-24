@@ -1,12 +1,12 @@
 # KRC MEDIA — CURRENT HANDOFF
 
 Version: 22.9
-Status: **ACTIVE_HANDOFF / GEMINI_FAILED_JOB_CONFIRMED / DIAGNOSTIC_FIX_DEPLOYED / FRESH_RETRY_AUTHORIZATION_REQUIRED / FREE_ONLY**
+Status: **ACTIVE_HANDOFF / FRESH_E1_RETRY_EXECUTED / UPSTREAM_HTTP503_EXPOSED / DIAGNOSTIC_FIX_PROVEN / READONLY_LOOKUP_NEXT / FREE_ONLY**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 217. Controlled E1 job KRCM_3d55d447-f32d-4d3b-8584-8030abc202e3 is durable FAILED with GEMINI_YOUTUBE_FAILED and zero charged credits. Old retryable=false was caused by adapter loss of upstream diagnostics. VoiceBridge PR #52 merged to deployed branch and Render deploy dep-daqolgek1f9s73ctv8pg is LIVE at commit 1e729ad8a7efc3bd3710510574ba24dd777ebea6; health=200. New code preserves provider_http_status/provider_error_status/retryability and canonicalizes youtu.be share URLs. Validation 269/269 PASS. No retry after deployment. Next gate requires explicit fresh user authorization for one new E1 attempt.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 218. Fresh explicitly authorized E1 retry in Work mode created FAILED job KRCM_d4545ce4-0971-408e-ae13-bcb01d4433ca. New diagnostics exposed provider_http_status=503, error.code=GEMINI_YOUTUBE_FAILED, zero transcript, zero charged credits, no paid fallback. R3C and E1 MCP calls reached 200, so Plugin/Work/MCP routing is healthy and failure is isolated to Gemini provider response. Next gate: read-only media_youtube_lookup to capture provider_error_status and error.retryable; no new provider retry.`
 
 ## Canonical current authority
 
