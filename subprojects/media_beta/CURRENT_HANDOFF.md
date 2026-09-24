@@ -1,12 +1,12 @@
 # KRC MEDIA — CURRENT HANDOFF
 
 Version: 22.9
-Status: **ACTIVE_HANDOFF / PRIVATE_S2_PASS / PRIVATE_S3_PASS / KRC_R3C_USED / GEMINI_NOTICE_SHOWN / CONSENT_PENDING / ZERO_PROVIDER / FREE_ONLY**
+Status: **ACTIVE_HANDOFF / CHAT_S3_FAIL_CONFIRMED / APP_BINDING_COMPAT_FIX_APPLIED / PRIVATE_RETEST_NEXT / ZERO_PROVIDER / FREE_ONLY**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 209. Private Plugin re-smoke after routing fix PASS: fresh Chat + YouTube request + profile approval used R3C read-only route; R3C POST /mcp=200 twice, E1 requests=0, TinyFish preemptive fallback=0. Gemini Free Tier data-use notice displayed and explicit consent requested; provider_work=0. Next gate: user consents, expect E1 consequential confirmation, then deny/cancel it and verify zero provider work.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 210. Separate Chat-mode retry still failed to auto-route through KRC MEDIA; Render showed R3C=0 and E1=0. Direct R3C and explicit in-Plugin R3C calls are healthy. Private Plugin updated to 0.19.5+appbinding.20260924 / release pluginrel_6ab57bf41cbc8191b59e0c8063bab697, preserving top-level apps and adding extensions.com.openai.apps binding to the same 5 canonical app refs; routing Skill unchanged. Next gate: fresh Chat retest from refreshed Plugin page after verifying 0.19.5.`
 
 ## Canonical current authority
 
