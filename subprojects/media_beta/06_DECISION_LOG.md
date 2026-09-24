@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
 Version: 6.12
-Status: **ACTIVE / R3_9_PUBLIC_GPT_ACCEPTED / PUBLIC_SMOKE_S1_TO_S4_PASS / PRODUCTION_AUTH_PASS / ROLLBACK_BASELINE_CAPTURED / NATIVE_PLUGIN_MIGRATION_PREFLIGHT_NEXT / FREE_ONLY**
+Status: **ACTIVE / R3_9_PUBLIC_GPT_ACCEPTED / PUBLIC_SMOKE_S1_TO_S4_PASS / PRODUCTION_AUTH_PASS / ROLLBACK_BASELINE_CAPTURED / PRIVACY_URL_RECONCILIATION_PENDING / NATIVE_PLUGIN_MIGRATION_PREFLIGHT_NEXT / FREE_ONLY**
 Updated: 2026-09-24
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -742,6 +742,29 @@ NEW_MEDIA_PROVIDER_WORK=NO
 ```
 
 The next gate is read-only inspection of the native migration flow. Any automatic Core semantic change, loss of MEDIA operation parity, confirmation-boundary drift, FREE_ONLY violation, forced public-GPT retirement, or publication/sharing mutation is a STOP condition.
+
+### D093 — Active public Privacy Policy prepared; live Builder URL reconciliation required before Plugin preflight
+
+P0 readback found that the live public Action Privacy Policy URL points to the `main` copy of `docs/PRIVACY_POLICY.md`, while that document still describes MEDIA as `PUBLIC_MEDIA_CANDIDATE / NOT_YET_ACTIVATED`.
+
+No `main` mutation is authorized. The active recovery branch policy was therefore updated to:
+
+```text
+Version=2.3
+Status=PUBLIC_MEDIA_ACTIVE / R39_PUBLIC_ACCEPTED / FREE_TIER_ONLY
+Updated=2026-09-24
+```
+
+Immediate gate:
+
+```text
+PUBLIC_PRIVACY_POLICY_ACTIVE_BRANCH=READY
+LIVE_BUILDER_PRIVACY_URL_RECONCILIATION=PENDING
+NATIVE_PLUGIN_MIGRATION_PREFLIGHT=HOLD_UNTIL_RECONCILED
+MAIN_MUTATION=NO
+```
+
+After the Builder Privacy Policy URL is repointed to the active branch document and the metadata update is published, native migration preflight may resume.
 
 ## Canonical authority
 
