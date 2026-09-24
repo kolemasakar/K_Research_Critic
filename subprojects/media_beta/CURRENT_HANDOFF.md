@@ -1,17 +1,18 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 22.5
-Status: **ACTIVE_HANDOFF / FIVE_APP_REBIND_APPLIED / PRIVATE_PLUGIN / UI_VERIFICATION_NEXT / FREE_ONLY**
+Version: 22.6
+Status: **ACTIVE_HANDOFF / FIVE_APP_UI_RENDER_PASS / E2_RECONNECT_PENDING / PRIVATE_PLUGIN / ZERO_PROVIDER / FREE_ONLY**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 200. Native private Plugin plugin_bb3595f295708191a3f9e145ba1ff2d5 is at version 0.19.3+apps.20260924 / release pluginrel_6ab565dc1a788191b775aa8ddbc14042. Five canonical existing Apps are rebound through native .app.json references (R3C/E1/E2/E3/E4); no new custom app was created. Next gate: close create-new-app dialog, refresh Plugin UI, verify 5/5 Apps render, then private zero-provider smoke. No publication/share, provider work, PR merges, or main mutation.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 201. Private native Plugin version 0.19.3+apps.20260924 renders all five canonical Apps. R3C/E1/E3/E4 show no reconnect warning; E2 asdk_app_6aaeae197c9081918b90e46f5bb09615 explicitly shows Повторно підключити. Next gate: reconnect only E2 Instagram Sentinel-v5, then private zero-provider smoke. No other app changes, publication/share, provider work, PR merges, or main mutation.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v22.5.
-2. `200_FIVE_CANONICAL_APPS_REBOUND_PRIVATE_PLUGIN_VERIFY_UI_NEXT_2026_09_24.md`.
+1. `CURRENT_HANDOFF.md` — v22.6.
+2. `201_FIVE_APPS_UI_RENDER_PASS_E2_RECONNECT_PENDING_2026_09_24.md`.
+3. `200_FIVE_CANONICAL_APPS_REBOUND_PRIVATE_PLUGIN_VERIFY_UI_NEXT_2026_09_24.md`.
 3. `199_PLUGIN_TRANSPORT_NORMALIZATION_PASS_APP_REBIND_NEXT_2026_09_24.md`.
 3. `198_GENERATED_SKILL_SOURCE_PARITY_PASS_PLUGIN_TRANSPORT_WORDING_REVISE_NEXT_2026_09_24.md`.
 3. `197_NATIVE_PLUGIN_MIGRATION_COMPLETE_PRIVATE_PLUGIN_CREATED_SKILL_PRESENT_APPS_EMPTY_2026_09_24.md`.
