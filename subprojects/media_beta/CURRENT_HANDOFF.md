@@ -1,17 +1,18 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 22.1
-Status: **ACTIVE_HANDOFF / R3_9_PUBLIC_GPT_ACCEPTED / NATIVE_MIGRATION_PREFLIGHT_PASS / MEDIA_REBIND_PREBUILD_PASS / NATIVE_MIGRATION_EXECUTION_AUTHORIZED / UI_EXECUTION_PENDING / FREE_ONLY**
+Version: 22.2
+Status: **ACTIVE_HANDOFF / NATIVE_PLUGIN_MIGRATION_COMPLETE / PRIVATE_PLUGIN_CREATED / GENERATED_SKILL_PRESENT / APPS_EMPTY / GENERATED_SKILL_PARITY_NEXT / FREE_ONLY**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 196. Native Plugin migration execution is explicitly AUTHORIZED by owner; UI confirmation has not yet been captured. Preconditions: public R3.9 accepted, P1 preflight PASS, MEDIA_REBIND_PREBUILD PASS, five canonical Apps FOUND. Next gate: complete native migration in UI, capture resulting private Plugin, then rebind R3C/E1/E2/E3/E4 and run private zero-provider smoke. No Plugin publication/share, PR merges, main mutation, or provider work.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 197. Native migration COMPLETE: private K-Research & Critic Plugin created successfully; generated Skill present; Apps attached=0; custom Actions did not transfer as expected. Plugin version 0.19.1+bundle.537edef6e9b2291f8ee718897254ce9b. Next gate: inspect generated Skill parity before attaching R3C/E1/E2/E3/E4. No Plugin publication/share, provider work, PR merges, or main mutation.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v22.1.
-2. `196_NATIVE_PLUGIN_MIGRATION_EXECUTION_AUTHORIZED_PENDING_UI_2026_09_24.md`.
+1. `CURRENT_HANDOFF.md` — v22.2.
+2. `197_NATIVE_PLUGIN_MIGRATION_COMPLETE_PRIVATE_PLUGIN_CREATED_SKILL_PRESENT_APPS_EMPTY_2026_09_24.md`.
+3. `196_NATIVE_PLUGIN_MIGRATION_EXECUTION_AUTHORIZED_PENDING_UI_2026_09_24.md`.
 3. `195_MEDIA_REBIND_PREBUILD_PASS_NATIVE_MIGRATION_EXECUTION_DECISION_NEXT_2026_09_24.md`.
 3. `194_NATIVE_PLUGIN_MIGRATION_PREFLIGHT_PASS_MEDIA_REBIND_PREBUILD_NEXT_2026_09_24.md`.
 3. `193_R39_PUBLIC_GPT_ACCEPTED_NATIVE_PLUGIN_MIGRATION_PREFLIGHT_NEXT_2026_09_24.md`.
