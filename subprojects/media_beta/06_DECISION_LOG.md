@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 6.14
-Status: **ACTIVE / R3_9_PUBLIC_GPT_ACCEPTED / NATIVE_MIGRATION_PREFLIGHT_PASS / MEDIA_REBIND_PREBUILD_PASS / FIVE_APPS_FOUND / NATIVE_MIGRATION_EXECUTION_DECISION_NEXT / FREE_ONLY**
+Version: 6.15
+Status: **ACTIVE / R3_9_PUBLIC_GPT_ACCEPTED / NATIVE_MIGRATION_PREFLIGHT_PASS / MEDIA_REBIND_PREBUILD_PASS / NATIVE_MIGRATION_EXECUTION_AUTHORIZED / UI_EXECUTION_PENDING / FREE_ONLY**
 Updated: 2026-09-24
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -880,12 +880,34 @@ FINAL_NATIVE_MIGRATION_EXECUTION=NOT_AUTHORIZED
 NEXT=NATIVE_PLUGIN_MIGRATION_EXECUTION_DECISION
 ```
 
+### D098 — Owner authorizes native Plugin migration execution
+
+After P1 native migration preflight PASS and checkpoint 195 MEDIA rebind prebuild PASS, the owner explicitly selected:
+
+```text
+1 = APPROVE
+```
+
+Decision:
+
+```text
+NATIVE_PLUGIN_MIGRATION_EXECUTION_AUTHORIZED=YES
+FINAL_MIGRATION_CONFIRMATION_AUTHORIZED=YES
+PLUGIN_INITIAL_VISIBILITY=PRIVATE
+POST_MIGRATION_MEDIA_REBIND=REQUIRED
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING_CHANGE=NO
+NEW_PROVIDER_WORK=NO
+```
+
+Execution is expected to make the source public GPT read-only while keeping it usable until retirement. Immediately after migration, capture the generated Plugin before attaching the five canonical Apps.
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v22.0
-- checkpoint 195
-- `02_ROADMAP.md` v9.11
-- `00_INDEX.md` v10.14
+- `CURRENT_HANDOFF.md` v22.1
+- checkpoint 196
+- `02_ROADMAP.md` v9.12
+- `00_INDEX.md` v10.15
 - `08_CHAT_HANDOFF.md` v7.11
 
 ## Hard boundary
