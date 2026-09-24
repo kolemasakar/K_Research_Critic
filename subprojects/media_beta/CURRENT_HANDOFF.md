@@ -1,17 +1,18 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 21.7
-Status: **ACTIVE_HANDOFF / R3_9_UNIFIED_KRC_GPT_ACTIVE / PRIVATE_STAGING_ACCEPTED / S1_TO_S4_PASS / 92_TESTS_PASS / NATIVE_PLUGIN_MIGRATION_AVAILABLE / PUBLIC_GPT_UNCHANGED / PUBLIC_ROLLBACK_SNAPSHOT_NEXT / PROJECT_FROZEN_FOR_HANDOFF / FREE_ONLY**
-Date: 2026-09-22
+Version: 21.8
+Status: **ACTIVE_HANDOFF / R3_9_PUBLIC_GPT_ACCEPTED / PUBLIC_SMOKE_S1_TO_S4_PASS / PRODUCTION_AUTH_PASS / ROLLBACK_BASELINE_CAPTURED / NATIVE_PLUGIN_MIGRATION_PREFLIGHT_NEXT / FREE_ONLY**
+Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 192. R3.9 Unified KRC GPT ACTIVE; private MEDIA BETA staging ACCEPTED; S1-S4 PASS; selected regression 92/92 PASS; native Plus migration to Plugin is visible but deferred. Public K-Research & Critic remains unchanged. Next gate: capture the complete public GPT rollback baseline before any public Builder mutation. Do not reuse the exposed staging credential as production; create a fresh production credential only when public activation is authorized.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 193. Unified R3.9 public K-Research & Critic is PUBLISHED and ACCEPTED; public smoke S1-S4 PASS; fresh public-production R3.9 bearer auth PASS; rollback baseline captured; provider work during public smoke=0. Next gate: read-only native Перенести в плагін preflight. Keep the accepted public GPT published as rollback anchor; do not execute migration, publish/share Plugin, merge PR #22/#45, or start new MEDIA provider work during preflight.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v21.7.
-2. `192_R39_PRIVATE_STAGING_ACCEPTED_PROJECT_FROZEN_DOCS_SYNCED_AWAIT_TRANSITION_GENERATOR_2026_09_23.md`.
+1. `CURRENT_HANDOFF.md` — v21.8.
+2. `193_R39_PUBLIC_GPT_ACCEPTED_NATIVE_PLUGIN_MIGRATION_PREFLIGHT_NEXT_2026_09_24.md`.
+3. `192_R39_PRIVATE_STAGING_ACCEPTED_PROJECT_FROZEN_DOCS_SYNCED_AWAIT_TRANSITION_GENERATOR_2026_09_23.md`.
 3. `191_R39_PRIVATE_STAGING_ACCEPTANCE_PASS_READY_FOR_PUBLIC_GPT_ROLLBACK_SNAPSHOT_2026_09_23.md`.
 4. `183_R39_EXACT_VALIDATION_91_PASS_NATIVE_MIGRATION_TRIGGER_CONFIRMED_PRIVATE_STAGING_PACKAGE_READY_2026_09_22.md`.
 3. `182_R39_UNIFIED_KRC_GPT_ROUTING_CONTRACT_STAGING_READY_STATIC_PASS_PUBLIC_GPT_UNCHANGED_2026_09_22.md`.
@@ -62,9 +63,9 @@ R4_B_B4=OPTIONAL / NOT_RUN
 PRIVATE_REPLACEMENT_ACCEPTED=YES
 R4_USER_SWITCH_AUTHORIZED=NO
 R4_CUTOVER_READY=YES
-R4_C=NATIVE_MIGRATION_AVAILABLE_DEFERRED_UNTIL_PUBLIC_UNIFIED_ACCEPTANCE
+R4_C=NATIVE_PLUGIN_MIGRATION_PREFLIGHT_READY
 R4_C_NATIVE_MIGRATION_TRIGGER=CONFIRMED
-R4_C_AUTHORIZED=DEFERRED_UNTIL_PUBLIC_UNIFIED_ACCEPTANCE
+R4_C_PREFLIGHT_AUTHORIZED=YES / MIGRATION_EXECUTION=NO
 R4_CUTOVER=NOT_COMPLETE
 
 R3_9=ACTIVE
@@ -74,8 +75,33 @@ R3_9_STATIC_READBACK=PASS
 R3_9_SELECTED_PYTEST=92/92 PASS
 R3_9_PRIVATE_STAGING=ACCEPTED
 R3_9_PRIVATE_STAGING=ACCEPTED
-R3_9_PUBLIC_GPT_MUTATION=NO
+R3_9_PUBLIC_GPT=PUBLISHED_AND_ACCEPTED
 ```
+
+## Public R3.9 acceptance — checkpoint 193
+
+```text
+PUBLIC_ROLLBACK_BASELINE=CAPTURED_AND_VERIFIED
+PUBLIC_R39_BUILDER_DELTA=APPLIED
+PUBLIC_GPT=PUBLISHED_IN_GPT_STORE
+PUBLIC_PRODUCTION_AUTH=PASS
+PUBLIC_ACTION_SCHEMA=9 read + 4 execution = 13
+S1_CORE_GATE=PASS
+S2_MEDIA_PREAPPROVAL_GATE=PASS
+S3_READONLY_BOUNDARY=PASS
+S3_GEMINI_DATA_USE_NOTICE=PASS
+S3_SEPARATE_USER_ACK=PASS
+S4_EXECUTION_CONFIRMATION_PROMPT=PASS
+S4_CONFIRMATION_CANCELLED=PASS
+START_HTTP_REQUEST_DURING_S4=0
+PROVIDER_WORK_DURING_PUBLIC_SMOKE=0
+FREE_ONLY=PASS
+NATIVE_PLUGIN_MIGRATION_PREFLIGHT=NEXT
+```
+
+Public production Action authentication uses a fresh dedicated R3.9 credential. The private staging credential was not promoted. Secret values are not stored in documentation.
+
+The accepted public GPT remains published and is the rollback anchor until a later Plugin acceptance/cutover decision.
 
 ## Repository / PR authority
 
@@ -235,32 +261,24 @@ R4_READONLY_PREFLIGHT=COMPLETE
 
 ## Next gate
 
-Project is frozen for transition handoff.
-
-After the next-chat bootstrap is generated, resume with:
+Resume with:
 
 ```text
-RESUME_FROM=CHECKPOINT_192_R39_PRIVATE_STAGING_ACCEPTED
-NEXT_GATE=PUBLIC_GPT_ROLLBACK_BASELINE_SNAPSHOT
+RESUME_FROM=CHECKPOINT_193_R39_PUBLIC_GPT_ACCEPTED
+NEXT_GATE=NATIVE_PLUGIN_MIGRATION_PREFLIGHT_READONLY
 ```
 
-Capture the current public `K-Research & Critic` baseline before any mutation:
+Open the native **Перенести в плагін** flow only for read-only preflight/inspection first. Do not complete migration until the proposed native Plugin structure, permissions, app/action mapping, sharing defaults, rollback implications and semantic parity are inspected and accepted.
 
-- Instructions;
-- Knowledge;
-- capabilities;
-- Actions/auth state;
-- sharing/publication state.
-
-Then prepare the exact R3.9 public Builder delta. The staging credential must not be promoted to public production; use a fresh production credential when public activation is authorized. Native Plugin migration remains available but deferred until the unified public GPT passes smoke acceptance.
+Keep the current public `K-Research & Critic` published as the rollback anchor.
 
 ## Hard release boundary
 
 ```text
 PROJECT_COST_POLICY=FREE_ONLY
-R4_CUTOVER_AUTHORIZED=NO / PAUSED
-PUBLIC_GPT_MUTATION=NO
-PLUGIN_INSTALLATION_OR_CHANGE=NO
+PUBLIC_GPT_STATE=R39_ACCEPTED / KEEP_PUBLISHED_ROLLBACK_ANCHOR
+NATIVE_PLUGIN_MIGRATION_PREFLIGHT=AUTHORIZED
+NATIVE_PLUGIN_MIGRATION_EXECUTION=NO
 PLUGIN_PUBLICATION=NO
 PLUGIN_SHARING_CHANGE=NO
 MAIN_MUTATION=NO
@@ -268,6 +286,8 @@ PR22_MERGE=NO
 PR45_MERGE=NO
 ADDITIONAL_LIVE_MEDIA_STARTS=NO
 ```
+
+The recovery-delta/history sections below remain historical evidence where checkpoint 193 does not explicitly override them.
 
 ## Recovery delta after checkpoint 165
 
@@ -297,4 +317,4 @@ R4_CUTOVER=DEFERRED
 
 Terminal marker:
 
-`KRC_MEDIA_CURRENT_HANDOFF_V21_7_R39_PRIVATE_STAGING_ACCEPTED_PUBLIC_ROLLBACK_SNAPSHOT_NEXT_2026_09_23`
+`KRC_MEDIA_CURRENT_HANDOFF_V21_8_R39_PUBLIC_GPT_ACCEPTED_NATIVE_PLUGIN_MIGRATION_PREFLIGHT_NEXT_2026_09_24`
