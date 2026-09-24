@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 9.12
-Status: **R3_9_PUBLIC_GPT_ACCEPTED / NATIVE_MIGRATION_PREFLIGHT_PASS / MEDIA_REBIND_PREBUILD_PASS / NATIVE_MIGRATION_EXECUTION_AUTHORIZED / UI_EXECUTION_PENDING / FREE_ONLY**
+Version: 9.13
+Status: **NATIVE_PLUGIN_MIGRATION_COMPLETE / PRIVATE_PLUGIN_CREATED / GENERATED_SKILL_PRESENT / APPS_EMPTY / GENERATED_SKILL_PARITY_NEXT / FREE_ONLY**
 Updated: 2026-09-24
 
 ## Current roadmap position
@@ -26,8 +26,22 @@ R4 Package                                  READY
 R4-A Private assembly                       PASS / COMPLETE
 R4-B Private acceptance                     PASS / COMPLETE
 R4-C Native Plugin migration                PREFLIGHT PASS / REBIND PREBUILD PASS
-R4 Cutover                                  NATIVE MIGRATION EXECUTION AUTHORIZED / UI PENDING
+R4 Cutover                                  NATIVE MIGRATION COMPLETE / SKILL PARITY + APP REBIND NEXT
 ```
+
+## Native migration COMPLETE — checkpoint 197
+
+```text
+PLUGIN_NAME=K-Research & Critic
+PRIVATE_PLUGIN_CREATED=PASS
+PLUGIN_VERSION=0.19.1+bundle.537edef6e9b2291f8ee718897254ce9b
+GENERATED_SKILL=K-Research & Critic / PRESENT
+APPS_ATTACHED=0
+CUSTOM_ACTIONS_TRANSFERRED=NO
+NEXT=GENERATED_SKILL_PARITY_INSPECTION
+```
+
+App attachment is intentionally held until the generated Skill is inspected for parity.
 
 ## Native migration execution authorized — checkpoint 196
 
