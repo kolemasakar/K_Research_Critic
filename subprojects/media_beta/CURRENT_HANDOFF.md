@@ -1,12 +1,12 @@
 # KRC MEDIA — CURRENT HANDOFF
 
 Version: 22.9
-Status: **ACTIVE_HANDOFF / WORK_MODE_APP_EXPOSURE_PASS / R3C_REACHED / VOICEBRIDGE_429_COLD_EDGE / VOICEBRIDGE_WOKEN / ZERO_PROVIDER / RETRY_NEXT**
+Status: **ACTIVE_HANDOFF / WORK_MODE_S3_PASS / R3C_READONLY_PASS / GEMINI_NOTICE_SHOWN / CONSENT_PENDING / ZERO_PROVIDER / FREE_ONLY**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 213. Canonical Work-mode test on private Plugin 0.19.6+portable.20260924 proved bundled App exposure: R3C oauth/token=200 and POST /mcp=200 twice; E1 requests=0. The test failed only at downstream VoiceBridge HTTP 429 while the service was cold/asleep. VoiceBridge was then woken with GET /api/v1/health=200; provider_work=0. Next gate: repeat Work-mode S2/S3 once after wake, stop at Gemini consent/confirmation boundary.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 214. Canonical Work-mode S3 on private Plugin 0.19.6+portable.20260924 PASS: after CriticProfile approval, R3C read-only route executed, R3C POST /mcp=200 three times, E1 requests=0, no reusable transcript found, Gemini Free Tier data-use notice shown, explicit user consent requested, provider_work=0. Next gate: in same Work chat consent, expect separate E1 consequential confirmation, then deny/cancel it and verify zero provider work.`
 
 ## Canonical current authority
 
