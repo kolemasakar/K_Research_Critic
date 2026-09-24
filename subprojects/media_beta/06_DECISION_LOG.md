@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 6.18
-Status: **ACTIVE / NATIVE_PLUGIN_MIGRATION_COMPLETE / TRANSPORT_NORMALIZATION_PASS / PRIVATE_PLUGIN_UPDATED / APPS_EMPTY / FIVE_APP_REBIND_NEXT / FREE_ONLY**
+Version: 6.19
+Status: **ACTIVE / PRIVATE_PLUGIN_ROUTING_PRIORITY_FIX_APPLIED / DIRECT_R3C_PASS / PLUGIN_APP_EXPOSURE_PASS / PRIVATE_RESMOKE_NEXT / FREE_ONLY**
 Updated: 2026-09-24
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -954,12 +954,41 @@ BUSINESS_LOGIC_DRIFT=NO
 APP_ATTACHMENT=HOLD
 ```
 
+### D102 — Bundled App exposure PASS; failed S3 was routing priority, so KRC MEDIA-first routing is now mandatory
+
+Direct R3C `media_get_capabilities` passed after VoiceBridge wake. An explicit R3C call from inside the private Plugin also passed.
+
+```text
+UNDERLYING_R3C_APP=HEALTHY
+PLUGIN_BUNDLED_APP_EXPOSURE=PASS
+R3C_CALLABLE_IN_PLUGIN_CONTEXT=PASS
+```
+
+The earlier failed S3 used TinyFish exclusively and never attempted R3C/E1. Therefore the defect is routing/tool-selection priority, not app binding.
+
+The private Plugin was updated:
+
+```text
+old_version=0.19.3+apps.20260924
+new_version=0.19.4+routingfix.20260924
+release=pluginrel_6ab578661cbc81918222878502316a6c
+```
+
+New invariant: for supported public media URLs after CriticProfile approval, KRC MEDIA read-only tools are mandatory before TinyFish/web. The Plugin may not claim KRC MEDIA unavailable without an actual KRC call attempt.
+
+```text
+APPS_CHANGED=NO
+PROVIDER_WORK=0
+PUBLICATION=NO
+NEXT=PRIVATE_PLUGIN_S2_S3_RESMOKE
+```
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v22.4
-- checkpoint 199
-- `02_ROADMAP.md` v9.15
-- `00_INDEX.md` v10.18
+- `CURRENT_HANDOFF.md` v23.3
+- checkpoint 208
+- `02_ROADMAP.md` v9.16
+- `00_INDEX.md` v10.27
 - `08_CHAT_HANDOFF.md` v7.11
 
 ## Hard boundary
