@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
 Version: 6.12
-Status: **ACTIVE / R3_9_PUBLIC_GPT_ACCEPTED / PUBLIC_SMOKE_S1_TO_S4_PASS / PRODUCTION_AUTH_PASS / ROLLBACK_BASELINE_CAPTURED / PRIVACY_URL_RECONCILIATION_PENDING / NATIVE_PLUGIN_MIGRATION_PREFLIGHT_NEXT / FREE_ONLY**
+Status: **ACTIVE / R3_9_PUBLIC_GPT_ACCEPTED / PUBLIC_SMOKE_S1_TO_S4_PASS / PRODUCTION_AUTH_PASS / ROLLBACK_BASELINE_CAPTURED / PRIVACY_URL_RECONCILIATION_PASS / NATIVE_PLUGIN_MIGRATION_PREFLIGHT_NEXT / FREE_ONLY**
 Updated: 2026-09-24
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -765,6 +765,26 @@ MAIN_MUTATION=NO
 ```
 
 After the Builder Privacy Policy URL is repointed to the active branch document and the metadata update is published, native migration preflight may resume.
+
+### D094 — Live public Privacy Policy URL reconciled; native Plugin preflight unblocked
+
+Owner UI evidence confirms the public GPT Action Privacy Policy URL now points to:
+
+```text
+https://github.com/kolemasakar/K_Research_Critic/blob/agent/krc-public-media-r3-integration/docs/PRIVACY_POLICY.md
+```
+
+The GPT was then updated and remains published in GPT Store.
+
+```text
+PUBLIC_PRIVACY_POLICY_VERSION=2.3
+LIVE_BUILDER_PRIVACY_URL_RECONCILIATION=PASS
+PUBLIC_GPT_PUBLICATION=UNCHANGED / GPT_STORE
+NATIVE_PLUGIN_MIGRATION_PREFLIGHT=AUTHORIZED
+NATIVE_PLUGIN_MIGRATION_EXECUTION=NO
+```
+
+No Core instructions, Action schema, authentication, provider routing, or audience change was made during this reconciliation. Re-running S1-S4 is not required for this metadata-only update.
 
 ## Canonical authority
 
