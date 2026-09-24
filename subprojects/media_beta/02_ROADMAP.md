@@ -1,8 +1,8 @@
 # MEDIA BETA Roadmap
 
-Version: 9.8
-Status: **R3_9_UNIFIED_KRC_GPT_ACTIVE / PRIVATE_STAGING_ACCEPTED / S1_TO_S4_PASS / 92_TESTS_PASS / NATIVE_PLUGIN_MIGRATION_AVAILABLE / PUBLIC_GPT_UNCHANGED / PUBLIC_ROLLBACK_SNAPSHOT_NEXT / PROJECT_FROZEN_FOR_HANDOFF / FREE_ONLY**
-Updated: 2026-09-22
+Version: 9.9
+Status: **R3_9_PUBLIC_GPT_ACCEPTED / PUBLIC_SMOKE_S1_TO_S4_PASS / PRODUCTION_AUTH_PASS / ROLLBACK_BASELINE_CAPTURED / NATIVE_PLUGIN_MIGRATION_PREFLIGHT_NEXT / FREE_ONLY**
+Updated: 2026-09-24
 
 ## Current roadmap position
 
@@ -25,9 +25,30 @@ R4 Read-only preflight overall                PASS / COMPLETE
 R4 Package                                  READY
 R4-A Private assembly                       PASS / COMPLETE
 R4-B Private acceptance                     PASS / COMPLETE
-R4-C Native Plugin migration                AVAILABLE / DEFERRED UNTIL UNIFIED PUBLIC GPT ACCEPTANCE
-R4 Cutover                                  PAUSED
+R4-C Native Plugin migration                PREFLIGHT READY / PUBLIC R3.9 ACCEPTED
+R4 Cutover                                  PREFLIGHT ONLY / MIGRATION EXECUTION NOT STARTED
 ```
+
+## R3.9 public GPT accepted — checkpoint 193
+
+```text
+PUBLIC_ROLLBACK_BASELINE=CAPTURED_AND_VERIFIED
+PUBLIC_R39_BUILDER_DELTA=APPLIED
+PUBLIC_GPT=PUBLISHED_IN_GPT_STORE
+PUBLIC_PRODUCTION_AUTH=PASS
+ACTION_SCHEMA=9 read + 4 execution = 13
+S1_CORE_GATE=PASS
+S2_MEDIA_PREAPPROVAL_GATE=PASS
+S3_READONLY_AND_GEMINI_CONSENT_BOUNDARY=PASS
+S4_CONSEQUENTIAL_CONFIRMATION_BOUNDARY=PASS
+S4_CONFIRMATION_CANCELLED=PASS
+START_HTTP_REQUEST_DURING_S4=0
+PROVIDER_WORK_DURING_PUBLIC_SMOKE=0
+FREE_ONLY=PASS
+NATIVE_PLUGIN_MIGRATION_PREFLIGHT=NEXT
+```
+
+The source public GPT remains published as the rollback anchor. Native migration execution, Plugin publication/sharing, PR merges and new provider work remain outside the next read-only preflight gate.
 
 ## R3.9 private staging accepted — checkpoint 192
 
