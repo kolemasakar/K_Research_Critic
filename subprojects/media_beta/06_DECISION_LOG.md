@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 6.17
-Status: **ACTIVE / NATIVE_PLUGIN_MIGRATION_COMPLETE / GENERATED_SKILL_SOURCE_PARITY_PASS / PLUGIN_TRANSPORT_WORDING_REVISE / APPS_EMPTY / FREE_ONLY**
+Version: 6.18
+Status: **ACTIVE / NATIVE_PLUGIN_MIGRATION_COMPLETE / TRANSPORT_NORMALIZATION_PASS / PRIVATE_PLUGIN_UPDATED / APPS_EMPTY / FIVE_APP_REBIND_NEXT / FREE_ONLY**
 Updated: 2026-09-24
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -956,10 +956,10 @@ APP_ATTACHMENT=HOLD
 
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v22.3
-- checkpoint 198
-- `02_ROADMAP.md` v9.14
-- `00_INDEX.md` v10.17
+- `CURRENT_HANDOFF.md` v22.4
+- checkpoint 199
+- `02_ROADMAP.md` v9.15
+- `00_INDEX.md` v10.18
 - `08_CHAT_HANDOFF.md` v7.11
 
 ## Hard boundary
