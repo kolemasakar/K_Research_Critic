@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 9.11
-Status: **R3_9_PUBLIC_GPT_ACCEPTED / NATIVE_MIGRATION_PREFLIGHT_PASS / MEDIA_REBIND_PREBUILD_PASS / FIVE_APPS_FOUND / NATIVE_MIGRATION_EXECUTION_DECISION_NEXT / FREE_ONLY**
+Version: 9.12
+Status: **R3_9_PUBLIC_GPT_ACCEPTED / NATIVE_MIGRATION_PREFLIGHT_PASS / MEDIA_REBIND_PREBUILD_PASS / NATIVE_MIGRATION_EXECUTION_AUTHORIZED / UI_EXECUTION_PENDING / FREE_ONLY**
 Updated: 2026-09-24
 
 ## Current roadmap position
@@ -26,8 +26,21 @@ R4 Package                                  READY
 R4-A Private assembly                       PASS / COMPLETE
 R4-B Private acceptance                     PASS / COMPLETE
 R4-C Native Plugin migration                PREFLIGHT PASS / REBIND PREBUILD PASS
-R4 Cutover                                  OWNER MIGRATION EXECUTION DECISION NEXT
+R4 Cutover                                  NATIVE MIGRATION EXECUTION AUTHORIZED / UI PENDING
 ```
+
+## Native migration execution authorized — checkpoint 196
+
+```text
+OWNER_AUTHORIZATION=APPROVE
+NATIVE_PLUGIN_MIGRATION_EXECUTION_AUTHORIZED=YES
+UI_CONFIRMATION_CAPTURE=PENDING
+PLUGIN_INITIAL_VISIBILITY=PRIVATE
+POST_MIGRATION_MEDIA_REBIND=REQUIRED
+PROVIDER_WORK=0
+```
+
+Next: execute native migration in UI, capture the generated private Plugin, then rebind the five canonical Apps and run private zero-provider smoke.
 
 ## MEDIA rebind prebuild PASS — checkpoint 195
 
