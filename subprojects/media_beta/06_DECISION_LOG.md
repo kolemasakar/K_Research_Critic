@@ -1,8 +1,8 @@
 # MEDIA BETA Decision Log
 
-Version: 6.11
+Version: 6.12
 Status: **ACTIVE / R3_9_UNIFIED_KRC_GPT_ACTIVE / PRIVATE_STAGING_ACCEPTED / S1_TO_S4_PASS / 92_TESTS_PASS / NATIVE_PLUGIN_MIGRATION_AVAILABLE / PUBLIC_GPT_UNCHANGED / PROJECT_FROZEN_FOR_HANDOFF**
-Updated: 2026-09-22
+Updated: 2026-09-24
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
 
@@ -690,25 +690,78 @@ The staging credential was exposed during interactive setup, so it must not beco
 
 Project is frozen at checkpoint 192 pending the owner's transition generator.
 
+### D092 — Unified R3.9 public GPT accepted; native Plugin migration preflight is next
+
+The owner authorized the exact public R3.9 Builder delta only after the complete rollback baseline had been captured.
+
+The accepted public update preserved Core semantics and added the validated MEDIA evidence-acquisition layer:
+
+```text
+PUBLIC_ROLLBACK_BASELINE=CAPTURED_AND_VERIFIED
+PUBLIC_R39_BUILDER_DELTA=APPLIED
+PUBLIC_GPT=PUBLISHED_IN_GPT_STORE
+ACTION_SCHEMA=0.9.1-r39-unified-candidate
+READ_OPERATIONS=9
+EXECUTION_OPERATIONS=4
+TOTAL_OPERATIONS=13
+PUBLIC_PRODUCTION_AUTH=PASS
+STAGING_CREDENTIAL_PROMOTION=NO
+FREE_ONLY=PASS
+```
+
+A fresh public-production `KRC_MEDIA_R39_ACTION_TOKEN` was configured server-side and validated through the Builder/read-only public capabilities path. Its secret value is not stored in repository documentation.
+
+Public smoke acceptance:
+
+```text
+S1_CORE_GATE=PASS
+S2_MEDIA_PREAPPROVAL_GATE=PASS
+S3_READONLY_BOUNDARY=PASS
+S3_GEMINI_DATA_USE_NOTICE=PASS
+S3_SEPARATE_USER_ACK=PASS
+S4_EXECUTION_CONFIRMATION_PROMPT=PASS
+S4_CONFIRMATION_CANCELLED=PASS
+START_HTTP_REQUEST_DURING_S4=0
+PROVIDER_WORK_DURING_PUBLIC_SMOKE=0
+PUBLIC_R39_SMOKE_ACCEPTANCE=PASS
+```
+
+The native ChatGPT **Перенести в плагін** trigger had already been confirmed and was previously deferred until public Unified R3.9 acceptance. That prerequisite is now satisfied.
+
+Owner decision:
+
+```text
+NATIVE_PLUGIN_MIGRATION_PREFLIGHT=AUTHORIZED
+NATIVE_PLUGIN_MIGRATION_EXECUTION=NO
+PUBLIC_GPT=KEEP_PUBLISHED_AS_ROLLBACK_ANCHOR
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING_CHANGE=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+NEW_MEDIA_PROVIDER_WORK=NO
+```
+
+The next gate is read-only inspection of the native migration flow. Any automatic Core semantic change, loss of MEDIA operation parity, confirmation-boundary drift, FREE_ONLY violation, forced public-GPT retirement, or publication/sharing mutation is a STOP condition.
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v21.7
-- checkpoint 192
-- `02_ROADMAP.md` v9.8
-- `00_INDEX.md` v10.11
+- `CURRENT_HANDOFF.md` v21.8
+- checkpoint 193
+- `02_ROADMAP.md` v9.9
+- `00_INDEX.md` v10.12
 - `08_CHAT_HANDOFF.md` v7.11
 
 ## Hard boundary
 
 ```text
 PROJECT_COST_POLICY=FREE_ONLY
-PUBLIC_GPT_MUTATION=NO
-PLUGIN_INSTALLATION_OR_CHANGE=NO
+PUBLIC_GPT_STATE=R39_ACCEPTED / KEEP_PUBLISHED_ROLLBACK_ANCHOR
+NATIVE_PLUGIN_MIGRATION_PREFLIGHT=AUTHORIZED
+NATIVE_PLUGIN_MIGRATION_EXECUTION=NO
 PLUGIN_PUBLICATION=NO
 PLUGIN_SHARING_CHANGE=NO
 MAIN_MUTATION=NO
 PR22_MERGE=NO
 PR45_MERGE=NO
 ADDITIONAL_LIVE_MEDIA_STARTS=NO
-R4_CUTOVER=DEFERRED
 ```
