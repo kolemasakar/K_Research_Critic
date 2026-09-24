@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 9.15
-Status: **NATIVE_PLUGIN_MIGRATION_COMPLETE / TRANSPORT_NORMALIZATION_PASS / PRIVATE_PLUGIN_UPDATED / APPS_EMPTY / FIVE_APP_REBIND_NEXT / FREE_ONLY**
+Version: 9.16
+Status: **PRIVATE_PLUGIN_ROUTING_PRIORITY_FIX_APPLIED / DIRECT_R3C_PASS / PLUGIN_APP_EXPOSURE_PASS / PRIVATE_RESMOKE_NEXT / FREE_ONLY**
 Updated: 2026-09-24
 
 ## Current roadmap position
@@ -26,8 +26,23 @@ R4 Package                                  READY
 R4-A Private assembly                       PASS / COMPLETE
 R4-B Private acceptance                     PASS / COMPLETE
 R4-C Native Plugin migration                PREFLIGHT PASS / REBIND PREBUILD PASS
-R4 Cutover                                  TRANSPORT NORMALIZATION PASS / FIVE-APP REBIND NEXT
+R4 Cutover                                  FIVE-APP REBIND PASS / ROUTING FIX APPLIED / PRIVATE RE-SMOKE
 ```
+
+## Private Plugin routing-priority fix — checkpoint 208
+
+```text
+DIRECT_R3C_CAPABILITIES=PASS
+R3C_CALLABLE_INSIDE_PLUGIN=PASS
+PLUGIN_BUNDLED_APP_EXPOSURE=PASS
+FAILED_S3_ROOT_CAUSE=ROUTING_PRIORITY
+PLUGIN_VERSION=0.19.4+routingfix.20260924
+KRC_MEDIA_FIRST_ROUTING=ENFORCED
+TINYFISH_PREEMPTIVE_FALLBACK=FORBIDDEN
+PROVIDER_WORK=0
+```
+
+Next: fresh Chat re-smoke of YouTube S2/S3 before any consequential execution approval.
 
 ## Plugin transport normalization PASS — checkpoint 199
 
