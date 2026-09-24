@@ -1,7 +1,7 @@
 # MEDIA BETA Decision Log
 
-Version: 6.15
-Status: **ACTIVE / R3_9_PUBLIC_GPT_ACCEPTED / NATIVE_MIGRATION_PREFLIGHT_PASS / MEDIA_REBIND_PREBUILD_PASS / NATIVE_MIGRATION_EXECUTION_AUTHORIZED / UI_EXECUTION_PENDING / FREE_ONLY**
+Version: 6.16
+Status: **ACTIVE / NATIVE_PLUGIN_MIGRATION_COMPLETE / PRIVATE_PLUGIN_CREATED / GENERATED_SKILL_PRESENT / APPS_EMPTY / GENERATED_SKILL_PARITY_NEXT / FREE_ONLY**
 Updated: 2026-09-24
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
@@ -902,12 +902,38 @@ NEW_PROVIDER_WORK=NO
 
 Execution is expected to make the source public GPT read-only while keeping it usable until retirement. Immediately after migration, capture the generated Plugin before attaching the five canonical Apps.
 
+### D099 — Native migration completed successfully; generated Skill present; Apps empty
+
+Owner UI confirms successful completion of native migration.
+
+```text
+PLUGIN_NAME=K-Research & Critic
+PLUGIN_VISIBILITY=PRIVATE
+GENERATED_SKILL=K-Research & Critic / PRESENT
+APPS_ATTACHED=0
+ADD_APP_CONTROL=PRESENT
+VERSION=0.19.1+bundle.537edef6e9b2291f8ee718897254ce9b
+```
+
+This matches the expected migration contract: custom GPT Actions were not transferred.
+
+```text
+NATIVE_PLUGIN_MIGRATION_EXECUTION=PASS
+GENERATED_SKILL_PARITY_INSPECTION=NEXT
+APP_ATTACHMENT=HOLD
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING_CHANGE=NO
+PROVIDER_WORK=NO
+```
+
+Only after generated Skill parity passes may the five canonical Apps be attached.
+
 ## Canonical authority
 
-- `CURRENT_HANDOFF.md` v22.1
-- checkpoint 196
-- `02_ROADMAP.md` v9.12
-- `00_INDEX.md` v10.15
+- `CURRENT_HANDOFF.md` v22.2
+- checkpoint 197
+- `02_ROADMAP.md` v9.13
+- `00_INDEX.md` v10.16
 - `08_CHAT_HANDOFF.md` v7.11
 
 ## Hard boundary
