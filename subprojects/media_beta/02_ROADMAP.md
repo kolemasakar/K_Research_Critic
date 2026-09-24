@@ -29,6 +29,20 @@ R4-C Native Plugin migration                PREFLIGHT READY / PUBLIC R3.9 ACCEPT
 R4 Cutover                                  PREFLIGHT ONLY / MIGRATION EXECUTION NOT STARTED
 ```
 
+## Native Plugin migration semantics — verified current OpenAI behavior
+
+```text
+instructions -> Skill
+knowledge -> reference files
+connected apps -> Plugin apps
+custom Actions -> NOT transferred
+selected model -> NOT transferred
+migrated Plugin -> starts private
+source GPT after completed migration -> read-only, still usable until retirement
+```
+
+Roadmap consequence: R4-C preflight must stop before final migration confirmation. After inspecting the generated Skill/app surface, create a separate integration-rebuild gate for the 13-operation MEDIA contract using the accepted R3C/E1-E4 app/MCP path.
+
 ## R3.9 public GPT accepted — checkpoint 193
 
 ```text
