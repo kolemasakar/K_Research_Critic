@@ -1,12 +1,12 @@
 # KRC MEDIA — CURRENT HANDOFF
 
 Version: 22.9
-Status: **ACTIVE_HANDOFF / PRIVATE_S1_PASS / PRIVATE_S2_PASS / PRIVATE_S3_MEDIA_ROUTING_FAIL / KRC_RUNTIME_NOT_REACHED / ZERO_PROVIDER / DIAGNOSTIC_NEXT**
+Status: **ACTIVE_HANDOFF / DIRECT_R3C_APP_EXPOSURE_PASS / MCP_REACHED / VOICEBRIDGE_429_COLD_EDGE / VOICEBRIDGE_WOKEN / DIRECT_RETRY_NEXT / ZERO_PROVIDER**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 204. Private Plugin Chat smoke: S1 Core gate PASS, S2 MEDIA preapproval gate PASS, S3 FAIL. After profile approval the Plugin reported KRC MEDIA tools unavailable and fell back to non-KRC/public web research. Render correlation shows zero R3C and zero E1 requests in the smoke window, so failure is before KRC backend: Plugin/App tool exposure, selection, or client-side connection/routing. Provider work=0. Next gate: inspect the two ChatGPT tool-call traces from failed S3. No Plugin/app mutation until trace is identified.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 206. Direct @KRC MCP R3C Readonly media_get_capabilities reached OAuth/token=200 and POST /mcp=200, proving App exposure/connection outside Plugin. It returned sanitized VoiceBridge HTTP 429 retryable=true, consistent with the known free-tier cold edge. VoiceBridge was then woken via GET /api/v1/health=200; provider_work=0. Next gate: retry direct R3C capabilities once, then return to private Plugin bundled-app tool exposure/selection defect.`
 
 ## Canonical current authority
 
