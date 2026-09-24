@@ -257,6 +257,22 @@ INSTALL_ADD_CONTROL=PASS
 R4_READONLY_PREFLIGHT=COMPLETE
 ```
 
+## Native migration product semantics
+
+Current OpenAI migration behavior requires the following assumptions:
+
+```text
+INSTRUCTIONS_TRANSFER=YES / AS_SKILL
+KNOWLEDGE_TRANSFER=YES / AS_REFERENCE_FILES
+CONNECTED_APPS_TRANSFER=YES
+CUSTOM_ACTIONS_TRANSFER=NO
+SELECTED_MODEL_TRANSFER=NO
+MIGRATED_PLUGIN_STARTS_PRIVATE=YES
+SOURCE_GPT_AFTER_COMPLETED_MIGRATION=READ_ONLY_BUT_USABLE_UNTIL_RETIREMENT
+```
+
+Therefore the 13-operation MEDIA custom Action is not expected to migrate automatically. P1 is inspection-only and must stop before final migration confirmation. The MEDIA replacement must be rebuilt/rebound separately through the accepted app/MCP architecture before any user cutover.
+
 ## Next gate
 
 Resume with:
