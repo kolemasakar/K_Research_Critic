@@ -417,4 +417,4 @@ ADDITIONAL_LIVE_MEDIA_STARTS=NO
 
 **R4-B is COMPLETE.** B1/B2/B3 passed; B4 was optional and not run. The private replacement is accepted. R4-C is ready to propose but remains HOLD pending separate owner authorization.
 
-Recovery authority: `CURRENT_HANDOFF.md` v21.7 + checkpoint 192.
+Recovery authority: `CURRENT_HANDOFF.md` v21.8 + checkpoint 193.
