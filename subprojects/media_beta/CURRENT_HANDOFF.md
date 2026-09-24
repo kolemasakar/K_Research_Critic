@@ -1,17 +1,18 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 22.6
-Status: **ACTIVE_HANDOFF / FIVE_APP_UI_RENDER_PASS / E2_RECONNECT_PENDING / PRIVATE_PLUGIN / ZERO_PROVIDER / FREE_ONLY**
+Version: 22.7
+Status: **ACTIVE_HANDOFF / FIVE_APP_UI_RENDER_PASS / E2_OAUTH_REMEDIATION_PASS / RECONNECT_RETRY_NEXT / PRIVATE_PLUGIN / ZERO_PROVIDER / FREE_ONLY**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 201. Private native Plugin version 0.19.3+apps.20260924 renders all five canonical Apps. R3C/E1/E3/E4 show no reconnect warning; E2 asdk_app_6aaeae197c9081918b90e46f5bb09615 explicitly shows Повторно підключити. Next gate: reconnect only E2 Instagram Sentinel-v5, then private zero-provider smoke. No other app changes, publication/share, provider work, PR merges, or main mutation.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 202. Private Plugin five-App render PASS. E2 OAuth legacy-bridge remediation PASS: current deploy dep-daqmsg6gekts7398n0rg LIVE; /healthz=200; DCR returns restart-safe krc1 client; old ChatGPT E2 client authorize=200; provider_work_started=false. Next gate: retry only E2 Повторно підключити, then private zero-provider smoke. No other app changes, publication/share, provider work, PR merges, or main mutation.`
 
 ## Canonical current authority
 
-1. `CURRENT_HANDOFF.md` — v22.6.
-2. `201_FIVE_APPS_UI_RENDER_PASS_E2_RECONNECT_PENDING_2026_09_24.md`.
+1. `CURRENT_HANDOFF.md` — v22.7.
+2. `202_E2_OAUTH_LEGACY_BRIDGE_REMEDIATION_PASS_RECONNECT_RETRY_NEXT_2026_09_24.md`.
+3. `201_FIVE_APPS_UI_RENDER_PASS_E2_RECONNECT_PENDING_2026_09_24.md`.
 3. `200_FIVE_CANONICAL_APPS_REBOUND_PRIVATE_PLUGIN_VERIFY_UI_NEXT_2026_09_24.md`.
 3. `199_PLUGIN_TRANSPORT_NORMALIZATION_PASS_APP_REBIND_NEXT_2026_09_24.md`.
 3. `198_GENERATED_SKILL_SOURCE_PARITY_PASS_PLUGIN_TRANSPORT_WORDING_REVISE_NEXT_2026_09_24.md`.
