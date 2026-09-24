@@ -1,12 +1,12 @@
 # KRC MEDIA — CURRENT HANDOFF
 
 Version: 22.9
-Status: **ACTIVE_HANDOFF / DIRECT_R3C_PASS / PLUGIN_APP_EXPOSURE_PASS / ROUTING_PRIORITY_FIX_APPLIED / PRIVATE_RESMOKE_NEXT / ZERO_PROVIDER / FREE_ONLY**
+Status: **ACTIVE_HANDOFF / PRIVATE_S2_PASS / PRIVATE_S3_PASS / KRC_R3C_USED / GEMINI_NOTICE_SHOWN / CONSENT_PENDING / ZERO_PROVIDER / FREE_ONLY**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 208. Direct R3C capabilities PASS and explicit R3C call inside private Plugin PASS, proving bundled App exposure is healthy. Failed S3 root cause is routing/tool-selection priority. Private Plugin updated to 0.19.4+routingfix.20260924 / release pluginrel_6ab578661cbc81918222878502316a6c with mandatory KRC MEDIA-first routing and no TinyFish/web substitution before actual KRC read-only attempt. Apps 5/5 unchanged, provider_work=0. Next gate: fresh Chat re-smoke S2/S3.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 209. Private Plugin re-smoke after routing fix PASS: fresh Chat + YouTube request + profile approval used R3C read-only route; R3C POST /mcp=200 twice, E1 requests=0, TinyFish preemptive fallback=0. Gemini Free Tier data-use notice displayed and explicit consent requested; provider_work=0. Next gate: user consents, expect E1 consequential confirmation, then deny/cancel it and verify zero provider work.`
 
 ## Canonical current authority
 
