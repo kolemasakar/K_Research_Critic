@@ -1,7 +1,7 @@
 # MEDIA BETA Roadmap
 
-Version: 9.13
-Status: **NATIVE_PLUGIN_MIGRATION_COMPLETE / PRIVATE_PLUGIN_CREATED / GENERATED_SKILL_PRESENT / APPS_EMPTY / GENERATED_SKILL_PARITY_NEXT / FREE_ONLY**
+Version: 9.14
+Status: **NATIVE_PLUGIN_MIGRATION_COMPLETE / GENERATED_SKILL_SOURCE_PARITY_PASS / PLUGIN_TRANSPORT_WORDING_REVISE / APPS_EMPTY / FREE_ONLY**
 Updated: 2026-09-24
 
 ## Current roadmap position
@@ -26,8 +26,21 @@ R4 Package                                  READY
 R4-A Private assembly                       PASS / COMPLETE
 R4-B Private acceptance                     PASS / COMPLETE
 R4-C Native Plugin migration                PREFLIGHT PASS / REBIND PREBUILD PASS
-R4 Cutover                                  NATIVE MIGRATION COMPLETE / SKILL PARITY + APP REBIND NEXT
+R4 Cutover                                  NATIVE MIGRATION COMPLETE / TRANSPORT NORMALIZATION + APP REBIND NEXT
 ```
+
+## Generated Skill source parity PASS — checkpoint 198
+
+```text
+SOURCE_MIGRATION_FIDELITY=PASS
+CORE_BODY_PARITY=PASS
+MEDIA_ADDENDUM_BODY_PARITY=PASS
+PLUGIN_NATIVE_SEMANTIC_PARITY=REVISE
+REVISION_SCOPE=2 transport-specific lines only
+APPS_ATTACHED=0
+```
+
+The legacy phrases `MEDIA Action` and `gemini_free_consent object` are Custom Action transport wording. Normalize them to generic KRC MEDIA app/tool and tool-defined consent wording before attaching Apps.
 
 ## Native migration COMPLETE — checkpoint 197
 
