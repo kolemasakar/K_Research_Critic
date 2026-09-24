@@ -1,12 +1,12 @@
 # KRC MEDIA — CURRENT HANDOFF
 
 Version: 22.9
-Status: **ACTIVE_HANDOFF / DIRECT_R3C_APP_EXPOSURE_PASS / MCP_REACHED / VOICEBRIDGE_429_COLD_EDGE / VOICEBRIDGE_WOKEN / DIRECT_RETRY_NEXT / ZERO_PROVIDER**
+Status: **ACTIVE_HANDOFF / DIRECT_R3C_PASS / UNDERLYING_APP_HEALTHY / PLUGIN_ROUTING_UNRESOLVED / EXPLICIT_IN_PLUGIN_APP_CALL_NEXT / ZERO_PROVIDER**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 206. Direct @KRC MCP R3C Readonly media_get_capabilities reached OAuth/token=200 and POST /mcp=200, proving App exposure/connection outside Plugin. It returned sanitized VoiceBridge HTTP 429 retryable=true, consistent with the known free-tier cold edge. VoiceBridge was then woken via GET /api/v1/health=200; provider_work=0. Next gate: retry direct R3C capabilities once, then return to private Plugin bundled-app tool exposure/selection defect.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 207. Direct @KRC MCP R3C Readonly media_get_capabilities now PASS after VoiceBridge wake: configured=true, FREE_ONLY preserved, provider_work=0. Underlying R3C App/auth/MCP/VoiceBridge are healthy. Private Plugin S3 still used TinyFish only. Next gate: in a fresh private Plugin Chat explicitly request only media_get_capabilities via KRC MCP R3C Readonly, forbidding TinyFish/web, to distinguish app exposure from model routing.`
 
 ## Canonical current authority
 
