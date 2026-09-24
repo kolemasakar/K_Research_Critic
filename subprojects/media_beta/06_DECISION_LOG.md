@@ -786,6 +786,32 @@ NATIVE_PLUGIN_MIGRATION_EXECUTION=NO
 
 No Core instructions, Action schema, authentication, provider routing, or audience change was made during this reconciliation. Re-running S1-S4 is not required for this metadata-only update.
 
+### D095 — Native migration does not transfer custom Actions; source GPT becomes read-only after completed migration
+
+Current OpenAI migration documentation was rechecked before opening the native migration flow.
+
+```text
+GPT_INSTRUCTIONS -> PLUGIN_SKILL
+KNOWLEDGE_FILES -> PLUGIN_REFERENCE_FILES
+CONNECTED_APPS -> PLUGIN_APPS
+CUSTOM_ACTIONS -> NOT_TRANSFERRED
+SELECTED_MODEL -> NOT_TRANSFERRED
+MIGRATED_PLUGIN_INITIAL_STATE -> PRIVATE
+SOURCE_GPT_AFTER_COMPLETED_MIGRATION -> READ_ONLY / USABLE_UNTIL_RETIREMENT
+```
+
+This materially changes the R4-C execution plan because Unified R3.9 MEDIA currently uses a custom Action schema with 13 operations. Those operations must be rebuilt/rebound separately, preferably through the already accepted R3C/E1-E4 app/MCP architecture, before any Plugin cutover.
+
+Decision:
+
+```text
+NATIVE_MIGRATION_PREFLIGHT=DETAILS_INSPECTION_ONLY
+FINAL_MIGRATION_CONFIRMATION=NOT_AUTHORIZED
+CUSTOM_ACTION_AUTO_TRANSFER_ASSUMPTION=FORBIDDEN
+MEDIA_REBIND_GATE=REQUIRED_AFTER_PREFLIGHT
+SOURCE_PUBLIC_GPT=KEEP_AS_OPERATIONAL_FALLBACK
+```
+
 ## Canonical authority
 
 - `CURRENT_HANDOFF.md` v21.8
