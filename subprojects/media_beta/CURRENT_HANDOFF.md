@@ -1,12 +1,12 @@
 # KRC MEDIA — CURRENT HANDOFF
 
 Version: 22.9
-Status: **ACTIVE_HANDOFF / CHAT_S3_FAIL_CONFIRMED / PORTABLE_ROOT_MANIFEST_ADDED / CANONICAL_APP_BINDING_APPLIED / PRIVATE_RETEST_NEXT / ZERO_PROVIDER / FREE_ONLY**
+Status: **ACTIVE_HANDOFF / CHAT_APP_RUNTIME_UNAVAILABLE / PACKAGE_VALID / DIRECT_APPS_HEALTHY / WORK_MODE_CANONICAL_TEST_NEXT / ZERO_PROVIDER / FREE_ONLY**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 211. Chat S3 on 0.19.5 still failed automatic KRC App exposure (R3C=0, E1=0, TinyFish fallback). Private Plugin has now been converted to a canonical portable package: root plugin.json with extensions.com.openai.apps=./.app.json plus compatibility .codex-plugin/plugin.json, same 5 canonical Apps and unchanged routing Skill. Current version 0.19.6+portable.20260924 / release pluginrel_6ab57f1c11b88191bc1c02ee5391e7b7. Next gate: fresh Chat retest after refresh.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 212. On private Plugin 0.19.6+portable.20260924, Chat-mode Skill correctly attempted KRC MEDIA but media_youtube_preflight/lookup/get_capabilities returned UNAVAILABLE_IN_RUNTIME; R3C/E1 server requests remained zero. Direct R3C App invocation passes, package/app mappings validate, and app permissions resolve. OpenAI's current personal MCP-plugin quickstart uses ChatGPT Work as the canonical test surface. Next gate: fresh Work-mode S2/S3 retest on 0.19.6. No further manifest/app mutation until that test.`
 
 ## Canonical current authority
 
