@@ -1,267 +1,556 @@
 # MEDIA BETA Roadmap
 
-Поточний roadmap K-Research & Critic MEDIA BETA після YouTube acceptance, Render Cobalt edge-blocker isolation, and successful local Instagram retrieval on the owner-approved OCI free-only replacement.
+Version: 9.17
+Status: **MEDIA_EXECUTION_ACCEPTANCE_PASS / ORIGINAL_TRANSCRIPT_EXPIRED_OR_UNAVAILABLE / AUDIT_PARTIAL / OWNER_PAUSE**
+Updated: 2026-09-25
 
-Version: 4.9
-Status: R2_PARTIAL_PASS / YOUTUBE_ACCEPTED / OCI_COBALT_LOCAL_PASS / INSTAGRAM_LOCAL_RETRIEVAL_PASS / PUBLIC_HTTPS_PENDING / R3_HOLD
-Updated: 2026-09-08
-
-## Product position
-
-`K-Research & Critic - MEDIA BETA` is a private owner-only validation surface for an additive MEDIA capability planned for the already-published `K-Research & Critic` GPT.
+## Current roadmap position
 
 ```text
-product/release authority: kolemasakar/K_Research_Critic
-public KRC: existing published GPT / unchanged
-private MEDIA BETA GPT: owner-only
-backend implementation: kolemasakar/VoiceBridge
-VoiceBridge branch: agent/krc-media-gemini-migration
+R3_A_TO_H=COMPLETE
+R4_B_PRIVATE_ACCEPTANCE=COMPLETE
+PRIVATE_PLUGIN_LAST_OBSERVED=0.19.6+portable.20260924
+CHATGPT_WORK_MCP_BUNDLED_APP_ROUTING=PASS
+GEMINI_FREE_COMPLETED_JOB=KRCM_a01a95b5-b91a-47b4-9d2d-5323fa36c8a4
+HISTORIC_SEGMENTS=30
+HISTORIC_TRANSCRIPT_CHARS=47289
+HISTORIC_CREDITS_CHARGED=0
+CURRENT_TRANSCRIPT_STATUS_AND_SEGMENTS=HTTP_404
+VISIBLE_SOURCE_TRACEABILITY_AUDIT=COMPLETE_WITH_FINDINGS
+FULL_ORIGINAL_42_CLAIM_FIDELITY_AUDIT=BLOCKED_NO_FULL_TRANSCRIPT
+OWNER_GATE=PAUSED_AWAITING_TRANSITION_GENERATOR
 ```
 
-Critical invariant:
+## Immediate work after transition generator — read-only recovery gate
+
+1. Recover `CURRENT_HANDOFF.md` v24.6 and checkpoints 222, 221, 220.
+2. Identify which authorized persistent DB **actually** backs `KRC_MEDIA_DATABASE_URL` using safe metadata only. Earlier suspended Render DB listing is not evidence of active storage. Neon project ID is not verified.
+3. Run read-only existing-job/segment-presence checks. TTL 3600 from current VoiceBridge /health and code suggests expired record; verify physical deletion before assuming.
+4. Only if current storage is confirmed and contains no record, check real backup/PITR retention for the same database without modifying production. Require explicit separate permission for a restore branch.
+5. If original 30 segments recovered, export verbatim and reconcile all 42 report rows against source; repair traceability counts and verify genuinely independent cited origins.
+6. If no recoverable original exists, report limitation and obtain owner decision before any new provider attempt.
+
+No further technical work before the owner provides the transition generator. On-screen table layout is correct and must not be treated as a defect.
 
 ```text
-MEDIA unavailable/fails -> MEDIA unavailable/fails closed
-Core KRC               -> remains usable and accessible
+NEXT_GATE=OWNER_TRANSITION_GENERATOR_THEN_IDENTIFY_REAL_ACTIVE_DB_READONLY
+NEW_PROVIDER_WORK=NO
+DB_WRITE=NO
+PLUGIN_OR_PUBLIC_GPT_MUTATION=NO
+MAIN_MUTATION=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+FREE_ONLY=YES
 ```
 
-## Canonical recovery authority
+---
 
-`88_R2_OCI_COBALT_LOCAL_INSTAGRAM_RETRIEVAL_PASS_PUBLIC_HTTPS_PENDING_CHECKPOINT_2026_09_08.md`
+## Historical roadmap details (not live instructions)
 
-Recovery command:
-
-`recover KRC MEDIA BETA checkpoint 88 OCI Cobalt local Instagram retrieval pass public HTTPS pending 2026-09-08`
-
-## Current provider routing
-
-Logical free-only routing remains:
+## Private Plugin routing-priority fix — checkpoint 208
 
 ```text
-YouTube   -> Gemini Developer API Free Tier direct public URL -> durable KRCM/Neon
-Instagram -> self-hosted Cobalt -> AssemblyAI universal-2 Free -> durable KRCM/Neon
-Facebook  -> self-hosted Cobalt -> AssemblyAI universal-2 Free -> durable KRCM/Neon
-Telegram  -> public Telegram web -> AssemblyAI universal-2 Free -> durable KRCM/Neon
+DIRECT_R3C_CAPABILITIES=PASS
+R3C_CALLABLE_INSIDE_PLUGIN=PASS
+PLUGIN_BUNDLED_APP_EXPOSURE=PASS
+FAILED_S3_ROOT_CAUSE=ROUTING_PRIORITY
+PLUGIN_VERSION=0.19.4+routingfix.20260924
+KRC_MEDIA_FIRST_ROUTING=ENFORCED
+TINYFISH_PREEMPTIVE_FALLBACK=FORBIDDEN
+PROVIDER_WORK=0
 ```
 
-Policy:
+Next: fresh Chat re-smoke of YouTube S2/S3 before any consequential execution approval.
+
+## Plugin transport normalization PASS — checkpoint 199
 
 ```text
-Supadata public: inactive
-ScrapeCreators public paid retrieval: forbidden
-paid retrieval fallback: false
-paid STT fallback: false
-paid proxy fallback: false
-paid hosting remediation: excluded
-YouTube Cobalt fallback: none
-YouTube AssemblyAI fallback: none
-user cookies/login: forbidden
+plugin_id=plugin_bb3595f295708191a3f9e145ba1ff2d5
+version=0.19.2+transportfix.20260924
+release=pluginrel_6ab563faebe48191ac77f4df8c705581
+scope=USER
+discoverability=PRIVATE
+two_transport_lines=UPDATED
+apps_attached=0
+provider_work=0
 ```
 
-## R0 - Public KRC Update Safety Preflight
+Next: attach the five canonical Apps, verify 13-operation parity, then run private zero-provider smoke.
 
-Status: PASS.
-
-The existing public KRC identity remains the protected product target. No MEDIA Action is attached to public KRC and checkpoint 88 does not authorize changing it.
-
-## R1 - Repository integration
-
-Status: COMPLETE.
-
-KRC repository contains the public MEDIA candidate Action, private canary package, privacy candidate, regression tests, and recovery documentation.
-
-## R2 - Permanent MEDIA backend promotion/readiness
-
-Status: PARTIAL PASS / OCI PUBLIC-HTTPS REMEDIATION IN PROGRESS.
-
-Completed:
+## Generated Skill source parity PASS — checkpoint 198
 
 ```text
-R2-A public free-tier admission: PASS
-R2-B failure isolation/free quota: PASS
-R2-C privacy/promotion preparation: COMPLETE
-exact VoiceBridge Gemini-direct deployment: PASS
-Render VoiceBridge health/startup: PASS
-private MEDIA BETA Builder activation: PASS
-Action bearer auth: PASS
-capability read: PASS
-YouTube Gemini consent canary: PASS
-YouTube durable completion: PASS
-YouTube transcript retrieval: PASS
-YouTube duplicate reuse/idempotency: PASS
-YouTube no-paid/no-fallback boundary: PASS
-Instagram fail-closed behavior on blocked Render Cobalt: PASS as safety behavior
-OCI Always Free-eligible VM creation: PASS
-OCI Docker/pinned Cobalt deployment: PASS
-OCI local port isolation 127.0.0.1:9000: PASS
-OCI API-key fail-closed gate: PASS
-OCI authenticated Instagram retrieval-only local preflight: PASS
+SOURCE_MIGRATION_FIDELITY=PASS
+CORE_BODY_PARITY=PASS
+MEDIA_ADDENDUM_BODY_PARITY=PASS
+PLUGIN_NATIVE_SEMANTIC_PARITY=REVISE
+REVISION_SCOPE=2 transport-specific lines only
+APPS_ATTACHED=0
 ```
 
-Exact accepted VoiceBridge backend remains:
+The legacy phrases `MEDIA Action` and `gemini_free_consent object` are Custom Action transport wording. Normalize them to generic KRC MEDIA app/tool and tool-defined consent wording before attaching Apps.
+
+## Native migration COMPLETE — checkpoint 197
 
 ```text
-Render service: voicebridge-krc-media-beta-kolemasakar
-branch: agent/krc-media-gemini-migration
-autoDeploy: no
-live commit: 68a39d9109455c3e9e69ffeb3a7456998f0620db
-live deploy: dep-dafhul0n74is73a3nncg
-latest known Validate on exact head: 34159780308 / SUCCESS
-PR #45: OPEN / DRAFT / UNMERGED / mergeable=true
+PLUGIN_NAME=K-Research & Critic
+PRIVATE_PLUGIN_CREATED=PASS
+PLUGIN_VERSION=0.19.1+bundle.537edef6e9b2291f8ee718897254ce9b
+GENERATED_SKILL=K-Research & Critic / PRESENT
+APPS_ATTACHED=0
+CUSTOM_ACTIONS_TRANSFERRED=NO
+NEXT=GENERATED_SKILL_PARITY_INSPECTION
 ```
 
-Old blocked Render Cobalt remains present and externally configured until a separate cutover:
+App attachment is intentionally held until the generated Skill is inspected for parity.
+
+## Native migration execution authorized — checkpoint 196
 
 ```text
-Render service: krc-cobalt-media-beta-kolemasakar
-plan: free
-region: frankfurt
-image: ghcr.io/imputnet/cobalt@sha256:63186dd68afd57ce3bb1f62cc4c139f5fa95b9c3e87a3cf5c6e4c7a570523f62
-historical blocker: edge HTTP 429 / non-JSON
+OWNER_AUTHORIZATION=APPROVE
+NATIVE_PLUGIN_MIGRATION_EXECUTION_AUTHORIZED=YES
+UI_CONFIRMATION_CAPTURE=PENDING
+PLUGIN_INITIAL_VISIBILITY=PRIVATE
+POST_MIGRATION_MEDIA_REBIND=REQUIRED
+PROVIDER_WORK=0
 ```
 
-### OCI Cobalt local acceptance
+Next: execute native migration in UI, capture the generated private Plugin, then rebind the five canonical Apps and run private zero-provider smoke.
 
-Current VM/runtime:
+## MEDIA rebind prebuild PASS — checkpoint 195
 
 ```text
-instance: krc-cobalt-media-beta
-shape: VM.Standard.E2.1.Micro / Always Free-eligible
-region: eu-frankfurt-1
-public IP: 89.168.65.88
-private IP: 10.0.0.26
-Docker: 29.1.3
-Compose: 2.40.3
-Cobalt: 11.7.1 / commit a636575b09de1fc55d9b8cd98cac88f5f2f16b42
-container port: 127.0.0.1:9000 only
-API auth required: yes
+FIVE_CANONICAL_APPS_FOUND=5/5
+APP_IDS_UNCHANGED=PASS
+R3C_READ_SURFACE=AVAILABLE
+E1_YOUTUBE_EXECUTION_SURFACE=AVAILABLE
+E2_INSTAGRAM_EXECUTION_SURFACE=AVAILABLE
+E3_FACEBOOK_EXECUTION_SURFACE=AVAILABLE
+E4_TELEGRAM_EXECUTION_SURFACE=AVAILABLE
+PERMISSION_BASELINE=ALLOW_READ_ACTIONS
+STATIC_MEDIA_CONTRACT=9 read + 4 execution = 13
+FINAL_NATIVE_MIGRATION_EXECUTION=NOT_AUTHORIZED
 ```
 
-Security state:
+Next gate is an explicit owner decision whether to execute native migration. If approved, the resulting private Plugin must be inspected and rebound to the five canonical Apps before any cutover/distribution decision.
+
+## Native migration preflight PASS — checkpoint 194
+
+Live migration dialog confirmed:
 
 ```text
-SSH local ingress narrowed to 91.199.188.209/32
-iptables persistence: enabled
-swap: 2 GiB
-missing API key -> blocked / error.api.auth.key.missing
-valid API key -> accepted by auth layer
+INSTRUCTIONS_AND_FILES=NO_PROBLEMS_DETECTED
+CUSTOM_ACTIONS=UNSUPPORTED
+PLUGIN_INITIAL_VISIBILITY=PRIVATE
+PUBLIC_PLUGIN_SHARING=UNAVAILABLE
+SOURCE_GPT_AFTER_MIGRATION=READ_ONLY
+FINAL_MIGRATION_EXECUTION=NO
 ```
 
-Instagram local retrieval-only evidence:
+Next phase is MEDIA rebind prebuild using the already validated five-app R4 mapping. Final migration remains separately gated.
+
+## Native Plugin migration semantics — verified current OpenAI behavior
 
 ```text
-source: https://www.instagram.com/reel/DEAyVa4SF3E/
-POST: HTTP 200
-status: tunnel
-fresh tunnel download: rc=0
-bytes: 214560
-paid retrieval: none
+instructions -> Skill
+knowledge -> reference files
+connected apps -> Plugin apps
+custom Actions -> NOT transferred
+selected model -> NOT transferred
+migrated Plugin -> starts private
+source GPT after completed migration -> read-only, still usable until retirement
 ```
 
-Therefore:
+Roadmap consequence: R4-C preflight must stop before final migration confirmation. After inspecting the generated Skill/app surface, create a separate integration-rebuild gate for the 13-operation MEDIA contract using the accepted R3C/E1-E4 app/MCP path.
 
-`OCI_COBALT_INSTAGRAM_LOCAL_RETRIEVAL = PASS`.
-
-### Public endpoint still pending
-
-DNS preparation passed:
+## R3.9 public GPT accepted — checkpoint 193
 
 ```text
-89-168-65-88.sslip.io -> 89.168.65.88
+PUBLIC_ROLLBACK_BASELINE=CAPTURED_AND_VERIFIED
+PUBLIC_R39_BUILDER_DELTA=APPLIED
+PUBLIC_GPT=PUBLISHED_IN_GPT_STORE
+PUBLIC_PRODUCTION_AUTH=PASS
+ACTION_SCHEMA=9 read + 4 execution = 13
+S1_CORE_GATE=PASS
+S2_MEDIA_PREAPPROVAL_GATE=PASS
+S3_READONLY_AND_GEMINI_CONSENT_BOUNDARY=PASS
+S4_CONSEQUENTIAL_CONFIRMATION_BOUNDARY=PASS
+S4_CONFIRMATION_CANCELLED=PASS
+START_HTTP_REQUEST_DURING_S4=0
+PROVIDER_WORK_DURING_PUBLIC_SMOKE=0
+FREE_ONLY=PASS
+PUBLIC_PRIVACY_POLICY_ACTIVE_BRANCH=READY
+LIVE_BUILDER_PRIVACY_URL_RECONCILIATION=PASS
+NATIVE_PLUGIN_MIGRATION_PREFLIGHT=NEXT
 ```
 
-Still required before VoiceBridge cutover:
+The source public GPT remains published as the rollback anchor. Native migration execution, Plugin publication/sharing, PR merges and new provider work remain outside the next read-only preflight gate.
+
+## R3.9 private staging accepted — checkpoint 192
 
 ```text
-dedicated OCI NSG attached to krc-cobalt-vnic
-80/443 ingress without modifying the shared default Security List
-matching local firewall rules while preserving SSH restriction/OCI instance-service rules
-HTTPS reverse proxy + public TLS
-Cobalt API_URL set to public HTTPS base URL
-external authenticated Instagram POST + tunnel preflight
+PRIVATE_STAGING=ACCEPTED
+S1_CORE_GATE=PASS
+S2_MEDIA_PREAPPROVAL_GATE=PASS
+S3_READONLY_AND_GEMINI_CONSENT_BOUNDARY=PASS
+S4_CONSEQUENTIAL_CONFIRMATION_BOUNDARY=PASS
+SELECTED_REGRESSION_TESTS=92/92 PASS
+ACTION_TRANSPORT_AUTH=PASS
+FREE_ONLY=PASS
+PROVIDER_WORK_DURING_S4=0
+NATIVE_PLUGIN_MIGRATION=AVAILABLE / DEFERRED
+PUBLIC_GPT_MUTATION=NO
+NEXT=PUBLIC_GPT_ROLLBACK_BASELINE_SNAPSHOT
 ```
 
-Cobalt port 9000 must remain loopback-only.
+Release note: the dedicated staging credential must not be promoted to public production. A fresh production credential is required at the public activation gate.
 
-A local OCI API key exists for preflight. Before live cutover, align OCI Cobalt server-side to the existing VoiceBridge `KRC_MEDIA_COBALT_API_KEY` without exposing the secret, preserving the intended live configuration change as `KRC_MEDIA_COBALT_ENDPOINT` only.
-
-### YouTube regression boundary
-
-The OCI Cobalt diagnostic control returned:
+## R3.9 exact validation and private staging — checkpoint 183
 
 ```text
-HTTP 400
-error.api.youtube.login
+SELECTED_REGRESSION_TESTS=91
+PASS=91
+FAIL=0
+R39_ACTION_SCHEMA=media_public_r39_openapi.yaml
+ACTION_BOUNDARY=9 non-consequential + 4 consequential
+BUILDER_INSTRUCTIONS=GPT_STORE_UNIFIED_R39_INSTRUCTIONS.md
+BUILDER_CHARS=7404/8000
+NATIVE_MIGRATION_PLUS=AVAILABLE
+DISPLAYED_DEADLINE=2026-12-11
+R4_C=DEFERRED_UNTIL_R39_UNIFIED_ACCEPTANCE
+NEXT=PRIVATE MEDIA BETA STAGING
+PUBLIC_GPT_MUTATION=NO
 ```
 
-This does not revoke accepted YouTube R2 evidence because current YouTube processing is Gemini direct. Before changing the Cobalt endpoint, prove the accepted Gemini-direct path is unaffected and no Cobalt fallback can be introduced.
-
-Still required before full R2 PASS:
+## R3.9 Unified KRC GPT — checkpoint 182
 
 ```text
-OCI public HTTPS endpoint/preflight
-server-side API-key alignment
-Gemini-direct YouTube regression protection
-VoiceBridge endpoint cutover only after endpoint preflight PASS
-Instagram functional live canary PASS
-Facebook bounded canary PASS
-Telegram bounded canary PASS
-Render + Neon delta/no-paid-fallback verification
-Core KRC isolation regression including forced MEDIA failure
+R3_9=ACTIVE
+ROUTING_CONTRACT=contracts/krc_unified_media_routing.yaml
+STAGING_MANIFEST=gpt_store/unified_r39_manifest.yaml
+NEW_STATIC_TESTS=tests/test_krc_unified_r39.py
+CORE_UNCHANGED=PASS
+CORE_PLUS_MEDIA_ADDENDUM_CHARS=7404/8000
+MEDIA_OPS=9 read + 4 execution = 13
+R4_APP_IDS=5 / unchanged
+PUBLIC_GPT_MUTATION=NO
+R4_C=PAUSED
 ```
 
-## R3 - Update existing published KRC GPT
+Next: exact-branch regression/runtime validation, then prepare an exact Builder delta. No public GPT mutation before that gate.
 
-Status: HOLD / NOT READY.
-
-R3 cannot start until full R2 PASS is recorded.
-
-No current authorization exists to modify or update the public GPT.
-
-## R4 - Post-update public verification
-
-Status: HOLD until R3.
-
-Required after any future R3 update:
-
-- same public KRC identity/URL remains accessible;
-- Core tasks work without MEDIA;
-- MEDIA works only as intended;
-- MEDIA failure does not degrade Core;
-- sharing state remains intact;
-- rollback remains available.
-
-## Current gate model
+## Recovery delta — 2026-09-22
 
 ```text
-R0  PASS
-R1  COMPLETE
-R2  PARTIAL PASS / YouTube accepted / OCI Instagram local retrieval PASS / public HTTPS pending
-R3  HOLD / NOT READY
-R4  HOLD
+R3C_OAUTH_RECOVERY=PASS
+R3C_RUNTIME_HEAD=27585c0ce924c78529b90aaadbfbeee841d0d249
+R3C_RENDER_DEPLOY=dep-dap55aegekts73fr0960 / LIVE
+MEDIA_GET_CAPABILITIES=PASS
+R3C_TO_VOICEBRIDGE_BINDING=PASS
+PLUGIN_REQUIRED_SURFACES=PASS
+FUNCTIONAL_INVENTORY_DRIFT=NO
+RECOVERY_CONSISTENCY_WARNING=CLOSED
+GITHUB_ACTIONS_CURRENTLY_AVAILABLE=NO
+CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 ```
 
-Every gate remains independent. Successful OCI local retrieval does not authorize endpoint cutover, R3, or public GPT changes.
+No MEDIA execution tool was invoked during this recovery.
 
-## Exact continuation point
+## R4-C pause decision — checkpoint 181
 
 ```text
-OCI PUBLIC HTTPS COMPLETION
-- dedicated NSG for krc-cobalt-vnic; do not change shared default Security List
-- required 80/443 OCI + local firewall path
-- HTTPS reverse proxy/TLS for 89-168-65-88.sslip.io
-- Cobalt API_URL -> public HTTPS base URL
-- keep 9000 loopback-only
-- align OCI API key to existing VoiceBridge secret server-side
-- external authenticated Instagram POST/tunnel preflight
-- verify Gemini-direct YouTube regression protection
-- update KRC_MEDIA_COBALT_ENDPOINT only after public preflight PASS
-- repeat Instagram live canary
-- Facebook
-- Telegram
-- Render/Neon no-paid-fallback checks
-- Core isolation regression
-
-NO PUBLIC GPT CHANGE
-NO PR #45 MERGE
+R4_C=PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION
+CURRENT_PRODUCTION_ENTRY_POINT=EXISTING_PUBLIC_GPT
+LOCAL_MARKETPLACE_PILOT=OPTIONAL / NOT_REQUIRED
+TRIGGER_1=NATIVE_MIGRATION_AVAILABLE_IN_PLUS_ACCOUNT
+TRIGGER_2=SUPPORTED_PLUGIN_DISTRIBUTION_TO_ORDINARY_CHATGPT_USERS
 ```
+
+Do not spend further implementation effort on Node/Codex/local pilot solely to achieve the end-user cutover. Re-check product support when either trigger appears.
+
+## R4-C local marketplace pilot — checkpoint 180
+
+```text
+R4_C_DISTRIBUTION=LOCAL_MARKETPLACE_PILOT
+PILOT_BUNDLE_READY=YES
+ZIP_SHA256=e6cf16718183b3403179798b3e0ef7d5e5dfa703c1b160d6bfc16a56afea9868
+NEXT_GATE=marketplace + plugin + Core Skill + 5/5 app availability
+MEDIA_STARTS=0
+PROVIDER_WORK=0
+```
+
+## R4-C distribution correction — checkpoint 179
+
+```text
+current_account=PERSONAL_PLUS
+candidate_type=LOCAL_MARKETPLACE_PACKAGE
+web_link_only_control=NOT_AVAILABLE
+plus_control=NEW_MCP_PLUGIN_FORM_ONLY
+state_changes=0
+next_decision=A local marketplace pilot | B managed workspace link pilot | C public directory
+```
+
+## R4-C link-only pilot — checkpoint 178
+
+```text
+R4_C_AUDIENCE=LINK_ONLY_PILOT
+R4_C_AUTHORIZED=YES
+C0_ROLLBACK_ANCHOR_FREEZE=PASS
+C1_AUDIENCE_SELECTION=PASS
+C2_LINK_ONLY_SHARE_MUTATION=BLOCKED_BEFORE_MUTATION
+C3_ACCESS_VERIFICATION=PENDING
+C4_USER_SWITCH=PENDING
+UI_AUTH_BLOCKER=OPEN
+ZERO_STATE_CHANGES=YES
+```
+
+## R4-C proposal — checkpoint 177
+
+```text
+R4_C_PROPOSAL_READY=YES
+CUTOVER_STYLE=NON_DESTRUCTIVE
+SOURCE_PUBLIC_GPT=KEEP PUBLISHED / UNCHANGED
+AUDIENCE_SELECTION_REQUIRED=YES
+OPTIONS=PRIVATE_OWNER_ONLY | LINK_ONLY_PILOT | PUBLIC_DISCOVERY
+PUBLICATION_CHANGE=HOLD
+USER_SWITCH=HOLD
+ROLLBACK_ANCHOR=EXISTING_PUBLIC_GPT
+```
+
+## R4-B completion — checkpoint 176
+
+```text
+B1=PASS
+B2=PASS
+B3=PASS
+B4=OPTIONAL / NOT_RUN
+CORE_REGRESSION=PASS
+MEDIA_READONLY_REGRESSION=PASS
+13_OPERATION_SCAN=PASS
+EXECUTION_CONFIRMATION_BOUNDARY=PASS
+FREE_ONLY_FAIL_CLOSED=PASS
+PRIVATE_REPLACEMENT_ACCEPTED=YES
+R4_B=COMPLETE
+R4_CUTOVER_READY=YES
+R4_C_AUTHORIZED=PAUSED
+```
+
+R4-C may now be proposed, but no publication/share or source-GPT mutation is authorized.
+
+## R4-B read-only admission fix — checkpoint 175
+
+```text
+B1=PASS
+B3=PASS
+remaining_non_youtube_429_root_cause=read-only routes consumed provider admission budget
+fix=read-only managed routes bypass provider admission
+provider-start rate/concurrency guards=PRESERVED
+VoiceBridge exact deployed SHA=174174aae0635736f05d812094b555544623270c
+Render deploy=dep-dapb6f3m8hqs7395ntj0
+deploy_status=LIVE
+post_deploy_health=200
+B2_FINAL_AUTHENTICATED_RERUN=PENDING
+```
+
+For missing/expired jobs, authenticated `MEDIA_TRANSCRIPT_NOT_FOUND / 404 / retryable=false` is valid read semantics and does not require a new provider start.
+
+## R4-B VoiceBridge remediation — checkpoint 174
+
+```text
+B1=PASS
+B3=PASS
+B2_429_ROOT_CAUSE=RENDER_FREE_SERVICE_COLD_START
+B2_429_REMEDIATION=PASS
+POST_WAKE_HEALTH=200
+POST_WAKE_9_ROUTE_PATHS=401_AUTH_BOUNDARY / ZERO_429
+B2_AUTHENTICATED_CANDIDATE_RERUN=PENDING
+R4_B_OVERALL=NOT_COMPLETE
+```
+
+No code/config mutation was required. Repeat only authenticated B2 while VoiceBridge is awake.
+
+## R4-B live Candidate — checkpoint 173
+
+```text
+B1=PASS
+B2=BLOCKED_BY_VOICEBRIDGE_429
+B3=PASS
+all_9_readonly_attempted=true
+common_http_status=429
+retryable=true
+execution_tools_called=0
+provider_work_started=false
+R4_B_OVERALL=NOT_COMPLETE
+```
+
+Next gate: read-only 429 diagnosis/remediation on shared VoiceBridge path, then repeat only B2.
+
+## R4-B progress — checkpoint 172
+
+```text
+R4_B_AUTHORIZED=YES
+B1 repository fixture regression=PASS
+B1 live Candidate behavior=PENDING
+B2 nine read-only live regression=BLOCKED / Candidate reselect required
+B3 contract scan=PASS
+B3 live Candidate visibility=PENDING
+B4 live execution=NOT PERFORMED
+R4_C=NOT AUTHORIZED
+```
+
+## R4-A completion — checkpoint 171
+
+```text
+A0=PASS
+A1=PASS
+A2=PASS
+A3=PASS
+A4 package=PASS
+A4 private install=PASS
+A5 private assembly verification=PASS
+A6 STOP checkpoint=COMPLETE
+R4_A=COMPLETE
+R4_B=NOT_AUTHORIZED
+```
+
+## R4-A progress — checkpoint 169
+
+```text
+A0=PASS
+A1 E1 restart-safe OAuth=PASS
+A1 restart continuity=PASS
+A2 E1 private connection=PASS
+A3 krc-core private Skill=PASS
+A4 package static validation=PASS
+A4 private Candidate install=PENDING
+A5=PENDING
+A6=PENDING
+```
+
+## R4-A corrected ordering — checkpoint 168
+
+```text
+A0 read-only freeze/preflight
+A1 E1 restart-safe OAuth hardening
+A1 acceptance incl. restart continuity
+A2 restore private E1 ChatGPT Plugin connection
+A3 create/install private KRC Core Skill
+A4 assemble private R4 Candidate Plugin
+A5 private assembly verification
+A6 STOP / checkpoint
+
+R4_A_SEQUENCE_167=SUPERSEDED_BY_168
+E1_RESTART_SAFE_OAUTH_REQUIRED_BEFORE_RECONNECT=YES
+R4_A_AUTHORIZED=NO
+```
+
+## R4 staged execution plan — checkpoint 167
+
+```text
+R4_A=PRIVATE_ASSEMBLY / NOT_AUTHORIZED
+  A1=create/install private KRC Core Skill
+  A2=restore private E1 YouTube MCP connection
+  A3=assemble private K-Research & Critic R4 Candidate Plugin
+
+R4_B=PRIVATE_ACCEPTANCE / NOT_AUTHORIZED
+  Core regression
+  nine read-only MEDIA operations
+  13-operation visibility/permission scan
+  no new *_start without separate explicit consent
+
+R4_C=PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION
+  source GPT stays unchanged by default
+  replacement audience/share is a separate approval
+```
+
+```text
+R4_CUTOVER_PACKAGE=READY
+R4_ROLLBACK_PACKAGE=READY
+R4_A=COMPLETE
+R4_A5=PASS
+R4_A6=COMPLETE
+R4_B_AUTHORIZED=YES
+R4_B=COMPLETE
+R4_B_B1=PASS
+R4_B_B2=PASS
+R4_B_B3=PASS
+R4_B_B4=OPTIONAL / NOT_RUN
+PRIVATE_REPLACEMENT_ACCEPTED=YES
+R4_CUTOVER_READY=YES
+R4_C_AUTHORIZED=PAUSED
+```
+
+## R4 preflight accepted
+
+### Non-UI
+
+```text
+CORE_SKILL_PARITY=PASS
+MEDIA_13_TOOL_PARITY=PASS
+LIVE_RUNTIME_HEALTH=PASS
+EXECUTION_ISOLATION=PASS
+CONFIRMATION_SAFE_STATE=PASS
+PLUGIN_EXISTENCE=PASS
+PLUGIN_PERMISSION_MODEL=PASS
+OAUTH_HARDENING=PASS
+VOICEBRIDGE_SCOPED_AUTH=PASS
+FREE_ONLY_POLICY=PASS
+GITHUB_ACTIONS_CURRENTLY_AVAILABLE=NO
+CURRENT_VALIDATION=PASS / exact-commit Render + live read-only runtime
+ROLLBACK_PACKAGE=READY
+```
+
+### Manual account UI
+
+```text
+GPT_IDENTITY=PASS
+GPT_EDITOR_ACCESS=PASS
+PUBLICATION_STATE=Published
+VISIBLE_AUDIENCE=Everyone
+
+SHARE_CONTROL=PASS
+GPT_STORE_SURFACE=PASS
+CATEGORY_CONTROL=PASS
+
+PLUGIN_SURFACE=PASS
+PRIVATE_PLUGIN_INVENTORY=PASS
+INSTALL_ADD_CONTROL=PASS
+
+SKILLS_SURFACE=PASS
+SKILLS_ADD_CONTROL=PASS
+
+MIGRATE_CONTROL=AVAILABLE / owner UI confirmed
+```
+
+No UI mutation was made during inspection.
+
+## Current path decision
+
+The current account exposes the required Plugin and Skill surfaces directly. No explicit migration control was found.
+
+Therefore, if R4 is later authorized, the cutover plan must use the validated Plugin/Skill path actually present in the account, not depend on an unobserved `Migrate` button.
+
+## R4 cutover remains unauthorized
+
+R4-B is complete and the private replacement is accepted. R4-C is ready to propose but remains unauthorized. Preserve FREE_ONLY; no publication/share, public GPT mutation, additional MEDIA execution, or PR merge without separate explicit approval.
+
+## Hard boundary
+
+```text
+PROJECT_COST_POLICY=FREE_ONLY
+R4_CUTOVER_AUTHORIZED=NO / PAUSED
+PUBLIC_GPT_MUTATION=NO
+PLUGIN_INSTALLATION_OR_CHANGE=NO
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING_CHANGE=NO
+MAIN_MUTATION=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+ADDITIONAL_LIVE_MEDIA_STARTS=NO
+```
+
+## Next state
+
+**R4-B is COMPLETE.** B1/B2/B3 passed; B4 was optional and not run. The private replacement is accepted. R4-C is ready to propose but remains HOLD pending separate owner authorization.
+
+Recovery authority: `CURRENT_HANDOFF.md` v21.8 + checkpoint 193.

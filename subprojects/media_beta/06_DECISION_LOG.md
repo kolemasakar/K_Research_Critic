@@ -1,490 +1,1038 @@
 # MEDIA BETA Decision Log
-Реєстр чинних і історичних рішень MEDIA BETA з актуальними release-hold рішеннями.
 
-Version: 2.7
-Status: ACTIVE
-Updated: 2026-09-08
+Version: 6.20
+Status: **PAUSED_BY_OWNER / TRANSCRIPT_READBACK_404 / STORAGE_IDENTIFICATION_READONLY_NEXT / FREE_ONLY**
+Updated: 2026-09-25
 
-This file is the compact current decision index. Detailed historical rationale remains available in Git history and the numbered phase/acceptance records.
+Historical decisions remain preserved in Git history and numbered checkpoints.
 
-## Historical Decisions D001-D022
+## Active decisions
 
-`D001` Media input is additive to the KRC Core - APPROVED.
-
-`D002` CriticProfile approval remains mandatory before independent research - APPROVED.
-
-`D003` Transcript proves what was said, not truth - APPROVED.
-
-`D004` Closed beta precedes public scaling - APPROVED; original multi-tester target is now operationally superseded by owner-only hold state.
-
-`D005` MEDIA BETA uses separate private product identity - APPROVED.
-
-`D006` MEDIA BETA backend is isolated from production VoiceBridge - APPROVED.
-
-`D007` Historical multi-tester admission used per-tester codes - APPROVED_HISTORICAL; normal current owner flow no longer asks for a code.
-
-`D008` Subtitle-first principle - retained where reliable, but historical browser-helper implementation decisions are not current normal UX.
-
-`D009` AssemblyAI is a beta reliability/STT provider, not a permanent public-free commitment - APPROVED.
-
-`D010` Bounded beta resource limits - APPROVED.
-
-`D011` Users do not provide provider API keys - APPROVED.
-
-`D012` Full transcript is excluded from KRC checkpoints - APPROVED.
-
-`D013` Sustainable free hybrid is a future direction, not current active architecture - APPROVED_DIRECTION.
-
-`D014` Unlimited-free is interpreted operationally, not literally - APPROVED_DIRECTION.
-
-`D015` Resource limits change only by explicit decision - APPROVED.
-
-`D016` Browser-assisted ingress was the A4 fallback architecture - APPROVED_HISTORICAL / FALLBACK_ONLY.
-
-`D017` Zero-client media router is public-only for remote platforms and multi-platform - APPROVED.
-
-`D018` Local audio/video upload is a separate approved ingress class - APPROVED; live acceptance later completed in A9.10.
-
-`D019` Managed transcript provider became primary zero-client YouTube approach - APPROVED.
-
-`D020` Billable managed-provider operations require explicit user consent - APPROVED.
-
-`D021` Managed KRCM jobs are durable and duplicate starts are credit-safe - APPROVED / LIVE_ACCEPTED.
-
-`D022` Private owner Action hides beta admission behind bearer authentication and server-side owner admission - APPROVED / LIVE_ACCEPTED.
-
-## D023 - Facebook Active Route Is Free Cobalt Only
-
-Decision: APPROVED / LIVE_ACCEPTED
-Date: 2026-08-24
-
-Active Facebook behavior:
+### D103 — Owner pause; 3600-second media TTL and safe original-transcript recovery
 
 ```text
-Cobalt success -> AssemblyAI -> durable KRCM
-Cobalt failure -> unavailable -> STOP
+OWNER_DECISION=PAUSE_AWAIT_TRANSITION_GENERATOR
+KRC_JOB=KRCM_a01a95b5-b91a-47b4-9d2d-5323fa36c8a4
+HISTORICAL_JOB=COMPLETED / 30 segments / 47289 characters / 0 credits
+CURRENT_STATUS_AND_SEGMENTS=HTTP_404
+FULL_ORIGINAL_EXPORT=NOT_AVAILABLE
+VOICEBRIDGE_JOB_TTL_SECONDS=3600
+TTL_CAUSATION=STRONGLY_CONSISTENT_NOT_FORENSICALLY_PROVEN
+ACTUAL_PRIMARY_DATABASE=NOT_YET_VERIFIED
+PHYSICAL_PURGE_OF_JOB=NOT_YET_VERIFIED
+SNAPSHOT_OR_PITR_AVAILABILITY=NOT_YET_VERIFIED
+SOURCE_TRACEABILITY_AUDIT=VISIBLE_COUNTS_COMPLETE / REPAIR_PENDING
+VERBATIM_42_CLAIM_FIDELITY=NOT_VERIFIED
+ONSCREEN_TABLE_LAYOUT=CORRECT_CONFIRMED_BY_OWNER
+NEXT_GATE=OWNER_TRANSITION_GENERATOR_THEN_IDENTIFY_REAL_ACTIVE_DB_READONLY
+NEW_PROVIDER_WORK=NO
+DB_WRITES=NO
+PRODUCTION_DEPLOY=NO
+PLUGIN_MUTATION=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
 ```
 
-ScrapeCreators remains reserve-only, unconfigured, inactive, and not offerable. Automatic or offered paid fallback after Cobalt failure is forbidden.
+The latest verified health endpoint reports media-job TTL of 3600 seconds. Existing code only reads non-expired jobs and can purge expired rows. The HTTP 404 alone does not prove physical deletion or identify the active DB. Earlier Render instance listing is suspended and must not be assumed to store this job. A connected Neon tool requires a project ID that is not yet verified. After the owner's generator, identify the real DB without revealing credentials, then perform read-only existence and verified backup-retention checks only. No implicit Gemini retry or reconstructed transcript. Checkpoint 222 is authoritative; audit details are in checkpoint 221.
 
-Reason: preserve zero-client owner UX and prevent silent/accidental paid retrieval.
 
-## D024 - Telegram Public Adapter Is Zero-Credit and No-Auth
+### D036 — Plugin-first authenticated Remote MCP path accepted
+```text
+PLUGIN_FIRST_STRATEGY=ACCEPTED
+PUBLIC_KRC_CUSTOM_GPT=UNCHANGED
+```
 
-Decision: APPROVED / LIVE_ACCEPTED
-Date: 2026-08-26
+### D037 — R3-A/B/C/D accepted
+```text
+R3_A=PASS
+R3_B=PASS
+R3_C=PASS
+R3_D=PASS
+```
 
-Supported public Telegram video posts use public web/embed retrieval, trusted Telegram media delivery, AssemblyAI STT, and durable KRCM. Retrieval credits are zero. No login, cookies, session, bot token, or paid fallback is allowed.
+### D038 — Four isolated execution surfaces accepted
+```text
+R3_E1_YOUTUBE=COMPLETE
+R3_E2_INSTAGRAM=COMPLETE
+R3_E3_FACEBOOK=COMPLETE
+R3_E4_TELEGRAM=COMPLETE
+OTHER_EXECUTION_TOOLS_PER_SURFACE=0
+```
 
-Reason: maintain a public-only, credential-free adapter with explicit terminal failure behavior.
+### D039 — Project policy remains FREE_ONLY
+```text
+PROJECT_COST_POLICY=FREE_ONLY
+RENDER_FREE_WEB_SERVICES=ACCEPTED
+NEON_FREE_POSTGRES=PRIMARY_DURABLE_DATABASE
+OCI_ALWAYS_FREE=ACCEPTED
+SELF_HOSTED_COBALT_ON_OCI=ACCEPTED
+PAID_HOSTING_FALLBACK=DENIED
+PAID_PROVIDER_FALLBACK=DENIED
+PAID_ACTIONS_USAGE=DENIED
+```
 
-## D025 - Local openaiFileIdRefs Attachment Ingestion Is Accepted
+### D059 — Facebook R3-E3 accepted
+```text
+LIVE_CANARY=PASS
+FREE_RETRIEVAL=cobalt
+DURABLE_PERSISTENCE=PASS
+RESTART_DURABILITY=PASS
+DUPLICATE_START_IDEMPOTENCY=PASS
+ZERO_PAID_FALLBACK=PASS
+```
 
-Decision: APPROVED / LIVE_ACCEPTED
-Date: 2026-08-26
+### D060 — Telegram R3-E4 accepted
+The first no-spoken-audio fixture produced a valid bounded content failure. The approved replacement completed successfully.
+```text
+COMPLETED_CANARY=PASS
+RETRIEVAL_PROVIDER=telegram_public_web
+DURABLE_PERSISTENCE=PASS
+RESTART_DURABILITY=PASS
+DUPLICATE_START_IDEMPOTENCY=PASS
+ZERO_CHARGE=PASS
+```
 
-One current-conversation audio/video attachment may use ChatGPT `openaiFileIdRefs` transport to the isolated backend. The backend accepts trusted OpenAI temporary HTTPS delivery, validates media, limits attachment size to 32 MiB, normalizes audio/video, uses AssemblyAI STT, and stores durable KRCM segments. Retrieval credits are zero. File IDs/signed URLs are not user-visible.
+### D061 — Full 13-operation runtime parity accepted
+```text
+R3_F=COMPLETE
+READ_OPERATIONS=9
+EXECUTION_OPERATIONS=4
+TOTAL_OPERATIONS=13
+READ_ONLY_EXECUTION_LEAKAGE=0
+```
 
-Reason: provide a stable zero-client source path for owner-local media without platform authentication.
+### D062 — OAuth / operational hardening accepted
+```text
+R3_G=COMPLETE
+DCR=PASS
+ACCESS_TOKEN_RESTART_CONTINUITY=PASS
+REFRESH_TOKEN_RESTART_CONTINUITY=PASS
+RUNTIME_REFRESH_AFTER_3600S_TTL=PASS
+CHATGPT_RECONNECT_REQUIRED=NO
+E3_TO_VOICEBRIDGE_SCOPED_AUTH=PASS
+MANAGED_MEDIA_JOB_TTL_SECONDS=3600
+```
 
-## D026 - Copy-Safe Fenced Claim Table Is the Accepted UI Mitigation
+### D063 — R3-H readiness review accepted
+```text
+R3_H=COMPLETE
+ROLLBACK_PACKAGE=READY
+R4_RELEASE_CHECKLIST=READY
+R4=HOLD
+```
 
-Decision: APPROVED / LIVE_ACCEPTED
-Date: 2026-08-26
+### D064 — R4 non-UI read-only preflight accepted
+```text
+CORE_SKILL_PARITY=PASS
+MEDIA_13_TOOL_PARITY=PASS
+LIVE_RUNTIME_HEALTH=PASS
+PRIVATE_PLUGIN_EXISTENCE=PASS
+PLUGIN_PERMISSION_MODEL=PASS
+CI=PASS
+R4_NON_UI_PREFLIGHT=COMPLETE
+```
 
-The normal four-column table remains required. Because ChatGPT whole-response Copy can collapse the rendered table header, the final report also includes an identical fenced `text` table with literal pipe delimiters.
+### D065 — Automated account UI inspection may fail closed
+Cloud Browser was blocked by Cloudflare human verification. No bypass was attempted and no mutation occurred.
 
-The fenced duplicate passed owner copy testing and is the accepted mitigation. The external rendered-table Copy defect alone does not reopen A10.
+### D066 — Manual R4 account UI preflight accepted
+Manual screenshots on 2026-09-21 confirmed:
+```text
+GPT_NAME=K-Research & Critic
+GPT_IDENTITY=PASS
+GPT_EDITOR_ACCESS=PASS
+PUBLICATION_STATE=Published
+VISIBLE_AUDIENCE=Everyone
 
-## D027 - Release Hold Owner Testing
+SHARE_CONTROL=PASS
+GPT_STORE_SURFACE=PASS
+CATEGORY_CONTROL=PASS
 
-Decision: APPROVED
-Date: 2026-08-27
+PLUGIN_SURFACE=PASS
+PRIVATE_KRC_PLUGIN_INVENTORY=PASS
+INSTALL_ADD_CONTROL=PASS
 
-After A9/A9.10/A10 acceptance, the owner chose continued private testing before release.
+SKILLS_SURFACE=PASS
+SKILLS_ADD_CONTROL=PASS
+
+MIGRATE_CONTROL=NOT_FOUND_IN_CURRENT_UI
+```
+
+No state-changing UI action was performed.
+
+### D067 — R4 read-only preflight is complete
+Combined non-UI and manual UI evidence closes the technical preflight.
+```text
+R4_NON_UI_PREFLIGHT=COMPLETE
+R4_MANUAL_UI_PREFLIGHT=COMPLETE
+R4_READONLY_PREFLIGHT=PASS / COMPLETE
+R4_TECHNICAL_PREFLIGHT_DEBT=0
+R4_CUTOVER_AUTHORIZED=NO
+NEXT_GATE=OWNER_CUTOVER_DECISION_IN_FRESH_CHAT
+```
+
+### D068 — No explicit migration control is assumed
+No `Migrate` / `Перенести` control was found across the inspected GPT, editor, overflow, share, plugin, and skill surfaces.
+
+Future R4 work, if owner-authorized, must use the validated Plugin/Skill path actually present in the account and must not depend on an unobserved migration button.
+
+### D069 — Final project/docs sync accepted
+Checkpoint 165 freezes the transition state before a new-chat generator is applied.
+```text
+PROJECT_SYNC_COMPLETE=YES
+R4_READONLY_PREFLIGHT=COMPLETE
+R4_CUTOVER_AUTHORIZED=NO
+NEW_CHAT_READY=YES
+CANONICAL_RECOVERY=CURRENT_HANDOFF_v19.8 + checkpoint_165
+```
+### D070 — R3C OAuth recovery accepted without GitHub Actions
+
+GitHub Actions were unavailable and were not used as a current validation gate.
 
 ```text
-merge to main = HOLD
-production promotion = HOLD
-external testers = HOLD
-public rollout = HOLD
+R3C_RUNTIME_VALIDATED_HEAD=27585c0ce924c78529b90aaadbfbeee841d0d249
+R3C_RENDER_DEPLOY=dep-dap55aegekts73fr0960 / LIVE
+OAUTH_AUTHORIZE_GET=200
+OAUTH_AUTHORIZE_POST=302
+OAUTH_TOKEN_POST=200
+MEDIA_GET_CAPABILITIES=PASS
+R3C_TO_VOICEBRIDGE_BINDING=PASS
+GITHUB_ACTIONS_CURRENTLY_AVAILABLE=NO
+CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
 ```
 
-Defects are fixed/revalidated in isolated feature branches during the hold.
+The legacy OAuth bridge is limited to an exact configured client-id/callback pair and upgrades successful authorization into restart-safe signed tokens.
 
-## D028 - Release Gates Are Independent
-
-Decision: APPROVED
-Date: 2026-08-27
-
-Merge, production promotion, external tester onboarding, and public rollout are separate decisions. Approval of one must never be inferred as approval of another.
-
-Reason: repository integration, infrastructure deployment, audience expansion, and public publication carry different risks and controls.
-
-## D029 - Post-AssemblyAI Free-Credit Hybrid C/D Is the Planned Free-First Direction
-
-Decision: APPROVED_PLAN / NOT_IMPLEMENTED
-Date: 2026-09-02
-
-The owner selected the combined Hybrid C/D direction as the planned STT architecture **after AssemblyAI free credits are exhausted**.
-
-Current runtime remains unchanged:
+### D071 — Plugin inventory drift warning closed
 
 ```text
-active KRC prerecorded provider: AssemblyAI universal-2
-Gemini normal prerecorded activation: FALSE
-hybrid implementation now: FALSE
+PLUGIN_REQUIRED_SURFACES=PASS
+LEGACY_PLUGIN_ENTRIES=NOT_REQUIRED
+FUNCTIONAL_INVENTORY_DRIFT=NO
+RECOVERY_CONSISTENCY_WARNING=CLOSED
+REINSTALL_REQUIRED=NO
 ```
 
-Planned future routing direction:
+Checkpoint 164 remains a historical UI snapshot. Current accepted R3-B and R3-E2 surfaces are the newer R3B and Instagram-v5 connections. No Plugin install/remove/permission mutation was performed during reconciliation.
+
+### D054 — GitHub remains authoritative storage
+```text
+AUTHORITATIVE_PROJECT_STATE=GITHUB_REPOSITORIES
+LOCAL_WORKTREE_USE=TRANSIENT_ONLY
+```
+
+### D072 — Checkpoint 166 canonical sync accepted
 
 ```text
-Gemini 3.5 Transcribe Live
-  -> preferred free route for eligible jobs without word timestamps/diarization
-
-Gemini 3.5 Transcribe unary
-  -> free feature route when timestamps and/or diarization are required and quota allows
-
-AssemblyAI universal-2
-  -> retained rollback/fallback technology
-  -> billable fallback disabled by default after free credits expire
-  -> paid use requires separate explicit owner authorization
+PROJECT_SYNC_COMPLETE=YES
+CANONICAL_RECOVERY=CURRENT_HANDOFF_v19.9 + checkpoint_166
+GITHUB_ACTIONS_CURRENTLY_AVAILABLE=NO
+CURRENT_VALIDATION_MODE=EXACT_COMMIT_RENDER_BUILD + LIVE_READONLY_RUNTIME
+R4_CUTOVER_AUTHORIZED=NO
 ```
 
-No automatic paid provider fallback is authorized.
+This supersedes checkpoint 165 as the current recovery entry point while preserving checkpoint 165 as historical evidence.
 
-Before implementation, mutable assumptions must be revalidated: Gemini model availability, Free Tier limits, language coverage, Live session restrictions, privacy/data-use policy, and actual remaining AssemblyAI balance.
+### D073 — R4 staged cutover/rollback package accepted
 
-Targeted validation before cutover must cover code-switching, noisy Ukrainian/Russian, multi-speaker media, telephone-bandwidth speech, longer real-world media, numeric/date/name fidelity, and Gemini unary-versus-Live parity where applicable.
-
-Detailed product plan:
-
-`69_POST_ASSEMBLYAI_FREE_CREDITS_HYBRID_STT_PLAN_2026_09_02.md`
-
-Technical implementation plan:
-
-`kolemasakar/VoiceBridge` -> `docs/planning/2026-09-02_KRC_POST_ASSEMBLYAI_FREE_CREDITS_HYBRID_STT_IMPLEMENTATION_PLAN.md`
-
-This decision does not authorize code changes, provider activation, deployment, merge, external testing, public rollout, or provider-consuming validation now.
-
-## D030 - Close M3 With AssemblyAI Retained; M4 Starts as Repository-Only Preflight
-
-Decision: APPROVED / M3_CLOSED / M4_PREFLIGHT
-Date: 2026-09-02
-
-The owner continued the project after recording D029. Because Hybrid C/D is explicitly deferred until AssemblyAI free credits are exhausted, the current M3 provider decision is closed without a cutover.
+Checkpoint 167 defines the exact mutation and rollback order without authorizing execution.
 
 ```text
-M3: CLOSED
-current KRC prerecorded provider: AssemblyAI universal-2
-Gemini normal prerecorded activation: FALSE
-provider cutover now: FALSE
-future Hybrid C/D: PLANNED / NOT_IMPLEMENTED
+R4_PATH=PRIVATE_ASSEMBLY -> PRIVATE_ACCEPTANCE -> OPTIONAL_USER_SWITCH
+R4_A_PRIVATE_ASSEMBLY_AUTHORIZED=NO
+R4_B_PRIVATE_ACCEPTANCE_AUTHORIZED=NO
+R4_C_USER_SWITCH_AUTHORIZED=NO
+
+SOURCE_PUBLIC_GPT=KEEP_UNCHANGED
+BUILTIN_MIGRATION_CONTROL=NOT_FOUND / NOT_USED
+ROLLBACK_ANCHOR=EXISTING_PUBLIC_GPT
+
+R4_CUTOVER_PACKAGE=READY
+R4_ROLLBACK_PACKAGE=READY
+R4_CUTOVER_READY=NO
 ```
 
-The next phase is M4 infrastructure readiness. M4 begins with repository/image parity verification only; no deployment or canary is implied.
+R4-A requires a private KRC Core Skill, restoration of the E1 YouTube private MCP connection, and assembly of the private replacement Plugin. No new MEDIA execution is implicitly authorized.
 
-The first M4 preflight found two hard blockers in the current VoiceBridge cloud Docker image definition:
+### D074 — Public cutover is non-destructive by default
 
-```text
-ffmpeg/ffprobe required by accepted local attachment processing: MISSING
-psql required by durable PostgreSQL/Neon persistence: MISSING
-```
+Because no built-in migration control is available in the inspected account UI, the default future R4-C plan does not delete, edit, or unpublish the existing K-Research & Critic GPT. Replacement sharing/publication and any later source-GPT retirement are separate owner decisions.
+
+### D075 — E1 restart-safe OAuth is mandatory before reconnect
+
+Read-only inspection established that the accepted live E1 commit `88cdc465...` still uses process-memory `OAuthState`, while the accepted recovery code at `27585c0...` contains `RestartSafeOAuthState`.
 
 Therefore:
 
 ```text
-M4_PREFLIGHT: COMPLETE
-M4_CANARY_READY: FALSE
-M4_DEPLOYMENT: NOT_AUTHORIZED
+E1_RESTART_SAFE_OAUTH_REQUIRED_BEFORE_RECONNECT=YES
+R4_A_SEQUENCE_167=SUPERSEDED_BY_168
+R4_A_FIRST_MUTATION=E1_OAUTH_HARDENING
+R4_A_AUTHORIZED=NO
 ```
 
-Required next work is feature-branch image remediation plus CI image-parity evidence. Any actual deployment/canary requires a separate owner authorization after those checks pass.
+No E1 redeploy, reconnect, Plugin installation, Skill installation, provider work, publication or source-GPT mutation was performed during this review.
 
-Canonical checkpoint:
-
-`70_M3_CLOSED_M4_PREFLIGHT_BLOCKED_CHECKPOINT_2026_09_02.md`
-
-VoiceBridge preflight authority:
-
-`docs/history/2026-09-02_KRC_MEDIA_M4_DEPLOYMENT_IMAGE_PARITY_PREFLIGHT.md`
-
-## D031 - M4 Final-Image Parity Remediation Is Accepted
-
-Decision: ACCEPTED / OWNER_CANARY_AUTHORIZATION_PENDING
-Date: 2026-09-02
-
-VoiceBridge M4.1 feature-branch remediation installed the required runtime tooling and added CI validation of the final Docker image.
-
-Exact validated evidence:
+### D076 — R4-A private package assembly accepted through static gate
 
 ```text
-VoiceBridge acceptance commit: 6a9491359795840ec9e79c9edc0ea82f595e9784
-Validate run: 33577022166
-krc-image-parity: SUCCESS
-cloud: SUCCESS
-browser-extension: SUCCESS
-repository-docs: SUCCESS
+A1_E1_RESTART_SAFE_OAUTH=PASS
+A1_RESTART_CONTINUITY=PASS
+A2_E1_PRIVATE_CONNECTION=PASS
+A3_CORE_SKILL_PRIVATE_INSTALL=PASS
+A4_PACKAGE_STATIC_VALIDATION=PASS
+A4_PRIVATE_INSTALL=PENDING
 ```
 
-The final image proves working `ffmpeg`, `ffprobe`, and `psql`, and passes a no-provider-call KRC managed-route startup smoke.
+The R4 Candidate references five already registered ChatGPT apps through `.app.json`; no raw `mcp.json` is included. A repo-local marketplace entry was added for private testing. This does not authorize publication/share or R4-B.
 
-Therefore:
+### D077 — A4 private install accepted
+
+Work completed the Personal / Local installation of `K-Research & Critic R4 Candidate` with one Skill and five registered app mappings.
+
+Real Work schema validation found and corrected only:
+- unsupported `required` fields in `.app.json`;
+- missing `interface.defaultPrompt`.
+
+Repository manifests were reconciled to that validated shape.
 
 ```text
-M4_IMAGE_PARITY: PASS
-M4_CANARY_PREREQUISITE_IMAGE_PARITY: PASS
-M4_DEPLOYMENT: NOT_PERFORMED
-M4_CANARY: NOT_RUN
+A4_PRIVATE_INSTALL=PASS
+FINAL_VALIDATION_ERRORS=0
+PUBLICATION=NO
+SHARING=NO
+MEDIA_PROVIDER_WORK=NO
+A5=PENDING_NEW_CHAT
 ```
 
-Repository/CI readiness does not authorize an external deployment. A separate owner decision is mandatory before deployment or an owner-only canary.
+### D078 — R4-A private assembly accepted and stopped at A6
 
-Canonical checkpoint:
-
-`71_M4_IMAGE_PARITY_READY_OWNER_CANARY_DECISION_CHECKPOINT_2026_09_02.md`
-
-## D032 - M4 Bounded Owner-Only Canary Is Accepted and Rolled Back
-
-Decision: ACCEPTED / ROLLBACK_COMPLETE / PERMANENT_PROMOTION_NOT_AUTHORIZED
-Date: 2026-09-02
-
-The owner explicitly authorized a bounded M4 owner-only canary against the isolated MEDIA BETA Render/Neon contour.
-
-Exact execution evidence:
+A5 in the fresh chat verified the assembled private R4 Candidate without executing any MEDIA start operation or provider work.
 
 ```text
-VoiceBridge M4 target: 6a9491359795840ec9e79c9edc0ea82f595e9784
-workflow run: 33580592224
-result: SUCCESS
-real STT route: public Telegram -> AssemblyAI universal-2
-STT seconds: 53
-retrieval credits: 0
-provider cleanup: PASS
-Neon durable readback: PASS
-duplicate reuse: PASS
-single STT reservation: PASS
-invalid/private Telegram boundary: PASS
-mandatory rollback: PASS
+PLUGIN_VISIBLE=PASS
+CORE_SKILL_BOUND=PASS
+SKILL_COUNT=1
+REGISTERED_APP_COUNT=5
+READ_OPERATIONS=9
+EXECUTION_OPERATIONS=4
+TOTAL_OPERATIONS=13
+READ_ONLY_EXECUTION_LEAKAGE=0
+FREE_ONLY=PASS
+SOURCE_PUBLIC_GPT_UNCHANGED=YES
+PUBLICATION=NO
+SHARING=NO
+A5=PASS
+A6=COMPLETE
+R4_A=COMPLETE
+R4_B_AUTHORIZED=NO
+R4_C_AUTHORIZED=NO
 ```
 
-The isolated Render service was restored to exact pre-canary commit:
+A permitted read-only `media_get_capabilities` probe returned HTTP 429/retryable; no provider work was started. This is recorded as a runtime probe warning, not as execution leakage or a package parity failure.
 
-`2f0f02769dbdf2e8240e6b08867ecef2faaede16`
+### D079 — R4-B authorized; static regression PASS; live Candidate reselect required
 
-The one-shot canary workflow was removed after execution. No permanent backend promotion occurred.
+Owner authorized R4-B Private Acceptance after R4-A completion.
 
-Therefore:
+Repository/contract checks passed for Core snapshot/fixtures, risk and cross-check floors, claim ledger, traceability, language, checkpoint recovery, media/core isolation, model-agnostic behavior, 13-operation parity, consequential annotations, and FREE_ONLY fail-closed policy.
+
+The active turn then stopped exposing the Personal/Local Candidate KRC tool namespaces. Direct orchestration therefore failed before MCP/provider/backend invocation. This is treated fail-closed and must not be replaced by unrelated public/global plugin results.
 
 ```text
-M4_OWNER_CANARY: PASS
-M4_PERMANENT_BACKEND_PROMOTION: NOT_AUTHORIZED
-R1 merge: HOLD
-R2 backend promotion: HOLD
-R3 external testers: HOLD
-R4 public rollout: HOLD
+R4_B_AUTHORIZED=YES
+R4_B=IN_PROGRESS
+B1_REPOSITORY_FIXTURE_REGRESSION=PASS
+B1_LIVE_CANDIDATE_BEHAVIOR=PENDING
+B2_LIVE_READONLY_REGRESSION=BLOCKED_PENDING_CANDIDATE_RESELECT
+B3_CONTRACT_SCAN=PASS
+B3_LIVE_CANDIDATE_VISIBILITY_SCAN=PENDING
+B4_LIVE_EXECUTION=NOT_PERFORMED
+PROVIDER_WORK_STARTED=false
+ADDITIONAL_LIVE_MEDIA_STARTS=0
+PRIVATE_REPLACEMENT_ACCEPTED=NO
+R4_C_AUTHORIZED=NO
 ```
 
-The canary does not activate Gemini prerecorded, Hybrid C/D, or any automatic paid fallback.
+### D080 — R4-B live Candidate: B1 PASS / B2 blocked by VoiceBridge 429 / B3 PASS
 
-Canonical checkpoint:
-
-`72_M4_OWNER_CANARY_ACCEPTED_ROLLBACK_COMPLETE_CHECKPOINT_2026_09_02.md`
-
-VoiceBridge authority:
-
-`docs/history/2026-09-02_KRC_MEDIA_M4_OWNER_CANARY_ACCEPTANCE.md`
-
-## D033 - Preserve the Existing Published KRC Identity; MEDIA Integration Uses a Separate Safety-Gated Update Sequence
-
-Decision: APPROVED_PLAN / NOT_EXECUTED
-Date: 2026-09-04
-
-The owner confirmed the current product reality:
+Owner-provided live Candidate evidence confirms all 13 canonical operations are visible, B1 live Core behavior passes, and B3 visibility/confirmation scan passes. All nine B2 read-only operations reached the live path but returned the same retryable VoiceBridge HTTP 429.
 
 ```text
-KRC public GPT: already published and user-accessible
-KRC MEDIA BETA GPT: owner-only / not separately published
+B1=PASS
+B2=BLOCKED_BY_VOICEBRIDGE_429
+B3=PASS
+ALL_9_READONLY_ATTEMPTED=true
+COMMON_ERROR=voicebridge_http_error / HTTP 429 / retryable=true
+READ_ONLY_EXECUTION_LEAKAGE=0
+EXECUTION_TOOLS_CALLED=0
+PROVIDER_WORK_STARTED=false
+R4_B_OVERALL=NOT_COMPLETE
+R4_C_AUTHORIZED=NO
 ```
 
-The integration strategy must preserve the existing public KRC identity. Repository integration must not be treated as a GPT publication event, and the private MEDIA BETA GPT must never become a dependency required to use Core KRC.
+Decision: diagnose and minimally remediate only the shared read-only 429 path, then repeat B2 only. B1/B3 remain accepted unless remediation changes their governed components.
 
-Mandatory invariant:
+### D081 — VoiceBridge 429 root cause accepted as Render free-service cold start
+
+Checkpoint 166 already documented the same sequence: retryable 429 while VoiceBridge was cold/asleep, initial health wake 503, then health 200 and successful read-only invocation.
+
+Checkpoint 174 reproduced that sequence. During the B2 failure window R3C received the Candidate MCP calls with HTTP 200, while VoiceBridge had no corresponding request logs or HTTP metrics. Direct health wake returned 503 twice; Render then emitted `service_started` at 2026-09-22T16:46:28Z and health returned 200.
+
+After wake, all nine canonical MEDIA route paths returned the expected authentication boundary 401 when probed without credentials, with zero 429 responses.
 
 ```text
-MEDIA unavailable/fails -> MEDIA operation fails closed or becomes unavailable
-Core KRC              -> remains accessible and functional
+ROOT_CAUSE=RENDER_FREE_SERVICE_COLD_START
+CODE_CHANGE_REQUIRED=NO
+CONFIG_CHANGE_REQUIRED=NO
+REMEDIATION=READ_ONLY_HEALTH_WAKE
+POST_WAKE_HEALTH=200
+POST_WAKE_429_COUNT=0
+AUTH_BOUNDARY_PRESERVED=PASS
+B2_AUTHENTICATED_CANDIDATE_RERUN=PENDING
 ```
 
-The owner approved the following independent gate sequence:
+Direct unauthenticated probes do not count as B2 functional PASS. The remaining acceptance step is to repeat only B2 through the authenticated private Candidate while VoiceBridge is awake.
+
+### D082 — Managed read-only 429 leakage fixed without weakening FREE_ONLY
+
+Authenticated B2 showed that the cold-start blocker was cleared, but rapid non-YouTube read-only calls still returned retryable 429 after a successful preflight.
+
+Root cause was `PublicMediaAdmissionController`: it applied provider admission rate/concurrency controls to every authenticated `/api/v1/media/managed/*` request, including preflight, lookup, status, and segments.
+
+The minimal remediation restricts provider admission to the only route that can start provider work:
 
 ```text
-R0  Public KRC Update Safety Preflight
-R1  Repository integration
-R2  Permanent MEDIA backend promotion/readiness
-R3  Update the existing published KRC GPT
-R4  Post-update public-access + Core regression verification
+POST /api/v1/media/managed/transcriptions
 ```
 
-### R0 is mandatory before R1-R3 execution
-
-R0 must be no-live-change and must verify at execution time:
-
-- the existing public KRC is still accessible;
-- the same GPT identity is editable by the owner;
-- an Update path for that existing published GPT is available;
-- current sharing/publication state is recorded;
-- current OpenAI requirements for updating a published GPT and public Actions are revalidated;
-- required Privacy Policy URL/state is valid;
-- current GPT configuration is captured sufficiently for rollback/reconstruction;
-- public KRC URL/identity can be preserved.
-
-If safe update of the same existing published GPT cannot be confirmed without creating/republishing a new GPT, STOP.
-
-R1, R2, R3, and R4 remain separately authorized gates. Approval of repository integration does not authorize backend promotion or live GPT Update. Approval of backend readiness does not authorize live GPT Update.
-
-Before R3 `Update`, Preview must prove both Core regression safety and MEDIA functionality, including a forced MEDIA failure where Core remains usable. The exact pre-update GPT configuration must be retained for rollback/reconstruction.
-
-Immediately after any separately authorized R3 Update, R4 must verify the same public KRC identity/URL remains accessible and that Core works independently of MEDIA.
-
-Detailed product plan:
-
-`planning/PUBLIC_KRC_MEDIA_INTEGRATION_UPDATE_SAFETY_PLAN_2026_09_04.md`
-
-VoiceBridge technical plan:
-
-`kolemasakar/VoiceBridge` -> `docs/planning/2026-09-04_KRC_PUBLIC_GPT_MEDIA_INTEGRATION_SAFETY_PREFLIGHT.md`
-
-This decision changes planning/governance only. It does not authorize or perform repository merge, permanent Render promotion, live GPT Update, new GPT publication, external tester expansion, public MEDIA rollout, Gemini prerecorded activation, Hybrid C/D implementation, or automatic paid fallback.
-
-## D034 - Paid Cobalt Hosting Is Excluded; Migrate the Self-Hosted Cobalt Route to OCI Always Free
-
-Decision: APPROVED / R2_REMEDIATION / R3_HOLD
-Date: 2026-09-07
-
-The R2 bounded Instagram canary correctly failed closed before STT, with zero retrieval credits and zero STT charges. Two Instagram retrieval-only diagnostics and an independent YouTube control reproduced an `HTTP 429` non-JSON response from the current Render Cobalt endpoint. The control response was `text/plain; charset=utf-8` with `server=cloudflare`, so the accepted blocker description is an edge-level non-JSON response before a usable Cobalt application JSON response.
-
-The owner explicitly rejected paid hosting as a remediation path:
+Read-only managed routes bypass provider admission and continue through their normal authentication/read handlers. FREE_ONLY, start-route rate limits, and concurrency limits remain intact.
 
 ```text
-Render paid instance: NOT CONSIDERED
-paid Cobalt hosting: NOT CONSIDERED
-paid retrieval fallback: FORBIDDEN
-paid STT fallback: FORBIDDEN
-paid proxy fallback: FORBIDDEN
-FREE_TIER_ONLY: RETAINED
+VoiceBridge code commit=eda6fce7236eaa3d119864236078fbe45e5379f3
+VoiceBridge deployed head=174174aae0635736f05d812094b555544623270c
+Render deploy=dep-dapb6f3m8hqs7395ntj0
+deploy_status=LIVE
+typescript_build=PASS
+post_deploy_health=200
+PR45=OPEN / DRAFT / UNMERGED
 ```
 
-Approved remediation:
+YouTube `lookup/status/segments` 404 responses are not infrastructure failures when they represent `MEDIA_TRANSCRIPT_NOT_FOUND / retryable=false` for missing or expired jobs. Runtime retention is 3600 seconds. B2 acceptance therefore evaluates expected authenticated read semantics, not an all-2xx requirement.
+
+The remaining gate is one final authenticated Candidate B2 rerun with zero infrastructure 429 and zero execution/provider starts.
+
+### D083 — R4-B private acceptance complete
+
+The final authenticated Candidate B2 rerun after checkpoint 175 attempted all nine read-only MEDIA operations and satisfied the accepted read semantics for every operation.
 
 ```text
-self-hosted Cobalt -> migrate from Render Free path to OCI Always Free VM
-VoiceBridge        -> remain on Render Free
-Neon               -> unchanged
-private MEDIA BETA -> unchanged
-public KRC         -> unchanged
+operations_attempted=9/9
+accepted_pass=9
+accepted_fail=0
+infrastructure_HTTP_429=0
+execution_start_calls=0
+provider_work=0
 ```
 
-Execution constraints:
+Successful preflight/capability reads returned HTTP 200. Missing or expired lookup/status/segments returned the accepted negative read result `MEDIA_TRANSCRIPT_NOT_FOUND / HTTP 404 / retryable=false`. No provider execution was used to create fresh jobs.
 
-- OCI preflight must confirm an Always Free eligible resource before creation;
-- no paid OCI resource may be created as part of this decision;
-- Cobalt must remain API-key protected and exposed through HTTPS;
-- no provider secret is placed in GPT instructions, Action schema, or chat;
-- after OCI retrieval-only preflight PASS, only `KRC_MEDIA_COBALT_ENDPOINT` should change in VoiceBridge;
-- Instagram must be re-canary-tested before Facebook;
-- full R2 still requires Instagram, Facebook, Telegram, no-paid-fallback delta verification, and Core KRC isolation regression;
-- R3 and R4 remain HOLD.
-
-Canonical checkpoint:
-
-`87_R2_INSTAGRAM_COBALT_EDGE_BLOCKER_OCI_FREE_MIGRATION_CHECKPOINT_2026_09_07.md`
-
-## D035 - OCI Cobalt Local Secure Runtime and Instagram Retrieval Are Accepted; Public Cutover Remains Held
-
-Decision: ACCEPTED_LOCAL_PREFLIGHT / PUBLIC_HTTPS_PENDING / LIVE_ENDPOINT_CUTOVER_NOT_AUTHORIZED / R3_HOLD
-Date: 2026-09-08
-
-The owner-approved free-only OCI remediation reached a working local runtime on a dedicated `VM.Standard.E2.1.Micro` instance selected as Always Free-eligible in the OCI console.
-
-Accepted OCI runtime evidence:
+Checkpoint 167 defines B4 as optional. Therefore R4-B acceptance is satisfied by B1/B2/B3 plus the confirmation and FREE_ONLY boundaries:
 
 ```text
-instance: krc-cobalt-media-beta
-region: eu-frankfurt-1
-public IPv4: 89.168.65.88
-private IPv4: 10.0.0.26
-Docker: 29.1.3
-Docker Compose: 2.40.3
-Cobalt image: ghcr.io/imputnet/cobalt@sha256:63186dd68afd57ce3bb1f62cc4c139f5fa95b9c3e87a3cf5c6e4c7a570523f62
-Cobalt version: 11.7.1
-Cobalt commit: a636575b09de1fc55d9b8cd98cac88f5f2f16b42
-binding: 127.0.0.1:9000 only
+CORE_REGRESSION=PASS
+MEDIA_READONLY_REGRESSION=PASS
+13_OPERATION_SCAN=PASS
+EXECUTION_CONFIRMATION_BOUNDARY=PASS
+FREE_ONLY_FAIL_CLOSED=PASS
+B4=OPTIONAL / NOT_RUN
+PRIVATE_REPLACEMENT_ACCEPTED=YES
+R4_B=COMPLETE
 ```
 
-The host was hardened for the current owner access path:
+R4-C may now be proposed but remains separately gated:
 
 ```text
-SSH source 91.199.188.209/32 -> locally allowed
-iptables persistence -> enabled
-swap -> 2 GiB
+R4_CUTOVER_READY=YES
+R4_C_AUTHORIZED=NO
+R4_CUTOVER=DEFERRED
+SOURCE_PUBLIC_GPT_UNCHANGED=YES
+PUBLICATION=NO
+SHARING_CHANGE=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
 ```
 
-Cobalt API-key protection is accepted:
+### D084 — R4-C non-destructive cutover proposal prepared
+
+After R4-B completion, the exact R4-C contract from checkpoint 167 was recovered.
+
+R4-C remains a separate final owner decision. The preferred cutover is non-destructive:
 
 ```text
-API_AUTH_REQUIRED=1
-missing key -> error.api.auth.key.missing
-valid key -> auth passes to normal URL validation
+SOURCE_PUBLIC_GPT=KEEP PUBLISHED / UNCHANGED
+ROLLBACK_ANCHOR=EXISTING_PUBLIC_GPT
+PR22_MERGE=NO
+PR45_MERGE=NO
+NEW_MEDIA_STARTS=NO
+PROVIDER_WORK=NO
 ```
 
-Authenticated local Instagram retrieval-only preflight against:
-
-`https://www.instagram.com/reel/DEAyVa4SF3E/`
-
-passed:
+Before any replacement sharing/publication/user-switch mutation, the owner must select one exact audience:
 
 ```text
-POST -> HTTP 200
-status -> tunnel
-fresh tunnel download -> curl rc 0
-retrieved bytes -> 214560
-paid retrieval provider -> none
+1=PRIVATE_OWNER_ONLY
+2=LINK_ONLY_PILOT
+3=PUBLIC_DISCOVERY
 ```
 
-Therefore:
+No audience is inferred from the generic instruction to continue.
+
+Until an exact audience is selected:
 
 ```text
-OCI_COBALT_SECURE_LOCAL_RUNTIME: PASS
-OCI_COBALT_INSTAGRAM_LOCAL_RETRIEVAL: PASS
+R4_C_AUTHORIZED=NO
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING_CHANGE=NO
+USER_SWITCH=NO
 ```
 
-A diagnostic OCI Cobalt YouTube control returned `error.api.youtube.login`. This does not revoke the accepted YouTube R2 route because YouTube remains Gemini direct. Before changing the Cobalt endpoint, regression evidence must confirm the Gemini-direct YouTube path is unaffected and no Cobalt fallback is introduced.
+Checkpoint 177 is the canonical proposal/approval gate.
 
-Public cutover remains held because the OCI Cobalt service is still local-only and `API_URL` still points to `http://127.0.0.1:9000/`.
+### D085 — R4-C LINK_ONLY_PILOT authorized; browser UI blocked before mutation
 
-DNS preparation passed:
+Owner explicitly selected audience option 2:
 
 ```text
-89-168-65-88.sslip.io -> 89.168.65.88
+R4_C_AUDIENCE=LINK_ONLY_PILOT
+R4_C_AUTHORIZED=YES
 ```
 
-Required before live cutover:
+Two ChatGPT browser attempts were made. The first used the browser profile session; the second also enabled credential-vault recovery.
+
+Both stopped before Personal/Local Plugin management because:
 
 ```text
-dedicated OCI NSG attached to krc-cobalt-vnic
-required 80/443 OCI + local firewall ingress
-HTTPS reverse proxy + public TLS
-Cobalt API_URL -> public HTTPS base URL
-external authenticated Instagram POST + tunnel verification
+authenticated_ChatGPT_session=false
+configured_ChatGPT_vault_credentials=false
+Cloudflare_human_verification=blocking
+personal_plugin_management_reached=false
 ```
 
-Port 9000 must remain loopback-only.
+No state-changing control was reached and no mutation occurred:
 
-A local OCI API key was generated for preflight. The existing VoiceBridge `KRC_MEDIA_COBALT_API_KEY` value was not exposed and has not been proven identical. To preserve D034's intended single-variable live change, OCI should be aligned server-side to the existing VoiceBridge secret before cutover rather than exposing or rotating the secret through chat/GPT/repository documentation.
+```text
+PLUGIN_AUDIENCE_CHANGE=NO
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING_CHANGE=NO
+PUBLIC_DISCOVERY=NO
+SOURCE_PUBLIC_GPT_MUTATION=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+MEDIA_STARTS=0
+PROVIDER_WORK=0
+```
 
-No live Render environment variable was changed. PR #45 remains open/draft/unmerged. Public KRC remains unchanged.
+R4-C remains authorized only for LINK_ONLY_PILOT and resumes at C2 once an authenticated ChatGPT UI session is available.
 
-Canonical checkpoint:
+Browser run references:
 
-`88_R2_OCI_COBALT_LOCAL_INSTAGRAM_RETRIEVAL_PASS_PUBLIC_HTTPS_PENDING_CHECKPOINT_2026_09_08.md`
+```text
+e3e6cd2a-5a55-4011-9079-7cda4d17c6e7
+ea2a4b56-dd91-4415-aab3-bceb9ba6134e
+```
+
+### D086 — Personal Plus web surface cannot perform link-only sharing for the local marketplace Candidate
+
+Manual UI evidence confirmed that the top-right `+` control opens the standalone MCP plugin creation form, not management for the existing local marketplace package. Searching Personal plugins for `K-Research & Critic R4 Candidate` returns no result.
+
+Current OpenAI documentation distinguishes local marketplace plugins from workspace-shared plugins. Link-based plugin sharing is a managed-workspace capability; the current personal Plus web surface does not expose that control for the local Candidate.
+
+```text
+R4_C_LINK_ONLY_PILOT_INTENT=YES
+WEB_LINK_ONLY_CONTROL=UNAVAILABLE
+STATE_CHANGES=0
+SOURCE_PUBLIC_GPT_UNCHANGED=YES
+```
+
+Supported next mechanisms require a fresh owner decision:
+A local marketplace pilot; B managed workspace link pilot; C public directory.
+
+### D087 — Local marketplace pilot selected and bounded bundle prepared
+
+Owner selected the supported R4-C distribution mechanism:
+
+```text
+R4_C_DISTRIBUTION=LOCAL_MARKETPLACE_PILOT
+PUBLIC_DISCOVERY=NO
+MANAGED_WORKSPACE_LINK=NO
+```
+
+A clean local marketplace bundle was prepared without changing plugin architecture or app mappings:
+
+```text
+KRC_R4_LOCAL_PILOT_2026-09-22.zip
+SHA256=e6cf16718183b3403179798b3e0ef7d5e5dfa703c1b160d6bfc16a56afea9868
+marketplace=krc-r4-local
+plugin=k-research-critic-r4-candidate
+skills=1
+registered_apps=5
+```
+
+OpenAI plugin documentation confirms that local marketplace installation does not create or grant access to referenced existing apps. Therefore the first external-pilot gate is 5/5 app availability in the tester account. A blocked app stops the pilot; app IDs must not be substituted.
+
+```text
+MEDIA_STARTS=0
+PROVIDER_WORK=0
+PUBLICATION=NO
+SOURCE_PUBLIC_GPT_MUTATION=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+```
+
+### D088 — R4-C paused pending supported ChatGPT distribution
+
+Owner accepted pausing the user-facing R4-C cutover.
+
+The Local Marketplace/Codex pilot is retained only as an optional developer/test artifact and is no longer a required release gate.
+
+```text
+R4_C=PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION
+CURRENT_PRODUCTION_ENTRY_POINT=EXISTING_PUBLIC_K_RESEARCH_AND_CRITIC_GPT
+LOCAL_MARKETPLACE_PILOT=OPTIONAL / NOT_REQUIRED
+TRIGGER_1=NATIVE_MIGRATION_AVAILABLE_IN_PLUS_ACCOUNT
+TRIGGER_2=SUPPORTED_PLUGIN_DISTRIBUTION_TO_ORDINARY_CHATGPT_USERS
+```
+
+The accepted R4 replacement remains migration-ready. The existing public GPT stays published and unchanged as production entry point and rollback anchor.
+
+```text
+PUBLIC_GPT_MUTATION=NO
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING_CHANGE=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+MEDIA_STARTS=0
+PROVIDER_WORK=0
+```
+
+### D089 — R3.9 Unified KRC GPT approved; Core remains authority and MEDIA becomes evidence acquisition layer
+
+Owner approved the interim unification of KRC and KRC MEDIA before Plugin cutover.
+
+The architecture is deliberately non-monolithic:
+
+```text
+one_user_facing_product=K-Research & Critic
+core_authority=prompts/GPT_STORE_INSTRUCTIONS.md
+media_role=evidence_acquisition_layer
+media_backend_merge_required=false
+voicebridge_business_logic_change_required=false
+future_plugin_semantics_must_match=true
+```
+
+Created:
+
+```text
+contracts/krc_unified_media_routing.yaml
+gpt_store/unified_r39_manifest.yaml
+tests/test_krc_unified_r39.py
+```
+
+Static readback:
+
+```text
+CORE_UNCHANGED=PASS
+CORE_PLUS_MEDIA_ADDENDUM=7404/8000
+MEDIA_OPS=9 read + 4 execution = 13
+R4_APP_COUNT=5 / IDs unchanged
+FREE_ONLY=PASS
+PUBLIC_GPT_MUTATION=NO
+R4_C=PAUSED
+```
+
+The current GPT Action is treated as a transport adapter only. At future Plugin migration, the transport may be removed/replaced by R3C/E1-E4 apps without changing routing, consent, retry, evidence, or FREE_ONLY semantics.
+
+Full pytest/runtime acceptance has not yet been run for R3.9; GitHub Actions are unavailable and the current local execution container could not resolve github.com.
+
+### D090 — Native Plugin migration trigger confirmed; R3.9 private-first staging required before public mutation
+
+Owner UI now exposes native migration to Plugin and shows a displayed deadline of 2026-12-11.
+
+Decision:
+
+```text
+TRIGGER_1=NATIVE_MIGRATION_AVAILABLE_IN_PLUS_ACCOUNT / CONFIRMED
+NATIVE_MIGRATION_EXECUTION=DEFERRED
+R4_C=DEFERRED_UNTIL_R39_UNIFIED_ACCEPTANCE
+```
+
+R3.9 exact selected regression suite passed:
+
+```text
+91 passed
+0 failed
+```
+
+A dedicated R3.9 Action schema now preserves the custom-GPT confirmation boundary:
+
+```text
+9 read-only operations -> non-consequential
+4 execution starts -> consequential
+```
+
+An exact Builder instructions artifact was also created at 7404/8000 characters.
+
+Next staging target is the existing private `K-Research & Critic - MEDIA BETA`. The public GPT remains unchanged until private smoke acceptance.
+
+### D091 — Unified R3.9 private staging accepted; public rollout requires rollback snapshot and fresh production credential
+
+Private `K-Research & Critic - MEDIA BETA` staging passed the complete bounded smoke:
+
+```text
+S1_CORE_GATE=PASS
+S2_MEDIA_PREAPPROVAL_GATE=PASS
+S3_READONLY_AND_GEMINI_CONSENT_BOUNDARY=PASS
+S4_CONSEQUENTIAL_CONFIRMATION_BOUNDARY=PASS
+SELECTED_REGRESSION_TESTS=92/92 PASS
+FREE_ONLY=PASS
+PROVIDER_WORK_DURING_S4=0
+```
+
+Action transport/auth was repaired using a dedicated R3.9 server-side credential and validated with `getPublicMediaCapabilities`.
+
+Native account migration to Plugin is now visibly available. Earlier `MIGRATE_CONTROL=NOT_FOUND` evidence is superseded by owner UI evidence showing `Перенести в плагін` and the displayed 2026-12-11 deadline.
+
+Decision:
+
+```text
+PRIVATE_STAGING_ACCEPTED=YES
+PUBLIC_GPT_MUTATION=NO
+NEXT_GATE=PUBLIC_GPT_ROLLBACK_BASELINE_SNAPSHOT
+NATIVE_PLUGIN_MIGRATION=AVAILABLE / DEFERRED
+STAGING_CREDENTIAL_PROMOTION_TO_PUBLIC=FORBIDDEN
+PUBLIC_ACTIVATION_REQUIRES_FRESH_PRODUCTION_CREDENTIAL=YES
+```
+
+The staging credential was exposed during interactive setup, so it must not become the long-term public production credential. The credential value is not stored in repository documentation.
+
+Project is frozen at checkpoint 192 pending the owner's transition generator.
+
+### D092 — Unified R3.9 public GPT accepted; native Plugin migration preflight is next
+
+The owner authorized the exact public R3.9 Builder delta only after the complete rollback baseline had been captured.
+
+The accepted public update preserved Core semantics and added the validated MEDIA evidence-acquisition layer:
+
+```text
+PUBLIC_ROLLBACK_BASELINE=CAPTURED_AND_VERIFIED
+PUBLIC_R39_BUILDER_DELTA=APPLIED
+PUBLIC_GPT=PUBLISHED_IN_GPT_STORE
+ACTION_SCHEMA=0.9.1-r39-unified-candidate
+READ_OPERATIONS=9
+EXECUTION_OPERATIONS=4
+TOTAL_OPERATIONS=13
+PUBLIC_PRODUCTION_AUTH=PASS
+STAGING_CREDENTIAL_PROMOTION=NO
+FREE_ONLY=PASS
+```
+
+A fresh public-production `KRC_MEDIA_R39_ACTION_TOKEN` was configured server-side and validated through the Builder/read-only public capabilities path. Its secret value is not stored in repository documentation.
+
+Public smoke acceptance:
+
+```text
+S1_CORE_GATE=PASS
+S2_MEDIA_PREAPPROVAL_GATE=PASS
+S3_READONLY_BOUNDARY=PASS
+S3_GEMINI_DATA_USE_NOTICE=PASS
+S3_SEPARATE_USER_ACK=PASS
+S4_EXECUTION_CONFIRMATION_PROMPT=PASS
+S4_CONFIRMATION_CANCELLED=PASS
+START_HTTP_REQUEST_DURING_S4=0
+PROVIDER_WORK_DURING_PUBLIC_SMOKE=0
+PUBLIC_R39_SMOKE_ACCEPTANCE=PASS
+```
+
+The native ChatGPT **Перенести в плагін** trigger had already been confirmed and was previously deferred until public Unified R3.9 acceptance. That prerequisite is now satisfied.
+
+Owner decision:
+
+```text
+NATIVE_PLUGIN_MIGRATION_PREFLIGHT=AUTHORIZED
+NATIVE_PLUGIN_MIGRATION_EXECUTION=NO
+PUBLIC_GPT=KEEP_PUBLISHED_AS_ROLLBACK_ANCHOR
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING_CHANGE=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+NEW_MEDIA_PROVIDER_WORK=NO
+```
+
+The next gate is read-only inspection of the native migration flow. Any automatic Core semantic change, loss of MEDIA operation parity, confirmation-boundary drift, FREE_ONLY violation, forced public-GPT retirement, or publication/sharing mutation is a STOP condition.
+
+### D093 — Active public Privacy Policy prepared; live Builder URL reconciliation required before Plugin preflight
+
+P0 readback found that the live public Action Privacy Policy URL points to the `main` copy of `docs/PRIVACY_POLICY.md`, while that document still describes MEDIA as `PUBLIC_MEDIA_CANDIDATE / NOT_YET_ACTIVATED`.
+
+No `main` mutation is authorized. The active recovery branch policy was therefore updated to:
+
+```text
+Version=2.3
+Status=PUBLIC_MEDIA_ACTIVE / R39_PUBLIC_ACCEPTED / FREE_TIER_ONLY
+Updated=2026-09-24
+```
+
+Immediate gate:
+
+```text
+PUBLIC_PRIVACY_POLICY_ACTIVE_BRANCH=READY
+LIVE_BUILDER_PRIVACY_URL_RECONCILIATION=PENDING
+NATIVE_PLUGIN_MIGRATION_PREFLIGHT=HOLD_UNTIL_RECONCILED
+MAIN_MUTATION=NO
+```
+
+After the Builder Privacy Policy URL is repointed to the active branch document and the metadata update is published, native migration preflight may resume.
+
+### D094 — Live public Privacy Policy URL reconciled; native Plugin preflight unblocked
+
+Owner UI evidence confirms the public GPT Action Privacy Policy URL now points to:
+
+```text
+https://github.com/kolemasakar/K_Research_Critic/blob/agent/krc-public-media-r3-integration/docs/PRIVACY_POLICY.md
+```
+
+The GPT was then updated and remains published in GPT Store.
+
+```text
+PUBLIC_PRIVACY_POLICY_VERSION=2.3
+LIVE_BUILDER_PRIVACY_URL_RECONCILIATION=PASS
+PUBLIC_GPT_PUBLICATION=UNCHANGED / GPT_STORE
+NATIVE_PLUGIN_MIGRATION_PREFLIGHT=AUTHORIZED
+NATIVE_PLUGIN_MIGRATION_EXECUTION=NO
+```
+
+No Core instructions, Action schema, authentication, provider routing, or audience change was made during this reconciliation. Re-running S1-S4 is not required for this metadata-only update.
+
+### D095 — Native migration does not transfer custom Actions; source GPT becomes read-only after completed migration
+
+Current OpenAI migration documentation was rechecked before opening the native migration flow.
+
+```text
+GPT_INSTRUCTIONS -> PLUGIN_SKILL
+KNOWLEDGE_FILES -> PLUGIN_REFERENCE_FILES
+CONNECTED_APPS -> PLUGIN_APPS
+CUSTOM_ACTIONS -> NOT_TRANSFERRED
+SELECTED_MODEL -> NOT_TRANSFERRED
+MIGRATED_PLUGIN_INITIAL_STATE -> PRIVATE
+SOURCE_GPT_AFTER_COMPLETED_MIGRATION -> READ_ONLY / USABLE_UNTIL_RETIREMENT
+```
+
+This materially changes the R4-C execution plan because Unified R3.9 MEDIA currently uses a custom Action schema with 13 operations. Those operations must be rebuilt/rebound separately, preferably through the already accepted R3C/E1-E4 app/MCP architecture, before any Plugin cutover.
+
+Decision:
+
+```text
+NATIVE_MIGRATION_PREFLIGHT=DETAILS_INSPECTION_ONLY
+FINAL_MIGRATION_CONFIRMATION=NOT_AUTHORIZED
+CUSTOM_ACTION_AUTO_TRANSFER_ASSUMPTION=FORBIDDEN
+MEDIA_REBIND_GATE=REQUIRED_AFTER_PREFLIGHT
+SOURCE_PUBLIC_GPT=KEEP_AS_OPERATIONAL_FALLBACK
+```
+
+### D096 — Native migration preflight PASS; final migration held for MEDIA rebind prebuild
+
+Owner UI evidence from the native `Перенести K-Research & Critic` dialog confirms:
+
+```text
+INSTRUCTIONS_AND_FILES=NO_PROBLEMS_DETECTED
+CUSTOM_ACTIONS=UNSUPPORTED / WILL_NOT_WORK_IN_PLUGIN
+APP_SEARCH_FOR_REPLACEMENT=AVAILABLE
+PUBLIC_PLUGIN_SHARING=UNAVAILABLE
+MIGRATED_PLUGIN=PRIVATE
+SOURCE_GPT_AFTER_MIGRATION=NO_LONGER_EDITABLE
+```
+
+The owner did not press the final migration button.
+
+The existing validated R4 Candidate already maps the accepted five registered app surfaces:
+
+```text
+R3C=asdk_app_6aaaf8ca113c8191a4ac53f8793833a4
+E1=asdk_app_6ab26b061fb4819180fa096638f1e4df
+E2=asdk_app_6aaeae197c9081918b90e46f5bb09615
+E3=asdk_app_6aaf262767d8819199146dc84b8e1ee8
+E4=asdk_app_6aaf292e653481918c75767dea004c5c
+```
+
+Decision:
+
+```text
+P1_NATIVE_MIGRATION_PREFLIGHT=PASS
+FINAL_MIGRATION_CONFIRMATION=NO
+MEDIA_REBIND_PREBUILD=AUTHORIZED
+PREFERRED_REBIND=R3C+E1+E2+E3+E4
+SOURCE_PUBLIC_GPT=KEEP_PUBLISHED_AND_EDITABLE
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING_CHANGE=NO
+PROVIDER_WORK=NO
+```
+
+### D097 — MEDIA rebind prebuild PASS; five canonical Apps currently available
+
+Account-level read-only permission lookup resolved all five canonical R4 app IDs successfully:
+
+```text
+R3C KRC MCP R3C Readonly=FOUND
+E1 KRC MCP R3E1 YouTube Sentinel=FOUND
+E2 KRC MCP R3E2 Instagram Sentinel-v5=FOUND
+E3 MCP E3 Facebook 1=FOUND
+E4 MCP E4 Telegram 1=FOUND
+```
+
+Each currently inherits the account default:
+
+```text
+permission=Allow read actions
+read_without_ask=YES
+changes_require_confirmation=YES
+```
+
+The repository contract continues to map 9 non-execution operations to the read surface and exactly one execution start to each E1-E4 surface.
+
+```text
+MEDIA_REBIND_PREBUILD=PASS
+FIVE_APPS_CURRENTLY_AVAILABLE=5/5
+STATIC_13_OPERATION_PARITY=PASS
+FINAL_NATIVE_MIGRATION_EXECUTION=NOT_AUTHORIZED
+NEXT=NATIVE_PLUGIN_MIGRATION_EXECUTION_DECISION
+```
+
+### D098 — Owner authorizes native Plugin migration execution
+
+After P1 native migration preflight PASS and checkpoint 195 MEDIA rebind prebuild PASS, the owner explicitly selected:
+
+```text
+1 = APPROVE
+```
+
+Decision:
+
+```text
+NATIVE_PLUGIN_MIGRATION_EXECUTION_AUTHORIZED=YES
+FINAL_MIGRATION_CONFIRMATION_AUTHORIZED=YES
+PLUGIN_INITIAL_VISIBILITY=PRIVATE
+POST_MIGRATION_MEDIA_REBIND=REQUIRED
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING_CHANGE=NO
+NEW_PROVIDER_WORK=NO
+```
+
+Execution is expected to make the source public GPT read-only while keeping it usable until retirement. Immediately after migration, capture the generated Plugin before attaching the five canonical Apps.
+
+### D099 — Native migration completed successfully; generated Skill present; Apps empty
+
+Owner UI confirms successful completion of native migration.
+
+```text
+PLUGIN_NAME=K-Research & Critic
+PLUGIN_VISIBILITY=PRIVATE
+GENERATED_SKILL=K-Research & Critic / PRESENT
+APPS_ATTACHED=0
+ADD_APP_CONTROL=PRESENT
+VERSION=0.19.1+bundle.537edef6e9b2291f8ee718897254ce9b
+```
+
+This matches the expected migration contract: custom GPT Actions were not transferred.
+
+```text
+NATIVE_PLUGIN_MIGRATION_EXECUTION=PASS
+GENERATED_SKILL_PARITY_INSPECTION=NEXT
+APP_ATTACHMENT=HOLD
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING_CHANGE=NO
+PROVIDER_WORK=NO
+```
+
+Only after generated Skill parity passes may the five canonical Apps be attached.
+
+### D100 — Migrated Skill source fidelity PASS; normalize two legacy Action transport phrases before app rebind
+
+The full generated `skills/instructions/SKILL.md` supplied from the migrated Plugin was compared with the canonical public Unified R3.9 instructions.
+
+```text
+CORE_BODY_PARITY=PASS
+MEDIA_ADDENDUM_BODY_PARITY=PASS
+SOURCE_MIGRATION_FIDELITY=PASS
+```
+
+However, the migrated public-GPT wording still contains two Custom Action transport assumptions:
+
+```text
+use the MEDIA Action
+send the required gemini_free_consent object
+```
+
+The Plugin architecture uses KRC MEDIA Apps/MCP tools and the adapter-defined consent boundary. Decision: change only those two lines to transport-neutral app/tool wording before attaching the five canonical Apps.
+
+```text
+PLUGIN_NATIVE_SEMANTIC_PARITY=REVISE
+CORE_DRIFT=NO
+BUSINESS_LOGIC_DRIFT=NO
+APP_ATTACHMENT=HOLD
+```
+
+### D102 — Bundled App exposure PASS; failed S3 was routing priority, so KRC MEDIA-first routing is now mandatory
+
+Direct R3C `media_get_capabilities` passed after VoiceBridge wake. An explicit R3C call from inside the private Plugin also passed.
+
+```text
+UNDERLYING_R3C_APP=HEALTHY
+PLUGIN_BUNDLED_APP_EXPOSURE=PASS
+R3C_CALLABLE_IN_PLUGIN_CONTEXT=PASS
+```
+
+The earlier failed S3 used TinyFish exclusively and never attempted R3C/E1. Therefore the defect is routing/tool-selection priority, not app binding.
+
+The private Plugin was updated:
+
+```text
+old_version=0.19.3+apps.20260924
+new_version=0.19.4+routingfix.20260924
+release=pluginrel_6ab578661cbc81918222878502316a6c
+```
+
+New invariant: for supported public media URLs after CriticProfile approval, KRC MEDIA read-only tools are mandatory before TinyFish/web. The Plugin may not claim KRC MEDIA unavailable without an actual KRC call attempt.
+
+```text
+APPS_CHANGED=NO
+PROVIDER_WORK=0
+PUBLICATION=NO
+NEXT=PRIVATE_PLUGIN_S2_S3_RESMOKE
+```
+
+## Canonical authority (current)
+
+- `CURRENT_HANDOFF.md` v24.6
+- checkpoint 222: owner pause and read-only recovery gate
+- checkpoint 221: 42-row visible evidence audit and partial transcript fidelity
+- `00_INDEX.md` v10.41
+- `02_ROADMAP.md` v9.17
+- `08_CHAT_HANDOFF.md` v7.12
+
+Historical decisions and earlier gates below remain evidence only. No new media execution has been authorized.
+
+## Hard boundary
+
+```text
+PROJECT_COST_POLICY=FREE_ONLY
+PUBLIC_GPT_STATE=R39_ACCEPTED / KEEP_PUBLISHED_ROLLBACK_ANCHOR
+NATIVE_PLUGIN_MIGRATION_PREFLIGHT=AUTHORIZED
+NATIVE_PLUGIN_MIGRATION_EXECUTION=NO
+PLUGIN_PUBLICATION=NO
+PLUGIN_SHARING_CHANGE=NO
+MAIN_MUTATION=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+ADDITIONAL_LIVE_MEDIA_STARTS=NO
+```

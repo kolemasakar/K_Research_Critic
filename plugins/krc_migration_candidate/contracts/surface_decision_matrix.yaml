@@ -1,0 +1,143 @@
+schema_version: "0.2"
+status: R3A_REMOTE_MCP_SURFACE_SELECTED
+as_of: "2026-09-16"
+source_checkpoint: subprojects/media_beta/110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md
+
+principles:
+  inspect_before_binding: true
+  migration_button_is_state_changing: true
+  migrate_requires_separate_owner_approval: true
+  preserve_public_gpt_until_replacement_regression_accepted: true
+  preserve_all_13_media_operations: true
+  read_fetch_only_is_insufficient_for_full_media_parity: true
+  no_secret_in_skill_or_model_visible_output: true
+  fail_closed_on_unknown_permissions: true
+
+migration_observations:
+  instructions_to_skill: expected
+  connected_apps_to_apps: expected_when_supported
+  custom_actions_auto_transfer: false
+  conversation_starters_transfer_guaranteed: false
+  previous_chats_transfer_guaranteed: false
+  selected_model_transfer_guaranteed: false
+  original_gpt_after_migration: READ_ONLY_UNTIL_RETIREMENT
+  replacement_plugin_initial_access: PRIVATE_UNTIL_SHARED
+
+account_surface_evidence:
+  plugin_surface_present: true
+  custom_mcp_option: true
+  remote_mcp_supported: true
+  web_availability: true
+  private_custom_mcp_connection: PASS
+  discovered_tool_count: 1
+  read_only_canary_invocation: PASS
+  no_auth_canary_production_reuse: false
+  execution_write_actual: UNVERIFIED_R3_D
+
+required_krc_capabilities:
+  core_skill: true
+  native_web_or_equivalent_research_access: true
+  native_data_analysis_or_equivalent: true
+  media_operation_count: 13
+  media_execution_required: true
+  execution_operations:
+    - startPublicGeminiYoutubeTranscription
+    - startPublicInstagramCobaltTranscription
+    - startPublicFacebookCobaltTranscription
+    - startPublicTelegramTranscription
+  explicit_youtube_gemini_free_consent: true
+  durable_job_reuse: true
+  explicit_failed_free_only_retry: true
+  charge_uncertain_replay_block: true
+  core_media_failure_isolation: true
+
+surfaces:
+  - id: builtin_gpt_to_plugin_migration
+    purpose: migrate GPT instructions/configuration into replacement Plugin baseline
+    inspect_first: true
+    detect:
+      - migration control is visible on the published KRC GPT
+      - account/workspace notice confirms migration availability
+    acceptable_for_core: true
+    acceptable_for_media_custom_actions_without_rebuild: false
+    owner_approval_required_before_action: true
+    binding_status: NOT_USED_FOR_MEDIA_BINDING
+    forbidden_during_read_only_inspection:
+      - click_migrate
+      - confirm_migration
+      - change_sharing
+      - publish_replacement
+
+  - id: supported_connected_app
+    purpose: alternative app/connector binding if Remote MCP later fails required parity
+    inspect_first: true
+    eligible_if_all:
+      - supports required execution/action tools, not only search/read
+      - can preserve all 13 MEDIA semantic operations or a proven equivalent mapping
+      - supports server-side authentication without model-visible secrets
+      - supports required user/account audience and intended ChatGPT surface
+      - supports explicit consent before YouTube provider work
+    binding_status: HOLD_FALLBACK_NOT_SELECTED
+
+  - id: custom_remote_mcp
+    purpose: expose MEDIA operations through a supported remote MCP app/server
+    inspect_first: true
+    eligible_if_all:
+      - custom MCP is available for the actual account/workspace and target surface
+      - execution/write-capable tools are permitted for the account/workspace
+      - remote MCP transport is supported
+      - authentication can be held server-side or in the supported credential store
+      - tool permission/review behavior is compatible with the four execution operations
+      - intended web/desktop availability matches KRC replacement requirements
+    reject_if_any:
+      - account only permits read_fetch MCP
+      - desktop_only when intended KRC replacement requires broader supported access
+      - local_only_server_without_supported_tunnel_or_remote_transport
+      - secrets would be exposed to model/user/repository
+      - permissions cannot enforce required safety boundary
+    binding_status: SELECTED_CANDIDATE_CANARY_PROVEN
+    proven:
+      - remote_https_transport
+      - web_connection
+      - private_plugin_connection
+      - tool_discovery
+      - one_read_only_invocation
+    unproven_until_later_gates:
+      - authenticated_full_binding
+      - execution_confirmation_semantics
+      - four_start_operation_execution
+      - full_13_operation_parity
+
+  - id: external_api_agent_fallback
+    purpose: fallback only if supported ChatGPT Plugin/App/MCP surface cannot deliver required parity
+    inspect_first: true
+    default_status: HOLD
+    binding_status: NOT_SELECTED
+
+selection:
+  selected_media_surface: custom_remote_mcp
+  selected_transport: remote_mcp_http
+  protocol_version: "2026-07-28"
+  selection_evidence: bounded_remote_mcp_canary_closed_pass
+  full_binding_authorized: false
+
+hard_stop_conditions:
+  - migration action would make original GPT read-only before owner approval
+  - available integration is read_fetch_only
+  - execution permissions are ambiguous at the execution gate
+  - sharing/audience would regress materially without explicit approval
+  - secret handling cannot remain server-side
+  - MEDIA operation parity cannot be proven
+  - provider/free-only/retry invariants cannot be preserved
+
+release_boundary:
+  public_gpt_mutation: DENIED
+  migration_execution: DENIED
+  plugin_publication: DENIED
+  plugin_sharing: DENIED
+  full_media_mcp_creation: DENIED
+  voicebridge_credential_binding: DENIED
+  render_change: DENIED
+  main_mutation: DENIED
+  pr22_merge: DENIED
+  pr45_merge: DENIED

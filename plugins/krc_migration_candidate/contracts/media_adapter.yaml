@@ -1,0 +1,251 @@
+schema_version: "0.2"
+status: R3A_FROZEN_REMOTE_MCP_ADAPTER_CONTRACT
+as_of: "2026-09-16"
+purpose: >-
+  Freeze the repository-only adapter contract between the selected KRC Remote MCP
+  Plugin/App surface and the accepted VoiceBridge R3 MEDIA API. R3-A defines
+  exact operation identity, request/response boundaries, annotations, consent,
+  retry, audit, error, and secret invariants without live VoiceBridge binding.
+
+canonical_sources:
+  media_tools: plugins/krc_migration_candidate/contracts/media_tools.yaml
+  openapi: gpt_store/actions/media_public_r3_openapi.yaml
+  core: prompts/GPT_STORE_INSTRUCTIONS.md
+  canary_acceptance: subprojects/media_beta/110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md
+
+transport:
+  final_surface: custom_remote_mcp
+  protocol_binding: remote_mcp_http_2026_07_28
+  installable: false
+  deployed: false
+  live_mcp_server: false
+  backend_mutation_required: false
+  proven_canary_transport: true
+  canary_no_auth_reusable_for_full_media_binding: false
+
+backend:
+  logical_name: VoiceBridge MEDIA API
+  existing_base_url: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
+  preserve_existing_api: true
+  render_change_required_for_r3a: false
+  operation_count: 13
+
+authentication:
+  final_strategy: R3_B_REQUIRED_BEFORE_VOICEBRIDGE_BINDING
+  inbound_no_auth_allowed_for_full_binding: false
+  outbound_voicebridge_secret_placement: SERVER_SIDE_ONLY
+  model_receives_secret: false
+  repository_contains_secret: false
+  skill_contains_secret: false
+  evidence_contains_secret: false
+  tool_arguments_contain_secret: false
+
+canonical_request_envelope:
+  fields:
+    operation: required_by_adapter_internal_mapping
+    source_url: optional_by_operation
+    language_hint: optional
+    job_id: optional_by_operation
+    cursor: optional_by_operation
+    limit: optional_by_operation
+    consent: optional_except_youtube_start
+    explicit_retry: optional_except_failed_free_only_retry
+  language_hint_allowed: [auto, uk, ru, en]
+  job_id_pattern: "^KRCM_[A-Za-z0-9-]+$"
+  pagination:
+    cursor_minimum: 0
+    limit_minimum: 1
+    limit_maximum: 50
+
+consent_contract:
+  youtube_start:
+    required: true
+    provider: google_gemini
+    tier: free
+    data_use_acknowledged: true
+    plugin_installation_is_not_consent: true
+    plugin_connection_is_not_consent: true
+  youtube_preflight:
+    provider_work_allowed: false
+    may_return_disclosure: true
+
+retry_contract:
+  COMPLETED: REUSE
+  PROCESSING: REUSE_INFLIGHT
+  FAILED_FREE_ONLY:
+    action: FRESH_DETERMINISTIC_JOB
+    requires_new_explicit_retry_request: true
+  FAILED_PAID_OR_CHARGE_UNCERTAIN:
+    action: BLOCK_REPLAY
+  automatic_retry_loop: false
+  transport_retry_must_not_duplicate_execution: true
+
+canonical_response_envelope:
+  required_audit_fields:
+    - status
+    - provider
+    - provider_mode
+    - retrieval_provider
+    - retrieval_credits_charged
+    - stt_seconds_charged
+    - segment_count
+    - transcript_characters
+    - reused
+    - credit_charge_uncertain
+    - error
+  job_status_allowed: [PROCESSING, COMPLETED, FAILED]
+  error_must_be_structured: true
+  secrets_must_be_sanitized: true
+  raw_backend_authorization_headers_exposed: false
+
+error_taxonomy:
+  INVALID_INPUT:
+    retryable: false
+    examples: [malformed_url, platform_mismatch, invalid_job_id, invalid_pagination]
+  CONSENT_REQUIRED:
+    retryable: true_after_user_action
+    provider_call_allowed_before_resolution: false
+  UNSUPPORTED_MEDIA:
+    retryable: false_or_new_user_request
+  FREE_PROVIDER_QUOTA:
+    retryable: later_explicit_request_only
+    paid_fallback_allowed: false
+  FREE_PROVIDER_UNAVAILABLE:
+    retryable: later_explicit_request_only
+    paid_fallback_allowed: false
+  DURABLE_STATE_UNAVAILABLE:
+    retryable: later
+  AUTHENTICATION_OR_BINDING_FAILURE:
+    retryable: after_configuration_fix
+    secret_detail_exposed: false
+  CHARGE_UNCERTAIN:
+    retryable: false
+    replay_allowed: false
+  SECRET_SANITIZATION:
+    retryable: false
+    expose_raw_backend_error: false
+
+operation_bindings:
+  getPublicMediaCapabilities:
+    mcp_tool_name: media_get_capabilities
+    adapter_method: get_capabilities
+    mode: read_only
+    classification: non_execution
+    provider_work_allowed: false
+  preflightPublicGeminiYoutube:
+    mcp_tool_name: media_youtube_preflight
+    adapter_method: youtube_preflight
+    mode: read_only_preflight
+    classification: non_execution
+    provider_work_allowed: false
+  lookupPublicGeminiYoutubeJob:
+    mcp_tool_name: media_youtube_lookup
+    adapter_method: youtube_lookup
+    mode: read_only_lookup
+    classification: non_execution
+    provider_work_allowed: false
+  startPublicGeminiYoutubeTranscription:
+    mcp_tool_name: media_youtube_start
+    adapter_method: youtube_start
+    mode: execution
+    classification: execution
+    consent_required: true
+    execution_not_exposed_in_r3a: true
+  getPublicGeminiYoutubeJob:
+    mcp_tool_name: media_youtube_status
+    adapter_method: youtube_status
+    mode: read_only
+    classification: non_execution
+    provider_work_allowed: false
+  getPublicGeminiYoutubeSegments:
+    mcp_tool_name: media_youtube_segments
+    adapter_method: youtube_segments
+    mode: read_only
+    classification: non_execution
+    provider_work_allowed: false
+  preflightPublicInstagramCobalt:
+    mcp_tool_name: media_instagram_preflight
+    adapter_method: instagram_preflight
+    mode: read_only_preflight
+    classification: non_execution
+    provider_work_allowed: false
+  lookupPublicInstagramCobaltJob:
+    mcp_tool_name: media_instagram_lookup
+    adapter_method: instagram_lookup
+    mode: read_only_lookup
+    classification: non_execution
+    provider_work_allowed: false
+  startPublicInstagramCobaltTranscription:
+    mcp_tool_name: media_instagram_start
+    adapter_method: instagram_start
+    mode: execution
+    classification: execution
+    execution_not_exposed_in_r3a: true
+  startPublicFacebookCobaltTranscription:
+    mcp_tool_name: media_facebook_start
+    adapter_method: facebook_start
+    mode: execution
+    classification: execution
+    execution_not_exposed_in_r3a: true
+  startPublicTelegramTranscription:
+    mcp_tool_name: media_telegram_start
+    adapter_method: telegram_start
+    mode: execution
+    classification: execution
+    execution_not_exposed_in_r3a: true
+  getPublicNonYoutubeMediaJob:
+    mcp_tool_name: media_non_youtube_status
+    adapter_method: non_youtube_status
+    mode: read_only
+    classification: non_execution
+    provider_work_allowed: false
+  getPublicNonYoutubeMediaSegments:
+    mcp_tool_name: media_non_youtube_segments
+    adapter_method: non_youtube_segments
+    mode: read_only
+    classification: non_execution
+    provider_work_allowed: false
+
+platform_guards:
+  youtube:
+    canonical_provider_route: gemini_free_direct_url
+    forbid_fallback_to: [cobalt, assemblyai, paid_gemini, paid_proxy, supadata, scrapecreators, cookies_or_login]
+  instagram:
+    canonical_provider_route: cobalt_to_assemblyai
+    generic_managed_route_accepts_youtube: false
+  facebook:
+    canonical_provider_route: cobalt_video_plus_audio_to_ffmpeg_to_assemblyai
+    normalization: mono_pcm_wav_16khz
+    cobalt_only_audio_is_canonical: false
+  telegram:
+    canonical_provider_route: public_web_to_assemblyai
+    forbid_fallback_to: [account_login, session, bot_token]
+
+core_isolation:
+  media_failure_blocks_core: false
+  media_transcript_is_evidence_not_final_fact_verdict: true
+  fact_check_still_uses_criticprofile_gate: true
+
+r3a_exit_requirements:
+  - exact_13_operation_identity_frozen
+  - exact_9_non_execution_and_4_execution_classification_frozen
+  - mcp_annotations_frozen
+  - request_response_schema_mapping_frozen
+  - consent_retry_audit_error_secret_boundaries_frozen
+  - core_skill_snapshot_parity_pass
+  - repository_ci_pass
+
+release_boundary:
+  live_mcp_deployment: DENIED
+  live_canary_mutation: DENIED
+  voicebridge_credential_binding: DENIED
+  provider_work: DENIED
+  execution_tool_exposure: DENIED
+  plugin_publication: DENIED
+  plugin_sharing: DENIED
+  migration_execution: DENIED
+  render_mutation: DENIED
+  main_merge: DENIED
+  public_gpt_mutation: DENIED
+  pr22_merge: DENIED
+  pr45_merge: DENIED
