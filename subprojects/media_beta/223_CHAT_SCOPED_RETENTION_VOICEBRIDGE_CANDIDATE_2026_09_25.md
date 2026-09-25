@@ -36,3 +36,6 @@ Status: DEVELOPMENT_CANDIDATE / NO_DEPLOY / NO_PROVIDER_WORK / TESTS_PASS_DEPLOY
 
 ## Follow-up validation
 VoiceBridge candidate code commit 0e0b4d0: added a read-only paginated transcript collector. On an isolated krc-cobalt checkout, TypeScript build passed and 278 of 278 tests passed (exit 0). The dedicated collector suite passed 5 of 5 tests. Current live Render health still reports a 3600-second TTL; the candidate is not deployed. Plugin integration and preservation of original transcript separators remain open. No provider execution or production changes.
+
+## Owner decision: returning after temporary retention expires
+The owner clarified that the earlier YouTube transcript was unavailable because they returned to the chat after a significant delay. On return, check existing job and transcript first. If no longer accessible, offer reprocessing of the original video, and obtain fresh explicit consent before any provider start. Never automatically re-run a provider merely because a status/segments endpoint returns HTTP 404; distinguish expiry from identity/storage faults as far as read-only checks allow. Reuse the existing YouTube, Instagram, Facebook and Telegram pipelines. VoiceBridge candidate policy doc commit c9911cb2 records this decision. This is an approved policy/documentation change, not a production deployment.
