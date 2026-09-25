@@ -1,27 +1,48 @@
 # MEDIA BETA Chat Handoff
 
-Канонічна інструкція відновлення K-Research & Critic MEDIA у новому чаті.
+Version: 7.12
+Status: **OWNER_REQUESTED_PAUSE / AWAIT_TRANSITION_GENERATOR / TRANSCRIPT_STORAGE_RECOVERY_READONLY_NEXT**
+Checkpoint date: 2026-09-25
 
-Version: 7.11
-Status: **R3_9_UNIFIED_KRC_GPT_ACTIVE / PRIVATE_STAGING_ACCEPTED / S1_TO_S4_PASS / 92_TESTS_PASS / NATIVE_PLUGIN_MIGRATION_AVAILABLE / PUBLIC_GPT_UNCHANGED / PUBLIC_ROLLBACK_SNAPSHOT_NEXT / PROJECT_FROZEN_FOR_HANDOFF**
-Checkpoint date: 2026-09-22
+## Recovery instruction for the next chat
 
-## Recovery command
+**Wait for the owner's provided transition generator first.** Then use `subprojects/media_beta/CURRENT_HANDOFF.md` v24.6, checkpoint 222 and the 42-row audit checkpoint 221. Do not follow older live-gate text below.
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 192. R3.9 Unified KRC GPT ACTIVE; private MEDIA BETA staging ACCEPTED; S1-S4 PASS; selected regression 92/92 PASS. Native Plus migration to Plugin is visible but deferred. Public K-Research & Critic remains unchanged. Next gate is PUBLIC_GPT_ROLLBACK_BASELINE_SNAPSHOT before any public Builder mutation. Do not reuse the exposed staging credential as production; use a fresh production credential at public activation. Await/execute the owner's transition generator first.`
+`Віднови K-Research & Critic MEDIA із CURRENT_HANDOFF.md та checkpoint 222. Врахуй checkpoint 221. Користувач зупинив роботу для переходу в новий чат і надасть генератор. Успішно завершений колись job KRCM_a01a95b5-b91a-47b4-9d2d-5323fa36c8a4 мав 30 сегментів, 47289 символів, 0 кредитів, однак поточні read-only status/segments повертають 404, а повного експорту немає. Job TTL = 3600 сек підтверджено живим health endpoint і кодом; фізичне видалення та активне DB-сховище не підтверджені. Завдання нового чату після генератора: встановити реальну БД, перевірити існування job/сегментів read-only, далі лише верифіковану можливість backup/PITR; не виконувати media_start, provider retry або змінювати production.`
 
 ## Mandatory recovery order
 
-1. `subprojects/media_beta/CURRENT_HANDOFF.md` — v21.1
-2. `subprojects/media_beta/178_R4C_LINK_ONLY_PILOT_AUTHORIZED_UI_AUTH_BLOCKED_ZERO_MUTATION_2026_09_22.md`
-3. `subprojects/media_beta/177_R4C_CUTOVER_PROPOSAL_READY_EXACT_AUDIENCE_APPROVAL_PENDING_2026_09_22.md`
-4. `subprojects/media_beta/176_R4B_PRIVATE_ACCEPTANCE_COMPLETE_B1_B2_B3_PASS_R4C_PENDING_AUTHORIZATION_2026_09_22.md`
-5. `subprojects/media_beta/167_R4_EXACT_CUTOVER_ROLLBACK_PACKAGE_READY_PRIVATE_ASSEMBLY_FIRST_2026_09_22.md`
-6. `subprojects/media_beta/00_INDEX.md` — v10.5
-7. `subprojects/media_beta/02_ROADMAP.md` — v9.2
-8. `subprojects/media_beta/06_DECISION_LOG.md` — v6.5
-9. current PR #22 / PR #45 state
-10. current Render R3C/E1/E2/E3/E4/VoiceBridge health
+1. Owner transition generator supplied in new chat.
+2. `subprojects/media_beta/CURRENT_HANDOFF.md` v24.6.
+3. `subprojects/media_beta/222_PAUSED_FOR_TRANSITION_TRANSCRIPT_RETENTION_RECOVERY_READONLY_2026_09_25.md`.
+4. `subprojects/media_beta/221_42_CLAIM_TRACEABILITY_AND_TRANSCRIPT_FIDELITY_AUDIT_PARTIAL_2026_09_25.md`.
+5. `subprojects/media_beta/220_FRESH_RETRY_COMPLETED_TRANSCRIPT_READY_FACTCHECK_NEXT_2026_09_25.md` — historical completion only.
+6. `subprojects/media_beta/00_INDEX.md` v10.41, `02_ROADMAP.md` v9.17, `06_DECISION_LOG.md` v6.20.
+7. Confirm current live PR/runtime state only when authorized to resume.
+
+## Frozen boundary
+
+```text
+RESUME_FROM=CHECKPOINT_222_PAUSED_TRANSCRIPT_RETENTION_RECOVERY
+NEXT_GATE=OWNER_TRANSITION_GENERATOR_THEN_IDENTIFY_REAL_ACTIVE_DB_READONLY
+FULL_ORIGINAL_TRANSCRIPT_EXPORT=NO
+FULL_TRANSCRIPT_FIDELITY=NOT_VERIFIED
+CLAIM_TRACEABILITY=VISIBLE_COUNTS_AUDITED_FURTHER_CHECKS_PENDING
+USER_CONFIRMED_TABLE_LAYOUT=CORRECT
+ACTIVE_DATABASE=NOT_VERIFIED
+RECORD_PHYSICAL_DELETION=NOT_VERIFIED
+PITR=NOT_VERIFIED
+MEDIA_PROVIDER_WORK=NO
+DB_WRITES=NO
+PLUGIN_MUTATION=NO
+PUBLIC_GPT_MUTATION=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+```
+
+---
+
+## Historical chat handoff (superseded by current section above)
 
 ## Current phase state
 
