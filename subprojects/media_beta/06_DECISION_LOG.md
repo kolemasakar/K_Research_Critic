@@ -1,12 +1,40 @@
 # MEDIA BETA Decision Log
 
-Version: 6.19
-Status: **ACTIVE / PRIVATE_PLUGIN_ROUTING_PRIORITY_FIX_APPLIED / DIRECT_R3C_PASS / PLUGIN_APP_EXPOSURE_PASS / PRIVATE_RESMOKE_NEXT / FREE_ONLY**
-Updated: 2026-09-24
+Version: 6.20
+Status: **PAUSED_BY_OWNER / TRANSCRIPT_READBACK_404 / STORAGE_IDENTIFICATION_READONLY_NEXT / FREE_ONLY**
+Updated: 2026-09-25
 
 Historical decisions remain preserved in Git history and numbered checkpoints.
 
 ## Active decisions
+
+### D103 — Owner pause; 3600-second media TTL and safe original-transcript recovery
+
+```text
+OWNER_DECISION=PAUSE_AWAIT_TRANSITION_GENERATOR
+KRC_JOB=KRCM_a01a95b5-b91a-47b4-9d2d-5323fa36c8a4
+HISTORICAL_JOB=COMPLETED / 30 segments / 47289 characters / 0 credits
+CURRENT_STATUS_AND_SEGMENTS=HTTP_404
+FULL_ORIGINAL_EXPORT=NOT_AVAILABLE
+VOICEBRIDGE_JOB_TTL_SECONDS=3600
+TTL_CAUSATION=STRONGLY_CONSISTENT_NOT_FORENSICALLY_PROVEN
+ACTUAL_PRIMARY_DATABASE=NOT_YET_VERIFIED
+PHYSICAL_PURGE_OF_JOB=NOT_YET_VERIFIED
+SNAPSHOT_OR_PITR_AVAILABILITY=NOT_YET_VERIFIED
+SOURCE_TRACEABILITY_AUDIT=VISIBLE_COUNTS_COMPLETE / REPAIR_PENDING
+VERBATIM_42_CLAIM_FIDELITY=NOT_VERIFIED
+ONSCREEN_TABLE_LAYOUT=CORRECT_CONFIRMED_BY_OWNER
+NEXT_GATE=OWNER_TRANSITION_GENERATOR_THEN_IDENTIFY_REAL_ACTIVE_DB_READONLY
+NEW_PROVIDER_WORK=NO
+DB_WRITES=NO
+PRODUCTION_DEPLOY=NO
+PLUGIN_MUTATION=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+```
+
+The latest verified health endpoint reports media-job TTL of 3600 seconds. Existing code only reads non-expired jobs and can purge expired rows. The HTTP 404 alone does not prove physical deletion or identify the active DB. Earlier Render instance listing is suspended and must not be assumed to store this job. A connected Neon tool requires a project ID that is not yet verified. After the owner's generator, identify the real DB without revealing credentials, then perform read-only existence and verified backup-retention checks only. No implicit Gemini retry or reconstructed transcript. Checkpoint 222 is authoritative; audit details are in checkpoint 221.
+
 
 ### D036 — Plugin-first authenticated Remote MCP path accepted
 ```text
@@ -983,13 +1011,16 @@ PUBLICATION=NO
 NEXT=PRIVATE_PLUGIN_S2_S3_RESMOKE
 ```
 
-## Canonical authority
+## Canonical authority (current)
 
-- `CURRENT_HANDOFF.md` v23.3
-- checkpoint 208
-- `02_ROADMAP.md` v9.16
-- `00_INDEX.md` v10.27
-- `08_CHAT_HANDOFF.md` v7.11
+- `CURRENT_HANDOFF.md` v24.6
+- checkpoint 222: owner pause and read-only recovery gate
+- checkpoint 221: 42-row visible evidence audit and partial transcript fidelity
+- `00_INDEX.md` v10.41
+- `02_ROADMAP.md` v9.17
+- `08_CHAT_HANDOFF.md` v7.12
+
+Historical decisions and earlier gates below remain evidence only. No new media execution has been authorized.
 
 ## Hard boundary
 
