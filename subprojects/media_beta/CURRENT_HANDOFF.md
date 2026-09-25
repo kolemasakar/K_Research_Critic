@@ -1,43 +1,71 @@
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 22.9
-Status: **ACTIVE_HANDOFF / FRESH_RETRY_COMPLETED / TRANSCRIPT_READY / ZERO_CREDITS / FACTCHECK_NEXT / FREE_ONLY**
-Date: 2026-09-24
+Version: 24.6
+Status: **PAUSED_AWAITING_OWNER_TRANSITION_GENERATOR / TRANSCRIPT_READBACK_404 / READ_ONLY_STORAGE_IDENTIFICATION_NEXT / FREE_ONLY**
+Date: 2026-09-25
 
-## Recovery command
+## Authoritative recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 220. Fresh Work-mode retry job KRCM_a01a95b5-b91a-47b4-9d2d-5323fa36c8a4 is COMPLETED: Gemini direct YouTube, 30 segments, 47,289 transcript characters, zero charged credits, no error, no paid fallback. Read-only segment retrieval confirms the full 42-claim transcript. No further MEDIA provider work is needed. Next gate: independent fact-check of all 42 transcript claims under the approved CriticProfile.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md, checkpoint 222 і audit checkpoint 221; дочекайся наданого власником генератора переходу перед подальшими діями. Попередній Gemini job KRCM_a01a95b5-b91a-47b4-9d2d-5323fa36c8a4 раніше був COMPLETED (30 сегментів, 47289 символів, 0 кредитів), але зараз status/segments повертають HTTP 404 і повного оригінального експорту немає. Формат таблиць правильний. Audit 221: 8 рядків із завищеними counts і неповна звірка формулювань. Live VoiceBridge health показує TTL 3600 секунд; фактичну первинну БД і фізичне видалення не встановлено. Після генератора — лише безпечна ідентифікація активного сховища і read-only перевірка можливості відновлення, без Gemini-start чи DB writes.`
 
-## Canonical current authority
+## Current authoritative reading order
 
-1. `CURRENT_HANDOFF.md` — v22.9.
-2. `204_PRIVATE_PLUGIN_S3_MEDIA_ROUTING_FAIL_KRC_TOOLS_NOT_REACHED_DIAGNOSTIC_NEXT_2026_09_24.md`.
-3. `203_E2_RECONNECT_PASS_PRIVATE_PLUGIN_ZERO_PROVIDER_SMOKE_NEXT_2026_09_24.md`.
-3. `202_E2_OAUTH_LEGACY_BRIDGE_REMEDIATION_PASS_RECONNECT_RETRY_NEXT_2026_09_24.md`.
-3. `201_FIVE_APPS_UI_RENDER_PASS_E2_RECONNECT_PENDING_2026_09_24.md`.
-3. `200_FIVE_CANONICAL_APPS_REBOUND_PRIVATE_PLUGIN_VERIFY_UI_NEXT_2026_09_24.md`.
-3. `199_PLUGIN_TRANSPORT_NORMALIZATION_PASS_APP_REBIND_NEXT_2026_09_24.md`.
-3. `198_GENERATED_SKILL_SOURCE_PARITY_PASS_PLUGIN_TRANSPORT_WORDING_REVISE_NEXT_2026_09_24.md`.
-3. `197_NATIVE_PLUGIN_MIGRATION_COMPLETE_PRIVATE_PLUGIN_CREATED_SKILL_PRESENT_APPS_EMPTY_2026_09_24.md`.
-3. `196_NATIVE_PLUGIN_MIGRATION_EXECUTION_AUTHORIZED_PENDING_UI_2026_09_24.md`.
-3. `195_MEDIA_REBIND_PREBUILD_PASS_NATIVE_MIGRATION_EXECUTION_DECISION_NEXT_2026_09_24.md`.
-3. `194_NATIVE_PLUGIN_MIGRATION_PREFLIGHT_PASS_MEDIA_REBIND_PREBUILD_NEXT_2026_09_24.md`.
-3. `193_R39_PUBLIC_GPT_ACCEPTED_NATIVE_PLUGIN_MIGRATION_PREFLIGHT_NEXT_2026_09_24.md`.
-3. `192_R39_PRIVATE_STAGING_ACCEPTED_PROJECT_FROZEN_DOCS_SYNCED_AWAIT_TRANSITION_GENERATOR_2026_09_23.md`.
-3. `191_R39_PRIVATE_STAGING_ACCEPTANCE_PASS_READY_FOR_PUBLIC_GPT_ROLLBACK_SNAPSHOT_2026_09_23.md`.
-4. `183_R39_EXACT_VALIDATION_91_PASS_NATIVE_MIGRATION_TRIGGER_CONFIRMED_PRIVATE_STAGING_PACKAGE_READY_2026_09_22.md`.
-3. `182_R39_UNIFIED_KRC_GPT_ROUTING_CONTRACT_STAGING_READY_STATIC_PASS_PUBLIC_GPT_UNCHANGED_2026_09_22.md`.
-3. `181_R4C_PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION_2026_09_22.md`.
-4. `180_R4C_LOCAL_MARKETPLACE_PILOT_AUTHORIZED_BUNDLE_READY_APP_ACCESS_GATE_PENDING_2026_09_22.md`.
-5. `179_R4C_LINK_ONLY_WEB_PATH_UNAVAILABLE_LOCAL_MARKETPLACE_DISTRIBUTION_DECISION_PENDING_2026_09_22.md`.
-6. `178_R4C_LINK_ONLY_PILOT_AUTHORIZED_UI_AUTH_BLOCKED_ZERO_MUTATION_2026_09_22.md`.
-7. `177_R4C_CUTOVER_PROPOSAL_READY_EXACT_AUDIENCE_APPROVAL_PENDING_2026_09_22.md`.
-8. `176_R4B_PRIVATE_ACCEPTANCE_COMPLETE_B1_B2_B3_PASS_R4C_PENDING_AUTHORIZATION_2026_09_22.md`.
-9. `00_INDEX.md`.
-10. `02_ROADMAP.md`.
-11. `06_DECISION_LOG.md`.
-12. `08_CHAT_HANDOFF.md`.
-13. current PR #22 / PR #45 state and live runtime evidence.
+1. `CURRENT_HANDOFF.md` v24.6 — this section overrides historical handoff below.
+2. `222_PAUSED_FOR_TRANSITION_TRANSCRIPT_RETENTION_RECOVERY_READONLY_2026_09_25.md` — canonical pause, runtime evidence and recovery boundary.
+3. `221_42_CLAIM_TRACEABILITY_AND_TRANSCRIPT_FIDELITY_AUDIT_PARTIAL_2026_09_25.md` — all-42 visible-citation audit, limited original excerpt comparison.
+4. `220_FRESH_RETRY_COMPLETED_TRANSCRIPT_READY_FACTCHECK_NEXT_2026_09_25.md` — HISTORICAL completed status only; its transcript-availability and factcheck-next gate are superseded.
+5. `00_INDEX.md`, `02_ROADMAP.md`, `06_DECISION_LOG.md`, `08_CHAT_HANDOFF.md`.
+
+## Verified current state
+
+```text
+KRC_PLUGIN_LAST_ACCEPTED_VERSION=0.19.6+portable.20260924
+KRC_MEDIA_WORK_MODE_ACCEPTANCE=PASS
+MEDIA_JOB_ID=KRCM_a01a95b5-b91a-47b4-9d2d-5323fa36c8a4
+PRIOR_STATUS=COMPLETED
+PRIOR_SEGMENTS=30
+PRIOR_TRANSCRIPT_CHARACTERS=47289
+PRIOR_CREDITS_CHARGED=0
+CURRENT_STATUS_READBACK=HTTP_404
+CURRENT_SEGMENTS_READBACK=HTTP_404
+ORIGINAL_30_SEGMENT_EXPORT=NOT_AVAILABLE
+CLAIM_NUMBERED_REPORT=42_ROWS
+CLAIM_TRACEABILITY_VISIBLE_COUNTS_AUDITED=YES
+CLAIM_TRACEABILITY_REPAIRS=NOT_DONE
+FULL_42_CLAIM_VERBATIM_FIDELITY=NOT_PROVEN
+VOICEBRIDGE_MANAGED_MEDIA_TTL_SECONDS=3600
+DB_ACTUAL_ACTIVE_PROJECT=UNCONFIRMED
+RECORD_PHYSICAL_DELETION=UNCONFIRMED
+PITR_RECOVERY_AVAILABLE=UNCONFIRMED
+```
+
+Important: a historical Render PostgreSQL instance is suspended; that fact does NOT identify the active 2026-09-25 store. Neon connector queries require an actual `project_id` not yet verified; do not guess or disclose credentials. The 404 is strongly consistent with TTL expiry, but physical purge for this job was not verified.
+
+## Pause / next gate
+
+Await owner's transition generator. After recovery in new chat, first identify the real active database behind `KRC_MEDIA_DATABASE_URL` using safe metadata only, then make read-only job/segments existence query, assess verified backup/PITR availability only if needed. Never reconstruct missing text from the fact-check report.
+
+```text
+RESUME_FROM=CHECKPOINT_222_PAUSED_TRANSCRIPT_RETENTION_RECOVERY
+NEXT_GATE=OWNER_TRANSITION_GENERATOR_THEN_IDENTIFY_REAL_ACTIVE_DB_READONLY
+PROJECT_STATUS=PAUSED
+NEW_MEDIA_START=NO
+NEW_PROVIDER_WORK=NO
+DB_WRITE=NO
+PLUGIN_PUBLICATION=NO
+PLUGIN_MUTATION=NO
+PUBLIC_GPT_MUTATION=NO
+MAIN_MUTATION=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+```
+
+Terminal marker: `KRC_MEDIA_CURRENT_HANDOFF_V24_6_PAUSED_AWAIT_OWNER_GENERATOR_2026_09_25`
+
+---
+
+## Historical handoff material (archived for traceability — superseded by checkpoint 222)
+The following original sections preserve project history. Their old 'next gate', version references, tentative runtime state and release boundaries are not current instructions.
 
 ## Phase state
 
