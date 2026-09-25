@@ -33,3 +33,6 @@ Status: DEVELOPMENT_CANDIDATE / NO_DEPLOY / NO_PROVIDER_WORK / TESTS_PASS_DEPLOY
 3. Check Render effective MEDIA_JOB_TTL_SECONDS before deployment. If an environment override is 3600, changing code defaults alone will not alter runtime.
 4. Review PR/commit and obtain separate deployment authorization.
 5. No Gemini provider execution, Render changes, public GPT/Plugin changes, database writes/restores or merges without separate authorization.
+
+## Follow-up validation
+VoiceBridge candidate code commit 0e0b4d0: added a read-only paginated transcript collector. On an isolated krc-cobalt checkout, TypeScript build passed and 278 of 278 tests passed (exit 0). The dedicated collector suite passed 5 of 5 tests. Current live Render health still reports a 3600-second TTL; the candidate is not deployed. Plugin integration and preservation of original transcript separators remain open. No provider execution or production changes.
