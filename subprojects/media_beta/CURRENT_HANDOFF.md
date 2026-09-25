@@ -1,12 +1,12 @@
 # KRC MEDIA — CURRENT HANDOFF
 
 Version: 22.9
-Status: **ACTIVE_HANDOFF / HTTP503_RETRYABLE_CONFIRMED / INTERACTIONS_ERROR_CODE_FIX_DEPLOYED / NO_NEW_PROVIDER_RETRY / FREE_ONLY**
+Status: **ACTIVE_HANDOFF / FRESH_RETRY_COMPLETED / TRANSCRIPT_READY / ZERO_CREDITS / FACTCHECK_NEXT / FREE_ONLY**
 Date: 2026-09-24
 
 ## Recovery command
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 219. Read-only lookup of fresh job KRCM_d4545ce4-0971-408e-ae13-bcb01d4433ca confirms provider_http_status=503, error.retryable=true, zero charged credits, canonical YouTube URL, no paid fallback. provider_error_status=null exposed a diagnostic schema mismatch: current Gemini Interactions errors use error.code, not legacy error.status. VoiceBridge PR #53 merged and deploy dep-daqp1iou01pc73fgjb00 is LIVE at d3873bf13e60c4932ab08cae449c924051be4a37; new field provider_error_code is now persisted. Targeted tests 9/9 PASS. No new Gemini retry after deploy. Next gate: wait or obtain fresh explicit consent for one controlled retry.`
+`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md та checkpoint 220. Fresh Work-mode retry job KRCM_a01a95b5-b91a-47b4-9d2d-5323fa36c8a4 is COMPLETED: Gemini direct YouTube, 30 segments, 47,289 transcript characters, zero charged credits, no error, no paid fallback. Read-only segment retrieval confirms the full 42-claim transcript. No further MEDIA provider work is needed. Next gate: independent fact-check of all 42 transcript claims under the approved CriticProfile.`
 
 ## Canonical current authority
 
