@@ -1,3 +1,12 @@
+# KRC MEDIA — CURRENT DEVELOPMENT UPDATE
+
+Date: 2026-09-25
+Status: OWNER_APPROVED_CHAT_RETENTION_CANDIDATE / TEST_EXECUTION_PENDING / NO_DEPLOY
+
+Owner approved continuing VoiceBridge development with chat-scoped retention and six-hour temporary MEDIA TTL. See checkpoint 223: `subprojects/media_beta/223_CHAT_SCOPED_RETENTION_VOICEBRIDGE_CANDIDATE_2026_09_25.md`. Candidate branch: `VoiceBridge/agent/krc-media-chat-retention-6h-20260925`, candidate SHA `304bd968cfe878c7f7082f7d127d49a5c742e2a5`. Default TTL and engine fallback updated, fixture tests committed but NOT yet run. The deployed Render service remains on the earlier VoiceBridge branch. No Gemini start, deployment, DB mutation or merge authorized. The historical transcript recovery evidence in checkpoint 222 and audit 221 remain unchanged.
+
+---
+
 # KRC MEDIA — CURRENT HANDOFF
 
 Version: 24.6
