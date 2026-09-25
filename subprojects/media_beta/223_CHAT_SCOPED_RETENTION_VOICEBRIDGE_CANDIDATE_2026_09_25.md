@@ -14,12 +14,12 @@ Status: DEVELOPMENT_CANDIDATE / NO_DEPLOY / NO_PROVIDER_WORK / TEST_EXECUTION_PE
 ## Verified implementation
 - VoiceBridge repository: kolemasakar/VoiceBridge
 - Candidate branch: agent/krc-media-chat-retention-6h-20260925
-- Candidate commit at this checkpoint: 304bd968cfe878c7f7082f7d127d49a5c742e2a5
+- Candidate commit at this checkpoint: 8cd7fbd95b826982475dabaf08d3f6e872a9c4d8
 - config.ts default MEDIA_JOB_TTL_SECONDS changed 3600 -> 21600; explicit environment override retained.
 - public_gemini_youtube.ts direct-engine fallback TTL changed 3600 -> 21600.
-- tests/public_gemini_youtube.test.ts: added fixture-based tests for default/override TTL, read-only lookup after a lost response, paginated complete read and no implicit retry following failure.
+- tests/public_gemini_youtube.test.ts: added fixture-based tests for default/override TTL, read-only lookup after a lost response, paginated complete read, explicit provider call count = 1 and no implicit retry following failure.
 - Candidate documentation: docs/KRC_MEDIA_CHAT_RETENTION_6H_2026-09-25.md.
-- Test code committed; full Node/TypeScript suite has NOT been executed/verified. No claim of test PASS.
+- Test code committed; full Node/TypeScript suite has NOT been executed/verified. GitHub pull-request workflow runs for previous candidate commit 304bd968: none returned. No access to a clean Node 24 test workspace was established in this step. No claim of test PASS.
 
 ## Runtime and recovery boundary
 - Render service voicebridge-krc-media-beta-kolemasakar currently deploys the earlier VoiceBridge agent/krc-media-gemini-migration branch at d3873bf13e60c4932ab08cae449c924051be4a37; the candidate is not deployed.
