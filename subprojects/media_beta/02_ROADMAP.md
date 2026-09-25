@@ -1,33 +1,51 @@
 # MEDIA BETA Roadmap
 
-Version: 9.16
-Status: **PRIVATE_PLUGIN_ROUTING_PRIORITY_FIX_APPLIED / DIRECT_R3C_PASS / PLUGIN_APP_EXPOSURE_PASS / PRIVATE_RESMOKE_NEXT / FREE_ONLY**
-Updated: 2026-09-24
+Version: 9.17
+Status: **MEDIA_EXECUTION_ACCEPTANCE_PASS / ORIGINAL_TRANSCRIPT_EXPIRED_OR_UNAVAILABLE / AUDIT_PARTIAL / OWNER_PAUSE**
+Updated: 2026-09-25
 
 ## Current roadmap position
 
 ```text
-R3-A Contract freeze/security baseline        PASS
-R3-B Authentication/secret hardening          PASS
-R3-C 9-tool read-only binding                 PASS
-R3-D Consequential-action confirmation        PASS
-R3-E1 YouTube execution                       PASS / COMPLETE
-R3-E2 Instagram execution                     PASS / COMPLETE
-R3-E3 Facebook execution                      PASS / COMPLETE
-R3-E4 Telegram execution                      PASS / COMPLETE
-R3-F Full 13-operation parity                 PASS / COMPLETE
-R3-G Private operational hardening            PASS / COMPLETE
-R3-H Migration/publication readiness          PASS / COMPLETE
-
-R4 Non-UI read-only preflight                 COMPLETE
-R4 Manual account UI preflight                COMPLETE
-R4 Read-only preflight overall                PASS / COMPLETE
-R4 Package                                  READY
-R4-A Private assembly                       PASS / COMPLETE
-R4-B Private acceptance                     PASS / COMPLETE
-R4-C Native Plugin migration                PREFLIGHT PASS / REBIND PREBUILD PASS
-R4 Cutover                                  FIVE-APP REBIND PASS / ROUTING FIX APPLIED / PRIVATE RE-SMOKE
+R3_A_TO_H=COMPLETE
+R4_B_PRIVATE_ACCEPTANCE=COMPLETE
+PRIVATE_PLUGIN_LAST_OBSERVED=0.19.6+portable.20260924
+CHATGPT_WORK_MCP_BUNDLED_APP_ROUTING=PASS
+GEMINI_FREE_COMPLETED_JOB=KRCM_a01a95b5-b91a-47b4-9d2d-5323fa36c8a4
+HISTORIC_SEGMENTS=30
+HISTORIC_TRANSCRIPT_CHARS=47289
+HISTORIC_CREDITS_CHARGED=0
+CURRENT_TRANSCRIPT_STATUS_AND_SEGMENTS=HTTP_404
+VISIBLE_SOURCE_TRACEABILITY_AUDIT=COMPLETE_WITH_FINDINGS
+FULL_ORIGINAL_42_CLAIM_FIDELITY_AUDIT=BLOCKED_NO_FULL_TRANSCRIPT
+OWNER_GATE=PAUSED_AWAITING_TRANSITION_GENERATOR
 ```
+
+## Immediate work after transition generator — read-only recovery gate
+
+1. Recover `CURRENT_HANDOFF.md` v24.6 and checkpoints 222, 221, 220.
+2. Identify which authorized persistent DB **actually** backs `KRC_MEDIA_DATABASE_URL` using safe metadata only. Earlier suspended Render DB listing is not evidence of active storage. Neon project ID is not verified.
+3. Run read-only existing-job/segment-presence checks. TTL 3600 from current VoiceBridge /health and code suggests expired record; verify physical deletion before assuming.
+4. Only if current storage is confirmed and contains no record, check real backup/PITR retention for the same database without modifying production. Require explicit separate permission for a restore branch.
+5. If original 30 segments recovered, export verbatim and reconcile all 42 report rows against source; repair traceability counts and verify genuinely independent cited origins.
+6. If no recoverable original exists, report limitation and obtain owner decision before any new provider attempt.
+
+No further technical work before the owner provides the transition generator. On-screen table layout is correct and must not be treated as a defect.
+
+```text
+NEXT_GATE=OWNER_TRANSITION_GENERATOR_THEN_IDENTIFY_REAL_ACTIVE_DB_READONLY
+NEW_PROVIDER_WORK=NO
+DB_WRITE=NO
+PLUGIN_OR_PUBLIC_GPT_MUTATION=NO
+MAIN_MUTATION=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+FREE_ONLY=YES
+```
+
+---
+
+## Historical roadmap details (not live instructions)
 
 ## Private Plugin routing-priority fix — checkpoint 208
 
