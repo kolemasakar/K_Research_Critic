@@ -1,7 +1,7 @@
 # KRC MEDIA checkpoint 223 — VoiceBridge chat-scoped retention candidate
 
 Date: 2026-09-25
-Status: DEVELOPMENT_CANDIDATE / NO_DEPLOY / NO_PROVIDER_WORK / TEST_EXECUTION_PENDING
+Status: DEVELOPMENT_CANDIDATE / NO_DEPLOY / NO_PROVIDER_WORK / TESTS_PASS_DEPLOY_PENDING
 
 ## Owner-approved policy
 - MEDIA data serves a time-sensitive investigation within the current ChatGPT chat.
@@ -19,7 +19,7 @@ Status: DEVELOPMENT_CANDIDATE / NO_DEPLOY / NO_PROVIDER_WORK / TEST_EXECUTION_PE
 - public_gemini_youtube.ts direct-engine fallback TTL changed 3600 -> 21600.
 - tests/public_gemini_youtube.test.ts: added fixture-based tests for default/override TTL, read-only lookup after a lost response, paginated complete read, explicit provider call count = 1 and no implicit retry following failure.
 - Candidate documentation: docs/KRC_MEDIA_CHAT_RETENTION_6H_2026-09-25.md.
-- Test code committed; full Node/TypeScript suite has NOT been executed/verified. GitHub pull-request workflow runs for previous candidate commit 304bd968: none returned. No access to a clean Node 24 test workspace was established in this step. No claim of test PASS.
+- Test code committed and tested on an isolated checkout on krc-cobalt under /tmp/krc-voicebridge-validation-20260925/repo (no production service modification). Exact SHA: 8cd7fbd95b826982475dabaf08d3f6e872a9c4d8. Node v24.21.0; npm 11.19.0; npm ci --ignore-scripts --no-audit --no-fund succeeded; npm run check: TypeScript build PASS, complete suite 273 PASS / 0 FAIL, exit code 0; targeted Gemini test file 12 PASS / 0 FAIL. Tests use fixtures; no Gemini provider execution. GitHub PR workflow runs for earlier candidate commit 304bd968: none returned. No claim of test PASS.
 
 ## Runtime and recovery boundary
 - Render service voicebridge-krc-media-beta-kolemasakar currently deploys the earlier VoiceBridge agent/krc-media-gemini-migration branch at d3873bf13e60c4932ab08cae449c924051be4a37; the candidate is not deployed.
@@ -28,7 +28,7 @@ Status: DEVELOPMENT_CANDIDATE / NO_DEPLOY / NO_PROVIDER_WORK / TEST_EXECUTION_PE
 - Original checkpoint 222 remains authoritative for the historical transcript-recovery evidence and audit checkpoint 221 remains authoritative for partial report traceability. This checkpoint governs only the newer owner-approved development task.
 
 ## Next gate
-1. Run npm ci && npm run check against the exact candidate SHA, record pass/fail and logs.
+1. COMPLETE: npm ci && npm run check against exact candidate SHA 8cd7fbd95b826982475dabaf08d3f6e872a9c4d8; 273 PASS / 0 FAIL, exit 0.
 2. Review client/plugin flow for prompt all-pages readback and safe temporary in-chat export; do not claim it is already automated.
 3. Check Render effective MEDIA_JOB_TTL_SECONDS before deployment. If an environment override is 3600, changing code defaults alone will not alter runtime.
 4. Review PR/commit and obtain separate deployment authorization.
