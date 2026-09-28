@@ -1,41 +1,50 @@
-# MEDIA BETA Chat Handoff
+# KRC MEDIA — Chat Handoff
 
-Version: 7.12
-Status: **OWNER_REQUESTED_PAUSE / AWAIT_TRANSITION_GENERATOR / TRANSCRIPT_STORAGE_RECOVERY_READONLY_NEXT**
-Checkpoint date: 2026-09-25
+Version: 7.13
+Checkpoint date: 2026-09-28
+Status: **OWNER_REQUESTED_PAUSE / VERIFIED_DOCUMENTATION_SYNC / AWAIT_TRANSITION_GENERATOR / FREE_ONLY**
 
-## Recovery instruction for the next chat
+## Next-chat handoff command
 
-**Wait for the owner's provided transition generator first.** Then use `subprojects/media_beta/CURRENT_HANDOFF.md` v24.6, checkpoint 222 and the 42-row audit checkpoint 221. Do not follow older live-gate text below.
-
-`Віднови K-Research & Critic MEDIA із CURRENT_HANDOFF.md та checkpoint 222. Врахуй checkpoint 221. Користувач зупинив роботу для переходу в новий чат і надасть генератор. Успішно завершений колись job KRCM_a01a95b5-b91a-47b4-9d2d-5323fa36c8a4 мав 30 сегментів, 47289 символів, 0 кредитів, однак поточні read-only status/segments повертають 404, а повного експорту немає. Job TTL = 3600 сек підтверджено живим health endpoint і кодом; фізичне видалення та активне DB-сховище не підтверджені. Завдання нового чату після генератора: встановити реальну БД, перевірити існування job/сегментів read-only, далі лише верифіковану можливість backup/PITR; не виконувати media_start, provider retry або змінювати production.`
-
-## Mandatory recovery order
-
-1. Owner transition generator supplied in new chat.
-2. `subprojects/media_beta/CURRENT_HANDOFF.md` v24.6.
-3. `subprojects/media_beta/222_PAUSED_FOR_TRANSITION_TRANSCRIPT_RETENTION_RECOVERY_READONLY_2026_09_25.md`.
-4. `subprojects/media_beta/221_42_CLAIM_TRACEABILITY_AND_TRANSCRIPT_FIDELITY_AUDIT_PARTIAL_2026_09_25.md`.
-5. `subprojects/media_beta/220_FRESH_RETRY_COMPLETED_TRANSCRIPT_READY_FACTCHECK_NEXT_2026_09_25.md` — historical completion only.
-6. `subprojects/media_beta/00_INDEX.md` v10.41, `02_ROADMAP.md` v9.17, `06_DECISION_LOG.md` v6.20.
-7. Confirm current live PR/runtime state only when authorized to resume.
-
-## Frozen boundary
+**Do not move to a new task until the owner provides their transition generator.** The generator controls the transition; checkpoint 225 and this handoff supply the canonical verified state.
 
 ```text
-RESUME_FROM=CHECKPOINT_222_PAUSED_TRANSCRIPT_RETENTION_RECOVERY
-NEXT_GATE=OWNER_TRANSITION_GENERATOR_THEN_IDENTIFY_REAL_ACTIVE_DB_READONLY
-FULL_ORIGINAL_TRANSCRIPT_EXPORT=NO
-FULL_TRANSCRIPT_FIDELITY=NOT_VERIFIED
-CLAIM_TRACEABILITY=VISIBLE_COUNTS_AUDITED_FURTHER_CHECKS_PENDING
-USER_CONFIRMED_TABLE_LAYOUT=CORRECT
-ACTIVE_DATABASE=NOT_VERIFIED
-RECORD_PHYSICAL_DELETION=NOT_VERIFIED
-PITR=NOT_VERIFIED
-MEDIA_PROVIDER_WORK=NO
-DB_WRITES=NO
+Віднови K-Research & Critic MEDIA: спочатку CURRENT_HANDOFF.md v24.7 і checkpoint 225 (2026-09-28), потім 224, 223, 222, 221 і історичний 220. Власник наказав зафіксувати стан і очікувати його генератор переходу. Після генератора перевірити актуальні GitHub/Render/Plugin metadata read-only, без автоматичних запусків. VoiceBridge 6h retention candidate підтверджено тестами 279/279 на code SHA dabed98, але він НЕ розгорнутий; поточний Render live SHA d3873bf. Пропоноване доповнення Plugin Skill для late-return ще НЕ внесено. Старий Gemini job історично був COMPLETED (30 сегментів, 47289 символів, 0 кредитів), але останній documented readback 404; оригінальний transcript не експортовано. Не можна стверджувати, що old record фізично видалений або що можливе PITR: identity активної БД не встановлено. Audit 221: 8 overcounted rows, 9 excess claimed evidence origins, 42-claim verbatim fidelity incomplete. User-confirmed on-screen table layout CORRECT. Усі обмеження FREE_ONLY залишаються; жодних provider retry/deploy/DB writes/Plugin/public GPT changes/PR merges до окремої авторизації.
+```
+
+## Canonical recovery order
+
+1. Owner's transition generator.
+2. `subprojects/media_beta/CURRENT_HANDOFF.md` v24.7.
+3. `subprojects/media_beta/225_OWNER_PAUSE_PRE_TRANSITION_VERIFIED_STATE_2026_09_28.md`.
+4. `subprojects/media_beta/224_EXISTING_PLUGIN_LATE_RETURN_AUDIT_2026_09_25.md`.
+5. `subprojects/media_beta/223_CHAT_SCOPED_RETENTION_VOICEBRIDGE_CANDIDATE_2026_09_25.md`.
+6. `subprojects/media_beta/222_PAUSED_FOR_TRANSITION_TRANSCRIPT_RETENTION_RECOVERY_READONLY_2026_09_25.md`.
+7. `subprojects/media_beta/221_42_CLAIM_TRACEABILITY_AND_TRANSCRIPT_FIDELITY_AUDIT_PARTIAL_2026_09_25.md`.
+8. `subprojects/media_beta/220_FRESH_RETRY_COMPLETED_TRANSCRIPT_READY_FACTCHECK_NEXT_2026_09_25.md` (historical only).
+9. `00_INDEX.md` v10.42, `02_ROADMAP.md` v9.18, `06_DECISION_LOG.md` v6.21.
+
+## Project freeze
+
+```text
+RESUME_FROM=CHECKPOINT_225_OWNER_PAUSE_PRE_TRANSITION
+NEXT_GATE=OWNER_GENERATOR_THEN_REVALIDATE_READONLY_STATE
+OWNER_STATE=PAUSED_AWAIT_TRANSITION_GENERATOR
+PROJECT_COST_POLICY=FREE_ONLY
+PR22=OPEN_DRAFT_UNMERGED
+PR45=OPEN_DRAFT_UNMERGED
+VOICEBRIDGE_CANDIDATE=TESTED_NOT_DEPLOYED
+PLUGIN_LATE_RETURN_EXTENSION=PROPOSED_NOT_APPLIED
+ORIGINAL_TRANSCRIPT_EXPORT=UNAVAILABLE
+ACTIVE_DB_IDENTITY=UNVERIFIED
+PITR_AVAILABILITY=UNVERIFIED
+MEDIA_START=NO
+NEW_PROVIDER_WORK=NO
+DB_WRITES_OR_RESTORE=NO
+VOICEBRIDGE_DEPLOY=NO
 PLUGIN_MUTATION=NO
 PUBLIC_GPT_MUTATION=NO
+MAIN_MUTATION=NO
 PR22_MERGE=NO
 PR45_MERGE=NO
 ```
