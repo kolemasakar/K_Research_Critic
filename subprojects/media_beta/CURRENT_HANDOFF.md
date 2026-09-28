@@ -16,6 +16,22 @@ Reading order:
 5. `220_FRESH_RETRY_COMPLETED_TRANSCRIPT_READY_FACTCHECK_NEXT_2026_09_25.md` — historical successful MEDIA processing, not current transcript availability.
 6. `00_INDEX.md`, `02_ROADMAP.md`, `06_DECISION_LOG.md`, `08_CHAT_HANDOFF.md`.
 
+## 2026-09-28 addendum — Render Free cold start and manual HTTP recovery
+
+During the next-chat Combined Project Verification, the first attempt to read the public Render `/api/v1/health` endpoint did not yield a usable HTTP health result. The owner subsequently opened the endpoint in a browser and observed Render's wake-up sequence: incoming request, service waking up, compute allocation, instance initialization, and environment injection. After startup, the endpoint returned JSON with `status: "ok"`, `service: "voicebridge-cloud"`, `version: "0.6.0"`, `capabilities.managed_media_retention.job_ttl_seconds: 3600`, and timestamp `2026-09-28T11:16:31.071Z`.
+
+Interpretation: the initial unavailable response was consistent with a Render Free instance waking after idle, **not evidence of an application defect**. This does not imply that every future health failure is a cold start.
+
+Mandatory next-chat health-check procedure:
+1. Verify the Render service and latest live deploy metadata read-only.
+2. Request `https://voicebridge-krc-media-beta-kolemasakar.onrender.com/api/v1/health`. If the Render wake-up page appears, allow the free instance to start and retry the **same** endpoint; do not classify the initial response as a failure or redeploy prematurely.
+3. Record fresh JSON `status`, `service`, `version`, `timestamp`, and `capabilities.managed_media_retention.job_ttl_seconds`; reconcile with the currently live deploy and the six-hour candidate separately.
+4. If startup does not complete or HTTP errors persist, inspect Render logs and service state before proposing changes. Avoid rapid repeated polling, provider work, secret disclosure, or paid upgrades.
+
+Observed production TTL at this check: **3600 seconds (one hour)**. Approved six-hour candidate: **21600 seconds**, still not deployed. The current health result verifies the existing deployment only; it does not approve deployment or prove that the Render `MEDIA_JOB_TTL_SECONDS` environment override is absent/present. Check that environment variable manually without revealing secrets before any separately authorized cutover.
+
+Recovery gate update for this narrow check: GitHub repository/branch and Render deploy metadata independently verified; fresh public HTTP health now PASS. The broader transcript/DB recovery, Plugin extension and six-hour rollout remain separate unverified/unexecuted work.
+
 ## Verified state at documentation freeze
 
 ```text
