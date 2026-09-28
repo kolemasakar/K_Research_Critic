@@ -1,46 +1,42 @@
-# MEDIA BETA Roadmap
+# KRC MEDIA — Roadmap
 
-Version: 9.17
-Status: **MEDIA_EXECUTION_ACCEPTANCE_PASS / ORIGINAL_TRANSCRIPT_EXPIRED_OR_UNAVAILABLE / AUDIT_PARTIAL / OWNER_PAUSE**
-Updated: 2026-09-25
+Version: 9.18
+Updated: 2026-09-28
+Status: **OWNER_PAUSE / PRE_TRANSITION_DOCS_FROZEN / 6H_CANDIDATE_VALIDATED_UNDEPLOYED / FREE_ONLY**
 
-## Current roadmap position
+## Current project position
 
-```text
-R3_A_TO_H=COMPLETE
-R4_B_PRIVATE_ACCEPTANCE=COMPLETE
-PRIVATE_PLUGIN_LAST_OBSERVED=0.19.6+portable.20260924
-CHATGPT_WORK_MCP_BUNDLED_APP_ROUTING=PASS
-GEMINI_FREE_COMPLETED_JOB=KRCM_a01a95b5-b91a-47b4-9d2d-5323fa36c8a4
-HISTORIC_SEGMENTS=30
-HISTORIC_TRANSCRIPT_CHARS=47289
-HISTORIC_CREDITS_CHARGED=0
-CURRENT_TRANSCRIPT_STATUS_AND_SEGMENTS=HTTP_404
-VISIBLE_SOURCE_TRACEABILITY_AUDIT=COMPLETE_WITH_FINDINGS
-FULL_ORIGINAL_42_CLAIM_FIDELITY_AUDIT=BLOCKED_NO_FULL_TRANSCRIPT
-OWNER_GATE=PAUSED_AWAITING_TRANSITION_GENERATOR
-```
+- Private personal Plugin: last verified `0.19.6+portable.20260924`; existing KRC MEDIA Work acceptance PASS. No new release.
+- Retention: owner-approved six-hour temporary MEDIA storage in *candidate code only*. Last recorded isolated exact-code validation: TypeScript build PASS, 279/279 tests PASS for `dabed98d977416b20efad37d962e55471dcb2b42`; later branch docs head `8b86fa8fd067449748f58f6b7825c11b8118b963`. Candidate not deployed.
+- Current Render production branch `agent/krc-media-gemini-migration`; last live deployment SHA `d3873bf13e60c4932ab08cae449c924051be4a37`, `autoDeploy=no`. Last observed live TTL 3600; effective override must be checked again before any deploy.
+- Checkpoint 224 inspected current Plugin Skill. Four existing platform pathways and read-only operations are already in place. Minimal late-return/integrity/active-chat-delivery extension is *proposed only*.
+- Historical media job `KRCM_a01a95b5-b91a-47b4-9d2d-5323fa36c8a4` previously COMPLETED with 30 segments / 47,289 chars / 0 credits; later recorded status/segments returned 404. Full original archive does not exist. The active production database identity and PITR recoverability remain unverified.
+- 42-row report exists; checkpoint 221 audited visible citation counts. 8 rows overstate citation counts (9 excess claimed origins overall); independent verification and complete verbatim transcript match remain open. Owner confirmed displayed table formatting is correct.
+- PR #22 (KRC) and PR #45 (VoiceBridge) were confirmed open/draft/unmerged on 2026-09-28.
 
-## Immediate work after transition generator — read-only recovery gate
+## Work after owner's transition generator (no automatic execution)
 
-1. Recover `CURRENT_HANDOFF.md` v24.6 and checkpoints 222, 221, 220.
-2. Identify which authorized persistent DB **actually** backs `KRC_MEDIA_DATABASE_URL` using safe metadata only. Earlier suspended Render DB listing is not evidence of active storage. Neon project ID is not verified.
-3. Run read-only existing-job/segment-presence checks. TTL 3600 from current VoiceBridge /health and code suggests expired record; verify physical deletion before assuming.
-4. Only if current storage is confirmed and contains no record, check real backup/PITR retention for the same database without modifying production. Require explicit separate permission for a restore branch.
-5. If original 30 segments recovered, export verbatim and reconcile all 42 report rows against source; repair traceability counts and verify genuinely independent cited origins.
-6. If no recoverable original exists, report limitation and obtain owner decision before any new provider attempt.
+1. Recover `CURRENT_HANDOFF.md` v24.7 and checkpoint 225, then checkpoints 224, 223, 222, 221, 220. Revalidate latest commit/deploy metadata read-only.
+2. If historical transcript recovery is pursued, identify the actual active DB behind `KRC_MEDIA_DATABASE_URL` using authorized safe metadata only. Read-only check this exact job and verify same-store snapshot/PITR options. Do not infer physical deletion from 404 or rerun provider work without fresh consent.
+3. Audit the existing four-platform Plugin workflow, integrate only the approved late-return branch, read-all-pages/segment-integrity check and temporary active-chat delivery. Do not replace working platform acquisition or change app mapping unless separately authorized.
+4. Verify effective Render `MEDIA_JOB_TTL_SECONDS` and perform a review of candidate/diff, retaining `FREE_ONLY`; request distinct authorization for any candidate merge/deployment and private Plugin change.
+5. Only when the original transcript or separately authorized new transcript is available, complete 42-claim verbatim comparison and repair visible-source/underlying-evidence ledger. Preserve user-approved on-screen table presentation.
 
-No further technical work before the owner provides the transition generator. On-screen table layout is correct and must not be treated as a defect.
+## Frozen boundary and next gate
 
 ```text
-NEXT_GATE=OWNER_TRANSITION_GENERATOR_THEN_IDENTIFY_REAL_ACTIVE_DB_READONLY
-NEW_PROVIDER_WORK=NO
-DB_WRITE=NO
-PLUGIN_OR_PUBLIC_GPT_MUTATION=NO
+RESUME_FROM=CHECKPOINT_225_OWNER_PAUSE_PRE_TRANSITION
+NEXT_GATE=OWNER_GENERATOR_THEN_REVALIDATE_READONLY_STATE
+PROJECT_STATUS=PAUSED
+FREE_ONLY=YES
+MEDIA_PROVIDER_RETRY=NO
+DB_WRITE_OR_RESTORE=NO
+VOICEBRIDGE_DEPLOY=NO
+PLUGIN_MUTATION=NO
+PUBLIC_GPT_MUTATION=NO
 MAIN_MUTATION=NO
 PR22_MERGE=NO
 PR45_MERGE=NO
-FREE_ONLY=YES
 ```
 
 ---
