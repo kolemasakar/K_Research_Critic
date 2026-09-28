@@ -1,75 +1,90 @@
-# KRC MEDIA — CURRENT DEVELOPMENT UPDATE
-
-Date: 2026-09-25
-Status: OWNER_APPROVED_CHAT_RETENTION_CANDIDATE / TEST_EXECUTION_PENDING / NO_DEPLOY
-
-Owner approved continuing VoiceBridge development with chat-scoped retention and six-hour temporary MEDIA TTL. See checkpoint 223: `subprojects/media_beta/223_CHAT_SCOPED_RETENTION_VOICEBRIDGE_CANDIDATE_2026_09_25.md`. Candidate branch: `VoiceBridge/agent/krc-media-chat-retention-6h-20260925`, candidate SHA `304bd968cfe878c7f7082f7d127d49a5c742e2a5`. Default TTL and engine fallback updated, fixture tests committed but NOT yet run. The deployed Render service remains on the earlier VoiceBridge branch. No Gemini start, deployment, DB mutation or merge authorized. The historical transcript recovery evidence in checkpoint 222 and audit 221 remain unchanged.
-
----
-
 # KRC MEDIA — CURRENT HANDOFF
 
-Version: 24.6
-Status: **PAUSED_AWAITING_OWNER_TRANSITION_GENERATOR / TRANSCRIPT_READBACK_404 / READ_ONLY_STORAGE_IDENTIFICATION_NEXT / FREE_ONLY**
-Date: 2026-09-25
+Version: 24.7
+Date: 2026-09-28
+Status: **OWNER_PAUSE / PRE_TRANSITION_DOCS_SYNC / CANDIDATE_TESTED_NOT_DEPLOYED / TRANSCRIPT_RECOVERY_UNVERIFIED / FREE_ONLY**
 
-## Authoritative recovery command
+## Canonical authority and recovery
 
-`Віднови K-Research & Critic MEDIA з subprojects/media_beta/CURRENT_HANDOFF.md, checkpoint 222 і audit checkpoint 221; дочекайся наданого власником генератора переходу перед подальшими діями. Попередній Gemini job KRCM_a01a95b5-b91a-47b4-9d2d-5323fa36c8a4 раніше був COMPLETED (30 сегментів, 47289 символів, 0 кредитів), але зараз status/segments повертають HTTP 404 і повного оригінального експорту немає. Формат таблиць правильний. Audit 221: 8 рядків із завищеними counts і неповна звірка формулювань. Live VoiceBridge health показує TTL 3600 секунд; фактичну первинну БД і фізичне видалення не встановлено. Після генератора — лише безпечна ідентифікація активного сховища і read-only перевірка можливості відновлення, без Gemini-start чи DB writes.`
+**Checkpoint 225** is authoritative for the owner-requested pause and pre-transition verified state. Wait for the owner's transition generator and follow it in the next chat. Do not treat historical gates below as current instructions.
 
-## Current authoritative reading order
+Reading order:
+1. `CURRENT_HANDOFF.md` v24.7 and `225_OWNER_PAUSE_PRE_TRANSITION_VERIFIED_STATE_2026_09_28.md`.
+2. `224_EXISTING_PLUGIN_LATE_RETURN_AUDIT_2026_09_25.md` — proposed Skill-only late-return extension, NOT applied.
+3. `223_CHAT_SCOPED_RETENTION_VOICEBRIDGE_CANDIDATE_2026_09_25.md` — owner-approved six-hour candidate and validation history.
+4. `222_PAUSED_FOR_TRANSITION_TRANSCRIPT_RETENTION_RECOVERY_READONLY_2026_09_25.md` and `221_42_CLAIM_TRACEABILITY_AND_TRANSCRIPT_FIDELITY_AUDIT_PARTIAL_2026_09_25.md`.
+5. `220_FRESH_RETRY_COMPLETED_TRANSCRIPT_READY_FACTCHECK_NEXT_2026_09_25.md` — historical successful MEDIA processing, not current transcript availability.
+6. `00_INDEX.md`, `02_ROADMAP.md`, `06_DECISION_LOG.md`, `08_CHAT_HANDOFF.md`.
 
-1. `CURRENT_HANDOFF.md` v24.6 — this section overrides historical handoff below.
-2. `222_PAUSED_FOR_TRANSITION_TRANSCRIPT_RETENTION_RECOVERY_READONLY_2026_09_25.md` — canonical pause, runtime evidence and recovery boundary.
-3. `221_42_CLAIM_TRACEABILITY_AND_TRANSCRIPT_FIDELITY_AUDIT_PARTIAL_2026_09_25.md` — all-42 visible-citation audit, limited original excerpt comparison.
-4. `220_FRESH_RETRY_COMPLETED_TRANSCRIPT_READY_FACTCHECK_NEXT_2026_09_25.md` — HISTORICAL completed status only; its transcript-availability and factcheck-next gate are superseded.
-5. `00_INDEX.md`, `02_ROADMAP.md`, `06_DECISION_LOG.md`, `08_CHAT_HANDOFF.md`.
-
-## Verified current state
+## Verified state at documentation freeze
 
 ```text
-KRC_PLUGIN_LAST_ACCEPTED_VERSION=0.19.6+portable.20260924
-KRC_MEDIA_WORK_MODE_ACCEPTANCE=PASS
-MEDIA_JOB_ID=KRCM_a01a95b5-b91a-47b4-9d2d-5323fa36c8a4
-PRIOR_STATUS=COMPLETED
-PRIOR_SEGMENTS=30
-PRIOR_TRANSCRIPT_CHARACTERS=47289
-PRIOR_CREDITS_CHARGED=0
-CURRENT_STATUS_READBACK=HTTP_404
-CURRENT_SEGMENTS_READBACK=HTTP_404
-ORIGINAL_30_SEGMENT_EXPORT=NOT_AVAILABLE
-CLAIM_NUMBERED_REPORT=42_ROWS
-CLAIM_TRACEABILITY_VISIBLE_COUNTS_AUDITED=YES
-CLAIM_TRACEABILITY_REPAIRS=NOT_DONE
-FULL_42_CLAIM_VERBATIM_FIDELITY=NOT_PROVEN
-VOICEBRIDGE_MANAGED_MEDIA_TTL_SECONDS=3600
-DB_ACTUAL_ACTIVE_PROJECT=UNCONFIRMED
-RECORD_PHYSICAL_DELETION=UNCONFIRMED
-PITR_RECOVERY_AVAILABLE=UNCONFIRMED
+DATE=2026-09-28
+KRC_DOCS_BRANCH=agent/krc-public-media-r3-integration
+KRC_PLUGIN_LAST_VERIFIED=0.19.6+portable.20260924
+WORK_MODE_MEDIA_ACCEPTANCE=PASS_HISTORICAL
+RENDER_SERVICE=voicebridge-krc-media-beta-kolemasakar
+RENDER_PLAN=free
+RENDER_DEPLOYED_BRANCH=agent/krc-media-gemini-migration
+RENDER_LIVE_DEPLOY=dep-daqp1iou01pc73fgjb00
+RENDER_LIVE_SHA=d3873bf13e60c4932ab08cae449c924051be4a37
+RENDER_AUTODEPLOY=OFF
+VOICEBRIDGE_6H_CANDIDATE_BRANCH=agent/krc-media-chat-retention-6h-20260925
+VOICEBRIDGE_CANDIDATE_DOCS_HEAD=8b86fa8fd067449748f58f6b7825c11b8118b963
+VOICEBRIDGE_LAST_TESTED_CODE_SHA=dabed98d977416b20efad37d962e55471dcb2b42
+VOICEBRIDGE_LAST_RECORDED_BUILD=PASS
+VOICEBRIDGE_LAST_RECORDED_TESTS=279/279_PASS
+VOICEBRIDGE_6H_CANDIDATE_DEPLOYED=NO
+LIVE_MEDIA_TTL_LAST_OBSERVED=3600_SECONDS
+CANDIDATE_MEDIA_TTL=21600_SECONDS
+EFFECTIVE_RENDER_TTL_OVERRIDE=NOT_REVERIFIED_TODAY
+PLUGIN_LATE_RETURN_SKILL_CHANGE=PROPOSED_NOT_APPLIED
+KRC_PR22=OPEN_DRAFT_UNMERGED
+VOICEBRIDGE_PR45=OPEN_DRAFT_UNMERGED
+HISTORICAL_JOB=KRCM_a01a95b5-b91a-47b4-9d2d-5323fa36c8a4
+HISTORICAL_JOB_COMPLETED=30_SEGMENTS_47289_CHARACTERS_ZERO_CREDITS
+HISTORICAL_LAST_STATUS_AND_SEGMENTS=HTTP_404
+FULL_ORIGINAL_TRANSCRIPT_EXPORT=UNAVAILABLE
+ACTIVE_PRODUCTION_DB_IDENTITY=UNVERIFIED
+PHYSICAL_PURGE_OF_JOB=UNVERIFIED
+PITR_AVAILABILITY=UNVERIFIED
+REPORT_NUMBERED_ROWS=42
+VISIBLE_TRACEABILITY_AUDIT=COMPLETE_WITH_FINDINGS
+EIGHT_OVERCOUNTED_ROWS=2_3_8_10_29_30_32_34
+VERBATIM_42_CLAIM_FIDELITY=NOT_PROVEN
+ONSCREEN_REPORT_TABLE_FORMAT=OWNER_CONFIRMED_CORRECT
 ```
 
-Important: a historical Render PostgreSQL instance is suspended; that fact does NOT identify the active 2026-09-25 store. Neon connector queries require an actual `project_id` not yet verified; do not guess or disclose credentials. The 404 is strongly consistent with TTL expiry, but physical purge for this job was not verified.
+## Work already accepted, work still open
 
-## Pause / next gate
+- User-approved policy: in-chat MEDIA result with temporary backend retention of six hours; no permanent automatic transcript archive. Since chat closure cannot be detected by the server, TTL is a fallback.
+- Existing pagination in all four MEDIA pipelines should be reused, not replaced. The candidate includes all-pages collector and exact-boundary fixes. Last documented isolated test run was 279/279 PASS at code commit `dabed98...`; the branch head is a later documentation commit. This does not establish end-to-end Plugin acceptance.
+- Checkpoint 224 defines a minimal late-return Skill extension and all-pages/character-count verification; it was *not* applied.
+- Previous historical completed video job later returned 404. The exact active backing database and recoverability remain unconfirmed. Do not regenerate missing original text from the 42-row report or equate 404 with proven physical deletion.
+- Audit 221: 43 claimed evidence origins versus 34 visible citations (9 excess counts in 8 rows). Actual independence and claim fidelity remain incompletely verified. No auto-rewrite; screen-rendered report tables were confirmed correct.
 
-Await owner's transition generator. After recovery in new chat, first identify the real active database behind `KRC_MEDIA_DATABASE_URL` using safe metadata only, then make read-only job/segments existence query, assess verified backup/PITR availability only if needed. Never reconstruct missing text from the fact-check report.
+## Next-chat gate and hard boundary
+
+Wait for the owner's generator. After transfer, first reconcile metadata of current code, production deploy and actual backing database read-only before any technical work. For old transcript recovery, read-only inspect verified active storage and only verified backup/PITR availability. Before deployment, verify Render's effective `MEDIA_JOB_TTL_SECONDS`. Separately authorize any Plugin extension and any production deployment.
 
 ```text
-RESUME_FROM=CHECKPOINT_222_PAUSED_TRANSCRIPT_RETENTION_RECOVERY
-NEXT_GATE=OWNER_TRANSITION_GENERATOR_THEN_IDENTIFY_REAL_ACTIVE_DB_READONLY
-PROJECT_STATUS=PAUSED
+RESUME_FROM=CHECKPOINT_225_OWNER_PAUSE_PRE_TRANSITION
+NEXT_GATE=OWNER_GENERATOR_THEN_REVALIDATE_READONLY_STATE
+PROJECT_STATUS=PAUSED_AWAITING_OWNER_GENERATOR
+PROJECT_COST_POLICY=FREE_ONLY
 NEW_MEDIA_START=NO
 NEW_PROVIDER_WORK=NO
-DB_WRITE=NO
-PLUGIN_PUBLICATION=NO
+DB_WRITE_OR_RESTORE=NO
+VOICEBRIDGE_DEPLOY=NO
 PLUGIN_MUTATION=NO
+PLUGIN_PUBLICATION=NO
 PUBLIC_GPT_MUTATION=NO
 MAIN_MUTATION=NO
 PR22_MERGE=NO
 PR45_MERGE=NO
 ```
 
-Terminal marker: `KRC_MEDIA_CURRENT_HANDOFF_V24_6_PAUSED_AWAIT_OWNER_GENERATOR_2026_09_25`
+Terminal marker: `KRC_MEDIA_CURRENT_HANDOFF_V24_7_OWNER_PAUSE_2026_09_28`
 
 ---
 
