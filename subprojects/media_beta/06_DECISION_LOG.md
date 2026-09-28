@@ -1,40 +1,66 @@
-# MEDIA BETA Decision Log
+# KRC MEDIA — Decision Log
 
-Version: 6.20
-Status: **PAUSED_BY_OWNER / TRANSCRIPT_READBACK_404 / STORAGE_IDENTIFICATION_READONLY_NEXT / FREE_ONLY**
-Updated: 2026-09-25
+Version: 6.21
+Updated: 2026-09-28
+Status: **OWNER_PAUSE / PRE_TRANSITION_DOCS_ONLY / FREE_ONLY**
 
-Historical decisions remain preserved in Git history and numbered checkpoints.
+Earlier records preserved below and in Git history. Checkpoint 225 supersedes earlier live next-gate language without changing historical decisions.
 
 ## Active decisions
 
-### D103 — Owner pause; 3600-second media TTL and safe original-transcript recovery
+### D105 — Owner-requested pre-transition freeze (2026-09-28)
+
+The owner directed: synchronize authoritative KRC MEDIA project state and documentation, then wait for their transition generator to open a new chat. This **does not** authorize new MEDIA provider work, active DB recovery/write, deployments, Plugin updates, PR merges or publication.
+
+Read-only verification today:
+- Render service is free, autoDeploy OFF, tracking `agent/krc-media-gemini-migration`; last live deploy `d3873bf13e60c4932ab08cae449c924051be4a37`.
+- Undeployed six-hour candidate branch latest head `8b86fa8fd067449748f58f6b7825c11b8118b963`; last documented tested *code* `dabed98d977416b20efad37d962e55471dcb2b42` (279/279 isolated tests PASS; later head is a docs commit).
+- KRC PR #22 and VoiceBridge PR #45 still OPEN/DRAFT/UNMERGED.
+- Checkpoint 224 proposed (did not implement) private Plugin late-return all-pages readback/validation/chat-delivery instructions.
+- Historic job's latest documented status/segments are HTTP 404; active DB/PITR/physical deletion unproven; source audit 221 remains unresolved.
+
+```text
+OWNER_DECISION=PAUSE_THEN_OWNER_TRANSITION_GENERATOR
+CHECKPOINT=225
+RESUME_FROM=CHECKPOINT_225_OWNER_PAUSE_PRE_TRANSITION
+NEXT_GATE=OWNER_GENERATOR_THEN_REVALIDATE_READONLY_STATE
+STATE_MUTATION=DOCS_ONLY_ON_KRC_DEV_BRANCH
+PROVIDER_WORK=NO
+MEDIA_START=NO
+DB_WRITES_OR_RESTORE=NO
+VOICEBRIDGE_DEPLOY=NO
+PLUGIN_MUTATION=NO
+PUBLIC_GPT_MUTATION=NO
+PR22_MERGE=NO
+PR45_MERGE=NO
+MAIN_MUTATION=NO
+```
+
+### D104 — Owner-approved temporary MEDIA retention and late-return policy (2026-09-25)
+
+Owner approved six-hour temporary retention (`21600` s) for active-chat investigations with no permanent automatic archive; since server cannot detect ChatGPT chat closure reliably, technical TTL is the fallback. The intended flow first reads existing job and all pages of an available completed transcript, preserving exact text and verifying indexes/count. If unavailable, it informs the user and offers a fresh separately consented provider attempt without automatic retry. Reuse existing pipelines across all four platforms.
+
+VoiceBridge candidate contains 6h defaults plus existing-module pagination collector and exact chunk-boundary repair. Last recorded complete isolated suite: 279/279 PASS at `dabed98...`. This is approval of policy/candidate development, **not** authorization to merge or deploy the candidate, mutate the private Plugin or reprocess videos. Checkpoints 223 and 224 contain code/test evidence and the proposed minimal Skill extension.
+
+### D103 — Earlier transcript recovery pause and one-hour live TTL (historical, superseded next-gate only)
 
 ```text
 OWNER_DECISION=PAUSE_AWAIT_TRANSITION_GENERATOR
 KRC_JOB=KRCM_a01a95b5-b91a-47b4-9d2d-5323fa36c8a4
 HISTORICAL_JOB=COMPLETED / 30 segments / 47289 characters / 0 credits
-CURRENT_STATUS_AND_SEGMENTS=HTTP_404
+CURRENT_STATUS_AND_SEGMENTS=HTTP_404_LAST_OBSERVED
 FULL_ORIGINAL_EXPORT=NOT_AVAILABLE
-VOICEBRIDGE_JOB_TTL_SECONDS=3600
-TTL_CAUSATION=STRONGLY_CONSISTENT_NOT_FORENSICALLY_PROVEN
-ACTUAL_PRIMARY_DATABASE=NOT_YET_VERIFIED
-PHYSICAL_PURGE_OF_JOB=NOT_YET_VERIFIED
-SNAPSHOT_OR_PITR_AVAILABILITY=NOT_YET_VERIFIED
-SOURCE_TRACEABILITY_AUDIT=VISIBLE_COUNTS_COMPLETE / REPAIR_PENDING
+VOICEBRIDGE_JOB_TTL_SECONDS=3600_LAST_OBSERVED
+TTL_CAUSATION=CONSISTENT_NOT_PROVEN
+ACTUAL_PRIMARY_DATABASE=UNVERIFIED
+PHYSICAL_PURGE_OF_JOB=UNVERIFIED
+SNAPSHOT_OR_PITR_AVAILABILITY=UNVERIFIED
+SOURCE_TRACEABILITY_AUDIT=VISIBLE_COUNTS_COMPLETE_REPAIR_PENDING
 VERBATIM_42_CLAIM_FIDELITY=NOT_VERIFIED
 ONSCREEN_TABLE_LAYOUT=CORRECT_CONFIRMED_BY_OWNER
-NEXT_GATE=OWNER_TRANSITION_GENERATOR_THEN_IDENTIFY_REAL_ACTIVE_DB_READONLY
-NEW_PROVIDER_WORK=NO
-DB_WRITES=NO
-PRODUCTION_DEPLOY=NO
-PLUGIN_MUTATION=NO
-PR22_MERGE=NO
-PR45_MERGE=NO
 ```
 
-The latest verified health endpoint reports media-job TTL of 3600 seconds. Existing code only reads non-expired jobs and can purge expired rows. The HTTP 404 alone does not prove physical deletion or identify the active DB. Earlier Render instance listing is suspended and must not be assumed to store this job. A connected Neon tool requires a project ID that is not yet verified. After the owner's generator, identify the real DB without revealing credentials, then perform read-only existence and verified backup-retention checks only. No implicit Gemini retry or reconstructed transcript. Checkpoint 222 is authoritative; audit details are in checkpoint 221.
-
+Historical decision details remain in checkpoint 222 and the pre-update Git revision.
 
 ### D036 — Plugin-first authenticated Remote MCP path accepted
 ```text
