@@ -1,0 +1,139 @@
+schema_version: "1.0"
+status: R39_UNIFIED_KRC_MEDIA_ROUTING_FROZEN_CANDIDATE
+as_of: "2026-09-22"
+
+purpose: >-
+  Define one routing/orchestration contract for the current unified K-Research & Critic GPT
+  and the future Plugin replacement. Core remains authoritative; MEDIA is an evidence
+  acquisition capability, not a separate research product or verdict engine.
+
+canonical_sources:
+  core: prompts/GPT_STORE_INSTRUCTIONS.md
+  current_gpt_media_addendum: prompts/GPT_STORE_MEDIA_R3_PUBLIC_ADDENDUM.md
+  action_schema: gpt_store/actions/media_public_r39_openapi.yaml
+  plugin_tools: plugins/krc_migration_candidate/contracts/media_tools.yaml
+  plugin_adapter: plugins/krc_migration_candidate/contracts/media_adapter.yaml
+  r4_candidate_apps: plugins/krc_r4_candidate/.app.json
+
+architecture:
+  product_identity: K-Research & Critic
+  core_authority: prompts/GPT_STORE_INSTRUCTIONS.md
+  media_role: evidence_acquisition_layer
+  final_verdict_owner: core_critic_workflow
+  media_backend_merge_required: false
+  voicebridge_api_change_required: false
+  operation_rename_required: false
+  r4_skill_change_required: false
+
+routing_order:
+  - detect_media_intent_without_provider_work
+  - create_criticprofile
+  - obtain_explicit_criticprofile_approval
+  - perform_read_only_media_preflight_or_lookup_when_relevant
+  - reuse_existing_completed_or_processing_job_when_available
+  - request_platform_specific_execution_consent_only_if_new_provider_work_is_required
+  - retrieve_transcript_segments
+  - treat_media_content_as_evidence_of_what_the_source_says
+  - independently_corrobate_material_factual_claims_under_core_cross_check_rules
+  - run_critic_and_produce_one_final_report
+
+pre_approval_boundary:
+  allowed:
+    - classify_media_platform_from_user_input
+    - identify_that_media_capability_is_relevant
+    - create_criticprofile
+  forbidden:
+    - independent_web_research
+    - transcript_content_retrieval
+    - provider_work
+    - media_execution_start
+
+post_approval_read_only_tools:
+  - media_get_capabilities
+  - media_youtube_preflight
+  - media_youtube_lookup
+  - media_youtube_status
+  - media_youtube_segments
+  - media_instagram_preflight
+  - media_instagram_lookup
+  - media_non_youtube_status
+  - media_non_youtube_segments
+
+execution_tools:
+  media_youtube_start:
+    platform: youtube
+    surface: E1
+    explicit_user_consent_required: true
+  media_instagram_start:
+    platform: instagram
+    surface: E2
+    explicit_user_consent_required: true
+  media_facebook_start:
+    platform: facebook
+    surface: E3
+    explicit_user_consent_required: true
+  media_telegram_start:
+    platform: telegram
+    surface: E4
+    explicit_user_consent_required: true
+
+operation_counts:
+  read_only: 9
+  execution: 4
+  total: 13
+  read_only_execution_leakage: 0
+
+platform_routes:
+  youtube: Gemini Developer API Free Tier direct URL
+  instagram: self-hosted Cobalt -> AssemblyAI universal-2
+  facebook: Cobalt video+audio -> server ffmpeg mono PCM WAV 16 kHz -> AssemblyAI universal-2
+  telegram: public Telegram web -> AssemblyAI universal-2
+
+free_only:
+  required: true
+  paid_retrieval_fallback: false
+  paid_stt_fallback: false
+  paid_proxy_fallback: false
+  automatic_paid_retry: false
+  supadata_public_active: false
+  scrapecreators_public_active: false
+  cookie_or_login_fallback: false
+
+evidence_semantics:
+  transcript_proves: what_the_media_source_says
+  transcript_does_not_prove: external_factual_truth
+  one_media_item_counts_as_at_most_one_underlying_evidence_origin: true
+  derivative_reposts_do_not_add_independent_origins: true
+  material_external_claims_follow_core_cross_check_floor: true
+  traceability_invariant_required: true
+  shortfall_must_be_visible: true
+
+failure_isolation:
+  media_failure_blocks_core: false
+  media_failure_must_be_disclosed: true
+  fallback_to_web_research_if_appropriate_and_profile_approved: true
+  never_claim_transcript_success_when_unavailable: true
+
+retry:
+  completed: REUSE
+  processing: REUSE_INFLIGHT
+  failed_free_only: NEW_EXPLICIT_RETRY_REQUIRED
+  paid_or_charge_uncertain: BLOCK_REPLAY
+  automatic_retry_loop: false
+
+future_plugin_parity:
+  core_instructions_map_to: krc-core Skill
+  media_contract_maps_to: existing R3C/E1/E2/E3/E4 apps
+  app_count: 5
+  app_ids_must_not_change_for_r39: true
+  custom_action_is_transport_adapter_not_business_logic: true
+  custom_action_removal_at_plugin_migration_must_not_change_semantics: true
+
+release_boundary:
+  public_gpt_mutation: HOLD_UNTIL_R39_REPOSITORY_ACCEPTANCE
+  plugin_publication: DENIED
+  plugin_sharing_change: DENIED
+  r4_c_resume: DENIED
+  pr22_merge: DENIED
+  pr45_merge: DENIED
+  new_media_start_for_r39_validation: DENIED

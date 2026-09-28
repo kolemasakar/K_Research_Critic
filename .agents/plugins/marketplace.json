@@ -1,0 +1,20 @@
+{
+  "name": "krc-r4-local",
+  "interface": {
+    "displayName": "KRC R4 Local"
+  },
+  "plugins": [
+    {
+      "name": "k-research-critic-r4-candidate",
+      "source": {
+        "source": "local",
+        "path": "./plugins/krc_r4_candidate"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

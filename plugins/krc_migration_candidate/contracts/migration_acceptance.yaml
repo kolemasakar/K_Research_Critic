@@ -1,0 +1,159 @@
+schema_version: "0.2"
+status: R3A_RECONCILED_MIGRATION_ACCEPTANCE_CONTRACT
+as_of: "2026-09-16"
+source_research: kolemasakar/AI_general/docs/openai-custom-gpts-retirement-to-plugins-2026-09-16.md
+source_surface_matrix: plugins/krc_migration_candidate/contracts/surface_decision_matrix.yaml
+source_canary_acceptance: subprojects/media_beta/110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md
+
+purpose: >-
+  Define product-level acceptance gates for moving K-Research & Critic from the
+  current published Custom GPT to a replacement Plugin while using the proven
+  custom Remote MCP path for rebuilt MEDIA capabilities. This does not assume
+  1:1 portability of GPT-specific UX, distribution, model selection, chat
+  history, reference assets, sharing, or Custom Actions.
+
+selected_replacement_surface:
+  media_binding: custom_remote_mcp
+  transport: remote_mcp_http
+  protocol_version: "2026-07-28"
+  bounded_read_only_canary_proven: true
+  full_media_binding_started: false
+  inbound_auth_hardening_phase: R3_B
+  non_execution_binding_phase: R3_C
+  execution_confirmation_phase: R3_D
+  execution_binding_phase: R3_E
+
+source_gpt:
+  identity: K-Research & Critic
+  state_required_for_migration_flow: PUBLISHED
+  current_actions_expected: NONE
+  keep_operational_until_replacement_accepted: true
+  mutation_before_separate_owner_approval: false
+
+plan_timing:
+  enterprise_target_dates_are_universal_for_personal_plans: false
+  account_specific_notice_is_authoritative_for_execution_timing: true
+  do_not_assume_plus_cutoff_from_enterprise_calendar: true
+  dates_may_change: true
+
+portability:
+  instructions:
+    expected_target: PLUGIN_SKILL
+    acceptance: exact_core_semantic_parity_required
+
+  selected_model:
+    transfer_guaranteed: false
+    acceptance:
+      model_agnostic_core_required: true
+      selected_model_must_not_be_runtime_dependency: true
+
+  previous_chats:
+    transfer_guaranteed: false
+    acceptance:
+      required_state_must_not_exist_only_in_chat_history: true
+      cross_chat_continuity_uses_explicit_checkpoint_artifacts: true
+
+  conversation_starters:
+    transfer_guaranteed: false
+    acceptance:
+      starter_text_not_required_for_core_correctness: true
+      representative_starters_must_exist_as_regression_fixtures: true
+      replacement_starters_or_equivalent_entry_points_validated_after_migration: true
+
+  reference_assets:
+    transfer_guaranteed: false
+    acceptance:
+      enumerate_required_reference_assets_before_cutover: true
+      validate_access_and_behavior_after_migration: true
+      missing_optional_asset_must_not_silently_change_core_semantics: true
+
+  custom_actions:
+    transfer_guaranteed: false
+    acceptance:
+      legacy_action_creation_default: HOLD
+      media_rebuilt_through_supported_app_connector_or_mcp: true
+      selected_media_binding: CUSTOM_REMOTE_MCP
+      media_operation_parity_required: 13
+      non_execution_operation_count: 9
+      execution_operation_count: 4
+      no_auth_canary_is_not_full_binding_auth: true
+
+access_and_distribution:
+  replacement_plugin_initial_access: PRIVATE
+  bounded_private_canary_connection_proven: true
+  public_gpt_sharing_auto_inherited: false
+  sharing_must_be_reconfigured_and_validated: true
+  intended_user_access_must_be_tested_before_cutover: true
+
+  store_metrics:
+    ratings_transfer_guaranteed: false
+    reviews_transfer_guaranteed: false
+    usage_counters_transfer_guaranteed: false
+    ranking_transfer_guaranteed: false
+    store_position_transfer_guaranteed: false
+    acceptance_dependency_on_metric_transfer: false
+
+legacy_link:
+  redirect_to_replacement_expected_when_supported_and_user_has_access: true
+  redirect_guaranteed_for_acceptance: false
+  verify_after_activation: true
+  document_if_absent_or_inaccessible: true
+
+migration_state_change:
+  migration_makes_original_gpt_read_only: true
+  migration_requires_separate_owner_approval: true
+  migration_is_not_preview: true
+  read_only_inspection_must_stop_before_migrate: true
+
+media_pre_cutover_requirements:
+  inbound_authenticated_remote_mcp_required: true
+  voicebridge_secret_server_side_only: true
+  all_13_operation_semantic_parity_required: true
+  execution_confirmation_semantics_required: true
+  explicit_youtube_consent_required: true
+  no_paid_unapproved_fallback_required: true
+  retry_idempotency_regression_required: true
+  secret_error_sanitization_required: true
+  core_failure_isolation_required: true
+
+post_migration_regression:
+  required:
+    - core_skill_semantic_parity
+    - criticprofile_gate
+    - risk_and_cross_check_floors
+    - claim_ledger_and_traceability
+    - checkpoint_recovery_without_chat_history_dependency
+    - model_agnostic_behavior
+    - language_behavior
+    - reference_asset_access_if_any
+    - media_13_operation_semantic_parity
+    - media_free_only_fail_closed_policy
+    - media_failure_core_isolation
+    - sharing_and_intended_audience_access
+    - representative_entry_points_or_starters
+  must_pass_before_user_switch: true
+
+cutover_gate:
+  replacement_private_baseline_verified: true
+  bounded_remote_mcp_canary_verified: true
+  full_media_private_baseline_required: true
+  core_regression_pass_required: true
+  media_regression_pass_required: true
+  sharing_access_validation_required: true
+  reference_asset_validation_required_if_any: true
+  old_gpt_link_behavior_recorded: true
+  store_metric_transfer_not_required: true
+  current_public_gpt_kept_until_replacement_accepted: true
+  separate_owner_approval_required_for_activation_or_user_switch: true
+
+release_boundary:
+  public_gpt_mutation: DENIED
+  migration_execution: DENIED
+  plugin_publication: DENIED
+  plugin_sharing: DENIED
+  full_media_mcp_deployment: DENIED
+  voicebridge_credential_binding: DENIED
+  render_change: DENIED
+  main_mutation: DENIED
+  pr22_merge: DENIED
+  pr45_merge: DENIED

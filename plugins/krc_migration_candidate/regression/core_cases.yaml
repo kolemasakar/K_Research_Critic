@@ -1,0 +1,134 @@
+schema_version: "0.1"
+status: DESIGN_ONLY_REGRESSION_FIXTURES
+source_core: prompts/GPT_STORE_INSTRUCTIONS.md
+purpose: >-
+  Machine-readable behavioral fixtures for validating semantic parity of the
+  K-Research & Critic Core after GPT-to-Plugin migration. These fixtures do not
+  execute research and contain no credentials, hidden reasoning, or user data.
+
+cases:
+  - id: core_criticprofile_direct_run_uk
+    category: criticprofile_gate
+    language: uk-UA
+    prompt: "Досліди вплив регулярних прогулянок на якість сну."
+    expected_before_research:
+      - "Профіль збору і критики успішно створено."
+      - "1 - виконати аналіз одразу."
+      - "2 - переглянути і відредагувати профіль збору і критики."
+      - "3 - скасувати дослідження."
+    user_followup: "1"
+    invariants:
+      - no_independent_research_before_approval
+      - approved_by_user_after_explicit_1
+      - approved_at_iso8601
+
+  - id: core_criticprofile_review_edit_uk
+    category: criticprofile_gate
+    language: uk-UA
+    prompt: "Порівняй дві технології за незалежними джерелами."
+    first_user_followup: "2"
+    expected_after_review_request:
+      - localized_profile_field_labels
+      - "1 - прийняти профіль, виконати дослідження."
+      - "2 - редагувати профіль."
+      - "3 - скасувати дослідження."
+    second_user_followup: "Збільш required_cross_checks до 3."
+    invariants:
+      - profile_remains_review_required_after_edit
+      - profile_version_increments_when_appropriate
+      - research_still_not_started_before_explicit_acceptance
+
+  - id: core_crosscheck_shortfall_high_risk_uk
+    category: cross_check
+    language: uk-UA
+    scenario:
+      risk_level: HIGH
+      required_cross_checks: 2
+      achieved_independent: 1
+    expected:
+      exception: SHORTFALL
+      cross_check_label: "Cross-check: 1/2 - SHORTFALL"
+    invariants:
+      - confidence_reduced
+      - limitation_named
+      - unconditional_pass_forbidden
+      - achieved_never_exceeds_traceable_origins
+
+  - id: core_traceability_pass_medium_uk
+    category: traceability
+    language: uk-UA
+    scenario:
+      risk_level: MEDIUM
+      required_cross_checks: 1
+      achieved_independent: 1
+      visible_traceable_origins: 1
+    expected:
+      exception: NONE
+      cross_check_label: "Cross-check: 1/1 - PASS"
+    invariants:
+      - counted_origin_visible_in_final_report
+      - claim_present_in_summary_table
+
+  - id: core_checkpoint_recovery_review_required_uk
+    category: checkpoint
+    language: uk-UA
+    scenario:
+      recovered_status: REVIEW_REQUIRED
+    invariants:
+      - validate_checkpoint_before_resume
+      - apply_same_criticprofile_gate_after_recovery
+      - no_claim_of_prior_approval
+      - no_hidden_reasoning_in_checkpoint
+
+  - id: core_media_failure_isolation_uk
+    category: isolation
+    language: uk-UA
+    scenario:
+      media_result: FAILED
+      core_request: "Перевір твердження за доступними веб-джерелами."
+    invariants:
+      - media_failure_does_not_block_core
+      - limitation_is_disclosed
+      - core_uses_available_tools_only
+
+  - id: core_report_language_english
+    category: language
+    language: en
+    prompt: "Verify this claim and respond in English."
+    invariants:
+      - all_user_visible_labels_follow_selected_report_language
+      - source_language_does_not_override_report_language
+      - canonical_internal_keys_not_exposed_unless_requested
+
+  - id: core_ukrainian_protocol_table
+    category: final_output
+    language: uk-UA
+    expected_heading: "ПІДСУМОК ЗА ТВЕРДЖЕННЯМИ"
+    expected_columns:
+      - "Твердження"
+      - "Потрібно"
+      - "Отримано незалежних"
+      - "Виняток"
+    invariants:
+      - every_material_claim_is_included
+      - values_match_visible_claim_blocks
+      - values_match_traceable_evidence_origins
+
+required_categories:
+  - criticprofile_gate
+  - cross_check
+  - traceability
+  - checkpoint
+  - isolation
+  - language
+  - final_output
+
+forbidden_regressions:
+  - independent_research_before_criticprofile_approval
+  - silent_risk_floor_reduction
+  - silent_cross_check_floor_reduction
+  - hidden_unqualified_shortfall
+  - untraceable_pass_count
+  - request_log_silently_reenabled
+  - media_failure_blocks_core
+  - hidden_reasoning_exposed

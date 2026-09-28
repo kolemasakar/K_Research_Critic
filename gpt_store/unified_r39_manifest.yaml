@@ -1,0 +1,51 @@
+schema_version: "1.0"
+status: R39_UNIFIED_PUBLIC_GPT_STAGING_CANDIDATE
+
+product:
+  name: K-Research & Critic
+  target_channel: existing_public_custom_gpt
+  user_facing_identity_change: false
+  source_public_gpt_remains_rollback_anchor: true
+
+instructions:
+  core: prompts/GPT_STORE_INSTRUCTIONS.md
+  media_addendum: prompts/GPT_STORE_MEDIA_R3_PUBLIC_ADDENDUM.md
+  builder_artifact: prompts/GPT_STORE_UNIFIED_R39_INSTRUCTIONS.md
+  routing_contract: contracts/krc_unified_media_routing.yaml
+  core_text_must_remain_byte_identical: true
+
+capabilities:
+  web_search: true
+  code_interpreter_data_analysis: true
+  media_action_required_for_unified_runtime: true
+
+media_action:
+  schema: gpt_store/actions/media_public_r39_openapi.yaml
+  operation_count: 13
+  read_only_operations: 9
+  execution_operations: 4
+  backend_business_logic_change_required: false
+  free_only: true
+
+future_plugin_mapping:
+  plugin: plugins/krc_r4_candidate/plugin.json
+  apps: plugins/krc_r4_candidate/.app.json
+  skill: plugins/krc_r4_candidate/skills/krc-core/SKILL.md
+  semantic_parity_required: true
+  custom_action_transport_is_disposable_at_migration: true
+
+acceptance_before_public_gpt_mutation:
+  - core_regression_pass
+  - unified_routing_contract_static_pass
+  - exact_13_operation_parity_pass
+  - free_only_fail_closed_pass
+  - execution_confirmation_boundary_pass
+  - media_failure_isolation_pass
+  - future_plugin_mapping_parity_pass
+
+release_boundary:
+  current_public_gpt_update: NOT_YET_AUTHORIZED
+  r4_c: PAUSED_PENDING_SUPPORTED_CHATGPT_DISTRIBUTION
+  plugin_publication: NO
+  pr22_merge: NO
+  pr45_merge: NO

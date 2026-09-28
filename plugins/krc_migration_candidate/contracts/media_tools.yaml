@@ -1,0 +1,299 @@
+schema_version: "0.2"
+status: R3A_FROZEN_REMOTE_MCP_CONTRACT
+as_of: "2026-09-16"
+source_openapi: gpt_store/actions/media_public_r3_openapi.yaml
+source_checkpoint: subprojects/media_beta/111_POST_CANARY_PLUGIN_MEDIA_ROADMAP_DECISION_2026_09_16.md
+surface_evidence:
+  canary_checkpoint: subprojects/media_beta/110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md
+  selected_surface: custom_remote_mcp
+  transport: remote_mcp_http
+  protocol_version: "2026-07-28"
+  canary_tool_count: 1
+  canary_connection_pass: true
+  canary_invocation_pass: true
+  canary_no_auth_reusable_for_media_binding: false
+
+backend_url: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
+operation_count: 13
+non_execution_count: 9
+execution_count: 4
+
+authentication:
+  inbound_strategy: R3_B_REQUIRED_BEFORE_VOICEBRIDGE_BINDING
+  canary_no_auth_allowed_for_full_binding: false
+  outbound_voicebridge_credential: SERVER_SIDE_ONLY
+  secret_visibility: SERVER_SIDE_ONLY
+  model_visible_secret: false
+  repository_secret: false
+
+annotation_policy:
+  legacy_openapi_x_openai_isConsequential_is_authoritative_for_mcp: false
+  non_execution:
+    readOnlyHint: true
+    destructiveHint: false
+    idempotentHint: true
+    openWorldHint: false
+  execution:
+    readOnlyHint: false
+    destructiveHint: false
+    idempotentHint: false
+    openWorldHint: true
+    requires_confirmation_semantics_validation: true
+
+schema_freeze:
+  canonical_source: gpt_store/actions/media_public_r3_openapi.yaml
+  request_body_schema_refs_are_authoritative: true
+  job_id:
+    type: string
+    pattern: "^KRCM_[A-Za-z0-9-]+$"
+  cursor:
+    type: integer
+    minimum: 0
+    default: 0
+  limit:
+    type: integer
+    minimum: 1
+    maximum: 50
+    default: 20
+  instagram_preflight_output:
+    source_openapi_schema_present: false
+    frozen_mcp_schema:
+      type: object
+      additionalProperties: true
+    must_not_invent_backend_fields: true
+
+policy:
+  paid_retrieval_fallback: false
+  paid_stt_fallback: false
+  paid_proxy_fallback: false
+  supadata_public_active: false
+  scrapecreators_public_active: false
+  cookie_login_fallback: false
+  automatic_retry_loop: false
+  failed_free_only_retry: fresh_deterministic_job_on_new_explicit_retry_request
+  failed_paid_or_charge_uncertain_retry: blocked
+
+routes:
+  youtube: Gemini Developer API Free Tier direct URL
+  instagram: self-hosted Cobalt -> AssemblyAI universal-2
+  facebook: Cobalt video+audio -> server ffmpeg mono PCM WAV 16 kHz -> AssemblyAI universal-2
+  telegram: public Telegram web -> AssemblyAI universal-2
+
+youtube_consent:
+  preflight_calls_provider: false
+  provider: google_gemini
+  tier: free
+  data_use_acknowledged: true
+  required_before_start: true
+  installation_or_connection_is_not_consent: true
+
+tools:
+  - candidate_name: media_get_capabilities
+    source_operation_id: getPublicMediaCapabilities
+    method: GET
+    path: /api/v1/media/public-capabilities
+    mode: read_only
+    classification: non_execution
+    input_schema:
+      type: object
+      additionalProperties: false
+      properties: {}
+    output_schema_ref: "#/components/schemas/PublicCapabilities"
+    annotations: {readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false}
+
+  - candidate_name: media_youtube_preflight
+    source_operation_id: preflightPublicGeminiYoutube
+    method: POST
+    path: /api/v1/media/youtube-gemini/preflight
+    mode: read_only_preflight
+    classification: non_execution
+    input_schema_ref: "#/components/schemas/YoutubeRequest"
+    output_schema_ref: "#/components/schemas/GeminiYoutubePreflight"
+    provider_work_allowed: false
+    annotations: {readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false}
+
+  - candidate_name: media_youtube_lookup
+    source_operation_id: lookupPublicGeminiYoutubeJob
+    method: POST
+    path: /api/v1/media/youtube-gemini/lookup
+    mode: read_only_lookup
+    classification: non_execution
+    input_schema_ref: "#/components/schemas/YoutubeRequest"
+    output_schema_ref: "#/components/schemas/ManagedJob"
+    provider_work_allowed: false
+    annotations: {readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false}
+
+  - candidate_name: media_youtube_start
+    source_operation_id: startPublicGeminiYoutubeTranscription
+    method: POST
+    path: /api/v1/media/youtube-gemini/transcriptions
+    mode: execution
+    classification: execution
+    input_schema_ref: "#/components/schemas/YoutubeGeminiStartRequest"
+    output_schema_ref: "#/components/schemas/ManagedJob"
+    requires_explicit_user_consent: true
+    requires_confirmation_semantics_validation: true
+    annotations: {readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true}
+
+  - candidate_name: media_youtube_status
+    source_operation_id: getPublicGeminiYoutubeJob
+    method: GET
+    path: /api/v1/media/youtube-gemini/transcriptions/{job_id}
+    mode: read_only
+    classification: non_execution
+    input_schema:
+      type: object
+      additionalProperties: false
+      required: [job_id]
+      properties:
+        job_id: {type: string, pattern: "^KRCM_[A-Za-z0-9-]+$"}
+    output_schema_ref: "#/components/schemas/ManagedJob"
+    annotations: {readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false}
+
+  - candidate_name: media_youtube_segments
+    source_operation_id: getPublicGeminiYoutubeSegments
+    method: GET
+    path: /api/v1/media/youtube-gemini/transcriptions/{job_id}/segments
+    mode: read_only
+    classification: non_execution
+    input_schema:
+      type: object
+      additionalProperties: false
+      required: [job_id]
+      properties:
+        job_id: {type: string, pattern: "^KRCM_[A-Za-z0-9-]+$"}
+        cursor: {type: integer, minimum: 0, default: 0}
+        limit: {type: integer, minimum: 1, maximum: 50, default: 20}
+    output_schema_ref: "#/components/schemas/SegmentPage"
+    annotations: {readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false}
+
+  - candidate_name: media_instagram_preflight
+    source_operation_id: preflightPublicInstagramCobalt
+    method: POST
+    path: /api/v1/media/managed/preflight
+    mode: read_only_preflight
+    classification: non_execution
+    input_schema_ref: "#/components/schemas/InstagramRequest"
+    output_schema:
+      type: object
+      additionalProperties: true
+    source_openapi_output_schema_present: false
+    provider_work_allowed: false
+    annotations: {readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false}
+
+  - candidate_name: media_instagram_lookup
+    source_operation_id: lookupPublicInstagramCobaltJob
+    method: POST
+    path: /api/v1/media/managed/lookup
+    mode: read_only_lookup
+    classification: non_execution
+    input_schema_ref: "#/components/schemas/InstagramRequest"
+    output_schema_ref: "#/components/schemas/ManagedJob"
+    provider_work_allowed: false
+    annotations: {readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false}
+
+  - candidate_name: media_instagram_start
+    source_operation_id: startPublicInstagramCobaltTranscription
+    method: POST
+    path: /api/v1/media/managed/transcriptions
+    mode: execution
+    classification: execution
+    input_schema_ref: "#/components/schemas/InstagramRequest"
+    output_schema_ref: "#/components/schemas/ManagedJob"
+    requires_confirmation_semantics_validation: true
+    annotations: {readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true}
+
+  - candidate_name: media_facebook_start
+    source_operation_id: startPublicFacebookCobaltTranscription
+    method: POST
+    path: /api/v1/media/managed/facebook-fallback
+    mode: execution
+    classification: execution
+    input_schema_ref: "#/components/schemas/FacebookRequest"
+    output_schema_ref: "#/components/schemas/ManagedJob"
+    requires_confirmation_semantics_validation: true
+    annotations: {readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true}
+
+  - candidate_name: media_telegram_start
+    source_operation_id: startPublicTelegramTranscription
+    method: POST
+    path: /api/v1/media/managed/telegram
+    mode: execution
+    classification: execution
+    input_schema_ref: "#/components/schemas/TelegramRequest"
+    output_schema_ref: "#/components/schemas/ManagedJob"
+    requires_confirmation_semantics_validation: true
+    annotations: {readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true}
+
+  - candidate_name: media_non_youtube_status
+    source_operation_id: getPublicNonYoutubeMediaJob
+    method: GET
+    path: /api/v1/media/managed/transcriptions/{job_id}
+    mode: read_only
+    classification: non_execution
+    input_schema:
+      type: object
+      additionalProperties: false
+      required: [job_id]
+      properties:
+        job_id: {type: string, pattern: "^KRCM_[A-Za-z0-9-]+$"}
+    output_schema_ref: "#/components/schemas/ManagedJob"
+    annotations: {readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false}
+
+  - candidate_name: media_non_youtube_segments
+    source_operation_id: getPublicNonYoutubeMediaSegments
+    method: GET
+    path: /api/v1/media/managed/transcriptions/{job_id}/segments
+    mode: read_only
+    classification: non_execution
+    input_schema:
+      type: object
+      additionalProperties: false
+      required: [job_id]
+      properties:
+        job_id: {type: string, pattern: "^KRCM_[A-Za-z0-9-]+$"}
+        cursor: {type: integer, minimum: 0, default: 0}
+        limit: {type: integer, minimum: 1, maximum: 50, default: 20}
+    output_schema_ref: "#/components/schemas/SegmentPage"
+    annotations: {readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false}
+
+audit_fields_required:
+  - status
+  - provider
+  - provider_mode
+  - retrieval_provider
+  - retrieval_credits_charged
+  - stt_seconds_charged
+  - segment_count
+  - transcript_characters
+  - reused
+  - credit_charge_uncertain
+  - error
+
+hard_guards:
+  youtube:
+    forbid: [cobalt_fallback, assemblyai_fallback, paid_gemini, paid_proxy, supadata, scrapecreators, cookie_login]
+  facebook:
+    canonical_retrieval: cobalt_video_plus_audio
+    normalization: mono_pcm_wav_16khz
+    forbid: [cobalt_only_audio_canonical_route]
+  telegram:
+    canonical_retrieval: telegram_public_web
+    forbid: [telegram_login, telegram_session, telegram_bot_token]
+  instagram:
+    canonical_retrieval: cobalt
+    forbid: [youtube_on_generic_managed_route]
+
+release_boundary:
+  live_deployment: DENIED
+  live_canary_mutation: DENIED
+  voicebridge_credential_binding: DENIED
+  provider_work: DENIED
+  execution_tool_exposure: DENIED
+  public_gpt_mutation: DENIED
+  plugin_publication: DENIED
+  plugin_sharing: DENIED
+  migration_execution: DENIED
+  main_mutation: DENIED
+  pr22_merge: DENIED
+  pr45_merge: DENIED

@@ -1,13 +1,13 @@
 # PRIVACY_POLICY
-Політика конфіденційності для майбутньої публічної MEDIA-функції K-Research & Critic; до окремого R3 оновлення GPT ця редакція є підготовленим кандидатом і не активує публічний MEDIA-доступ.
+Політика конфіденційності для активної публічної MEDIA-функції K-Research & Critic у прийнятому Unified R3.9 public rollout.
 
-Version: 2.2-candidate
-Status: PUBLIC_MEDIA_CANDIDATE / NOT_YET_ACTIVATED / FREE_TIER_ONLY
-Updated: 2026-09-07
+Version: 2.3
+Status: PUBLIC_MEDIA_ACTIVE / R39_PUBLIC_ACCEPTED / FREE_TIER_ONLY
+Updated: 2026-09-24
 
 ## 1. Scope
 
-This policy describes the external MEDIA Action planned for the existing public `K-Research & Critic` GPT.
+This policy describes the active external MEDIA Action for the existing public `K-Research & Critic` GPT.
 
 The initial public MEDIA scope is limited to supported public video/media URLs from:
 
@@ -61,7 +61,7 @@ Reusable secrets must not be written to reports, checkpoints, public logs, or no
 
 ### YouTube - Gemini Developer API Free Tier direct public URL
 
-The public MEDIA candidate sends a supported public YouTube URL directly to Google Gemini for video understanding/transcript extraction. The YouTube public route does not use Cobalt, AssemblyAI, user cookies, YouTube login/session data, a paid proxy, Supadata, or a paid Gemini fallback.
+The public MEDIA route sends a supported public YouTube URL directly to Google Gemini for video understanding/transcript extraction. The YouTube public route does not use Cobalt, AssemblyAI, user cookies, YouTube login/session data, a paid proxy, Supadata, or a paid Gemini fallback.
 
 Before any new YouTube URL/content is sent through the Gemini Developer API Free Tier, the user must receive a clear disclosure that content submitted through the Free Tier may be used by Google to improve Google products and must explicitly consent to that boundary. A preflight or durable-job lookup may occur before this consent, but it must not submit the YouTube media to Gemini.
 
@@ -69,7 +69,7 @@ If explicit consent is not obtained, the YouTube MEDIA operation stops without c
 
 ### Instagram
 
-The public MEDIA candidate uses the project's self-hosted Cobalt retrieval service for supported public Instagram Reel/video URLs. The backend requests an audio-oriented media representation and may then send the retrieved audio to AssemblyAI `universal-2` while the project's accepted free allowance remains available.
+The public MEDIA route uses the project's self-hosted Cobalt retrieval service for supported public Instagram Reel/video URLs. The backend requests an audio-oriented media representation and may then send the retrieved audio to AssemblyAI `universal-2` while the project's accepted free allowance remains available.
 
 The initial Instagram public scope is limited to supported public single-video Reel/video-post forms. Multi-asset picker/carousel responses fail closed rather than selecting an item implicitly.
 
@@ -91,7 +91,7 @@ The service does not require Telegram login credentials, cookies, sessions, or a
 
 ### Google Gemini - YouTube direct Free Tier route
 
-Google Gemini is the selected public YouTube provider for the candidate route because the previously tested self-hosted Cobalt path encountered YouTube datacenter anti-bot/login requirements.
+Google Gemini is the selected public YouTube provider for the active route because the previously tested self-hosted Cobalt path encountered YouTube datacenter anti-bot/login requirements.
 
 The backend sends the supported public YouTube URL and a bounded instruction asking Gemini to extract spoken transcript content. It does not intentionally send unrelated ChatGPT conversation text.
 
@@ -113,7 +113,7 @@ Historical/private repository code may contain other Gemini prerecorded audio ad
 
 The public MEDIA feature is designed to operate only within free provider/service allowances configured for this project.
 
-Current candidate safety rules include:
+Current public safety rules include:
 
 ```text
 YouTube -> Gemini Developer API Free Tier direct public URL, explicit consent required
@@ -139,7 +139,7 @@ The isolated durable MEDIA store preserves accepted job state and transcript seg
 
 The current implementation defaults managed job/transcript expiry to approximately one hour (`MEDIA_JOB_TTL_SECONDS=3600`). Expired managed-job rows are purged by the backend cleanup path. Daily STT quota-accounting rows older than two days are also removed by the current implementation for routes using that quota ledger.
 
-These values are implementation defaults and may be reduced or otherwise changed only with corresponding documentation and privacy review before public activation.
+These values are implementation defaults and may be reduced or otherwise changed only with corresponding documentation and privacy review before deploying the change.
 
 The project does not intentionally retain raw downloaded source-media files after processing. The YouTube direct Gemini route does not require VoiceBridge to download the YouTube media first. Temporary local media artifacts used by non-YouTube retrieval/STT routes are cleaned up by the accepted provider pipelines.
 
@@ -147,7 +147,7 @@ The project does not intentionally retain raw downloaded source-media files afte
 
 Third-party providers process only the data required for the selected MEDIA operation. Their own privacy, retention, regional-routing, and model-improvement rules also apply and may change independently of this project.
 
-Before any public provider activation, the project must re-check the then-current provider terms. In particular:
+Provider terms must be re-checked before any material provider/routing change. In particular:
 
 - Google Gemini Free Tier data-use terms must be disclosed before a new YouTube provider submission and explicit consent must be obtained;
 - AssemblyAI provider-side deletion is attempted where supported and must be reported accurately;
@@ -177,9 +177,9 @@ Transcript text is evidence of what the media said, not independent proof that f
 
 ## 10. Public GPT Action Requirement
 
-OpenAI requires a valid Privacy Policy URL for a public GPT that uses Actions. This document is the repository-side candidate policy intended for that Action configuration.
+OpenAI requires a valid Privacy Policy URL for a public GPT that uses Actions. This document is the repository-side privacy policy for the active Unified R3.9 Action configuration.
 
-Updating this file does not itself publish or activate the MEDIA Action. The existing public GPT must be updated separately through the ChatGPT Builder only after the R2 release gates pass and the owner separately authorizes R3.
+Updating this file does not itself change the published GPT, Action routing, providers, credentials, or backend runtime. Material changes to those surfaces require their corresponding release review and explicit authorization.
 
 ## 11. Changes and Contact
 

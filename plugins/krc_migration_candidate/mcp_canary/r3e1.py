@@ -1,0 +1,280 @@
+from __future__ import annotations
+
+import json
+from copy import deepcopy
+from typing import Any, Mapping
+from urllib.parse import urlsplit
+
+from .r3c import (
+    R3C_TOOL_NAMES,
+    VoiceBridgeBinding,
+    VoiceBridgeError,
+    call_voicebridge,
+    dispatch_r3c,
+    tool_descriptors as r3c_tool_descriptors,
+)
+from .server import LEGACY_PROTOCOL_VERSION, MCP_PROTOCOL_VERSION, SERVER_NAME
+
+R3E1_SURFACE = "r3e1_youtube_execution"
+R3E1_SERVER_VERSION = "0.5.0"
+R3E1_EXECUTION_TOOL_NAME = "media_youtube_start"
+R3E1_TOOL_NAMES = R3C_TOOL_NAMES + (R3E1_EXECUTION_TOOL_NAME,)
+R3E1_TOOL_NAME_SET = frozenset(R3E1_TOOL_NAMES)
+_DISABLED_EXECUTION_TOOL_NAMES = frozenset(
+    {
+        "media_instagram_start",
+        "media_facebook_start",
+        "media_telegram_start",
+    }
+)
+_LANGUAGE_HINTS = frozenset({"auto", "uk", "ru", "en"})
+
+_ACTION_ANNOTATIONS: dict[str, bool] = {
+    "readOnlyHint": False,
+    "destructiveHint": False,
+    "idempotentHint": False,
+    "openWorldHint": True,
+}
+
+_YOUTUBE_START_INPUT_SCHEMA: dict[str, object] = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": ["url", "gemini_free_consent"],
+    "properties": {
+        "url": {"type": "string", "format": "uri"},
+        "language_hint": {
+            "type": "string",
+            "enum": ["auto", "uk", "ru", "en"],
+            "default": "auto",
+        },
+        "gemini_free_consent": {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["provider", "tier", "data_use_acknowledged"],
+            "properties": {
+                "provider": {"type": "string", "const": "google_gemini"},
+                "tier": {"type": "string", "const": "free"},
+                "data_use_acknowledged": {"type": "boolean", "const": True},
+            },
+        },
+    },
+}
+
+_OBJECT_OUTPUT_SCHEMA: dict[str, object] = {"type": "object", "additionalProperties": True}
+
+_YOUTUBE_START_DESCRIPTOR: dict[str, object] = {
+    "name": R3E1_EXECUTION_TOOL_NAME,
+    "title": "Start YouTube MEDIA processing",
+    "description": (
+        "Start Gemini Developer API Free Tier processing for a supported public YouTube URL. "
+        "This is the only execution tool exposed by R3-E1. It requires explicit Gemini Free "
+        "data-use acknowledgement and ChatGPT action confirmation."
+    ),
+    "inputSchema": _YOUTUBE_START_INPUT_SCHEMA,
+    "outputSchema": _OBJECT_OUTPUT_SCHEMA,
+    "annotations": _ACTION_ANNOTATIONS,
+}
+
+
+def tool_descriptors() -> list[dict[str, object]]:
+    descriptors = r3c_tool_descriptors()
+    descriptors.append(deepcopy(_YOUTUBE_START_DESCRIPTOR))
+    return descriptors
+
+
+def r3e1_health(binding: VoiceBridgeBinding) -> dict[str, object]:
+    return {
+        "service": SERVER_NAME,
+        "status": "ok" if binding.configured else "binding_required",
+        "surface": R3E1_SURFACE,
+        "tool_count": len(R3E1_TOOL_NAMES),
+        "non_execution_tool_count": len(R3C_TOOL_NAMES),
+        "execution_tool_count": 1,
+        "youtube_execution_enabled": True,
+        "other_execution_tools": "not_enabled",
+        "voicebridge_binding_configured": binding.configured,
+        "provider_work_started": False,
+    }
+
+
+def _response(request_id: object, result: object) -> dict[str, object]:
+    return {"jsonrpc": "2.0", "id": request_id, "result": result}
+
+
+def _error(request_id: object, code: int, message: str) -> dict[str, object]:
+    return {"jsonrpc": "2.0", "id": request_id, "error": {"code": code, "message": message}}
+
+
+def _complete(payload: Mapping[str, object]) -> dict[str, object]:
+    result = dict(payload)
+    result["resultType"] = "complete"
+    result["_meta"] = {
+        "io.modelcontextprotocol/serverInfo": {"name": SERVER_NAME, "version": R3E1_SERVER_VERSION}
+    }
+    return result
+
+
+def _tool_result(payload: Mapping[str, object], *, is_error: bool = False) -> dict[str, object]:
+    structured = dict(payload)
+    return _complete(
+        {
+            "content": [
+                {"type": "text", "text": json.dumps(structured, sort_keys=True, separators=(",", ":"))}
+            ],
+            "structuredContent": structured,
+            "isError": is_error,
+        }
+    )
+
+
+def _sanitized_backend_error(error: VoiceBridgeError) -> dict[str, object]:
+    detail: dict[str, object] = {"code": error.code, "retryable": error.retryable}
+    if error.http_status is not None:
+        detail["http_status"] = error.http_status
+    return {"status": "error", "error": detail}
+
+
+def _validate_https_url(value: object) -> str:
+    if not isinstance(value, str) or not value or len(value) > 4096:
+        raise ValueError("invalid_url")
+    parsed = urlsplit(value)
+    if parsed.scheme != "https" or not parsed.netloc or parsed.username or parsed.password:
+        raise ValueError("invalid_url")
+    return value
+
+
+def _validate_language_hint(arguments: Mapping[str, object]) -> str | None:
+    if "language_hint" not in arguments:
+        return None
+    value = arguments.get("language_hint")
+    if not isinstance(value, str) or value not in _LANGUAGE_HINTS:
+        raise ValueError("invalid_language_hint")
+    return value
+
+
+def _validate_consent(value: object) -> dict[str, object]:
+    if not isinstance(value, Mapping):
+        raise ValueError("invalid_consent")
+    if set(value) != {"provider", "tier", "data_use_acknowledged"}:
+        raise ValueError("invalid_consent")
+    if value.get("provider") != "google_gemini":
+        raise ValueError("invalid_consent")
+    if value.get("tier") != "free":
+        raise ValueError("invalid_consent")
+    if value.get("data_use_acknowledged") is not True:
+        raise ValueError("invalid_consent")
+    return {
+        "provider": "google_gemini",
+        "tier": "free",
+        "data_use_acknowledged": True,
+    }
+
+
+def _normalized_start(arguments: Mapping[str, object]) -> dict[str, object]:
+    if not set(arguments).issubset({"url", "language_hint", "gemini_free_consent"}):
+        raise ValueError("unexpected_argument")
+    if "url" not in arguments or "gemini_free_consent" not in arguments:
+        raise ValueError("missing_argument")
+    payload: dict[str, object] = {
+        "url": _validate_https_url(arguments.get("url")),
+        "gemini_free_consent": _validate_consent(arguments.get("gemini_free_consent")),
+    }
+    language_hint = _validate_language_hint(arguments)
+    if language_hint is not None:
+        payload["language_hint"] = language_hint
+    return payload
+
+
+def _rewrite_server_info(response: dict[str, object] | None) -> dict[str, object] | None:
+    if response is None:
+        return None
+    result = response.get("result")
+    if isinstance(result, dict):
+        meta = result.get("_meta")
+        if isinstance(meta, dict):
+            meta["io.modelcontextprotocol/serverInfo"] = {
+                "name": SERVER_NAME,
+                "version": R3E1_SERVER_VERSION,
+            }
+    return response
+
+
+def dispatch_r3e1(
+    message: Mapping[str, Any],
+    binding: VoiceBridgeBinding,
+) -> dict[str, object] | None:
+    request_id = message.get("id")
+    if message.get("jsonrpc") != "2.0":
+        return _error(request_id, -32600, "Invalid Request")
+    method = message.get("method")
+    if not isinstance(method, str):
+        return _error(request_id, -32600, "Invalid Request")
+    if method == "notifications/initialized":
+        return None
+    if method == "server/discover":
+        return _response(
+            request_id,
+            _complete(
+                {
+                    "supportedVersions": [MCP_PROTOCOL_VERSION],
+                    "capabilities": {"tools": {}},
+                    "instructions": (
+                        "R3-E1 exposes the accepted nine non-execution KRC MEDIA tools plus exactly "
+                        "one execution operation: media_youtube_start. Instagram, Facebook, and "
+                        "Telegram start operations remain disabled."
+                    ),
+                }
+            ),
+        )
+    if method == "initialize":
+        params = message.get("params")
+        requested_version = params.get("protocolVersion") if isinstance(params, Mapping) else None
+        protocol_version = LEGACY_PROTOCOL_VERSION if requested_version != LEGACY_PROTOCOL_VERSION else requested_version
+        return _response(
+            request_id,
+            {
+                "protocolVersion": protocol_version,
+                "capabilities": {"tools": {}},
+                "serverInfo": {"name": SERVER_NAME, "version": R3E1_SERVER_VERSION},
+            },
+        )
+    if method == "ping":
+        return _response(request_id, _complete({}))
+    if method == "tools/list":
+        return _response(request_id, _complete({"tools": tool_descriptors()}))
+    if method != "tools/call":
+        return _error(request_id, -32601, "Method not found")
+
+    params = message.get("params")
+    if not isinstance(params, Mapping):
+        return _error(request_id, -32602, "Invalid params")
+    name = params.get("name")
+    if not isinstance(name, str) or name not in R3E1_TOOL_NAME_SET:
+        return _error(request_id, -32602, "Unknown tool")
+    if name in _DISABLED_EXECUTION_TOOL_NAMES:
+        return _error(request_id, -32602, "Unknown tool")
+
+    if name != R3E1_EXECUTION_TOOL_NAME:
+        return _rewrite_server_info(
+            dispatch_r3c(message, binding, backend_call=call_voicebridge)
+        )
+
+    arguments = params.get("arguments", {})
+    if not isinstance(arguments, Mapping):
+        return _error(request_id, -32602, "Invalid params")
+    try:
+        payload = _normalized_start(arguments)
+    except ValueError:
+        return _error(request_id, -32602, "Invalid params")
+
+    try:
+        backend_payload = call_voicebridge(
+            binding,
+            "POST",
+            "/api/v1/media/youtube-gemini/transcriptions",
+            payload,
+            {},
+        )
+    except VoiceBridgeError as exc:
+        return _response(request_id, _tool_result(_sanitized_backend_error(exc), is_error=True))
+    return _response(request_id, _tool_result(backend_payload))

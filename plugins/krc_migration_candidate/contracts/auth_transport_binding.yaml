@@ -1,0 +1,168 @@
+schema_version: "0.2"
+status: R3A_FROZEN_AUTH_TRANSPORT_REQUIREMENTS
+as_of: "2026-09-16"
+source_media_contract: plugins/krc_migration_candidate/contracts/media_tools.yaml
+source_adapter_contract: plugins/krc_migration_candidate/contracts/media_adapter.yaml
+source_surface_matrix: plugins/krc_migration_candidate/contracts/surface_decision_matrix.yaml
+source_canary_acceptance: subprojects/media_beta/110_CHATGPT_CUSTOM_MCP_CANARY_INVOCATION_PASS_2026_09_16.md
+
+objective: >-
+  Freeze the selected Remote MCP transport and the secret/authentication boundary
+  that future MEDIA binding must satisfy. R3-A does not choose or activate live
+  inbound authentication and does not bind VoiceBridge credentials.
+
+backend:
+  logical_service: VoiceBridge MEDIA API
+  current_base_url: https://voicebridge-krc-media-beta-kolemasakar.onrender.com
+  backend_api_change_required_for_design: false
+  render_change_required_for_design: false
+  existing_openapi_source: gpt_store/actions/media_public_r3_openapi.yaml
+  operation_count: 13
+
+transport_contract:
+  final_transport: remote_mcp_http
+  protocol_version: "2026-07-28"
+  selected_surface: custom_remote_mcp
+  account_surface_proven: true
+  web_surface_proven: true
+  live_read_only_canary_proven: true
+  current_canary_auth_mode: none
+  current_canary_reusable_for_voicebridge_binding: false
+  local_mcp_direct_dependency: false
+  client_desktop_dependency_allowed_by_default: false
+  preserve_http_semantics: true
+  preserve_operation_identity_or_auditable_equivalent_mapping: true
+  request_timeout_strategy: TARGET_SURFACE_SPECIFIC_BUT_BOUNDED
+  automatic_transport_retry: false
+  backend_job_polling: EXPLICIT_STATUS_READS_ONLY
+  duplicate_execution_protection: BACKEND_DURABLE_JOB_AND_LOOKUP_SEMANTICS
+
+execution_boundary:
+  execution_required: true
+  execution_operations:
+    - startPublicGeminiYoutubeTranscription
+    - startPublicInstagramCobaltTranscription
+    - startPublicFacebookCobaltTranscription
+    - startPublicTelegramTranscription
+  read_only_operations:
+    - getPublicMediaCapabilities
+    - lookupPublicGeminiYoutubeJob
+    - getPublicGeminiYoutubeJob
+    - getPublicGeminiYoutubeSegments
+    - lookupPublicInstagramCobaltJob
+    - getPublicNonYoutubeMediaJob
+    - getPublicNonYoutubeMediaSegments
+  preflight_operations:
+    - preflightPublicGeminiYoutube
+    - preflightPublicInstagramCobalt
+  non_execution_operation_count: 9
+  execution_operation_count: 4
+  read_fetch_only_surface_accepted_for_full_binding: false
+  execution_tools_exposed_in_r3a: false
+  confirmation_semantics_validation_phase: R3_D
+
+credentials:
+  final_auth_method: R3_B_REQUIRED_BEFORE_VOICEBRIDGE_BINDING
+  inbound_no_auth_allowed_for_full_binding: false
+  canary_no_auth_is_evidence_only: true
+  acceptable_patterns:
+    - supported_oauth_or_managed_credential_store
+    - supported_authenticated_remote_mcp_mode
+  outbound_voicebridge_pattern: backend_to_backend_credential_injection_not_visible_to_model
+  forbidden_patterns:
+    - secret_in_skill_text
+    - secret_in_repository
+    - secret_in_tool_description
+    - secret_in_model_visible_arguments
+    - secret_in_user_visible_output
+    - secret_in_non_secret_sentinel_evidence
+    - reuse_public_no_auth_canary_for_voicebridge_secret
+  model_visible_secret: false
+  repository_secret: false
+  browser_profile_or_cookie_auth_for_media_backend: false
+  credential_rotation_requires_backend_contract_change: false
+  voicebridge_bearer_server_side_only: true
+
+consent:
+  youtube_preflight_must_not_call_provider: true
+  youtube_execution_requires_explicit_user_acknowledgement: true
+  consent_payload:
+    provider: google_gemini
+    tier: free
+    data_use_acknowledged: true
+  consent_must_not_be_inferred_from_plugin_installation: true
+  consent_must_not_be_inferred_from_plugin_connection: true
+  consent_must_not_be_inferred_from_prior_unrelated_request: true
+
+retry_idempotency:
+  completed: REUSE
+  processing: REUSE_AND_CONCURRENCY_PROTECT
+  failed_free_only: FRESH_DETERMINISTIC_JOB_ON_NEW_EXPLICIT_RETRY_REQUEST
+  failed_paid_or_charge_uncertain: BLOCK
+  automatic_retry_loop: false
+  transport_retry_must_not_duplicate_execution: true
+  execution_retry_requires_backend_state_check_when_surface_may_replay_calls: true
+
+errors:
+  structured_error_required: true
+  provider_secret_sanitization_required: true
+  internal_header_sanitization_required: true
+  credential_sanitization_required: true
+  raw_voicebridge_authorization_header_exposed: false
+  public_error_must_distinguish:
+    - invalid_request
+    - unsupported_url_or_media
+    - consent_missing
+    - free_quota_or_admission_limit
+    - provider_unavailable
+    - durable_state_unavailable
+    - authentication_or_binding_failure_without_secret_detail
+    - charge_uncertain_replay_blocked
+  media_failure_blocks_core: false
+
+permissions:
+  proven_at_canary_stage:
+    - custom_remote_mcp_available
+    - remote_mcp_connection_available_on_web
+    - private_plugin_connection_available
+    - one_read_only_tool_discovery_and_invocation_pass
+  still_requires_validation_before_execution_binding:
+    - authenticated_remote_mcp_mode
+    - execution_action_support
+    - per_action_confirmation_behavior
+    - cancellation_no_backend_work
+    - replay_duplicate_protection_at_chatgpt_surface
+    - intended_share_publish_permissions
+  minimum_required:
+    - execution_action_capability_for_four_start_operations
+    - read_capability_for_nine_non_execution_operations
+    - no_secret_exposure
+    - explicit_user_consent_boundary_preserved
+  unknown_permission_behavior: FAIL_CLOSED
+
+validation_before_activation:
+  - bind all 13 operations or documented semantic equivalents
+  - run Core regression pack
+  - run MEDIA positive parity regression
+  - run MEDIA negative/boundary regression
+  - verify no paid/unapproved fallback
+  - verify consent behavior
+  - verify retry/idempotency behavior
+  - verify error sanitization
+  - verify intended audience/sharing
+  - verify original public GPT remains available until owner-approved switch
+
+release_boundary:
+  r3a_contract_changes: AUTHORIZED
+  inbound_auth_implementation: DENIED
+  voicebridge_binding_implementation: DENIED
+  live_credentials: DENIED
+  live_mcp_mutation: DENIED
+  plugin_publication: DENIED
+  plugin_sharing: DENIED
+  migration_execution: DENIED
+  render_change: DENIED
+  public_gpt_change: DENIED
+  main_mutation: DENIED
+  pr22_merge: DENIED
+  pr45_merge: DENIED
