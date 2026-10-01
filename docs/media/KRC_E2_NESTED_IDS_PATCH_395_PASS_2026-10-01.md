@@ -1,0 +1,5 @@
+# E2 nested VoiceBridge IDs — test checkpoint
+
+Date: 2026-10-01. Inspected deployed VoiceBridge source `src/cloud/src/server.ts` at SHA `d3873bf13e60c4932ab08cae449c924051be4a37`. Its `sendError` nests `request_id` and `correlation_id` inside `error`, while the earlier diagnostic parser read them from the top-level object. Fixed `voicebridge_http_diagnostics.py` to prefer allowlisted IDs from nested `error` with top-level fallback; retained strict ID validation and no raw body logging. Added regression test for actual nested envelope. Branch commits: `fbce08b0a2a94807e8bafedf199f7a98f41fe9cc`, `e56eccd972744880c5db47cf561f3815be29fb0d`.
+
+On authorized `krc-cobalt`, updated the two files in an isolated temporary repository copy; installed test dependencies remained isolated. `python3 -m pytest -q tests` returned **395 passed in 18.62s, exit 0**. The already deployed E2 was not changed by this patch (autoDeploy off). The previously approved single Instagram live E2E acceptance remains recorded separately; do not infer the cause of earlier intermittent HTTP 429. No additional media provider work, secrets changes, or deployment in this checkpoint.
