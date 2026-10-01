@@ -1,5 +1,7 @@
 # KRC MEDIA — read-only integration checkpoint (2026-10-01)
 
+Контрольна точка незалежної перевірки інтеграції MEDIA у режимі лише читання.
+
 Scope: independent verification following Sentinel Remote infrastructure handoff. No MEDIA processing, paid fallback, container restart, permission change or production configuration change was performed.
 
 ## Confirmed checks
