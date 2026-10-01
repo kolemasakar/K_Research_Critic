@@ -15,6 +15,9 @@ class Tests(unittest.TestCase):
     def test_structured_rate_limit(self):
         e = error({"error": {"code": "RATE_LIMITED", "message": "secret"}, "request_id": "req_123", "correlation_id": "corr-7"}, {"Retry-After": "60"})
         self.assertEqual(safe_http_error_metadata(e), {"retry_after_seconds": 60, "upstream_code": "RATE_LIMITED", "request_id": "req_123", "correlation_id": "corr-7"})
+    def test_nested_voicebridge_ids(self):
+        e = error({"error": {"code": "RATE_LIMITED", "request_id": "req_nested", "correlation_id": "corr_nested", "message": "private"}}, {"Retry-After": "60"})
+        self.assertEqual(safe_http_error_metadata(e), {"retry_after_seconds": 60, "upstream_code": "RATE_LIMITED", "request_id": "req_nested", "correlation_id": "corr_nested"})
     def test_proxy_html(self):
         self.assertEqual(safe_http_error_metadata(error("<html>proxy token secret</html>")), {})
     def test_oversize(self):
