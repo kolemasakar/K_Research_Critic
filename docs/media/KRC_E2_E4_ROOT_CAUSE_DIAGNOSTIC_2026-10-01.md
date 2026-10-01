@@ -20,3 +20,8 @@
 - Run **one** read-only capability/preflight request after confirmed warmup and correlate timestamps/logs; do not retry rapidly.
 - Validate actual execution in an isolated reviewed configuration with paid fallback disabled and appropriate public media containing speech, recording job ID, terminal status, segments and repeat read.
 - Never interpret probe PASS as real provider E2E PASS. No production configuration or provider execution was performed in this diagnostic.
+
+## Warmed read-only retest — actual results
+- After canonical VoiceBridge health HTTP 200, direct R3C `media_get_capabilities` **PASS**; request ID `336713a6-fad0-4214-8df9-4745088a1cee`; `automatic_paid_fallback:false`, `durable_store:postgres`, all four platforms configured.
+- E2 Instagram preflight of `https://www.instagram.com/reel/Dcea3BiPTBm/` **PASS**; request ID `e691e838-918b-464a-9b67-4faffcd87bb5`, `can_continue:true`, `consent_required:false`, `provider:cobalt`, `stt_provider:assemblyai`, estimated retrieval credits 0.
+- These observations **strengthen cold-start correlation** for transient 429, but do not establish its precise origin or permanently fix it. E2/E3/E4 `confirmation_probe_only:true` remains the independently confirmed real-processing blocker.
