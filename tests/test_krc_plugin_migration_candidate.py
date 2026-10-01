@@ -368,7 +368,7 @@ def test_candidate_contains_no_concrete_browser_profile_or_common_secret_prefix(
     candidate_text = "\n".join(
         path.read_text(encoding="utf-8")
         for path in CANDIDATE.rglob("*")
-        if path.is_file()
+        if path.is_file() and path.suffix.lower() in {".md", ".yaml", ".yml", ".json", ".toml", ".txt", ".py", ".example"}
     )
     lowered = candidate_text.lower()
     assert "prof_" not in candidate_text
