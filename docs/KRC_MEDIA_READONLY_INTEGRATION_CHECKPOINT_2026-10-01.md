@@ -52,3 +52,9 @@ Current gate: transcript available for claim extraction and source-based fact-ch
 - Prior primary-source detailed fact-check of #2, #3, #4, #5, #10, #32 remains in `docs/media/KRC_VIDEO_42_FACTCHECK_PHASE1_2026-10-01.md`.
 - Safety review flagged #10 (FDA bean preparation), #18–21 (do not replace internal temperature or validated doneness with universal cooking minutes), #32 (properly stored pasteurized milk only), #35 and #39 (time/temperature storage of perishable foods).
 - Remaining evidence gap: independent primary-study verification of embedded numbers and experimental conditions in the other headings. Do not mark the complete video as fully scientifically verified.
+
+## Research closure (2026-10-01)
+- Consolidated evidence traceability for **all 42 headings** in `docs/media/KRC_VIDEO_42_EVIDENCE_CLOSURE_2026-10-01.md` (commit `b50d911080e833c5e0fdea5c2e3b71256ea0fd1d`).
+- 42/42 headings screened and important subclaims triaged; original study conditions, official safety guidance, culinary preferences, and unsupported absolutes separated. **This does not mean all subordinate numeric statements are verified.**
+- Primary safety flags: red kidney bean boiling, internal temperature for chicken liver, seafood time/appearance caveats, proper storage of milk and leftovers.
+- No additional provider starts, credits, production changes or public publishing performed.
