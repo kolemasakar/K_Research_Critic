@@ -45,3 +45,10 @@ Verdict: **Direct read-only MCP ↔ VoiceBridge PASS; owner-reported private Plu
 - This run demonstrates retrieval/transcription and repeat read for this video. It does not prove the scientific correctness of claims in the video or all providers' general reliability.
 
 Current gate: transcript available for claim extraction and source-based fact-check; investigate the 10-character accounting discrepancy separately.
+
+## All-42 heading screening completed (2026-10-01)
+- New report: `docs/media/KRC_VIDEO_42_FULL_SCREENING_2026-10-01.md` (commit `f44f91fa14924c265f2e8bb8ef5e96a9520ae73f`).
+- All 42 explicitly numbered headings in the fresh transcript were screened. Statuses distinguish substantiated core, qualified/partial, recipe preference, overgeneralization, and the author's non-testable synthesis. **This is not verification of every embedded numerical or mechanistic subclaim.**
+- Prior primary-source detailed fact-check of #2, #3, #4, #5, #10, #32 remains in `docs/media/KRC_VIDEO_42_FACTCHECK_PHASE1_2026-10-01.md`.
+- Safety review flagged #10 (FDA bean preparation), #18–21 (do not replace internal temperature or validated doneness with universal cooking minutes), #32 (properly stored pasteurized milk only), #35 and #39 (time/temperature storage of perishable foods).
+- Remaining evidence gap: independent primary-study verification of embedded numbers and experimental conditions in the other headings. Do not mark the complete video as fully scientifically verified.
