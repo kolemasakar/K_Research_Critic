@@ -15,3 +15,7 @@ IP-keyed limiter may group Render proxy traffic and E2 requests into one bucket.
 
 ## Status
 429 root cause: plausible, unconfirmed. Instagram current E2E: inconclusive. Existing E2 probe-only: verified. Isolated extra E2: pending owner-approved deletion after verification.
+
+## Later status update (2026-10-01; historical observations above retained)
+
+The earlier `Instagram current E2E: inconclusive` statement is now superseded. A single owner-approved real Instagram E2E job `KRCM_0074486f-4021-4bdc-a6c4-76d6625a4003` COMPLETED with Cobalt + AssemblyAI, zero reported credits, and independently verified status/one segment. Probe-only was restored. Nested VoiceBridge request/correlation ID diagnostic fix subsequently passed 395/395 isolated tests and was deployed to existing E2 as commit `3bebed84b56b3457bc064c24ce25fc7224baebfb`; Render deployment `dep-davau48u01pc73e2fr50` LIVE. Post-deploy read-only preflight and confirmation-probe safety checks PASS. Intermittent HTTP 429 root cause remains unproven. For consolidated current status and owner decisions, see `docs/media/KRC_MEDIA_OWNER_CANONICAL_CHECKPOINT_2026-10-01.md`.
