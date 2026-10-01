@@ -17,3 +17,11 @@ Do not substitute raw `X-Forwarded-For` for the TCP peer without verifying trust
 ## Next gate
 
 Obtain successful isolated unit-test output and review privacy/threat model; only then consider a separately owner-approved, minimal VoiceBridge diagnostic design. Existing E2 stays probe-only and FREE_ONLY.
+
+## Subsequent isolated validation and privacy review
+
+An independent local isolated Python pytest run using the checked-in prototype logic and its 12 parameter-expanded test cases completed **12 passed in 0.06s**. This supersedes the earlier blocked remote execution for these isolated tests only. The blocked `krc-cobalt` attempt remains historical fact; no authorized remote test or VoiceBridge integration has been performed.
+
+Privacy/security review: the code does not return raw peer IP or header content, uses an HMAC with a caller-supplied key of >=32 bytes, and treats forwarded headers as untrusted classification only. A stable tag still links observations within the same key period; if the ephemeral key leaks, low-entropy IP candidates may be tested offline. Operational integration must ensure fresh cryptographically random keys, no key/raw-IP logging, strict log access and retention, and explicit proxy trust-boundary review. The module currently has no runtime wiring and cannot establish the cause of earlier 429 responses. Full repository regression suite not rerun in this isolated test.
+
+Decision: **isolated unit gate PASS; privacy review CONDITIONAL; production integration NOT APPROVED**.
