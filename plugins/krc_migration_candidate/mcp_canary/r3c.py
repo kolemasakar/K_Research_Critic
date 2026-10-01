@@ -9,6 +9,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode, urlsplit
 from urllib.request import Request, urlopen
 
+from .voicebridge_http_diagnostics import safe_http_error_metadata
 from .server import LEGACY_PROTOCOL_VERSION, MCP_PROTOCOL_VERSION, SERVER_NAME
 
 R3C_SURFACE = "r3c_readonly"
@@ -170,11 +171,12 @@ class VoiceBridgeBinding:
 
 
 class VoiceBridgeError(RuntimeError):
-    def __init__(self, code: str, *, http_status: int | None = None, retryable: bool = False) -> None:
+    def __init__(self, code: str, *, http_status: int | None = None, retryable: bool = False, diagnostics: dict[str, object] | None = None) -> None:
         super().__init__(code)
         self.code = code
         self.http_status = http_status
         self.retryable = retryable
+        self.diagnostics = diagnostics or {}
 
 
 def tool_descriptors() -> list[dict[str, object]]:
@@ -301,6 +303,7 @@ def call_voicebridge(
             "voicebridge_http_error",
             http_status=status,
             retryable=status in {429, 502, 503, 504},
+            diagnostics=safe_http_error_metadata(exc),
         ) from None
     except (URLError, TimeoutError, OSError):
         raise VoiceBridgeError("voicebridge_unavailable", retryable=True) from None
@@ -354,6 +357,7 @@ def _sanitized_backend_error(error: VoiceBridgeError) -> dict[str, object]:
     detail: dict[str, object] = {"code": error.code, "retryable": error.retryable}
     if error.http_status is not None:
         detail["http_status"] = error.http_status
+    detail.update(error.diagnostics)
     return {"status": "error", "error": detail}
 
 
