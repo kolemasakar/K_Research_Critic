@@ -26,7 +26,7 @@ Scope: independent verification following Sentinel Remote infrastructure handoff
 - Owner supplied the full structured result of executing **only** `media_get_capabilities` from the private Plugin through `KRC MCP R3C Readonly`.
 - Result: SUCCESS, read-only; request_id `8315a39e-d4ca-42b3-8ae3-5e6ffadb9388`; no error, no provider work, no other MEDIA tools.
 - Reported capabilities match the direct R3C result: four platforms, PostgreSQL, YouTube Gemini Free Tier with consent, and disabled paid fallback.
-- This confirms the **Plugin UI → R3C capabilities** route at the time of the reported test. It does not demonstrate transcription/provider success or identify the root cause of earlier HTTP 429.
+- This confirms the **Plugin UI -> R3C capabilities** route at the time of the reported test. It does not demonstrate transcription/provider success or identify the root cause of earlier HTTP 429.
 
 ## Remaining limitations and next diagnostic gate
 
@@ -34,14 +34,14 @@ Scope: independent verification following Sentinel Remote infrastructure handoff
 2. Docker healthcheck and resource limits remain separate non-blocking infrastructure decisions; Tier-1 status alone does not prove long-term resilience.
 3. Full end-to-end MEDIA processing and transcript durability remain untested in this checkpoint. Require separate owner consent before new YouTube provider work; keep paid fallback disabled.
 
-Verdict: **Direct read-only MCP ↔ VoiceBridge PASS; owner-reported private Plugin → MEDIA read-only capabilities PASS; end-to-end MEDIA processing NOT VERIFIED.**
+Verdict: **Direct read-only MCP <-> VoiceBridge PASS; owner-reported private Plugin -> MEDIA read-only capabilities PASS; end-to-end MEDIA processing NOT VERIFIED.**
 
 ## Fresh end-to-end YouTube run (owner consent; 2026-10-01)
 
 - Owner explicitly acknowledged Google Gemini Free Tier data-use notice for a fresh run of `https://www.youtube.com/watch?v=bu_DYQAKnuQ`.
 - Initial start returned transient `voicebridge_unavailable`; read-only lookup found a newly created PROCESSING job. No duplicate start was attempted.
 - New job `KRCM_9d4c8eb0-2f09-432e-bc86-1c330cc3a5d6` subsequently COMPLETED: 30 segments, server-reported `transcript_characters=47393`, credits charged 0, no provider error.
-- Read-only segment pagination returned all 30 segments, indices 0–29, `next_cursor=null`, and repeat status/segment read confirmed durable retrieval. Segment text lengths sum to **47383 JS UTF-16 code units**, 10 fewer than server-reported 47393. This discrepancy is **unresolved**; do not claim exact character-count match. No timestamps were supplied.
+- Read-only segment pagination returned all 30 segments, indices 0-29, `next_cursor=null`, and repeat status/segment read confirmed durable retrieval. Segment text lengths sum to **47383 JS UTF-16 code units**, 10 fewer than server-reported 47393. This discrepancy is **unresolved**; do not claim exact character-count match. No timestamps were supplied.
 - Full original returned segment text archived without rewriting in `docs/media/KRC_VIDEO_TRANSCRIPT_42_FRESH_2026-10-01.md` (commit `40d85b6366e901f20c47735172c29dbe73d780d0`).
 - This run demonstrates retrieval/transcription and repeat read for this video. It does not prove the scientific correctness of claims in the video or all providers' general reliability.
 
@@ -51,7 +51,7 @@ Current gate: transcript available for claim extraction and source-based fact-ch
 - New report: `docs/media/KRC_VIDEO_42_FULL_SCREENING_2026-10-01.md` (commit `f44f91fa14924c265f2e8bb8ef5e96a9520ae73f`).
 - All 42 explicitly numbered headings in the fresh transcript were screened. Statuses distinguish substantiated core, qualified/partial, recipe preference, overgeneralization, and the author's non-testable synthesis. **This is not verification of every embedded numerical or mechanistic subclaim.**
 - Prior primary-source detailed fact-check of #2, #3, #4, #5, #10, #32 remains in `docs/media/KRC_VIDEO_42_FACTCHECK_PHASE1_2026-10-01.md`.
-- Safety review flagged #10 (FDA bean preparation), #18–21 (do not replace internal temperature or validated doneness with universal cooking minutes), #32 (properly stored pasteurized milk only), #35 and #39 (time/temperature storage of perishable foods).
+- Safety review flagged #10 (FDA bean preparation), #18-21 (do not replace internal temperature or validated doneness with universal cooking minutes), #32 (properly stored pasteurized milk only), #35 and #39 (time/temperature storage of perishable foods).
 - Remaining evidence gap: independent primary-study verification of embedded numbers and experimental conditions in the other headings. Do not mark the complete video as fully scientifically verified.
 
 ## Research closure (2026-10-01)
