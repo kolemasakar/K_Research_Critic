@@ -17,3 +17,7 @@ Date: 2026-10-01. Follow-up read-only audit; no provider starts, production muta
 - On a naturally recurring 429, capture only allowlisted diagnostics and inspect available app/request logs for the same window. Avoid synthetic load, extra media jobs, secrets disclosure or speculative production limiter changes.
 
 Owner boundaries: FREE_ONLY, probe-only on existing E2, defer Neon credential rotation pending separate owner approval. This document supplements `KRC_MEDIA_OWNER_CANONICAL_CHECKPOINT_2026-10-01.md`.
+
+## Owner-supplied Render environment evidence (2026-10-01)
+
+Owner supplied a cropped Render screenshot showing exactly `RATE_LIMIT_REQUESTS_PER_MINUTE = 60` for VoiceBridge. Combined with the inspected deployed source (`min(configuredRateLimit, 60)` in public MEDIA mode), the effective configured public-mode limit is **60 requests per minute**, assuming the screenshot reflects the active deployed service environment. This resolves the previous unknown configured value; no credential or other environment variable was disclosed or modified. It does **not** establish that the earlier intermittent 429 was caused by exhausting this limit, nor establish whether a reverse proxy causes different callers to share a `remoteAddress` key. Retain evidence-based diagnosis and avoid synthetic load.
