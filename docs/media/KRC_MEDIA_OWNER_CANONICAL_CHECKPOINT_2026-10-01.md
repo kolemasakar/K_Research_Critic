@@ -36,3 +36,7 @@
 4. Resolve separately whether to rotate the previously exposed Neon credential and whether to delete unused isolated E2; neither is implicitly approved here.
 
 Checkpoint status: **Instagram E2E PASS once; latest E2 diagnostic deploy LIVE; read-only preflight and probe safety PASS; HTTP 429 root cause OPEN**.
+
+## Later owner-provided runtime setting
+
+Owner-supplied cropped Render screenshot confirms VoiceBridge `RATE_LIMIT_REQUESTS_PER_MINUTE=60`. With the inspected public-mode code ceiling of 60, the effective configured public-mode limit is 60 requests/minute, assuming the screenshot reflects the active deployment. The cause of intermittent 429, including whether shared proxy IP aggregation is involved, remains unproven. Supporting audit: `docs/media/KRC_VOICEBRIDGE_RATE_LIMIT_RUNTIME_EVIDENCE_GATE_2026-10-01.md`.
