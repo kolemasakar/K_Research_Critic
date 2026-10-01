@@ -8,7 +8,7 @@ Scope: independent verification following Sentinel Remote infrastructure handoff
 - Independent Desktop Commander connection to krc-cobalt: online.
 - Direct R3C read-only `media_get_capabilities`: PASS; request_id `4d18b601-82b7-42c2-933c-fdf669422577`. Earlier direct calls returned HTTP 429; this result demonstrates recovery at the time of this call, **not a proven root cause or permanent fix**.
 - From krc-cobalt: VoiceBridge public `/api/v1/health` HTTP 200; local Cobalt `http://127.0.0.1:9000/` HTTP 200.
-- Private Plugin release inspected read-only: `0.19.7+portable.20260925`; .app.json still maps five apps (R3C, YouTube, Instagram, Facebook, Telegram). **Direct MCP tool success is not proof of successful invocation through the Plugin user interface**.
+- Private Plugin release inspected read-only: `0.19.7+portable.20260925`; .app.json still maps five apps (R3C, YouTube, Instagram, Facebook, Telegram). A subsequent user-provided result from the private Plugin UI independently reports successful invocation; see the Plugin UI verification below.
 
 ## MEDIA capability result (direct R3C)
 
@@ -20,11 +20,17 @@ Scope: independent verification following Sentinel Remote infrastructure handoff
 - automatic_paid_fallback, paid_retrieval_fallback and paid_stt_fallback all `false`.
 - These are configuration reports; no live provider transcription/retrieval was initiated or validated.
 
+## Private Plugin UI verification (owner-supplied execution result)
+
+- Owner supplied the full structured result of executing **only** `media_get_capabilities` from the private Plugin through `KRC MCP R3C Readonly`.
+- Result: SUCCESS, read-only; request_id `8315a39e-d4ca-42b3-8ae3-5e6ffadb9388`; no error, no provider work, no other MEDIA tools.
+- Reported capabilities match the direct R3C result: four platforms, PostgreSQL, YouTube Gemini Free Tier with consent, and disabled paid fallback.
+- This confirms the **Plugin UI → R3C capabilities** route at the time of the reported test. It does not demonstrate transcription/provider success or identify the root cause of earlier HTTP 429.
+
 ## Remaining limitations and next diagnostic gate
 
-1. Repeat `media_get_capabilities` from **inside the private Plugin UI**, rather than only through the direct R3C connector. Record outcome, timestamp, HTTP status and any safe request/correlation IDs.
-2. If HTTP 429 recurs, correlate MCP gateway response headers/body and VoiceBridge request logs before attributing it to backend, proxy, authentication or rate limiting. Do not log bearer tokens or secret values.
-3. Docker healthcheck and resource limits remain separate non-blocking infrastructure decisions; Tier-1 status alone does not prove long-term resilience.
-4. Full end-to-end MEDIA processing and transcript durability remain untested in this checkpoint. Require separate owner consent before new YouTube provider work; keep paid fallback disabled.
+1. If HTTP 429 recurs, correlate MCP gateway response headers/body and VoiceBridge request logs before attributing it to backend, proxy, authentication or rate limiting. Do not log bearer tokens or secret values.
+2. Docker healthcheck and resource limits remain separate non-blocking infrastructure decisions; Tier-1 status alone does not prove long-term resilience.
+3. Full end-to-end MEDIA processing and transcript durability remain untested in this checkpoint. Require separate owner consent before new YouTube provider work; keep paid fallback disabled.
 
-Verdict: **Direct read-only MCP ↔ VoiceBridge PASS at check time; private Plugin → MEDIA UI integration NOT YET VERIFIED; end-to-end MEDIA NOT VERIFIED.**
+Verdict: **Direct read-only MCP ↔ VoiceBridge PASS; owner-reported private Plugin → MEDIA read-only capabilities PASS; end-to-end MEDIA processing NOT VERIFIED.**
