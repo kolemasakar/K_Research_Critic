@@ -138,8 +138,10 @@ def validate_repository(root: Path) -> RepositoryValidationSummary:
         _require(_is_ascii(relative), f"tracked filename must be ASCII: {relative}")
         upper_name = path.name.upper()
         if path.suffix == ".md":
+            # Reject revision markers only at the end of the stem, not descriptive
+            # words such as NEW_CHAT within an otherwise stable document name.
             _require(
-                not any(marker in upper_name for marker in _FORBIDDEN_STABLE_SUFFIXES),
+                not any(upper_name.removesuffix(".MD").endswith(marker) for marker in _FORBIDDEN_STABLE_SUFFIXES),
                 f"ambiguous documentation revision suffix: {relative}",
             )
 
