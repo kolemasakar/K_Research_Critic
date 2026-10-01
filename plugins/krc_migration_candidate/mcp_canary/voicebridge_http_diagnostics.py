@@ -28,7 +28,9 @@ def safe_http_error_metadata(exc: HTTPError) -> dict[str, object]:
     if isinstance(code, str) and code in ALLOWED_CODES:
         result["upstream_code"] = code
     for field in ("request_id", "correlation_id"):
-        value = parsed.get(field)
+        value = error.get(field)
+        if value is None:
+            value = parsed.get(field)
         if isinstance(value, str) and re.fullmatch(r"[A-Za-z0-9_-]{1,80}", value):
             result[field] = value
     return result
