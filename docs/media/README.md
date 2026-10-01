@@ -8,6 +8,7 @@ Current owner-approved status and decisions: [canonical October 1 checkpoint](KR
 - [Follow-up source and Render log audit (cause still unverified)](KRC_E2_429_READONLY_CODE_LOG_AUDIT_2026-10-01.md)
 - [Runtime limit verification gate and Render log capabilities](KRC_VOICEBRIDGE_RATE_LIMIT_RUNTIME_EVIDENCE_GATE_2026-10-01.md)
 - [Proxy IP limiter source audit and safe design decision](KRC_VOICEBRIDGE_PROXY_IP_RATE_LIMIT_DESIGN_REVIEW_2026-10-01.md)
+- [VoiceBridge privacy-bounded peer diagnostics integration design and regression gate](KRC_VOICEBRIDGE_PEER_DIAGNOSTIC_INTEGRATION_DESIGN_2026-10-01.md)
 - [Original diagnostics implementation gate](KRC_E2_429_DIAGNOSTIC_IMPLEMENTATION_GATE_2026-10-01.md)
 - [Isolated 394-test checkpoint](KRC_E2_429_FULL_SUITE_394_PASS_2026-10-01.md)
 - [First deployed diagnostics read-only acceptance](KRC_E2_429_DEPLOYED_READONLY_PREFLIGHT_PASS_2026-10-01.md)
