@@ -67,3 +67,19 @@ Sources: https://pubmed.ncbi.nlm.nih.gov/18950181/ ; https://pubmed.ncbi.nlm.nih
 - Verify remaining 39 headings, plus each embedded quantitative/mechanistic subclaim; heading count does not equal count of independently checkable statements.
 - Check original references behind numerical claims rather than using culinary commentary as proof.
 - Preserve safety-first corrections and distinguish laboratory/in-vitro results from clinical outcomes.
+
+## Phase 2: #3 carrots, #4 tomatoes, #5 garlic (2026-10-01)
+
+### #3 Carrots — SUPPORTED WITH QUALIFICATIONS
+Human ileostomy study: 65.1 ± 7.4% β-carotene absorbed from cooked puréed carrots vs 41.4 ± 7.4% from raw chopped carrots. Another small human stable-isotope study estimates 75% stir-fried vs 11% raw relative to pure β-carotene under its own methodology: figures must not be pooled across studies. An **in vitro** digestion study found 52% micellarization cooked vs 29% raw and up to 80% with 10% olive oil; this is NOT 80% absorption in humans. Thus processing and fat affect carotenoid availability, but no universally necessary fixed 3–5 g fat threshold is established by these sources.
+Primary sources: https://pubmed.ncbi.nlm.nih.gov/14673607/ ; https://pubmed.ncbi.nlm.nih.gov/21923982/ ; https://doi.org/10.1016/j.ifset.2007.03.014
+
+### #4 Tomatoes — PARTIALLY SUPPORTED (overbroad overall-health conclusion)
+Cornell study: heating at 88 °C for 30 min increased measured trans-lycopene from 2.01 to 5.32 mg/g (approximately +164%) and decreased vitamin C from 0.76 to 0.54 µmol/g (approximately −29%). These are compositional and laboratory antioxidant findings, not clinical evidence that cooked tomatoes are categorically healthier or prevent disease.
+Primary source: https://pubmed.ncbi.nlm.nih.gov/11982434/
+
+### #5 Garlic — PARTIALLY SUPPORTED (animal experimental evidence)
+Rat mammary tissue experiments: microwave heating for 30 s reduced alliinase activity ~90%; heating for 60 s reduced the measured protection against DMBA-induced DNA adducts; allowing crushed garlic to stand 10 min before 60 s microwave heating significantly restored the experimental effect. These results do not establish prevention of human disease, universal retention of all beneficial compounds, or an exact optimal 10-min duration for every preparation.
+Primary sources: https://pubmed.ncbi.nlm.nih.gov/10082770/ ; https://pubmed.ncbi.nlm.nih.gov/11238815/
+
+Progress: six primary numbered headings reviewed (#2, #3, #4, #5, #10, #32); 36 headings remain. Embedded subclaims require separate verification.
