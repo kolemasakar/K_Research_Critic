@@ -28,3 +28,24 @@
 ## Повний сценарій плагіна
 Модульні перевірки Core, профілю, шлюзу погодження, критики й звітності входять до449PASS. Це не є реальним незалежним дослідженням з конкретного відео.
 Живий сценарій «транскрипт → незалежне дослідження → критика → звіт» потребує визначеної теми і погодженого CriticProfile. Правило чинного плагіна: «No independent research before CriticProfile approval». Жодної згоди на профіль не вигадано, дослідження не запускалося.
+
+## Фактично встановлено
+
+Продуктивний KRCcommitaed47ff049849e2f033efe289e9edf1a3f5ddd7a; R3CтаE1–E4live. Усі5healthHTTP200/statusok. E2/E3/E4confirmation_probe_only=false. FREE_ONLYі всіpaidfallbackfalse підтвердженоcapabilities9009c81a-d869-4d60-b2fb-c49956ae69de.
+- srv-dale3r942hec73c5t9hg: dep-db1a3did0e5s73eqfat0,live 2026-10-04T18:58:35.02595Z.
+- srv-dall4qv40ujc73ednpqg: dep-db1a3dqd0e5s73eqfdeg,live 2026-10-04T18:58:42.236582Z.
+- srv-dan7vsijnfac73fmrtl0: dep-db1a3efavr4c73avgjn0,live 2026-10-04T18:58:42.302791Z.
+- srv-danerqmgekts738oejsg: dep-db1a3enavr4c73avgl5g,live 2026-10-04T18:58:38.55011Z.
+- srv-danertv40ujc73bn9hog: dep-db1a3f2d0e5s73eqfihg,live 2026-10-04T18:58:39.958906Z.
+
+Реальне B2:9/9операцій R3C PASS(можливості+8нижче), безпровайдерних запусків:
+- youtube_preflight:request84ecb947-1de9-4ef0-92f6-a34370708f64,PASS.
+- youtube_lookup:request09190746-4897-4ceb-94d5-5a6f3afd90f6,PASS.
+- instagram_preflight:request32fc6cc4-0a47-4f4f-9cca-7581a5528ad5,PASS.
+- instagram_lookup:requestb0c0a829-2fed-4ac3-adeb-2e95b3cc4698,PASS.
+- youtube_status:request02f96c66-1ffb-4b99-9179-9aac98d7b614,PASS.
+- non_youtube_status:request78deb6a6-4c0b-42b6-944e-d3104cfa24d4,PASS.
+- youtube_segments:request5b395f6c-fa5c-4a5d-bfef-333c3a582b2f,PASS.
+- non_youtube_segments:request340188c2-5932-4b6c-bbb8-d209a3bcced3,PASS.
+
+Попередні4/4платформні транскрипти залишаються підтвердженим прийманням на тестових URL. Стабільність на тривалому простої ще не доведено. Інженерні й Coreперевірки автоматизовано; фактичний незалежний дослідний сценарій залишається за погодженим профілем. Нових provider starts/витрат STT у цьому етапі немає. Код і документацію синхронізовано;mainне змінено.
