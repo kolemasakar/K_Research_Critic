@@ -9,7 +9,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode, urlsplit
 from urllib.request import Request, urlopen
 
-from .voicebridge_http_diagnostics import safe_http_error_metadata
+from .voicebridge_http_diagnostics import safe_http_error_metadata, safe_error_diagnostics
 from .server import LEGACY_PROTOCOL_VERSION, MCP_PROTOCOL_VERSION, SERVER_NAME
 
 R3C_SURFACE = "r3c_readonly"
@@ -357,7 +357,7 @@ def _sanitized_backend_error(error: VoiceBridgeError) -> dict[str, object]:
     detail: dict[str, object] = {"code": error.code, "retryable": error.retryable}
     if error.http_status is not None:
         detail["http_status"] = error.http_status
-    detail.update(error.diagnostics)
+    detail.update(safe_error_diagnostics(error.diagnostics))
     return {"status": "error", "error": detail}
 
 

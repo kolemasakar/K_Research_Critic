@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from .voicebridge_http_diagnostics import safe_error_diagnostics
+
 import json
 from copy import deepcopy
 from typing import Any, Callable, Mapping
@@ -139,6 +141,7 @@ def _sanitized_backend_error(error: VoiceBridgeError) -> dict[str, object]:
     detail: dict[str, object] = {"code": error.code, "retryable": error.retryable}
     if error.http_status is not None:
         detail["http_status"] = error.http_status
+    detail.update(safe_error_diagnostics(error.diagnostics))
     return {"status": "error", "error": detail}
 
 
