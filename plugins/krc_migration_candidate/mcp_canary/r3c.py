@@ -292,6 +292,20 @@ def call_voicebridge(
     if payload is not None:
         data = json.dumps(dict(payload), separators=(",", ":")).encode("utf-8")
         headers["Content-Type"] = "application/json"
+    # Runs after tool confirmation, immediately before the single consequential POST.
+    # Readiness failure never sends or retries provider work.
+    if method == "POST" and path in {
+        "/api/v1/media/managed/transcriptions",
+        "/api/v1/media/youtube-gemini/transcriptions",
+    }:
+        readiness = Request(base + "/api/v1/health", headers={"Accept": "application/json"}, method="GET")
+        try:
+            with urlopen(readiness, timeout=binding.timeout_seconds) as response:
+                health = json.loads(response.read(65536).decode("utf-8"))
+                if int(response.status) != 200 or not isinstance(health, dict) or health.get("status") != "ok":
+                    raise VoiceBridgeError("voicebridge_not_ready", retryable=True)
+        except (HTTPError, URLError, TimeoutError, OSError, UnicodeDecodeError, json.JSONDecodeError):
+            raise VoiceBridgeError("voicebridge_not_ready", retryable=True) from None
     request = Request(url, data=data, headers=headers, method=method)
     try:
         with urlopen(request, timeout=binding.timeout_seconds) as response:
