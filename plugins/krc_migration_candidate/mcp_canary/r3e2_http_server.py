@@ -148,7 +148,11 @@ def _cold_start_resilient_backend(
     query: Mapping[str, object],
 ) -> dict[str, object]:
     if method == "POST" and path == "/api/v1/media/managed/transcriptions":
-        _warm_voicebridge(binding)
+        try:
+            _warm_voicebridge(binding)
+        except VoiceBridgeError as exc:
+            exc.diagnostics.update({"failure_stage": "warmup", "consequential_post_attempted": False})
+            raise
     return call_voicebridge(binding, method, path, payload, query)
 
 
