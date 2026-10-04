@@ -267,7 +267,7 @@ def _normalized_call(name: str, arguments: Mapping[str, object]) -> tuple[str, s
     raise ValueError("unknown_tool")
 
 
-def call_voicebridge(
+def _call_voicebridge_once(
     binding: VoiceBridgeBinding,
     method: str,
     path: str,
@@ -341,6 +341,50 @@ def call_voicebridge(
     if not isinstance(decoded, dict):
         raise VoiceBridgeError("voicebridge_invalid_response")
     return decoded
+
+
+def _is_readonly_route(method: str, path: str) -> bool:
+    for allowed_method, template in _TOOL_ROUTES.values():
+        if method != allowed_method:
+            continue
+        if "{job_id}" not in template and path == template:
+            return True
+        if "{job_id}" in template:
+            before, after = template.split("{job_id}")
+            if path.startswith(before) and path.endswith(after):
+                value = path[len(before):len(path) - len(after) if after else None]
+                if _JOB_ID_RE.fullmatch(value):
+                    return True
+    return False
+
+
+def call_voicebridge(
+    binding: VoiceBridgeBinding,
+    method: str,
+    path: str,
+    payload: Mapping[str, object] | None,
+    query: Mapping[str, object],
+) -> dict[str, object]:
+    try:
+        return _call_voicebridge_once(binding, method, path, payload, query)
+    except VoiceBridgeError as original:
+        # Only declared readonly routes can be replayed, once. Never execution.
+        transient = original.http_status in {429, 502, 503, 504} or original.code == "voicebridge_unavailable"
+        if not _is_readonly_route(method, path) or not transient:
+            raise
+        if not binding.base_url:
+            raise
+        health_request = Request(binding.base_url.rstrip("/") + "/api/v1/health",
+                                 headers={"Accept": "application/json"}, method="GET")
+        try:
+            with urlopen(health_request, timeout=binding.timeout_seconds) as response:
+                health = json.loads(response.read(65536).decode("utf-8"))
+                ready = int(response.status) == 200 and isinstance(health, dict) and health.get("status") == "ok"
+        except (HTTPError, URLError, TimeoutError, OSError, UnicodeDecodeError, json.JSONDecodeError):
+            ready = False
+        if not ready:
+            raise original from None
+    return _call_voicebridge_once(binding, method, path, payload, query)
 
 
 def _response(request_id: object, result: object) -> dict[str, object]:
