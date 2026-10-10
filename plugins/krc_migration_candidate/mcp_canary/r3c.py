@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 from copy import deepcopy
 from dataclasses import dataclass
@@ -373,6 +374,7 @@ def _wait_for_voicebridge_health(binding: VoiceBridgeBinding) -> tuple[bool, int
         return False, 0
     deadline = monotonic() + _READONLY_HEALTH_BUDGET_SECONDS
     attempts = 0
+    first_http_failure_logged = False
     while attempts < _READONLY_HEALTH_ATTEMPTS:
         remaining = deadline - monotonic()
         if remaining <= 0:
@@ -389,6 +391,13 @@ def _wait_for_voicebridge_health(binding: VoiceBridgeBinding) -> tuple[bool, int
             if status != 200 and status not in _TRANSIENT_STATUSES:
                 return False, attempts
         except HTTPError as exc:
+            if not first_http_failure_logged:
+                # Bounded cold-start attribution; no URLs, body, credentials or arbitrary headers.
+                logging.getLogger(__name__).warning(
+                    "voicebridge_readiness_http_error status=%d attempt=%d diagnostics=%s",
+                    int(exc.code), attempts, safe_http_error_metadata(exc),
+                )
+                first_http_failure_logged = True
             if int(exc.code) not in _TRANSIENT_STATUSES:
                 return False, attempts
         except (URLError, TimeoutError, OSError, UnicodeDecodeError, json.JSONDecodeError):
