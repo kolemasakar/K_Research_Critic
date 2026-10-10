@@ -296,6 +296,8 @@ def _call_voicebridge_once(
     is_start = method == "POST" and path in {
         "/api/v1/media/managed/transcriptions",
         "/api/v1/media/youtube-gemini/transcriptions",
+        "/api/v1/media/managed/facebook-fallback",
+        "/api/v1/media/managed/telegram",
     }
     stage_metadata = {"failure_stage": "start", "consequential_post_attempted": True} if is_start else {}
     # Runs after tool confirmation, immediately before the single consequential POST.
@@ -303,6 +305,8 @@ def _call_voicebridge_once(
     if method == "POST" and path in {
         "/api/v1/media/managed/transcriptions",
         "/api/v1/media/youtube-gemini/transcriptions",
+        "/api/v1/media/managed/facebook-fallback",
+        "/api/v1/media/managed/telegram",
     }:
         ready, attempts = _wait_for_voicebridge_health(binding)
         if not ready:
@@ -406,6 +410,30 @@ def call_voicebridge(
     try:
         return _call_voicebridge_once(binding, method, path, payload, query)
     except VoiceBridgeError as original:
+        # A lost start response can hide an already accepted durable job.
+        # Recover via lookup only; never repeat the consequential POST.
+        start_lookup = {
+            "/api/v1/media/youtube-gemini/transcriptions": "/api/v1/media/youtube-gemini/lookup",
+            "/api/v1/media/managed/transcriptions": "/api/v1/media/managed/lookup",
+            "/api/v1/media/managed/facebook-fallback": "/api/v1/media/managed/lookup",
+            "/api/v1/media/managed/telegram": "/api/v1/media/managed/lookup",
+        }.get(path) if method == "POST" else None
+        if (start_lookup and original.code == "voicebridge_unavailable"
+                and original.diagnostics.get("failure_stage") == "start"
+                and original.diagnostics.get("consequential_post_attempted") is True
+                and isinstance(payload, Mapping) and isinstance(payload.get("url"), str)):
+            lookup_payload = {k: payload[k] for k in ("url", "language_hint") if k in payload}
+            try:
+                existing = call_voicebridge(binding, "POST", start_lookup, lookup_payload, {})
+            except VoiceBridgeError:
+                raise original from None
+            if (isinstance(existing.get("status"), str)
+                    and existing["status"] in {"PROCESSING", "COMPLETED"}
+                    and isinstance(existing.get("job_id"), str)
+                    and _JOB_ID_RE.fullmatch(existing["job_id"])
+                    and existing.get("reused") is True):
+                return {**existing, "start_response_recovered": True}
+            raise original from None
         # One replay of declared reads only. Explicit application rate limits
         # and Retry-After are returned to the caller without internal replay.
         transient = original.http_status in _TRANSIENT_STATUSES or original.code == "voicebridge_unavailable"

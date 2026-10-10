@@ -122,6 +122,11 @@ def stack(tmp_path, monkeypatch, request):
                     response = connection.getresponse()
                     raw = response.read()
                     current.transport_requests += 1
+                    if getattr(current, "drop_start_reply", False) and self.command == "POST" and self.path in {"/api/v1/media/managed/transcriptions", "/api/v1/media/youtube-gemini/transcriptions", "/api/v1/media/managed/facebook-fallback", "/api/v1/media/managed/telegram"}:
+                        current.drop_start_reply = False
+                        self.close_connection = True
+                        self.connection.close()
+                        return
                     self.send_response(response.status)
                     for name, value in response.getheaders():
                         if name.lower() not in {"connection", "transfer-encoding", "content-length"}:
@@ -325,3 +330,18 @@ def test_long_multilingual_transcripts_round_trip_all_pages_without_provider_rep
     assert stack.command("counts")["counts"] == before
     assert before["paid"] == 0
     assert sum(before.values()) == (1 if platform == "youtube" else 2)
+
+
+@pytest.mark.parametrize("platform", list(URLS))
+def test_lost_https_start_response_recovers_completed_job_without_second_provider_call(stack, platform):
+    stack.drop_start_reply = True
+    recovered = stack.data(platform, "media_" + platform + "_start", start_arguments(platform))
+    assert recovered["status"] == "COMPLETED"
+    assert recovered["start_response_recovered"] is True
+    assert recovered["reused"] is True
+    counts = stack.command("counts")["counts"]
+    for name, value in counts.items():
+        assert value == counts_for(platform).get(name, 0)
+    status_tool = "media_youtube_status" if platform == "youtube" else "media_non_youtube_status"
+    assert stack.data("read", status_tool, {"job_id":recovered["job_id"]})["status"] == "COMPLETED"
+    assert stack.command("counts")["counts"] == counts

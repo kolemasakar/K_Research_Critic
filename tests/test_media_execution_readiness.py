@@ -14,7 +14,7 @@ class Reply:
 
 BINDING = VoiceBridgeBinding("https://voicebridge.example", "private-token")
 
-@pytest.mark.parametrize("path", ["/api/v1/media/managed/transcriptions", "/api/v1/media/youtube-gemini/transcriptions"])
+@pytest.mark.parametrize("path", ["/api/v1/media/managed/transcriptions", "/api/v1/media/youtube-gemini/transcriptions", "/api/v1/media/managed/facebook-fallback", "/api/v1/media/managed/telegram"])
 def test_ready_checks_then_posts_once(path):
     calls = []
     def send(request, timeout):
@@ -53,7 +53,7 @@ def test_readonly_has_no_extra_call_and_post_failure_is_not_retried():
     assert [c.method for c in calls] == ["GET", "GET", "POST"]
 
 
-@pytest.mark.parametrize("path", ["/api/v1/media/managed/transcriptions", "/api/v1/media/youtube-gemini/transcriptions"])
+@pytest.mark.parametrize("path", ["/api/v1/media/managed/transcriptions", "/api/v1/media/youtube-gemini/transcriptions", "/api/v1/media/managed/facebook-fallback", "/api/v1/media/managed/telegram"])
 def test_delayed_health_never_replays_consequential_post(path):
     calls = []
     def send(request, timeout):

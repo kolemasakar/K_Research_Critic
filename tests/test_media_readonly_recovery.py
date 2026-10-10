@@ -25,7 +25,7 @@ def test_read_recovery_after_health_once(method,path):
     assert health.call_count == 1
     assert health.call_args.args[0].get_header("Authorization") is None
 
-@pytest.mark.parametrize("path",["/api/v1/media/managed/transcriptions","/api/v1/media/youtube-gemini/transcriptions","/api/v1/media/unknown"])
+@pytest.mark.parametrize("path",["/api/v1/media/managed/transcriptions","/api/v1/media/youtube-gemini/transcriptions","/api/v1/media/managed/facebook-fallback","/api/v1/media/managed/telegram","/api/v1/media/unknown"])
 def test_no_execution_replay(path):
     failure=r3c.VoiceBridgeError("voicebridge_http_error",http_status=429,retryable=True)
     with patch.object(r3c,"_call_voicebridge_once",side_effect=failure) as once, patch.object(r3c,"urlopen") as health:
@@ -138,3 +138,37 @@ def test_safe_upstream_format_never_exposes_body(content_type,expected):
     detail = safe_http_error_metadata(exc)
     assert detail == {"upstream_response_format":expected}
     assert r3c._sanitized_backend_error(r3c.VoiceBridgeError("voicebridge_http_error", diagnostics=detail))["error"]["upstream_response_format"] == expected
+
+
+@pytest.mark.parametrize("path,lookup", [("/api/v1/media/youtube-gemini/transcriptions","/api/v1/media/youtube-gemini/lookup"),("/api/v1/media/managed/transcriptions","/api/v1/media/managed/lookup"),("/api/v1/media/managed/facebook-fallback","/api/v1/media/managed/lookup"),("/api/v1/media/managed/telegram","/api/v1/media/managed/lookup")])
+@pytest.mark.parametrize("status", ["PROCESSING", "COMPLETED"])
+def test_lost_start_response_recovers_durable_job_without_execution_replay(path,lookup,status):
+    failure = r3c.VoiceBridgeError("voicebridge_unavailable", diagnostics={"failure_stage":"start","consequential_post_attempted":True})
+    job = {"job_id":"KRCM_existing","status":status,"reused":True}
+    payload = {"url":"https://fixture.invalid/video","language_hint":"uk","gemini_free_consent":{"fixture":"never-forward"}}
+    with patch.object(r3c,"_call_voicebridge_once", side_effect=[failure,job]) as once:
+        result = r3c.call_voicebridge(BINDING,"POST",path,payload,{})
+    assert result["job_id"] == job["job_id"]
+    assert result["start_response_recovered"] is True
+    assert [c.args[2] for c in once.call_args_list] == [path,lookup]
+    assert once.call_args_list[1].args[3] == {"url":payload["url"],"language_hint":"uk"}
+
+
+@pytest.mark.parametrize("lookup_result", [{"status":"FAILED","job_id":"KRCM_old","reused":True},{"status":"PROCESSING","job_id":"invalid","reused":True},{"status":"PROCESSING","job_id":"KRCM_other","reused":False},{"status":[],"job_id":"KRCM_other","reused":True}])
+def test_unsafe_or_failed_lookup_preserves_original_start_error(lookup_result):
+    failure = r3c.VoiceBridgeError("voicebridge_unavailable", diagnostics={"failure_stage":"start","consequential_post_attempted":True})
+    with patch.object(r3c,"_call_voicebridge_once", side_effect=[failure,lookup_result]) as once:
+        with pytest.raises(r3c.VoiceBridgeError) as caught:
+            r3c.call_voicebridge(BINDING,"POST","/api/v1/media/managed/transcriptions",{"url":"https://fixture.invalid"},{})
+    assert caught.value is failure
+    assert once.call_count == 2
+
+
+def test_failed_lookup_does_not_replay_start():
+    failure = r3c.VoiceBridgeError("voicebridge_unavailable", diagnostics={"failure_stage":"start","consequential_post_attempted":True})
+    missing = r3c.VoiceBridgeError("voicebridge_http_error", http_status=404)
+    with patch.object(r3c,"_call_voicebridge_once", side_effect=[failure,missing]) as once:
+        with pytest.raises(r3c.VoiceBridgeError) as caught:
+            r3c.call_voicebridge(BINDING,"POST","/api/v1/media/managed/transcriptions",{"url":"https://fixture.invalid"},{})
+    assert caught.value is failure
+    assert once.call_count == 2
