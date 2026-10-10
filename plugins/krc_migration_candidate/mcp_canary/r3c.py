@@ -4,6 +4,7 @@ import json
 import re
 from copy import deepcopy
 from dataclasses import dataclass
+from time import monotonic, sleep
 from typing import Any, Callable, Mapping
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode, urlsplit
@@ -358,6 +359,45 @@ def _is_readonly_route(method: str, path: str) -> bool:
     return False
 
 
+_READONLY_HEALTH_BUDGET_SECONDS = 45.0
+_READONLY_HEALTH_ATTEMPTS = 24
+_TRANSIENT_STATUSES = frozenset({429, 502, 503, 504})
+_RATE_LIMIT_CODES = frozenset({"RATE_LIMITED", "MEDIA_PUBLIC_FREE_TIER_RATE_LIMIT", "MEDIA_PUBLIC_CONCURRENCY_LIMIT"})
+
+
+def _wait_for_readonly_health(binding: VoiceBridgeBinding) -> tuple[bool, int]:
+    """Bounded, unauthenticated health GETs; no MEDIA or provider execution."""
+    if not binding.base_url:
+        return False, 0
+    deadline = monotonic() + _READONLY_HEALTH_BUDGET_SECONDS
+    attempts = 0
+    while attempts < _READONLY_HEALTH_ATTEMPTS:
+        remaining = deadline - monotonic()
+        if remaining <= 0:
+            break
+        request = Request(binding.base_url.rstrip("/") + "/api/v1/health",
+                          headers={"Accept": "application/json"}, method="GET")
+        attempts += 1
+        try:
+            with urlopen(request, timeout=min(binding.timeout_seconds, 5.0, remaining)) as response:
+                status = int(response.status)
+                health = json.loads(response.read(65536).decode("utf-8"))
+            if status == 200 and isinstance(health, dict) and health.get("status") == "ok":
+                return True, attempts
+            if status != 200 and status not in _TRANSIENT_STATUSES:
+                return False, attempts
+        except HTTPError as exc:
+            if int(exc.code) not in _TRANSIENT_STATUSES:
+                return False, attempts
+        except (URLError, TimeoutError, OSError, UnicodeDecodeError, json.JSONDecodeError):
+            pass
+        remaining = deadline - monotonic()
+        if remaining <= 0 or attempts >= _READONLY_HEALTH_ATTEMPTS:
+            break
+        sleep(min(2.0, remaining))
+    return False, attempts
+
+
 def call_voicebridge(
     binding: VoiceBridgeBinding,
     method: str,
@@ -368,23 +408,22 @@ def call_voicebridge(
     try:
         return _call_voicebridge_once(binding, method, path, payload, query)
     except VoiceBridgeError as original:
-        # Only declared readonly routes can be replayed, once. Never execution.
-        transient = original.http_status in {429, 502, 503, 504} or original.code == "voicebridge_unavailable"
-        if not _is_readonly_route(method, path) or not transient:
+        # One replay of declared reads only. Explicit application rate limits
+        # and Retry-After are returned to the caller without internal replay.
+        transient = original.http_status in _TRANSIENT_STATUSES or original.code == "voicebridge_unavailable"
+        explicit_limit = original.diagnostics.get("upstream_code") in _RATE_LIMIT_CODES or "retry_after_seconds" in original.diagnostics
+        if not _is_readonly_route(method, path) or not transient or explicit_limit:
             raise
-        if not binding.base_url:
-            raise
-        health_request = Request(binding.base_url.rstrip("/") + "/api/v1/health",
-                                 headers={"Accept": "application/json"}, method="GET")
-        try:
-            with urlopen(health_request, timeout=binding.timeout_seconds) as response:
-                health = json.loads(response.read(65536).decode("utf-8"))
-                ready = int(response.status) == 200 and isinstance(health, dict) and health.get("status") == "ok"
-        except (HTTPError, URLError, TimeoutError, OSError, UnicodeDecodeError, json.JSONDecodeError):
-            ready = False
+        ready, attempts = _wait_for_readonly_health(binding)
+        recovery = {"readonly_health_ready": ready, "readonly_health_attempts": attempts}
         if not ready:
+            original.diagnostics.update(recovery)
             raise original from None
-    return _call_voicebridge_once(binding, method, path, payload, query)
+    try:
+        return _call_voicebridge_once(binding, method, path, payload, query)
+    except VoiceBridgeError as final:
+        final.diagnostics.update(recovery)
+        raise
 
 
 def _response(request_id: object, result: object) -> dict[str, object]:

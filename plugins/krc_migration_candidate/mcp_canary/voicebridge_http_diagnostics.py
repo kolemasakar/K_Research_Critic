@@ -45,6 +45,11 @@ def safe_error_diagnostics(values: dict[str, object]) -> dict[str, object]:
         if (stage == "start" and attempted) or (stage != "start" and not attempted):
             result["failure_stage"] = stage
             result["consequential_post_attempted"] = attempted
+    ready = values.get("readonly_health_ready")
+    attempts = values.get("readonly_health_attempts")
+    if isinstance(ready, bool) and isinstance(attempts, int) and not isinstance(attempts, bool) and 0 <= attempts <= 24:
+        result["readonly_health_ready"] = ready
+        result["readonly_health_attempts"] = attempts
     retry = values.get("retry_after_seconds")
     if isinstance(retry, int) and not isinstance(retry, bool) and 0 <= retry <= 3600:
         result["retry_after_seconds"] = retry
