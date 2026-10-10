@@ -12,6 +12,20 @@ def safe_http_error_metadata(exc: HTTPError) -> dict[str, object]:
         result["upstream_response_format"] = "json"
     elif "text/html" in content_type:
         result["upstream_response_format"] = "html"
+    # Only known infrastructure header values and bounded, format-checked trace IDs.
+    if exc.headers:
+        server = exc.headers.get("Server", "").strip().lower()
+        if server in {"cloudflare", "render"}:
+            result["upstream_server"] = server
+        render_origin = exc.headers.get("X-Render-Origin-Server", "").strip()
+        if render_origin == "Render":
+            result["render_origin_confirmed"] = True
+        cf_ray = exc.headers.get("CF-Ray", "").strip()
+        if re.fullmatch(r"[a-fA-F0-9]{8,24}-[A-Za-z]{3}", cf_ray):
+            result["edge_cf_ray"] = cf_ray
+        req_id = exc.headers.get("X-Request-Id", "").strip()
+        if re.fullmatch(r"[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}", req_id):
+            result["edge_request_id"] = req_id
     retry_after = exc.headers.get("Retry-After") if exc.headers else None
     if isinstance(retry_after, str) and re.fullmatch(r"[0-9]{1,4}", retry_after.strip()):
         seconds = int(retry_after.strip())
@@ -61,6 +75,17 @@ def safe_error_diagnostics(values: dict[str, object]) -> dict[str, object]:
     if isinstance(ready, bool) and isinstance(attempts, int) and not isinstance(attempts, bool) and 0 <= attempts <= 24:
         result["readonly_health_ready"] = ready
         result["readonly_health_attempts"] = attempts
+    server = values.get("upstream_server")
+    if server in {"cloudflare", "render"}:
+        result["upstream_server"] = server
+    if values.get("render_origin_confirmed") is True:
+        result["render_origin_confirmed"] = True
+    ray = values.get("edge_cf_ray")
+    if isinstance(ray, str) and re.fullmatch(r"[a-fA-F0-9]{8,24}-[A-Za-z]{3}", ray):
+        result["edge_cf_ray"] = ray
+    edge_req = values.get("edge_request_id")
+    if isinstance(edge_req, str) and re.fullmatch(r"[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}", edge_req):
+        result["edge_request_id"] = edge_req
     retry = values.get("retry_after_seconds")
     if isinstance(retry, int) and not isinstance(retry, bool) and 0 <= retry <= 3600:
         result["retry_after_seconds"] = retry
