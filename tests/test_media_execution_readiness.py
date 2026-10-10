@@ -76,3 +76,26 @@ def test_readiness_exhaustion_exposes_safe_attempt_count():
     detail = _sanitized_backend_error(error.value)["error"]
     assert detail["readiness_health_attempts"] == 9
     assert detail["consequential_post_attempted"] is False
+
+def test_cold_health_429_logs_only_allowlisted_diagnostics(caplog):
+    import io
+    from urllib.error import HTTPError
+    from plugins.krc_migration_candidate.mcp_canary.r3c import _wait_for_voicebridge_health
+    attempts = []
+    def send(request, timeout):
+        attempts.append(request)
+        raise HTTPError(request.full_url, 429, "private", {
+            "Content-Type": "text/html; charset=utf-8",
+            "X-Secret-Header": "SECRET_HEADER",
+            "Retry-After": "11",
+        }, io.BytesIO(b"<html>SECRET_BODY</html>"))
+    with patch("plugins.krc_migration_candidate.mcp_canary.r3c.urlopen", send), patch("plugins.krc_migration_candidate.mcp_canary.r3c._READONLY_HEALTH_ATTEMPTS", 2), patch("plugins.krc_migration_candidate.mcp_canary.r3c.sleep"):
+        ready, count = _wait_for_voicebridge_health(BINDING)
+    assert (ready, count) == (False, 2)
+    assert caplog.text.count("voicebridge_readiness_http_error") == 1
+    assert "status=429" in caplog.text
+    assert "'upstream_response_format': 'html'" in caplog.text
+    assert "'retry_after_seconds': 11" in caplog.text
+    assert "SECRET_BODY" not in caplog.text
+    assert "SECRET_HEADER" not in caplog.text
+    assert "private-token" not in caplog.text
