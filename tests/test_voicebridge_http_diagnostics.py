@@ -26,6 +26,33 @@ class Tests(unittest.TestCase):
         self.assertEqual(safe_http_error_metadata(error({"error": {"code": "TOKEN_SECRET"}, "request_id": "secret@example.com"}, {"Retry-After": "99999"})), {})
     def test_503(self):
         self.assertEqual(safe_http_error_metadata(error({"error": {"code": "SERVICE_UNAVAILABLE"}}, code=503)), {"upstream_code": "SERVICE_UNAVAILABLE"})
+    def test_bounded_proxy_provenance(self):
+        headers = {
+            "Content-Type": "text/html; charset=utf-8",
+            "Server": "cloudflare",
+            "X-Render-Origin-Server": "Render",
+            "CF-Ray": "a485cf155ff71e33-FRA",
+            "X-Request-Id": "8d395bfc-8273-45e6-86b3-cd844d72c579",
+            "Authorization": "SECRET_AUTH",
+            "X-Other": "SECRET_OTHER",
+        }
+        result = safe_http_error_metadata(error("<html>SECRET_BODY</html>", headers))
+        self.assertEqual(result, {
+            "upstream_response_format": "html",
+            "upstream_server": "cloudflare",
+            "render_origin_confirmed": True,
+            "edge_cf_ray": "a485cf155ff71e33-FRA",
+            "edge_request_id": "8d395bfc-8273-45e6-86b3-cd844d72c579",
+        })
+        self.assertNotIn("SECRET", repr(result))
+    def test_reject_untrusted_provenance_values(self):
+        headers = {
+            "Server": "cloudflare SECRET",
+            "X-Render-Origin-Server": "Render; SECRET",
+            "CF-Ray": "SECRET_RAY",
+            "X-Request-Id": "SECRET",
+        }
+        self.assertEqual(safe_http_error_metadata(error("no body", headers)), {})
     def test_no_leak(self):
         self.assertNotIn("token", repr(safe_http_error_metadata(error({"error": {"code": "RATE_LIMITED", "token": "secret"}}))))
 
