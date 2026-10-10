@@ -17,7 +17,7 @@ def test_warmup_failure_marks_unsent_and_never_posts():
     assert error["consequential_post_attempted"] is False
 
 def test_readiness_failure_marks_unsent():
-    with patch("plugins.krc_migration_candidate.mcp_canary.r3c.urlopen", side_effect=URLError("private")) as send:
+    with patch("plugins.krc_migration_candidate.mcp_canary.r3c.urlopen", side_effect=URLError("private")) as send, patch("plugins.krc_migration_candidate.mcp_canary.r3c._READONLY_HEALTH_ATTEMPTS", 1):
         with pytest.raises(VoiceBridgeError) as caught:
             call_voicebridge(BINDING, "POST", "/api/v1/media/managed/transcriptions", {}, {})
     assert send.call_count == 1

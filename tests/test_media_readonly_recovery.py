@@ -43,7 +43,7 @@ def test_terminal_read_errors_not_retried(status):
 
 def test_unready_preserves_original_error():
     failure=r3c.VoiceBridgeError("voicebridge_http_error",http_status=429)
-    with patch.object(r3c,"_call_voicebridge_once",side_effect=failure) as once, patch.object(r3c,"_wait_for_readonly_health",return_value=(False, 4)):
+    with patch.object(r3c,"_call_voicebridge_once",side_effect=failure) as once, patch.object(r3c,"_wait_for_voicebridge_health",return_value=(False, 4)):
         with pytest.raises(r3c.VoiceBridgeError) as caught:r3c.call_voicebridge(BINDING,"GET","/api/v1/media/public-capabilities",None,{})
     assert caught.value is failure
     assert once.call_count==1
@@ -67,7 +67,7 @@ def test_health_polls_until_ready_without_credentials():
     clock = Clock()
     responses = [HTTPError("https://voicebridge.invalid/api/v1/health", 429, "warming", {}, None), TimeoutError(), Health()]
     with patch.object(r3c, "monotonic", clock.monotonic), patch.object(r3c, "sleep", clock.sleep), patch.object(r3c, "urlopen", side_effect=responses) as health:
-        assert r3c._wait_for_readonly_health(BINDING) == (True, 3)
+        assert r3c._wait_for_voicebridge_health(BINDING) == (True, 3)
     assert clock.now == 4.0
     for call in health.call_args_list:
         request = call.args[0]
@@ -85,7 +85,7 @@ def test_health_deadline_clamps_each_request_and_sleep():
         clock.now += timeout
         raise TimeoutError()
     with patch.object(r3c, "monotonic", clock.monotonic), patch.object(r3c, "sleep", clock.sleep), patch.object(r3c, "urlopen", side_effect=unavailable):
-        ready, attempts = r3c._wait_for_readonly_health(BINDING)
+        ready, attempts = r3c._wait_for_voicebridge_health(BINDING)
     assert not ready
     assert attempts == len(timeouts)
     assert clock.now == 45.0
@@ -96,7 +96,7 @@ def test_health_deadline_clamps_each_request_and_sleep():
 def test_health_terminal_http_stops_without_polling(status):
     from urllib.error import HTTPError
     with patch.object(r3c, "urlopen", side_effect=HTTPError("https://voicebridge.invalid", status, "terminal", {}, None)) as health, patch.object(r3c, "sleep") as sleep:
-        assert r3c._wait_for_readonly_health(BINDING) == (False, 1)
+        assert r3c._wait_for_voicebridge_health(BINDING) == (False, 1)
     assert health.call_count == 1
     sleep.assert_not_called()
 
@@ -104,7 +104,7 @@ def test_health_terminal_http_stops_without_polling(status):
 @pytest.mark.parametrize("diagnostics", [{"upstream_code":"RATE_LIMITED"}, {"upstream_code":"MEDIA_PUBLIC_FREE_TIER_RATE_LIMIT"}, {"upstream_code":"MEDIA_PUBLIC_CONCURRENCY_LIMIT"}, {"retry_after_seconds":10}])
 def test_explicit_rate_limit_is_not_replayed(diagnostics):
     failure = r3c.VoiceBridgeError("voicebridge_http_error", http_status=429, diagnostics=diagnostics)
-    with patch.object(r3c, "_call_voicebridge_once", side_effect=failure) as once, patch.object(r3c, "_wait_for_readonly_health") as health:
+    with patch.object(r3c, "_call_voicebridge_once", side_effect=failure) as once, patch.object(r3c, "_wait_for_voicebridge_health") as health:
         with pytest.raises(r3c.VoiceBridgeError) as caught:
             r3c.call_voicebridge(BINDING, "GET", "/api/v1/media/public-capabilities", None, {})
     assert caught.value is failure
@@ -114,7 +114,7 @@ def test_explicit_rate_limit_is_not_replayed(diagnostics):
 
 def test_exhausted_recovery_diagnostics_survive_mcp_egress():
     failure = r3c.VoiceBridgeError("voicebridge_http_error", http_status=429)
-    with patch.object(r3c, "_call_voicebridge_once", side_effect=failure), patch.object(r3c, "_wait_for_readonly_health", return_value=(False, 7)):
+    with patch.object(r3c, "_call_voicebridge_once", side_effect=failure), patch.object(r3c, "_wait_for_voicebridge_health", return_value=(False, 7)):
         with pytest.raises(r3c.VoiceBridgeError) as caught:
             r3c.call_voicebridge(BINDING, "GET", "/api/v1/media/public-capabilities", None, {})
     detail = r3c._sanitized_backend_error(caught.value)["error"]
@@ -127,3 +127,14 @@ def test_invalid_recovery_diagnostics_are_dropped(ready,attempts):
     detail = r3c._sanitized_backend_error(r3c.VoiceBridgeError("voicebridge_http_error", diagnostics={"readonly_health_ready":ready,"readonly_health_attempts":attempts}))["error"]
     assert "readonly_health_ready" not in detail
     assert "readonly_health_attempts" not in detail
+
+
+@pytest.mark.parametrize("content_type,expected", [("text/html; charset=utf-8","html"),("application/json","json")])
+def test_safe_upstream_format_never_exposes_body(content_type,expected):
+    from io import BytesIO
+    from urllib.error import HTTPError
+    from plugins.krc_migration_candidate.mcp_canary.voicebridge_http_diagnostics import safe_http_error_metadata
+    exc = HTTPError("https://voicebridge.invalid", 429, "private", {"Content-Type":content_type}, BytesIO(b"private response"))
+    detail = safe_http_error_metadata(exc)
+    assert detail == {"upstream_response_format":expected}
+    assert r3c._sanitized_backend_error(r3c.VoiceBridgeError("voicebridge_http_error", diagnostics=detail))["error"]["upstream_response_format"] == expected

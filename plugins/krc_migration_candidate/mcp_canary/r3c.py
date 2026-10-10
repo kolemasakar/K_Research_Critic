@@ -304,14 +304,12 @@ def _call_voicebridge_once(
         "/api/v1/media/managed/transcriptions",
         "/api/v1/media/youtube-gemini/transcriptions",
     }:
-        readiness = Request(base + "/api/v1/health", headers={"Accept": "application/json"}, method="GET")
-        try:
-            with urlopen(readiness, timeout=binding.timeout_seconds) as response:
-                health = json.loads(response.read(65536).decode("utf-8"))
-                if int(response.status) != 200 or not isinstance(health, dict) or health.get("status") != "ok":
-                    raise VoiceBridgeError("voicebridge_not_ready", retryable=True, diagnostics={"failure_stage": "readiness", "consequential_post_attempted": False})
-        except (HTTPError, URLError, TimeoutError, OSError, UnicodeDecodeError, json.JSONDecodeError):
-            raise VoiceBridgeError("voicebridge_not_ready", retryable=True, diagnostics={"failure_stage": "readiness", "consequential_post_attempted": False}) from None
+        ready, attempts = _wait_for_voicebridge_health(binding)
+        if not ready:
+            raise VoiceBridgeError("voicebridge_not_ready", retryable=True, diagnostics={
+                "failure_stage": "readiness", "consequential_post_attempted": False,
+                "readiness_health_attempts": attempts,
+            })
     request = Request(url, data=data, headers=headers, method=method)
     try:
         with urlopen(request, timeout=binding.timeout_seconds) as response:
@@ -365,7 +363,7 @@ _TRANSIENT_STATUSES = frozenset({429, 502, 503, 504})
 _RATE_LIMIT_CODES = frozenset({"RATE_LIMITED", "MEDIA_PUBLIC_FREE_TIER_RATE_LIMIT", "MEDIA_PUBLIC_CONCURRENCY_LIMIT"})
 
 
-def _wait_for_readonly_health(binding: VoiceBridgeBinding) -> tuple[bool, int]:
+def _wait_for_voicebridge_health(binding: VoiceBridgeBinding) -> tuple[bool, int]:
     """Bounded, unauthenticated health GETs; no MEDIA or provider execution."""
     if not binding.base_url:
         return False, 0
@@ -414,7 +412,7 @@ def call_voicebridge(
         explicit_limit = original.diagnostics.get("upstream_code") in _RATE_LIMIT_CODES or "retry_after_seconds" in original.diagnostics
         if not _is_readonly_route(method, path) or not transient or explicit_limit:
             raise
-        ready, attempts = _wait_for_readonly_health(binding)
+        ready, attempts = _wait_for_voicebridge_health(binding)
         recovery = {"readonly_health_ready": ready, "readonly_health_attempts": attempts}
         if not ready:
             original.diagnostics.update(recovery)

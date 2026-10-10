@@ -22,20 +22,22 @@ const tokens = {
 const counts = { youtube: 0, instagramRetrieval: 0, instagramStt: 0,
   facebookRetrieval: 0, facebookStt: 0, telegramRetrieval: 0, telegramStt: 0, paid: 0 };
 const code = derivePublicMediaAdmissionCode(tokens.read);
+const scenario = JSON.parse(process.env.KRC_TEST_MEDIA_SCENARIO ?? "{}");
+const duration = scenario.duration ?? 3;
 function result(platform) {
-  const texts = [platform + " first", "Український текст", platform + " last 🙂"];
+  const texts = scenario.segments ? Array.from({length: scenario.segments}, (_, i) => `${platform} ${i}: English Українська Русский 🙂`) : [platform + " first", "Український текст", platform + " last 🙂"];
   return {
     provider: "assemblyai", provider_model: "universal-2", provider_data_deleted: true,
-    detected_language: "uk", language_confidence: 1, duration_seconds: 3,
+    detected_language: scenario.language ?? "uk", language_confidence: 1, duration_seconds: duration,
     transcript_text: texts.join("\n"),
     segments: texts.map((text, index) => ({
-      index, start_ms: index * 1000, end_ms: (index + 1) * 1000, text, confidence: 1
+      index, start_ms: Math.floor(index * duration * 1000 / texts.length), end_ms: Math.floor((index + 1) * duration * 1000 / texts.length), text, confidence: 1
     }))
   };
 }
 function asset(url, platform) {
   return { source_url: url, media_url: "https://fixture.invalid/" + platform + ".mp4",
-    duration_seconds: 3, provider: platform === "telegram" ? "telegram_public_web" : "cobalt",
+    duration_seconds: duration, provider: platform === "telegram" ? "telegram_public_web" : "cobalt",
     provider_mode: platform === "telegram" ? "telegram_post" : "self_hosted",
     credits_charged: 0, credits_remaining: null, cached: false };
 }
@@ -48,18 +50,18 @@ const youtube = new PublicGeminiYoutubeEngine(new MediaBetaGate([code]), null, t
 const instagram = new PublicCobaltMediaEngine(new MediaBetaGate([code]), null, null, null, {
   retriever: { configured: true, async retrieve(url) { counts.instagramRetrieval++; return asset(url, "instagram"); }},
   stt: { configured: true, async transcribe(_asset, _hint, reserve) {
-    counts.instagramStt++; await reserve(3); return result("instagram");
+    counts.instagramStt++; await reserve(duration); return result("instagram");
   }}
 });
 const managed = new ManagedMediaService(new MediaBetaGate([code]), null, undefined, {
   facebookPipeline: { configured: true,
     async freeRetrieve(url) { counts.facebookRetrieval++; return asset(url, "facebook"); },
     async paidRetrieve() { counts.paid++; throw new Error("paid provider forbidden"); },
-    async transcribe(_asset, _hint, reserve) { counts.facebookStt++; await reserve(3); return result("facebook"); }
+    async transcribe(_asset, _hint, reserve) { counts.facebookStt++; await reserve(duration); return result("facebook"); }
   },
   telegramPipeline: { configured: true,
     async retrieve(url) { counts.telegramRetrieval++; return asset(url, "telegram"); },
-    async transcribe(_asset, _hint, reserve) { counts.telegramStt++; await reserve(3); return result("telegram"); }
+    async transcribe(_asset, _hint, reserve) { counts.telegramStt++; await reserve(duration); return result("telegram"); }
   }
 });
 const config = {

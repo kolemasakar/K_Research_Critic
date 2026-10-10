@@ -80,7 +80,7 @@ def read_json(node):
     return json.loads(line)
 
 @pytest.fixture
-def stack(tmp_path, monkeypatch):
+def stack(tmp_path, monkeypatch, request):
     vb_root = os.getenv("KRC_TEST_VOICEBRIDGE_ROOT")
     if not vb_root:
         pytest.skip("Opt-in cross-repository VoiceBridge integration")
@@ -96,6 +96,7 @@ def stack(tmp_path, monkeypatch):
     environment = dict(os.environ)
     environment.pop("KRC_MEDIA_DATABASE_URL", None)
     environment["KRC_TEST_VOICEBRIDGE_ROOT"] = vb_root
+    environment["KRC_TEST_MEDIA_SCENARIO"] = json.dumps(getattr(request, "param", {}))
     node = subprocess.Popen(
         ["node", str(ROOT / "tests/fixtures/voicebridge_all_routes.mjs")],
         stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -282,3 +283,45 @@ def test_all_dispatchers_preserve_real_429_metadata_without_replaying_provider_w
         serialized = json.dumps(detail)
         assert all(token not in serialized for token in stack.tokens.values())
     assert not any(stack.command("counts")["counts"].values())
+
+
+@pytest.mark.parametrize("platform,stack", [
+    ("youtube", {"duration":720,"language":"en","segments":57}),
+    ("instagram", {"duration":480,"language":"ru","segments":57}),
+    ("facebook", {"duration":720,"language":"en","segments":57}),
+    ("telegram", {"duration":600,"language":"uk","segments":57}),
+], indirect=["stack"])
+def test_long_multilingual_transcripts_round_trip_all_pages_without_provider_replay(stack, platform):
+    args = start_arguments(platform)
+    args["language_hint"] = {"youtube":"en", "instagram":"ru", "facebook":"en", "telegram":"uk"}[platform]
+    started = stack.data(platform, "media_" + platform + "_start", args)
+    assert started["status"] == "COMPLETED"
+    job = started["job_id"]
+    status_tool = "media_youtube_status" if platform == "youtube" else "media_non_youtube_status"
+    segments_tool = "media_youtube_segments" if platform == "youtube" else "media_non_youtube_segments"
+    status = stack.data("read", status_tool, {"job_id":job})
+    before = stack.command("counts")["counts"]
+    pages, collected, cursor = 0, [], 0
+    while True:
+        page = stack.data("read", segments_tool, {"job_id":job,"cursor":cursor,"limit":7})
+        assert page["job_id"] == job
+        assert page["cursor"] == cursor
+        pages += 1
+        collected.extend(page["segments"])
+        if page["next_cursor"] is None: break
+        assert page["next_cursor"] > cursor
+        cursor = page["next_cursor"]
+        assert pages < 10
+    expected = [f"{platform} {i}: English Українська Русский 🙂" for i in range(57)]
+    assert pages == 9
+    assert [s["index"] for s in collected] == list(range(57))
+    assert [s["text"] for s in collected] == expected
+    assert status["segment_count"] == len(expected)
+    assert status["transcript_characters"] == len("\n".join(expected).encode("utf-16-le")) // 2
+    expected_duration = {"youtube":720,"instagram":480,"facebook":720,"telegram":600}[platform]
+    assert collected[-1]["end_ms"] == expected_duration * 1000
+    assert all(s["start_ms"] < s["end_ms"] for s in collected)
+    assert status["credits_charged"] == 0
+    assert stack.command("counts")["counts"] == before
+    assert before["paid"] == 0
+    assert sum(before.values()) == (1 if platform == "youtube" else 2)

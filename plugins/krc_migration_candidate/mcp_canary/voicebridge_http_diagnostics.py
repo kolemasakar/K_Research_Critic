@@ -7,6 +7,11 @@ ALLOWED_CODES = frozenset({"RATE_LIMITED", "MEDIA_PUBLIC_FREE_TIER_RATE_LIMIT", 
 
 def safe_http_error_metadata(exc: HTTPError) -> dict[str, object]:
     result: dict[str, object] = {}
+    content_type = exc.headers.get("Content-Type", "").lower() if exc.headers else ""
+    if "application/json" in content_type or "+json" in content_type:
+        result["upstream_response_format"] = "json"
+    elif "text/html" in content_type:
+        result["upstream_response_format"] = "html"
     retry_after = exc.headers.get("Retry-After") if exc.headers else None
     if isinstance(retry_after, str) and re.fullmatch(r"[0-9]{1,4}", retry_after.strip()):
         seconds = int(retry_after.strip())
@@ -39,12 +44,18 @@ def safe_http_error_metadata(exc: HTTPError) -> dict[str, object]:
 def safe_error_diagnostics(values: dict[str, object]) -> dict[str, object]:
     """Revalidate the same narrow HTTP diagnostic allowlist at MCP egress."""
     result: dict[str, object] = {}
+    response_format = values.get("upstream_response_format")
+    if isinstance(response_format, str) and response_format in {"json", "html"}:
+        result["upstream_response_format"] = response_format
     stage = values.get("failure_stage")
     attempted = values.get("consequential_post_attempted")
     if isinstance(stage, str) and stage in {"warmup", "readiness", "start"} and isinstance(attempted, bool):
         if (stage == "start" and attempted) or (stage != "start" and not attempted):
             result["failure_stage"] = stage
             result["consequential_post_attempted"] = attempted
+    readiness_attempts = values.get("readiness_health_attempts")
+    if isinstance(readiness_attempts, int) and not isinstance(readiness_attempts, bool) and 0 <= readiness_attempts <= 24:
+        result["readiness_health_attempts"] = readiness_attempts
     ready = values.get("readonly_health_ready")
     attempts = values.get("readonly_health_attempts")
     if isinstance(ready, bool) and isinstance(attempts, int) and not isinstance(attempts, bool) and 0 <= attempts <= 24:
