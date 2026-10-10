@@ -48,3 +48,22 @@ Owner explicitly approved sequence: (1) 429 diagnosis, (2) longer live Instagram
 - External read-only GET from krc-cobalt: R3C /healthz HTTP 200 in 3.19 s; VoiceBridge /api/v1/health HTTP 200 in 0.18 s. Read-only R3C media_get_capabilities succeeded, request_id fc546c2a-0d77-46a2-b844-8e65e1c27efa; configured=true, automatic_paid_fallback=false, durable_store=postgres.
 - **Cold-429 root cause remains OPEN**. VoiceBridge was already warm in this check, so no new cold 429 with the enhanced logs was observed. The instrumentation is active on R3C, but sufficient cold response provenance is not available yet. Do not claim that the defect has been resolved.
 - No provider jobs started, no paid fallback, no Telegram retry, no keepalive, and no public/main changes in this step. Long live checks remain PARTIAL.
+
+## Continuation: reproduced cold 429 and Facebook three-minute live test — 2026-10-10
+### Cold health failure after deployed diagnostics
+- R3C live diagnostic log at 2026-10-10T12:59:29.654511209Z: `voicebridge_readiness_http_error status=429 attempt=1 diagnostics={}`.
+- Subsequent R3C read-only media_get_capabilities failed with `voicebridge_http_error`, HTTP 429, `readonly_health_attempts=22`, `readonly_health_ready=false`. R3C POST /mcp HTTP 200 appears at 13:00:14.566538705Z; 429 was returned in the tool result, not as MCP transport status.
+- VoiceBridge log: service_stopping SIGTERM at 12:50:23.345302381Z; next service_started at 13:00:46.664863556Z, after the unsuccessful internal R3C cold readiness cycle.
+- External krc-cobalt health-only GET later returned HTTP 200/status=ok, elapsed 13.372 s; headers from this SUCCESSFUL response included Content-Type application/json; Server cloudflare; x-render-origin-server Render; x-request-id 8d395bfc-8273-45e6-86b3-cd844d72c579; CF-RAY a485cf155ff71e33-FRA.
+- Evidence excludes normal MEDIA POST admission control for GET /health and confirms cold failure before application startup. However the exact layer producing 429 (Render routing vs other edge proxy) remains unproven; diagnostics={} indicates no allowlisted application code, response format, retry-after, or request ID was extracted. Do not declare solved.
+
+### Facebook live, recovered start and segments
+- Public URL: https://www.facebook.com/FriendsOfNASA/videos/1515673112768756/
+- Job KRCM_c7547bbc-cb9b-4f20-b18d-079991116343; start request_id e0df5c75-8c51-4d61-9378-f700e62710ba, recovered PROCESSING, reused=true, start_response_recovered=true. No second start was sent.
+- Status subsequently COMPLETED, request_id f5ea615b-c588-47ad-a4e2-d1b9b20c8fb9. Media duration 180.302938 s; 3 transcript segments, 2984 characters; STT charged seconds 181, credits charged 0, charge uncertain=false, provider_data_deleted=true, cobalt retrieval + assemblyai STT.
+- Segment read request_id 8d794b04-ab56-4597-b65b-c5fe8581c944, indices 0,1,2, cursor=0, next_cursor=null; segment ends 59920 / 119620 / 171500 ms. Audio transcription was not independently validated against original media.
+- This confirms a ~3 minute Facebook route but NOT the planned 8–12 minute gate. Prior Facebook failed audio-normalization sample remains separate. Instagram long sample not executed without a verified suitable URL; Telegram invocation previously blocked by platform safety and not repeated. FREE_ONLY unchanged.
+
+### Remaining scope
+- Cold-429 attribution requires correlatable failed-response edge diagnostics (safe header/server/trace ID capture on FAILED health, Render support/edge logs); do not infer cause from timestamps alone.
+- Additional verified 8–12 minute IG/FB audiovisual examples are required to close long-test gate. Do not reuse FAILED jobs or start undocumented speculative media. Telegram safety gate remains respected.
