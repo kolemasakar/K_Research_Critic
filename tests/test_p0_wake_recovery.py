@@ -73,7 +73,7 @@ def test_no_redirect_credentials_to_third_party():
             assert request.get_header("Authorization") == "Bearer " + "a"*40
             assert request.data==b'{"action":"wake_voicebridge"}'
             assert request.method=="POST"
-            assert timeout==12
+            assert timeout==35
             return type("Response",(),{"status":200,"__enter__":lambda self:self,"__exit__":lambda self,*a:None,"read":lambda self,n:b'{"status":"woken"}'})()
     with patch.dict("os.environ",{"KRC_WAKE_RELAY_ENABLED":"1",
           "KRC_WAKE_RELAY_URL":"https://wake.example/krc-wake/v1",
