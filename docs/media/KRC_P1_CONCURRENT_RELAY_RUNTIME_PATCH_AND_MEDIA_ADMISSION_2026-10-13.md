@@ -39,3 +39,12 @@ Under `docs/media/KRC_LONG_MEDIA_LIVE_TEST_PROTOCOL_2026-10-10.md`, consequentia
 - After verified candidates, one start per approved media source and immediate status/segments within configured TTL; no retry after unknown consequential outcome.
 - Schedule a controlled concurrent cold R3C+E1/E2 readiness test to demonstrate the deployed relay join behavior without starting paid work, inspect Render and safe krc-cobalt event logs.
 - Keep FREE_ONLY, fail-closed Telegram and separate R4 release acceptance.
+
+## Live post-patch concurrent read-only recovery — 2026-10-13T18:00Z
+- Historical Render VoiceBridge logs show `service_stopping` at 17:19:54Z and no later start before controlled test. After 40 min idle, two MCP `media_get_capabilities` requests were dispatched simultaneously to R3C and E1, both **PASS**.
+- R3C response `request_id=61b03cf5-120f-482a-974c-c0312732c810`, `configured=true`, `automatic_paid_fallback=false`. E1 `request_id=420e043a-8765-4631-9b45-3610b0e0d022`, same configured/FREE_ONLY results.
+- R3C log: 18:00:10.500Z cold readiness 429 CF-Ray `a4a03e050c89d2e7-FRA`; VoiceBridge startup 18:00:18.332Z; R3C `relay_success` 18:00:23.284Z and HTTP 200 at 18:00:27.445Z.
+- Independent relay `krc-cobalt` journal confirms `wake_relay_success` at 18:00:23Z.
+- This confirms real cold recovery while two read-only requests were issued concurrently, with both completing. It does **not** demonstrate that both POSTs arrived simultaneously at relay or that the join branch specifically executed: journal recorded a single `wake_relay_success` and no `wake_relay_join_success` in the inspected interval.
+- No new MEDIA jobs, STT/retrieval provider starts or paid fallback.
+- Update verdict: `CONCURRENT_READONLY_COLD_CAPABILITIES=PASS`; `CONCURRENT_RELAY_JOIN_BRANCH=OFFLINE_PASS_LIVE_NOT_OBSERVED`. Long-video candidate admission and consequential P1 media tests remain blocked by absent independently verified 480–720s speech-bearing Instagram/Facebook videos.
