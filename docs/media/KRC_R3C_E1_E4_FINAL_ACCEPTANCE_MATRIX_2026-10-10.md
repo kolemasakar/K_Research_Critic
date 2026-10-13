@@ -36,3 +36,14 @@
 - Не звертатися до Render/VoiceBridge після початку паузи до запланованого холодного read-only тесту; не використовувати keepalive.
 - Не робити автоматичних повторних consequential POST після 429/503/втрати відповіді.
 - Не комітити секрети, транскрипти користувачів, сирі response headers; не активувати платні маршрути.
+
+
+## Addendum 2026-10-13 — owner-authorized short reels scope and current status
+This historical 2026-10-10 matrix is preserved as the state **at that date**. The owner on 2026-10-13 explicitly cancelled Instagram/Facebook 480–720s acceptance. The 480–720s gate in the table above is **SUPERSEDED FOR E2 AND E3** and must not be treated as an outstanding release blocker. The original historic row is not an obligation to search for long social videos. Current authority: `docs/media/KRC_P1_OWNER_SHORT_REELS_SCOPE_DECISION_2026-10-13.md`.
+
+- **R3C P0:** three independent cold auto-wake cycles passed after fixing relay token. A later concurrent read-only capabilities check (R3C + E1) passed after a bounded concurrent relay fix, with direct positive krc-cobalt journald evidence. These newer tests supersede the historical **cold Render FAIL** row for the demonstrated cases only; concurrency join branch was exercised offline, but not separately demonstrated by two simultaneously received relay POSTs in production. See `docs/media/KRC_P0_COLD_AUTO_WAKE_3_OF_3_PASS_2026-10-13.md` and `docs/media/KRC_P1_CONCURRENT_RELAY_RUNTIME_PATCH_AND_MEDIA_ADMISSION_2026-10-13.md`.
+- **E2 Instagram:** historical short live COMPLETED 41.11675s, one segment, 331 chars, credits reported zero. **SHORT-LIVE PARTIAL**, with remaining independent transcript/audio 3-point accuracy, current retrieval/readback, and restart durability gates. E2 `Invalid params` from attempted long IGTV `/tv/B3It-ECHZrA/` is now **DIAGNOSED_NOT_A_SHORT_REEL_REGRESSION**: `plugins/krc_migration_candidate/mcp_canary/r3e2.py`, lines 148–159, intentionally allow only `/reel/` and `/p/`, not `/tv/`. The action thus returned MCP -32602 before `backend_call`; no need to extend the route for out-of-scope long IGTV.
+- **E3 Facebook:** historical 180.302938s COMPLETED, 3 segments, 2984 chars, zero credits reported. **SHORT/MEDIUM-LIVE PARTIAL** pending explicit current audio accuracy and persistence gates; no new short Facebook job required without a specific evidence gap.
+- **E1 YouTube:** long-form comparator remains an independent track, with Gemini Free disclosure; prior attempted start returned `voicebridge_not_ready` with `consequential_post_attempted=false`; do not convert to media completion.
+- **E4 Telegram:** live BLOCKED, unchanged.
+- **Overall R4 MEDIA:** HOLD / NOT ACCEPTED. Read-only historical traces are not a substitute for complete current persistence, status/segments and safety acceptance.
