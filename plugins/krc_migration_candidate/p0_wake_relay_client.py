@@ -51,7 +51,7 @@ def attempt_external_wake() -> str:
         },
     )
     try:
-        with build_opener(_NoRedirect()).open(request, timeout=12) as response:
+        with build_opener(_NoRedirect()).open(request, timeout=35) as response:
             if int(response.status) != 200:
                 return "relay_rejected"
             raw = response.read(513)
