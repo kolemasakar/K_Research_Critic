@@ -49,6 +49,36 @@ def test_relay_success_only_fixed_get():
         status,body=run_one("/krc-wake/v1",data=b'{"action":"wake_voicebridge"}')
     assert status==200 and json.loads(body)["status"]=="woken"
 def test_rate_gate_prevents_back_to_back():
-    g=RateGate()
-    assert g.acquire() is True
-    assert g.acquire() is False
+    g = RateGate()
+    assert g.begin_or_join() == "owner"
+    g.complete(False)
+    assert g.begin_or_join() == "rate_limited"
+
+def test_success_is_cached_during_cooldown():
+    g = RateGate()
+    assert g.begin_or_join() == "owner"
+    g.complete(True)
+    assert g.begin_or_join() == "ready"
+
+def test_concurrent_join_does_not_create_second_upstream_request():
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Event
+    started, release = Event(), Event()
+    calls = []
+    g = RateGate()
+    def first():
+        assert g.begin_or_join() == "owner"
+        calls.append("upstream")
+        started.set()
+        assert release.wait(2)
+        g.complete(True)
+    def second():
+        assert started.wait(2)
+        return g.begin_or_join()
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        a = pool.submit(first)
+        b = pool.submit(second)
+        release.set()
+        a.result()
+        assert b.result() == "ready"
+    assert calls == ["upstream"]
