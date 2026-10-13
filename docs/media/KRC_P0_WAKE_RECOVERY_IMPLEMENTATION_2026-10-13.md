@@ -27,3 +27,14 @@ Date 2026-10-13. Owner requested proceed without further confirmations. Scope: p
 3. Perform at least 3 genuine cold cycles (idle >15min, no keepalive), one user-triggered read per cycle, auto-wakeup without operator GET; capture startup latency, safe IDs, credits=0. Failed / ambiguous POST never repeated.
 4. Inspect Render support response to determine 429 origin and whether infrastructure fix can supersede relay workaround.
 5. After all P0 gates PASS, decide owner acceptance. Otherwise P0 PARTIAL and feature OFF.
+
+## Render support correspondence update — 2026-10-13
+- Initial support email SENT to support@render.com, Gmail thread 1a1345c51acb026f. Received a reply from Render's **AI Agent**, explaining standard Free 15-minute spin-down, Cloudflare transit and Rndr-Id tracing. The reply did NOT trace either failing CF-Ray nor establish the emitting layer of HTTP 429; attribution remains OPEN.
+- An escalation requesting a HUMAN Render support engineer and direct tracing of CF-Ray a49ccaf70d1d18cb-FRA / a49ccaf77d4d0d18-FRA was sent as a reply in the same thread (Gmail SENT id 1a13460d51754ced). Awaiting human analysis.
+- No Render support ticket number provided; do not claim one.
+
+## krc-cobalt staging detail
+- Enabled user systemd unit krc-p0-wake-relay.service with linger=yes; listener 127.0.0.1:9012 only, ActiveState=active, SubState=running; key/server/unit files have 0600 permissions. The relay emits no scheduled health/keepalive requests.
+- User systemd sandbox PrivateDevices/ProtectSystem options caused 218/CAPABILITIES, were removed; active service retains NoNewPrivileges, PrivateTmp, RestrictAddressFamilies, UMask, MemoryMax=64M and TasksMax=16. Initial restart counter included failed configuration attempts, not evidence of ongoing failures.
+- Proposed Caddy routing file /home/krcops/krc-p0-wake/Caddyfile.proposed successfully validated with caddy validate; **NOT INSTALLED**. Existing /etc/caddy/Caddyfile still forwards entire domain to Cobalt port 9000. A privileged authorized Caddy change is required; avoid editing config as unprivileged krcops or bypassing access controls.
+- An attempted local secret-bearing live-test call was blocked by a safety guard; it was NOT retried. Do not mark relay authenticated E2E as verified. All offline unit/integration tests remain PASS; live gate pending.
