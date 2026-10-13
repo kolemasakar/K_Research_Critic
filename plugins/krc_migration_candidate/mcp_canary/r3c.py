@@ -12,6 +12,7 @@ from urllib.parse import urlencode, urlsplit
 from urllib.request import Request, urlopen
 
 from .voicebridge_http_diagnostics import safe_http_error_metadata, safe_error_diagnostics
+from ..p0_wake_relay_client import attempt_external_wake
 from .server import LEGACY_PROTOCOL_VERSION, MCP_PROTOCOL_VERSION, SERVER_NAME
 
 R3C_SURFACE = "r3c_readonly"
@@ -375,6 +376,7 @@ def _wait_for_voicebridge_health(binding: VoiceBridgeBinding) -> tuple[bool, int
     deadline = monotonic() + _READONLY_HEALTH_BUDGET_SECONDS
     attempts = 0
     first_http_failure_logged = False
+    relay_attempted = False
     while attempts < _READONLY_HEALTH_ATTEMPTS:
         remaining = deadline - monotonic()
         if remaining <= 0:
@@ -391,13 +393,29 @@ def _wait_for_voicebridge_health(binding: VoiceBridgeBinding) -> tuple[bool, int
             if status != 200 and status not in _TRANSIENT_STATUSES:
                 return False, attempts
         except HTTPError as exc:
+            metadata = safe_http_error_metadata(exc)
             if not first_http_failure_logged:
                 # Bounded cold-start attribution; no URLs, body, credentials or arbitrary headers.
                 logging.getLogger(__name__).warning(
                     "voicebridge_readiness_http_error status=%d attempt=%d diagnostics=%s",
-                    int(exc.code), attempts, safe_http_error_metadata(exc),
+                    int(exc.code), attempts, metadata,
                 )
                 first_http_failure_logged = True
+            # Only an unattributed proxy-looking 429 can invoke the opt-in relay.
+            # Legitimate application limits and Retry-After MUST NOT be bypassed.
+            if (not relay_attempted and int(exc.code) == 429
+                    and metadata.get("upstream_server") == "cloudflare"
+                    and "upstream_code" not in metadata
+                    and "retry_after_seconds" not in metadata):
+                outcome = attempt_external_wake()
+                if outcome != "disabled":
+                    relay_attempted = True
+                    logging.getLogger(__name__).warning(
+                        "voicebridge_readiness_relay_attempt outcome=%s", outcome,
+                    )
+                if outcome == "relay_success":
+                    # Allow bounded startup after one authenticated external health wake.
+                    deadline = max(deadline, monotonic() + 90.0)
             if int(exc.code) not in _TRANSIENT_STATUSES:
                 return False, attempts
         except (URLError, TimeoutError, OSError, UnicodeDecodeError, json.JSONDecodeError):
@@ -405,7 +423,7 @@ def _wait_for_voicebridge_health(binding: VoiceBridgeBinding) -> tuple[bool, int
         remaining = deadline - monotonic()
         if remaining <= 0 or attempts >= _READONLY_HEALTH_ATTEMPTS:
             break
-        sleep(min(2.0, remaining))
+        sleep(min(4.0 if relay_attempted else 2.0, remaining))
     return False, attempts
 
 
