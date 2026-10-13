@@ -26,3 +26,9 @@ Scope: first P1 acceptance pass for E2 Instagram, E3 Facebook, E1 YouTube contro
 2. Before any POST, investigate 404 origin: route mapping, identity, Neon database and retention/job lifecycle with read-only logs; protect against misleading `durable_store=postgres` capabilities vs actual historical availability.
 3. After qualifying inputs are VERIFIED and free capacity checked, single authorized E2/E3 start, scoped status/segments, audio manual spot checks, charge 0, exact evidence ledger.
 4. YouTube E1 long control via Gemini Free only with separate explicit Google free-tier data-use acknowledgement and preflight. E4 remains BLOCKED.
+
+## Follow-up: Neon retention reconciliation (read-only)
+- Connected Neon project `plain-snow-71973546` contains exactly one primary branch `production` (`br-summer-union-b2qlszfv`). `current_database() = krc_media_beta`; both live tables `krc_managed_media_jobs` and `krc_media_client_jobs` contain 0 rows as of 2026-10-13T15:04:21Z. The old Facebook job ID is absent from both.
+- Earlier reviewed deployed-code investigation `docs/media/KRC_E2_NEON_RETENTION_ROOT_CAUSE_2026-10-01.md` documents `purgeExpired()` deleting jobs when `expires_at <= now()`, with a 3600-second configuration default and a supported 300–86400s range. Thus expiry/purge is a **plausible explanation** for old jobs returning 404, not definitive proof of unexpected data loss.
+- Current Render database target identity and effective runtime job TTL remain unverified. A future P1 live test must capture status/segments promptly within its active retention window; a durable job does not necessarily imply indefinite retention.
+- No destructive SQL, provider execution, relay wake test, Render deploy, or configuration change occurred in this Neon audit.
