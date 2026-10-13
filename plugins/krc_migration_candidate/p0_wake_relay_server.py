@@ -9,7 +9,7 @@ import hmac
 import json
 import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from threading import Lock
+from threading import Condition, Lock
 from time import monotonic
 from urllib.error import HTTPError, URLError
 from urllib.request import HTTPRedirectHandler, Request, build_opener
@@ -17,22 +17,42 @@ from urllib.request import HTTPRedirectHandler, Request, build_opener
 _TARGET = "https://voicebridge-krc-media-beta-kolemasakar.onrender.com/api/v1/health"
 _PATH = "/krc-wake/v1"
 _COOLDOWN_SECONDS = 90.0
+_JOIN_TIMEOUT_SECONDS = 34.0
 
 class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, request, fp, code, msg, headers, newurl):
         return None
 
 class RateGate:
+    """Join concurrent callers to one fixed health GET, preserving cooldown."""
     def __init__(self):
-        self._lock = Lock()
+        self._condition = Condition(Lock())
         self._next_at = 0.0
-    def acquire(self) -> bool:
-        with self._lock:
-            now = monotonic()
-            if now < self._next_at:
-                return False
-            self._next_at = now + _COOLDOWN_SECONDS
-            return True
+        self._inflight = False
+        self._last_success = False
+
+    def begin_or_join(self) -> str:
+        with self._condition:
+            if self._inflight:
+                deadline = monotonic() + _JOIN_TIMEOUT_SECONDS
+                while self._inflight:
+                    remaining = deadline - monotonic()
+                    if remaining <= 0:
+                        return "unavailable"
+                    self._condition.wait(remaining)
+                return "ready" if self._last_success else "unavailable"
+            if monotonic() < self._next_at:
+                return "ready" if self._last_success else "rate_limited"
+            self._inflight = True
+            self._last_success = False
+            self._next_at = monotonic() + _COOLDOWN_SECONDS
+            return "owner"
+
+    def complete(self, successful: bool) -> None:
+        with self._condition:
+            self._last_success = bool(successful)
+            self._inflight = False
+            self._condition.notify_all()
 
 class Handler(BaseHTTPRequestHandler):
     token: str
@@ -66,23 +86,32 @@ class Handler(BaseHTTPRequestHandler):
         if raw != b'{"action":"wake_voicebridge"}':
             self.reply(400, b'{"status":"invalid"}')
             return
-        if not self.gate.acquire():
+        role = self.gate.begin_or_join()
+        if role == "ready":
+            self.reply(200, b'{"status":"ready"}')
+            return
+        if role == "rate_limited":
             self.reply(429, b'{"status":"rate_limited"}')
             return
-        # GET only, fixed destination and disallowed redirects, no media or STT.
-        req = Request(_TARGET,headers={"Accept":"application/json"},method="GET")
+        if role == "unavailable":
+            self.reply(503, b'{"status":"unavailable"}')
+            return
+        valid = False
         try:
-            with build_opener(NoRedirect()).open(req,timeout=30) as response:
+            req = Request(_TARGET, headers={"Accept":"application/json"}, method="GET")
+            with build_opener(NoRedirect()).open(req, timeout=30) as response:
                 valid = response.status == 200
                 if valid:
                     obj = json.loads(response.read(4097).decode("utf-8"))
-                    valid = isinstance(obj,dict) and obj.get("status")=="ok"
-            if valid:
-                self.reply(200,b'{"status":"woken"}')
-            else:
-                self.reply(503,b'{"status":"unavailable"}')
-        except (HTTPError,URLError,TimeoutError,OSError,ValueError,UnicodeDecodeError):
-            self.reply(503,b'{"status":"unavailable"}')
+                    valid = isinstance(obj, dict) and obj.get("status") == "ok"
+        except (HTTPError, URLError, TimeoutError, OSError, ValueError, UnicodeDecodeError):
+            valid = False
+        finally:
+            self.gate.complete(valid)
+        if valid:
+            self.reply(200, b'{"status":"woken"}')
+        else:
+            self.reply(503, b'{"status":"unavailable"}')
 
 def main():
     token = os.environ.get("KRC_WAKE_RELAY_SERVER_TOKEN","")
