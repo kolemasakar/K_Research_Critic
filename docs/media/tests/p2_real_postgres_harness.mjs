@@ -26,6 +26,8 @@ async function holder(){
  await svc.startNative(input());
 }
 async function recover(){
+ // Simulate confirmed lease expiry after a crashed owner; no wall-clock sleep.
+ execFileSync('psql',['-X','-v','ON_ERROR_STOP=1','-d','p2_crash','-c',"UPDATE krc_managed_media_jobs SET lease_heartbeat_at=now()-interval '120 seconds' WHERE status='PROCESSING'"]);
  const {svc,store}=await startService('p2_crash',root+'/crash.count');
  const recovered=await svc.startNative(input());
  assert.equal(recovered.status,'FAILED');
@@ -88,6 +90,7 @@ async function facebookHolder(){
  await svc.startFacebookFallback(fbInput);
 }
 async function facebookRecover(){
+ execFileSync('psql',['-X','-v','ON_ERROR_STOP=1','-d','p2_facebook','-c',"UPDATE krc_managed_media_jobs SET lease_heartbeat_at=now()-interval '120 seconds' WHERE status='PROCESSING'"]);
  const store=new RealPgStore('p2_facebook');await store.ready();
  const svc=new ManagedMediaService(new MediaBetaGate([access],7200),null,undefined,{store,facebookPipeline:fbProvider(false)});
  const job=await svc.startFacebookFallback(fbInput);
