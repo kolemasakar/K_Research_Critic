@@ -15,6 +15,7 @@ from plugins.krc_migration_candidate.mcp_canary.r3e1 import (
     R3E1_EXECUTION_TOOL_NAME,
     R3E1_SURFACE,
     R3E1_TOOL_NAMES,
+    R3E1_READ_TOOL_NAMES,
     dispatch_r3e1,
     r3e1_health,
     tool_descriptors,
@@ -48,8 +49,9 @@ def _consent() -> dict[str, object]:
 
 
 def test_r3e1_exposes_nine_read_tools_plus_only_youtube_start() -> None:
-    assert R3E1_TOOL_NAMES == R3C_TOOL_NAMES + ("media_youtube_start",)
-    assert len(R3E1_TOOL_NAMES) == 10
+    assert R3E1_READ_TOOL_NAMES == tuple(name for name in R3C_TOOL_NAMES if name == "media_get_capabilities" or name.startswith("media_youtube_"))
+    assert R3E1_TOOL_NAMES == R3E1_READ_TOOL_NAMES + ("media_youtube_start",)
+    assert len(R3E1_TOOL_NAMES) == 6
     descriptors = tool_descriptors()
     names = [tool["name"] for tool in descriptors]
     assert names == list(R3E1_TOOL_NAMES)
@@ -236,8 +238,8 @@ def test_r3e1_health_reports_one_execution_tool_without_secret_material() -> Non
         VoiceBridgeBinding("https://voicebridge.invalid", "test-only-voicebridge-secret-value")
     )
     assert health["status"] == "ok"
-    assert health["tool_count"] == 10
-    assert health["non_execution_tool_count"] == 9
+    assert health["tool_count"] == 6
+    assert health["non_execution_tool_count"] == 5
     assert health["execution_tool_count"] == 1
     assert health["youtube_execution_enabled"] is True
     assert health["other_execution_tools"] == "not_enabled"
@@ -245,7 +247,7 @@ def test_r3e1_health_reports_one_execution_tool_without_secret_material() -> Non
     assert "secret" not in json.dumps(health).lower()
 
 
-def test_http_r3e1_requires_oauth_and_binding_then_lists_ten_tools() -> None:
+def test_http_r3e1_requires_oauth_and_binding_then_lists_six_tools() -> None:
     message = {
         "jsonrpc": "2.0",
         "id": 1,
@@ -574,3 +576,13 @@ def test_r3e1_record_replay_probe_reads_status_and_segments_only(monkeypatch) ->
     ]
     assert "media_youtube_start" not in json.dumps(calls)
     assert "must-not-be-logged" not in json.dumps(result)
+
+def test_e1_v06_does_not_advertise_or_dispatch_unauthorized_cross_platform_reads() -> None:
+    binding = VoiceBridgeBinding("https://voicebridge.invalid", "test-only-youtube-token")
+    for name in ("media_instagram_preflight", "media_instagram_lookup", "media_non_youtube_status", "media_non_youtube_segments"):
+        assert name not in R3E1_TOOL_NAMES
+        response = dispatch_r3e1(_request("tools/call", params={"name": name, "arguments": {}}), binding)
+        assert response is not None
+        assert response["error"]["code"] == -32602
+        assert response["error"]["message"] == "Unknown tool"
+    assert len(R3E1_TOOL_NAMES) == 6
