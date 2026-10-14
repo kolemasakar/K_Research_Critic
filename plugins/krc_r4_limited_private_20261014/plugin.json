@@ -1,0 +1,37 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "k-research-critic-r4-limited-private",
+  "version": "0.1.0",
+  "description": "Private R4 four-route KRC candidate: R3C, E1, E2 and E3. E4 Telegram excluded.",
+  "author": {
+    "name": "K-Research & Critic"
+  },
+  "repository": "https://github.com/kolemasakar/K_Research_Critic",
+  "keywords": [
+    "research",
+    "critique",
+    "verification",
+    "media",
+    "evidence"
+  ],
+  "extensions": {
+    "com.openai": {
+      "apps": "./.app.json",
+      "interface": {
+        "displayName": "K-Research & Critic R4 Limited Private",
+        "shortDescription": "Restricted research and FREE_ONLY MEDIA",
+        "longDescription": "Private four-app candidate with R3C, Gemini Free YouTube, Cobalt Instagram and Facebook. Telegram E4 excluded.",
+        "developerName": "K-Research & Critic",
+        "category": "Productivity",
+        "capabilities": [
+          "Read",
+          "Write"
+        ],
+        "defaultPrompt": "Use KRC Core CriticProfile gate. This private limited candidate permits R3C read-only, E1 YouTube with explicit Gemini Free data-use consent, E2 Instagram short reels, E3 Facebook short reels/posts only. Do not initiate Telegram LIVE, long Instagram/Facebook videos, paid fallback or blind consequential POST retries. Require confirmation for all consequential MEDIA starts, and disclose transcript verification limits. Global public release remains HOLD.",
+        "websiteURL": "https://github.com/kolemasakar/K_Research_Critic",
+        "privacyPolicyURL": "https://github.com/kolemasakar/K_Research_Critic/blob/agent/krc-public-media-r3-integration/docs/PRIVACY_POLICY.md"
+      }
+    }
+  },
+  "homepage": "https://github.com/kolemasakar/K_Research_Critic"
+}
