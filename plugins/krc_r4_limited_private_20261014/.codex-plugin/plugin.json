@@ -1,0 +1,22 @@
+{
+  "name": "k-research-critic-r4-limited-private",
+  "version": "0.1.0",
+  "description": "Private KRC R4 limited package, no E4.",
+  "author": {
+    "name": "K-Research & Critic"
+  },
+  "apps": "./.app.json",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "K-Research & Critic R4 Limited Private",
+    "shortDescription": "Restricted research and FREE_ONLY MEDIA",
+    "longDescription": "Private R4 candidate using R3C/E1/E2/E3; Telegram LIVE and paid fallbacks excluded.",
+    "developerName": "K-Research & Critic",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": "Use KRC Core CriticProfile gate. In this private package, allow R3C read-only; E1 Gemini Free YouTube with explicit data-use consent; E2 Instagram short reels and E3 Facebook short videos only. Never use Telegram LIVE, paid fallback, long social videos or blind consequential replay. Treat LIVE status and transcript semantic accuracy as separate gates."
+  }
+}
