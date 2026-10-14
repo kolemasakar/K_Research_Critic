@@ -8,7 +8,6 @@ from typing import Any, Mapping
 from urllib.parse import urlsplit
 
 from .r3c import (
-    R3C_TOOL_NAMES,
     VoiceBridgeBinding,
     VoiceBridgeError,
     call_voicebridge,
@@ -18,9 +17,17 @@ from .r3c import (
 from .server import LEGACY_PROTOCOL_VERSION, MCP_PROTOCOL_VERSION, SERVER_NAME
 
 R3E1_SURFACE = "r3e1_youtube_execution"
-R3E1_SERVER_VERSION = "0.5.0"
+R3E1_SERVER_VERSION = "0.6.0"
 R3E1_EXECUTION_TOOL_NAME = "media_youtube_start"
-R3E1_TOOL_NAMES = R3C_TOOL_NAMES + (R3E1_EXECUTION_TOOL_NAME,)
+# Versioned E1-only read surface: other platforms use R3C or their scoped apps.
+R3E1_READ_TOOL_NAMES = (
+    "media_get_capabilities",
+    "media_youtube_preflight",
+    "media_youtube_lookup",
+    "media_youtube_status",
+    "media_youtube_segments",
+)
+R3E1_TOOL_NAMES = R3E1_READ_TOOL_NAMES + (R3E1_EXECUTION_TOOL_NAME,)
 R3E1_TOOL_NAME_SET = frozenset(R3E1_TOOL_NAMES)
 _DISABLED_EXECUTION_TOOL_NAMES = frozenset(
     {
@@ -79,7 +86,8 @@ _YOUTUBE_START_DESCRIPTOR: dict[str, object] = {
 
 
 def tool_descriptors() -> list[dict[str, object]]:
-    descriptors = r3c_tool_descriptors()
+    by_name = {item["name"]: item for item in r3c_tool_descriptors()}
+    descriptors = [deepcopy(by_name[name]) for name in R3E1_READ_TOOL_NAMES]
     descriptors.append(deepcopy(_YOUTUBE_START_DESCRIPTOR))
     return descriptors
 
@@ -90,7 +98,7 @@ def r3e1_health(binding: VoiceBridgeBinding) -> dict[str, object]:
         "status": "ok" if binding.configured else "binding_required",
         "surface": R3E1_SURFACE,
         "tool_count": len(R3E1_TOOL_NAMES),
-        "non_execution_tool_count": len(R3C_TOOL_NAMES),
+        "non_execution_tool_count": len(R3E1_READ_TOOL_NAMES),
         "execution_tool_count": 1,
         "youtube_execution_enabled": True,
         "other_execution_tools": "not_enabled",
@@ -222,9 +230,9 @@ def dispatch_r3e1(
                     "supportedVersions": [MCP_PROTOCOL_VERSION],
                     "capabilities": {"tools": {}},
                     "instructions": (
-                        "R3-E1 exposes the accepted nine non-execution KRC MEDIA tools plus exactly "
-                        "one execution operation: media_youtube_start. Instagram, Facebook, and "
-                        "Telegram start operations remain disabled."
+                        "R3-E1 v0.6 exposes five authorized read-only capabilities/YouTube "
+                        "tools plus one execution operation: media_youtube_start. "
+                        "Instagram/Facebook/Telegram read tools belong to R3C or scoped apps."
                     ),
                 }
             ),
