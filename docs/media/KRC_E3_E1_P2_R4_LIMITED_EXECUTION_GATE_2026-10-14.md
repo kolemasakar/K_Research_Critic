@@ -43,3 +43,9 @@ Date: 2026-10-14 UTC. Owner instruction: execute E3 Facebook + E1 YouTube readin
 - **P2 tested operational guardrails PASS**, production provider crash/billing still open.
 - **R4 limited four-app candidate PREPARED IN PRIVATE REPO**, not yet schema-validated as a plugin nor created.
 - **Global/public KRC R4 release HOLD**; no new Telegram LIVE or paid fallback. Require explicit separate acceptance to promote beyond private tests.
+
+## Appendix — reproducible restricted package archive
+- On authorized `krc-cobalt`, private integration GitHub source was cloned without touching production or public main, candidate directory `plugins/krc_r4_limited_private_20261014/` zipped with only four manifest/Core files.
+- Created `/tmp/krc_r4_limited_private_20261014.zip`, size **5621 bytes**, SHA-256 **`2dc1e71be561912a29df52df063b333fdf2fb8bf45c9cbad3764a217b60828d8`**.
+- ZIP CRC integrity, exactly four members, four app mapping count, manifest names and exact original Core byte parity: **PASS**.
+- This is a prepared private archive on authorized remote host, not a sandbox download or installed Plugin Creator release. Plugin Creator schema validation and host-upload remain separate gates. E4 omitted from package mapping, not globally disabled in previously existing connector.
