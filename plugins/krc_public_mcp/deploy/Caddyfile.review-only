@@ -1,0 +1,14 @@
+# REVIEW ONLY: DO NOT ADD TO LIVE CADDY CONFIG BEFORE RELEASE GATES.
+# Existing host: 89-168-65-88.sslip.io
+# Proposed dedicated path, avoiding Cobalt's root handler.
+# Insert INSIDE existing host's routing block, BEFORE catch-all 'handle':
+#
+# @krcPublicMcp path /krc-public/mcp
+# handle @krcPublicMcp {
+#     uri strip_prefix /krc-public
+#     reverse_proxy 127.0.0.1:9013
+# }
+#
+# URL: https://89-168-65-88.sslip.io/krc-public/mcp
+# Verify route ordering, Host and Origin validation, TLS and any required
+# public auth/abuse protections; only deploy after security sign-off.
