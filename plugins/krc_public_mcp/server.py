@@ -235,8 +235,17 @@ class QueueStore:
                     r = c.execute("SELECT path,complete FROM documents WHERE id=?", (doc,)).fetchone()
                 if not r or not r[1]:
                     raise ValueError("document unavailable")
+                raw_doc = Path(r[0]).read_bytes()
+                if len(raw_doc) > MAX_DOC:
+                    raise ValueError("document exceeds limit")
                 payload = dict(payload)
-                payload["document_bytes"] = Path(r[0]).stat().st_size
+                if kind == "research_report_validate":
+                    payload["report"] = raw_doc.decode("utf-8")
+                else:
+                    obj = json.loads(raw_doc.decode("utf-8"))
+                    if not isinstance(obj, dict):
+                        raise ValueError("document must contain JSON object")
+                    payload.update(obj)
             result, state = analyze(kind, payload), "done"
         except Exception as e:
             result, state = {"error": str(e)}, "failed"
@@ -259,12 +268,8 @@ class QueueStore:
                 Path(path).unlink(missing_ok=True)
                 c.execute("DELETE FROM documents WHERE id=?", (ident,))
             c.execute("DELETE FROM jobs WHERE expires<=? AND state IN ('done','failed')", (now,))
-            # Quarantine stale queued jobs after extended outage; no silent eviction.
-            cutoff = now - TEN_HOURS
-            c.execute("UPDATE jobs SET state='failed',result=?,completed=?,expires=?"
-                      " WHERE state='queued' AND created<=?",
-                      (json.dumps({"error": "queue_expired_after_outage"}), now,
-                       now + TEN_HOURS, cutoff))
+            # Never expire jobs still queued: owner requires FIFO without
+            # queue-time deadline. Cleanup applies after completion only.
 
     def background(self):
         def work():
