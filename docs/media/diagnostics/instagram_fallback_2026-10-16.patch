@@ -1,0 +1,61 @@
+diff --git a/api/src/processing/services/instagram.js b/api/src/processing/services/instagram.js
+index 0fa2552..04447f9 100644
+--- a/api/src/processing/services/instagram.js
++++ b/api/src/processing/services/instagram.js
+@@ -414,9 +414,18 @@ export default function instagram(obj) {
+     }
+ 
+     async function getPost(id, alwaysProxy) {
+-        const hasData = (data) => data
+-                                    && data.gql_data !== null
+-                                    && data?.gql_data?.xdt_shortcode_media !== null;
++        const hasData = (data) => {
++            const old = data?.gql_data?.shortcode_media || data?.gql_data?.xdt_shortcode_media;
++            return Boolean(
++                old?.video_url || old?.display_url || old?.edge_sidecar_to_children?.edges?.length
++                || data?.video_versions?.length || data?.image_versions2?.candidates?.length
++                || data?.carousel_media?.length
++            );
++        };
++        // A failed extraction stage must not suppress later independent routes.
++        const attempt = async (fn) => {
++            try { return await fn(); } catch { return undefined; }
++        };
+         let data, result;
+         try {
+             const cookie = getCookie('instagram');
+@@ -425,24 +434,24 @@ export default function instagram(obj) {
+             const token = bearer?.values()?.token;
+ 
+             // get media_id for mobile api, three methods
+-            let media_id = await getMediaId(id);
+-            if (!media_id && token) media_id = await getMediaId(id, { token });
+-            if (!media_id && cookie) media_id = await getMediaId(id, { cookie });
++            let media_id = await attempt(() => getMediaId(id));
++            if (!media_id && token) media_id = await attempt(() => getMediaId(id, { token }));
++            if (!media_id && cookie) media_id = await attempt(() => getMediaId(id, { cookie }));
+ 
+             // mobile api (bearer)
+-            if (media_id && token) data = await requestMobileApi(media_id, { token });
++            if (media_id && token) data = await attempt(() => requestMobileApi(media_id, { token }));
+ 
+             // mobile api (no cookie, cookie)
+-            if (media_id && !hasData(data)) data = await requestMobileApi(media_id);
+-            if (media_id && cookie && !hasData(data)) data = await requestMobileApi(media_id, { cookie });
++            if (media_id && !hasData(data)) data = await attempt(() => requestMobileApi(media_id));
++            if (media_id && cookie && !hasData(data)) data = await attempt(() => requestMobileApi(media_id, { cookie }));
+ 
+             // html embed (no cookie, cookie)
+-            if (!hasData(data)) data = await requestHTML(id);
+-            if (!hasData(data) && cookie) data = await requestHTML(id, cookie);
++            if (!hasData(data)) data = await attempt(() => requestHTML(id));
++            if (!hasData(data) && cookie) data = await attempt(() => requestHTML(id, cookie));
+ 
+             // web app graphql api (no cookie, cookie)
+-            if (!hasData(data)) data = await requestGQL(id);
+-            if (!hasData(data) && cookie) data = await requestGQL(id, cookie);
++            if (!hasData(data)) data = await attempt(() => requestGQL(id));
++            if (!hasData(data) && cookie) data = await attempt(() => requestGQL(id, cookie));
+         } catch {}
+ 
+         if (!hasData(data)) {
