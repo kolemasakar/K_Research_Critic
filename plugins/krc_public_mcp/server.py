@@ -321,19 +321,22 @@ def app():
         return store.upload(guest_token, chunk_base64, document_id, final)
 
     @mcp.tool()
-    def research_profile_validate(payload: dict) -> dict:
-        """Synchronous CriticProfile policy validation; no user approval implied."""
-        return analyze("research_profile_validate", payload)
+    def research_profile_validate(payload: dict, guest_token: str = "") -> dict:
+        """Enqueue CriticProfile validation in FIFO; return private guest capability."""
+        token = guest_token or store.create_guest()
+        return {"guest_token": token, **store.submit(token, "research_profile_validate", payload)}
 
     @mcp.tool()
-    def claim_evidence_audit(payload: dict) -> dict:
-        """Check independent-origin counts; never infer truth of underlying claims."""
-        return analyze("claim_evidence_audit", payload)
+    def claim_evidence_audit(payload: dict, guest_token: str = "") -> dict:
+        """Enqueue evidence-origin quality check; no truth determination."""
+        token = guest_token or store.create_guest()
+        return {"guest_token": token, **store.submit(token, "claim_evidence_audit", payload)}
 
     @mcp.tool()
-    def research_report_validate(payload: dict) -> dict:
-        """Check Ukrainian report headings and required structure."""
-        return analyze("research_report_validate", payload)
+    def research_report_validate(payload: dict, guest_token: str = "") -> dict:
+        """Enqueue Ukrainian report structure check in FIFO."""
+        token = guest_token or store.create_guest()
+        return {"guest_token": token, **store.submit(token, "research_report_validate", payload)}
 
     return mcp
 
