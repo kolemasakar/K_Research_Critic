@@ -5,7 +5,7 @@ def docker(*args):
     p = subprocess.run(["docker", *args], capture_output=True, text=True, timeout=20)
     if p.returncode:
         raise RuntimeError("docker_read_failed")
-    return p.stdout
+    return p.stdout + (p.stderr if args and args[0] == "logs" else "")
 try:
     ids = docker("ps", "-q").split()
     found = []
