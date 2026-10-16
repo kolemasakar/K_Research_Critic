@@ -1,0 +1,7 @@
+# Cobalt operator diagnostic access gate — 2026-10-16
+
+Owner authorized sanitized container diagnostics. Rechecked identity: krcops UID/GID1002, no docker group. /opt/krc-cobalt ubuntu:ubuntu0700, Docker socket root:docker0660. No advertised krc-cobalt-diagnostics, krc-cobalt-status or cobalt-diagnostics helper on PATH. User systemctl query has no user bus in this process context. No privilege changes or bypass attempted.
+
+Prepared scripts/diagnostics/cobalt_redacted_readonly_20261016.py. Requires existing authorized Docker access. Queries only docker ps, inspect and bounded logs (last 2h/300 lines); prints booleans for configured cookie path/API key source/proxy settings and fixed successful/failed load markers. Prints no raw env values, logs, cookie contents or errors. No container exec/restart/deploy or media work. Local mocked check PASS for secret redaction, stderr marker capture and explicit limits.
+
+Stage HTTP statuses cannot be recovered if not logged. COOKIE_PATH configured does not prove Instagram cookies exist or are valid; absent recent log marker is not proof of missing configuration. Actual container diagnostics remain BLOCKED by OS permissions. Run script via the existing administrator identity; do not add krcops to docker or weaken permissions. Production remains unchanged; current fallback patch remains isolated candidate. FREE_ONLY/public HOLD/Telegram LIVE BLOCKED.
