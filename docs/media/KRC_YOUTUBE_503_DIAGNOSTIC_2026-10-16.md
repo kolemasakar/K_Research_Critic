@@ -13,3 +13,9 @@ https://ai.google.dev/gemini-api/docs/troubleshooting
 A single repeat start on the same public source6yXU8a5CK2Q was submitted after the first failure and diagnostic interval, using existing Gemini Free consent. No immediate retry loop, model fallback, paid tier, platform session or configuration mutation.
 Response pending at this checkpoint; do not duplicate pending work.
 Instagram development PAUSED; Telegram LIVE BLOCKED; PUBLIC HOLD; FREE_ONLY.
+
+## Repeat terminal outcome
+job_id KRCM_f1231bb9-1fd1-4dcf-adea-8389376ecbdc; created13:33:23.537UTC,failed13:33:45.101UTC.
+Start request_id b94dba2a-03f3-4db4-bf5e-a7d135518cc6 (response recovered, reused=true); status request_id c8683af5-1715-486b-9922-b5b35921a715.
+FAILED,GEMINI_YOUTUBE_FAILED,provider_http_status503,provider_error_code service_unavailable,retryable=true,model gemini-3.8-flash,credits0,STT0,segments0.
+Two terminal jobs now show503 on this source; stop repeated live starts for this diagnostic session. Current route operational status=UNAVAILABLE; anonymous capability is not disproven. A different-source or isolated provider control would be a separate diagnostic and has not been performed. No source-specific or global outage claim established.
