@@ -133,7 +133,8 @@ Baseline: c9f5ee7b9ccccdf407265c7d085cbec42aa553be; перевірити нов�
 - src/cloud/src/public_gemini_youtube.ts
 - src/cloud/src/managed_server.ts
 - src/cloud/src/config.ts
-- src/cloud/src/managed_media_store.ts
+- src/cloud/src/managed_media_persistence.ts
+- src/cloud/src/managed_media_service.ts
 - src/cloud/tests/r2a_public_free_tier.test.ts
 - src/cloud/tests/public_gemini_youtube.test.ts
 - src/cloud/package.json
