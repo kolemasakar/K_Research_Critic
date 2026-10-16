@@ -1,3 +1,15 @@
+# CANCELLED — anonymous-only owner decision, 2026-10-16
+
+AUTH_SESSION_TEST=CANCELLED_NOT_EXECUTED.
+
+The owner restricted this project to public videos accessible without social-platform login, cookies or credentials. This supersedes the proposed session test below. Do not implement its launcher, request a session, or execute its experiment. Instagram retrieval development is PAUSED until a reproducible anonymous route is established. No production changes authorized. FREE_ONLY; PUBLIC HOLD; Telegram LIVE BLOCKED remain in force.
+
+See KRC_ANONYMOUS_PUBLIC_VIDEO_FEASIBILITY_2026-10-16.md for the four-platform evidence and decision.
+
+---
+
+Historical cancelled proposal follows for traceability only.
+
 # Instagram authorized-session isolated test plan — 2026-10-16
 
 ## Purpose and current authority
