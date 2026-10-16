@@ -1,0 +1,31 @@
+# PROPOSED systemd system service; NOT installed.
+# Dedicated user/group 'krcmcp' must be provisioned through approved Sentinel workflow.
+[Unit]
+Description=KRC Public Research MCP (isolated)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=krcmcp
+Group=krcmcp
+WorkingDirectory=/opt/krc-public-mcp
+Environment=KRC_HOST=127.0.0.1
+Environment=KRC_PORT=9013
+Environment=KRC_STATE=/var/lib/krc-public-mcp
+ExecStart=/opt/krc-public-mcp/venv/bin/python /opt/krc-public-mcp/server.py
+Restart=on-failure
+RestartSec=5
+CPUQuota=50%
+MemoryMax=192M
+TasksMax=32
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/krc-public-mcp
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
