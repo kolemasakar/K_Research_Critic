@@ -21,3 +21,11 @@ YouTube lookup404 request_id987b72ee-fa20-4ff9-9d1c-5b0958932cc9; a fresh start 
 Historical Facebook job27482717... status404 request_id6f4f5e80-dd71-455a-b257-233e8133319e.
 Historical Telegram jobafe3cfb7... status404 request_idddf5ee23-eeac-4126-b634-ead3fa42fe79.
 404 cause not established; do not equate with platform authentication failure or database loss. No Telegram or Instagram start.
+
+## Terminal YouTube result
+Start response recovered an existing in-flight job (reused=true,start_response_recovered=true), request_id5779fadc-45b1-4caa-9cf5-740c71ca095d.
+job_idKRCM_8f3accb1-7b7f-45e0-ba36-a80c00eeba19.
+Separate status read: FAILED at2026-10-16T13:31:09.542Z; request_id57aa645e-a749-4905-b0c8-688802bae15a.
+GEMINI_YOUTUBE_FAILED; provider_http_status503; provider_error_code service_unavailable; retryable=true; credits0; STT0; transcript0.
+This is provider service unavailability, not evidence a YouTube account/session is required. No immediate retry, paid fallback or model/configuration change.
+Final current matrix: Facebook tested source PASS; YouTube current execution FAIL(provider503), anonymous capability retained; Instagram PAUSED; Telegram live not run, existing BLOCKED.
