@@ -27,11 +27,12 @@ if d.exists():
         with tempfile.TemporaryDirectory(prefix="krc-audit-") as tmp:
             src=sqlite3.connect(f"file:{d}?mode=ro",uri=True,timeout=3)
             dst=sqlite3.connect(str(pathlib.Path(tmp)/"snapshot.db"))
+            source_journal_mode=src.execute("PRAGMA journal_mode").fetchone()[0]
             src.backup(dst,pages=100)
             dst.close()
             src.close()
             ck=sqlite3.connect(str(pathlib.Path(tmp)/"snapshot.db"))
-            c["sqlite"]={"integrity":ck.execute("PRAGMA integrity_check").fetchone()[0],"journal_mode":ck.execute("PRAGMA journal_mode").fetchone()[0],"snapshot_only":True}
+            c["sqlite"]={"integrity":ck.execute("PRAGMA integrity_check").fetchone()[0],"source_journal_mode":source_journal_mode,"wal_file_present":pathlib.Path(str(d)+"-wal").exists(),"snapshot_only":True}
             ck.close()
     except Exception as e:
         c["sqlite"]={"status":"PARTIAL","error_type":type(e).__name__}
