@@ -1,3 +1,5 @@
+> **SUPERSEDED for execution prioritization on 2026-10-22.** The owner changed the priorities later the same day. New canonical execution roadmap: [KRC_CANONICAL_ROADMAP_2026-10-22.md](../roadmaps/KRC_CANONICAL_ROADMAP_2026-10-22.md). This file is retained for historical audit and quality methodology only. Specifically: scholarly research/manuscript process is P0; scientific analysis/source independence/deep fact checking/legal-technical-financial audits/long documents are P1; systematic Core quality testing, full-cycle evaluation, standardized scores, conflicting event accounts and documentation consolidation are P2; all public publication/HTTPS/MEDIA/load/security activities HOLD; SHA/version mapping continuous per chat handoff; isolated negative tests/fault injection PZ last. No production modifications authorized.
+
 # KRC Owner Task Priorities and Quality Acceptance Plan — 2026-10-22
 
 Status: OWNER APPROVED PRIORITIES; execution of tasks 1-3 authorized, production/MEDIA/publication changes NOT authorized.
