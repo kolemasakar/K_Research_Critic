@@ -30,3 +30,10 @@ Scope: private KRC Core only; NO_MCP; no deployment.
 - Repository prompt static presence check: PASS at commit 8c14295a85f2b81a8150902a71bd0ff0a230c848.
 - Runtime routing / regression fixture execution: NOT_RUN.
 - Private plugin released-version parity: NOT_VERIFIED.
+
+## 2026-10-22 verification update
+- Original tar.gz archive and alternative ZIP both passed local archive readability checks and contain `skills/instructions/SKILL.md` at the archive root. The original file is 10,931 UTF-8 bytes. Thus structural absence cannot be confirmed as the cause of rejection.
+- Plugin Creator update attempts using a local path, sandbox URI and uploaded file IDs all returned `INVALID_ARGUMENT: Plugin package must contain ... skills/*/SKILL.md`. This suggests an unresolved upload/attachment resolution issue, not established malformed SKILL.md content. No release update succeeded.
+- Installed plugin remains private release 0.19.8, `pluginrel_6ad64530575c8191872f3280de9181bd`; deployed skill lacks router. Parity FAIL.
+- Prior fixture result 10/10 was a deterministic mock-only routing check, **not** an installed-plugin behavioral test. Full gate override and runtime regression remain NOT_RUN.
+- P0.3 design file committed separately, no production changes.
