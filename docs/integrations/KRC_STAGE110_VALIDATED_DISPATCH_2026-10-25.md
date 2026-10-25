@@ -1,0 +1,7 @@
+# KRC №110 — Isolated schema-validated private dispatch adapter
+
+Date 2026-10-25. Implemented `src/krc_research/private_dispatch_adapter.py` and seven regression tests. Isolated krc-cobalt research checkout full suite **320/320 PASS**, 2.77s, exit 0, using existing jsonschema path `PYTHONPATH=src:/tmp/krc-mcp-sdk-isolated`; research `.venv` does not have its own `jsonschema` package installed. No production changes or network listener.
+
+Adapter checks draft operation input JSON schemas and nested Claim/Receipt schemas, delegates to existing signed envelope private dispatcher, sanitizes errors. Bibliography test uses explicitly injected stub (zero provider calls). This adapter is not deployed and does not guarantee full normalized machine error codes: currently invalid schema -> INVALID_REQUEST, and handler exceptions -> HANDLER_ERROR. Owner consent remains **unverified** even when receipt shape is present. Standardized trusted signer checks and durable approval binding not complete.
+
+Installing jsonschema later **only in research venv** if reproducibility needed: `cd /tmp/krc-p0-offline-20261025 && .venv/bin/python -m pip install 'jsonschema==4.26.0'` (via https://pypi.org/project/jsonschema/), after package/network approval; current implementation avoids download and uses already present copy. Never modify production interpreter. Current scientific acceptance NO_GO, K_Sentinel WAITING_FOR_SENTINEL_READY, FREE_ONLY, production/MEDIA/public unchanged.
