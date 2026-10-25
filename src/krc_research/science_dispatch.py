@@ -5,6 +5,7 @@ from .interproject_contract import validate_envelope, check_replay
 from .offline_acceptance import evaluate_payload
 from .bibliography_audit import audit_bibliography
 from .inspection_receipts import InspectionReceipt,audit_receipt
+from .profile_validator import validate_profile
 
 def handle_science_request(message:dict,*,secret:bytes,signature:str,seen:set,
                            permitted:set[str],now=None, bibliography_fn=audit_bibliography)->dict:
@@ -13,7 +14,9 @@ def handle_science_request(message:dict,*,secret:bytes,signature:str,seen:set,
     operation=auth["operation"]
     request=message["payload"]
     if not isinstance(request,dict): raise ValueError("Object payload required")
-    if operation=="research.evidence.preflight":
+    if operation=="research.profile.validate":
+        if "critic_profile" not in request: raise ValueError("CriticProfile required")
+    elif operation=="research.evidence.preflight":
         if request.get("user_profile_approved") is not True:
             raise ValueError("Explicit user profile approval required")
         if "manuscript_gate" not in request:
@@ -29,7 +32,9 @@ def handle_science_request(message:dict,*,secret:bytes,signature:str,seen:set,
         seen.claim(message["client"], auth["task_id"])
     else:
         check_replay(auth["task_id"], seen)
-    if operation=="research.evidence.preflight":
+    if operation=="research.profile.validate":
+        result=validate_profile(request)
+    elif operation=="research.evidence.preflight":
         result=evaluate_payload(request)
     elif operation=="research.bibliography.audit":
         result=bibliography_fn(request["dois"])
