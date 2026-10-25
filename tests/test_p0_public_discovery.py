@@ -26,3 +26,18 @@ def test_malformed_result_denied_as_provider_failure():
 def test_bad_urls_denied():
     with pytest.raises(ValueError):fetch_public_json("https://evil.example/works")
     with pytest.raises(ValueError):fetch_public_json("https://api.openalex.org/users")
+
+from krc_research.public_discovery import reconcile_discovery
+def test_two_provider_same_doi_is_one_bibliographic_work_not_two_experiments():
+    a=discover_metadata("concrete ultrasound",provider="Crossref",fetch=cross)
+    b=discover_metadata("concrete ultrasound",provider="OpenAlex",fetch=alex)
+    z=reconcile_discovery([a,b])
+    assert z["matching_dois"]==["10.1234/test"]
+    assert z["unique_matched_works"]==1
+    assert z["independent_experimental_origins_verified"]==0
+def test_provider_failure_cannot_be_presented_as_reconciled_success():
+    a=discover_metadata("concrete ultrasound",provider="Crossref",fetch=cross)
+    b=discover_metadata("concrete ultrasound",provider="OpenAlex",fetch=lambda _: (_ for _ in ()).throw(TimeoutError()))
+    assert reconcile_discovery([a,b])["status"]=="PARTIAL"
+def test_only_one_catalog_is_rejected():
+    with pytest.raises(ValueError):reconcile_discovery([discover_metadata("concrete ultrasound",provider="Crossref",fetch=cross)])
