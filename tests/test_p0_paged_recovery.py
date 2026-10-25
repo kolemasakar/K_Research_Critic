@@ -34,3 +34,27 @@ def test_changed_total_fails_closed():
 def test_retry_failure_retains_prior_records():
     r=resume_search(failed(),fetch=broken)
     assert len(r["records"])==2 and r["pages"][-1]["status"]=="FAIL"
+
+def test_controlled_total_drift_is_partial_but_keeps_page():
+    a=failed()
+    def drift(url):
+        x=response(url)
+        x["message"]["total-results"]=6
+        return x
+    v=resume_search(a,fetch=drift,allow_total_drift=True)
+    assert v["provider_total_drift_detected"]
+    assert v["coverage_status"]=="PARTIAL_TOTAL_DRIFT"
+    assert not v["complete_catalog_coverage"]
+    assert len(v["records"])>=4
+def test_transient_http_retry_is_bounded():
+    from urllib.error import HTTPError
+    attempts=[0]
+    def sometimes(url):
+        attempts[0]+=1
+        if attempts[0]==1: raise HTTPError(url,429,"Too many requests",{},None)
+        return response(url)
+    r=resume_search(failed(),fetch=sometimes,retries=1,sleep=lambda _:None)
+    assert r["retry_log"][0]["http_status"]==429
+    assert len(r["records"])==5
+def test_invalid_retry_limit_rejected():
+    with pytest.raises(ValueError):resume_search(failed(),fetch=response,retries=8)
