@@ -26,11 +26,10 @@ Run: https://github.com/kolemasakar/K_Science/actions/runs/40206034957
 
 ## Next engineering gate
 
-1. Add safe allow-listed gateway failure stage/reason codes; never log tokens, signatures, payloads, or unrestricted exception text.
-2. Address or explicitly resolve Sentinel-Remote PR #31's open P2 finding about synchronous HTTPServer slow-connection handling.
-3. Install the reviewed change on the gateway service only; keep `:9013` and `:19014` unchanged.
-4. Run one new bounded `krc_capabilities` probe and require a matching request/response plus a `dispatch_completed` record.
-5. Verify persistent replay rejection separately. This route test does not complete KRC P0, validate scientific claims, or authorize a K_Science research-data workflow.
+1. Sentinel-Remote PR #31 head `3506d3b3f09fb73de5543c75b10ad74ad57d05f1` contains the allow-listed failure codes and bounded request handling. Thirteen isolated targeted checks passed; the P2 thread is resolved. The candidate is not deployed on Cobalt.
+2. Owner-stage the reviewed files and run `deploy/update_gateway.sh` on the gateway service only; keep `:9013` and `:19014` unchanged.
+3. Run one new bounded `krc_capabilities` probe and require a matching request/response plus a `dispatch_completed` record.
+4. Verify persistent replay rejection separately. This route test does not complete KRC P0, validate scientific claims, or authorize a K_Science research-data workflow.
 
 ## Cross-project records
 
