@@ -43,3 +43,11 @@ The current loopback listener is not reachable by a ChatGPT cloud MCP client. To
 - True ChatGPT private plugin tool invocation: NOT CONNECTED.
 - P0-D end-to-end journal manuscript: NO_GO.
 - Next step: supported secure private app registration / binding and E2E plugin test (requires platform app connection action), or use the current Desktop Commander connector as an authorized execution bridge in chats outside the plugin.
+
+## 2026-10-25 update: isolated runtime and product eligibility
+- Independent private venv successfully installed in `/home/krcops/krc-research-private/.venv`: `mcp==1.30.0`, `pytest==9.1.1`; Python 3.12.3. The private service at `127.0.0.1:19014` was restarted using this dedicated venv rather than the original /opt Research MCP venv. No changes to existing 9013 service.
+- Official Python pytest on the project test fixture: **37 passed in 0.52s**. Private MCP SDK test via dedicated venv: **PASS** on four registered local tools, Crossref/Europe PMC and fail-closed review.
+- Current private executor is managed as a remote terminal process, not a systemd service; restart durability NOT_VERIFIED. systemctl --user returned 'Failed to connect to bus'; don't misstate managed deployment.
+- Official OpenAI help center updated guidance: custom MCP connections via Plugins are available to Business/Enterprise/Edu administrators or authorized developers; Pro has certain read/fetch permissions, **Plus is not listed for user-created custom MCP servers**. See https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt. Local MCP cannot be connected directly. Secure MCP Tunnel is possible in supported plans/products but tunnel registration/permission is not exposed through installed tools here.
+- Therefore no evidence of Plus-capable private plugin tool binding. DO NOT expose 19014 via Caddy/public proxy without a supported client registration and authentication. Private KRC 0.19.14 remains skill-only with no app mapping; PLUGIN_TO_PRIVATE_MCP=BLOCKED_BY_CONNECTION_SUPPORT, not PASS.
+- The user can continue manual engineering QA from this conversation using the connected Remote Desktop Commander app, while product-specific plugin integration awaits a supported custom MCP app connection. This is distinct from claiming the KRC plugin automatically invokes MCP.
