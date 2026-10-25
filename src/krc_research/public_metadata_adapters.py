@@ -2,6 +2,8 @@
 from __future__ import annotations
 import json
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError, URLError
+import time
 from urllib.parse import quote, urlencode
 from .doi_provenance import normalize_doi
 
@@ -14,10 +16,23 @@ def _fetch_json(url: str, timeout: int = 12) -> dict:
             url.startswith("https://www.ebi.ac.uk/europepmc/webservices/rest/search?")):
         raise ValueError("Provider URL not allowlisted")
     req = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
-    with urlopen(req, timeout=timeout) as resp:
-        raw = resp.read(MAX_BYTES + 1)
-        if len(raw) > MAX_BYTES:
-            raise ValueError("Metadata response too large")
+    for attempt in range(2):
+        try:
+            with urlopen(req, timeout=timeout) as resp:
+                raw = resp.read(MAX_BYTES + 1)
+                if len(raw) > MAX_BYTES:
+                    raise ValueError("Metadata response too large")
+            break
+        except HTTPError as exc:
+            if attempt == 0 and exc.code in (429, 500, 502, 503, 504):
+                time.sleep(0.6)
+                continue
+            raise
+        except (TimeoutError, URLError):
+            if attempt == 0:
+                time.sleep(0.6)
+                continue
+            raise
     payload = json.loads(raw)
     if not isinstance(payload, dict):
         raise ValueError("Bad metadata format")
