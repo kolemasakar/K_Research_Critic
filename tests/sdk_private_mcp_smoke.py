@@ -18,7 +18,7 @@ async def main():
             await session.initialize()
             names={t.name for t in (await session.list_tools()).tools}
             expected={"krc_capabilities","krc_scholarly_preflight",
-                      "krc_doi_metadata","krc_doi_updates","krc_bibliography_audit"}
+                      "krc_doi_metadata","krc_doi_updates","krc_bibliography_audit","krc_inspection_receipt_review"}
             assert expected <= names
             capabilities=await session.call_tool("krc_capabilities",{})
             raw=capabilities.structuredContent or json.loads(capabilities.content[0].text)
@@ -38,7 +38,16 @@ async def main():
             audit=batch.structuredContent or json.loads(batch.content[0].text)
             assert audit["count"]==1 and audit["retraction_clearance"]=="NOT_ESTABLISHED"
             assert audit["records"][0]["methods_results_verified"] is False
-            print("PRIVATE_MCP_SDK_SMOKE=PASS TOOLS="+str(len(expected))+" NO_GO=PASS BATCH=PASS")
+            receipt={"source_id":"S1","origin_id":"O1","doi":"10.1038/nmat2725",
+            "document_sha256":"a"*64,"inspected_sections":["methods","results"],
+            "passage_locators":["p3 fig2"],"checked_at":"2026-10-25T13:30:00+02:00",
+            "inspector_id":"test_only","method":"FULL_TEXT","evidence_relation":"SUPPORTS",
+            "external_trace_id":"UNVERIFIED_TEST","trace_verified":False}
+            tool=await session.call_tool("krc_inspection_receipt_review",{"receipt":receipt})
+            output=tool.structuredContent or json.loads(tool.content[0].text)
+            assert output["eligible_for_independent_claim_review"] is False
+            assert "external_trace_not_verified" in output["shortfalls"]
+            print("PRIVATE_MCP_SDK_SMOKE=PASS TOOLS="+str(len(expected))+" NO_GO=PASS BATCH=PASS RECEIPT=FAIL_CLOSED")
 
 if __name__=="__main__":
     asyncio.run(main())
