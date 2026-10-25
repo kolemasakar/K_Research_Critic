@@ -19,9 +19,9 @@ def test_unverified_2013_sources_do_not_pass():
     assert result["verdict"]=="SHORTFALL"
 def test_ref27_remains_not_independent():
     x=data()
-    assert x["overlap"]["REF27_vs_REF26"].startswith("ORIGINAL_RTU_PDF_EXPLICITLY_REPORTS")
+    assert x["overlap"]["REF27_vs_REF26"]=="OFFICIAL_RTU_REF27_PDF_AND_PUBLISHER_INDEXED_REF26_TABLE1_SHOW_EXACT_SAME_NINE_SAMPLE_IDS"
     assert x["prior"][1]["experiment_origin"]=="REUSED_ELEVATED_TEMPERATURE_2013_COHORT_9_OF_27_SUSPECTED"
-    assert x["overlap"]["REF27_confidence"]=="PRIMARY_ORIGINAL_CONTENT_VERIFIED_NO_INDEPENDENT_HUMAN_ATTESTATION"
+    assert x["overlap"]["REF27_confidence"]=="EXACT_NINE_ID_COHORT_MATCH_REF26_PUBLISHER_INDEXED_TABLE_AND_REF27_OFFICIAL_PDF"
 
 def test_ref27_reports_nine_reused_samples_not_new_independent_cohort():
     x=data()
@@ -38,3 +38,11 @@ def test_official_rtu_ref27_is_hash_anchored_but_not_peer_attested():
     assert p["inspection"]["status"]=="TEXT_MATCH_WITH_METHODS_RESULTS"
     assert p["inspection"]["found"]==3
     assert p["inspection"]["independent_reviewer_signed"] is False
+
+def test_ref26_ref27_same_nine_identified_specimens():
+    x=data()
+    ids=x["overlap"]["REF27_overlap_sample_ids"]
+    assert len(ids)==9 and len(set(ids))==9
+    assert ids==["N-1.28","N-2.28","N-7.28","K-9.28","K-11.28","K-12.28","KV-19.28","KV-21.28","KV-24.28"]
+    assert x["overlap"]["REF26_primary_pdf_original_sha256"] is None
+    assert x["overlap"]["REF27_independent_experiment_count_policy"].startswith("SAME_NINE_SPECIMENS_AS_REF26")
