@@ -1,0 +1,76 @@
+{
+  "schema": "KRC-ORIGIN-REVIEW-1",
+  "registry_id": "EXT-S04",
+  "central": {
+    "doi": "10.3390/buildings14030720",
+    "title": "Methodology for Determining the Correct Ultrasonic Pulse Velocity in Concrete",
+    "year": 2024,
+    "role": "METHODOLOGICAL_SYNTHESIS",
+    "new_data_reported": false,
+    "publisher_pdf_sha256": "9a40186cdce051ce2b8f313ea87af3e7c1b30653658621f0e7130679580fc07a"
+  },
+  "prior": [
+    {
+      "id": "REF26",
+      "title": "Effect of Elevated Temperature Environment on Ultrasonic Pulse Velocity in Curing Concrete",
+      "year": 2013,
+      "authors": [
+        "Lencis",
+        "Udris",
+        "Korjakins"
+      ],
+      "original_publisher_full_text_search_index": "https://lbtufb.lbtu.lv/conference/Civil_engineering/2013/partII/Latvia_CivilEngineering2013Vol4Part2.pdf",
+      "access": "SEARCH_INDEXED_FULL_TEXT_NO_BINARY_SHA",
+      "publisher_pages": "11-18",
+      "observed_samples": 27,
+      "dimensions_cm": "15x15x15",
+      "curing_groups": [
+        "N",
+        "K",
+        "KV"
+      ],
+      "measurement_device": "UK-1401",
+      "measurement_faces": [
+        "top",
+        "side",
+        "bottom"
+      ],
+      "experiment_origin": "LENCIS_UDRIS_KORJAKINS_2013_TEMPERATURE_COHORT_27",
+      "direct_document_digest": null
+    },
+    {
+      "id": "REF27",
+      "title": "Moisture Effect on the Ultrasonic Pulse Velocity in Concrete Cured under Normal Conditions and at Elevated Temperature",
+      "doi": "10.2478/cons-2013-0011",
+      "year": 2013,
+      "authors": [
+        "Lencis",
+        "Udris",
+        "Korjakins"
+      ],
+      "source": "https://ortus0m.rtu.lv/science/en/publications/16677",
+      "access": "ABSTRACT_AND_METADATA_ONLY",
+      "experiment_origin": "UNRESOLVED",
+      "direct_document_digest": null
+    }
+  ],
+  "overlap": {
+    "REF26_vs_2024": "HIGH_CONFIDENCE_SAME_REPORTED_27_SPECIMEN_COHORT",
+    "evidence": [
+      "REF26 2013 explicitly reports 27 concrete cubes 15x15x15 cm, groups N K KV and UK-1401 device",
+      "EXT-S04 2024 describes 27 concrete 150-mm cubes, same experimental scenario and cites refs 26/27",
+      "2024 states no new data created/analyzed"
+    ],
+    "REF27_vs_REF26": "POSSIBLE_SHARED_COHORT_NOT_PROVEN",
+    "REF27_fulltext": "NOT_BINARY_VERIFIED",
+    "experimental_origin_count_policy": "REF26 and reuse in EXT-S04 count as one origin at most; REF27 excluded from independent count until cohorts traced",
+    "scientific_status": "ORIGIN_OVERLAP_RESEARCH_FINDING_ONLY_NOT_ATTESTED"
+  },
+  "bibliography_ref27": {
+    "crossref": "METADATA_ONLY",
+    "europepmc": "NOT_FOUND",
+    "editorial_updates": "NO_UPDATES_RETURNED",
+    "retraction_clearance": "NOT_ESTABLISHED"
+  },
+  "conclusion": "DO_NOT_COUNT_REF26_AND_2024_AS_TWO_EXPERIMENTAL_ORIGINS"
+}
