@@ -69,3 +69,8 @@ Sentinel-Remote PR #32 was merged into `main` as merge commit `b07e232d002b656d1
 - K_Science workflow #10 (run ID `40226898639`, branch `main`, commit `648201864c8320d6e00924fbe1eaf99b52353c33`) completed successfully, including the bounded read-only `krc_capabilities` probe.
 - This confirms the capabilities-only route. No `research.*` operation, scientific corpus, or research result was sent; broader research readiness remains unverified.
 - Deployment-script defect found: committed updater expected SHA-256 `b3da222c9ff0ed00c4c7e0fed1e36b3f8bc626b90e21980de88edac58d4238f9`, which did not match the merged module. Only the temporary on-host updater copy was corrected to the verified digest above. The repository updater still needs a follow-up fix.
+
+
+## Updater checksum follow-up — 2026-10-25
+
+A draft fix is open as [Sentinel-Remote PR #33](https://github.com/kolemasakar/Sentinel-Remote/pull/33). It updates only `deploy/update_gateway.sh` so the expected digest matches the verified PR #32 module. This PR is not merged and has no production effect.
