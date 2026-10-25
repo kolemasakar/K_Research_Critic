@@ -1,0 +1,59 @@
+{
+  "source_id": "EXT-S04",
+  "title": "Methodology for Determining the Correct Ultrasonic Pulse Velocity in Concrete",
+  "doi": "10.3390/buildings14030720",
+  "publisher_pdf_url": "https://mdpi-res.com/d_attachment/buildings/buildings-14-00720/article_deploy/buildings-14-00720.pdf",
+  "pdf_sha256": "9a40186cdce051ce2b8f313ea87af3e7c1b30653658621f0e7130679580fc07a",
+  "pdf_bytes": 2130661,
+  "pdf_pages": 15,
+  "original_available": true,
+  "source_inspection": {
+    "status": "TEXT_MATCH_WITH_METHODS_RESULTS",
+    "verified_text_passages": [
+      {
+        "page": 3,
+        "section": "METHODS",
+        "quote": "Three devices were used to measure the UPV"
+      },
+      {
+        "page": 12,
+        "section": "RESULTS",
+        "quote": "The most significant changes in the UPV"
+      },
+      {
+        "page": 14,
+        "section": "LIMITATIONS",
+        "quote": "No new data were created or analyzed in this study."
+      }
+    ]
+  },
+  "independent_reviewer_attested": false,
+  "figures_independently_verified": false,
+  "scientific_truth_verified": false,
+  "original_experimental_studies": [
+    {
+      "reference": 26,
+      "title": "Effect of elevated temperature environment on ultrasonic pulse velocity in curing concrete",
+      "year": 2013,
+      "relationship": "cited prior study, same researcher team",
+      "primary_pdf_access": "TIMEOUT"
+    },
+    {
+      "reference": 27,
+      "title": "Moisture effect on the ultrasonic pulse velocity in concrete cured under normal conditions and at elevated temperature",
+      "year": 2013,
+      "relationship": "cited prior study, same researcher team",
+      "primary_pdf_access": "NOT_TESTED"
+    }
+  ],
+  "e2e_result": {
+    "claims": {
+      "C01": "SHORTFALL",
+      "C02": "SHORTFALL",
+      "C03": "SHORTFALL"
+    },
+    "critic": "REVISE",
+    "final": "NO_GO",
+    "output_sha256": "606684c9500134df7ef6b7564bd4e8d7257ace83dd4afdb62f6c96b75d0456f8"
+  }
+}
