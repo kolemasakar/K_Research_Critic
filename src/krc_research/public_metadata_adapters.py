@@ -71,3 +71,20 @@ def reconcile_doi(doi: str, *, crossref_fetch=_fetch_json,
             "methods_results_verified":False,
             "independent_experiment_origins_verified":0,
             "retraction_status":"NOT_CLEARED"}
+
+
+def crossref_editorial_updates(doi: str, *, fetch=_fetch_json) -> dict:
+    """Discover related updates, not a clearance certificate for all retractions."""
+    normalized=normalize_doi(doi)
+    from urllib.parse import urlencode
+    url="https://api.crossref.org/works?" + urlencode({"filter":"updates:"+normalized,"rows":20})
+    payload=fetch(url)
+    if payload.get("status")!="ok" or not isinstance(payload.get("message"),dict):
+        raise ValueError("Invalid Crossref search")
+    rows=payload["message"].get("items",[])
+    edits=[{"doi":normalize_doi(x["DOI"]),"title":(x.get("title") or [""])[0],
+            "update_type":x.get("update-type"),"links_to":x.get("update-to",[])}
+           for x in rows if x.get("DOI")]
+    return {"doi":normalized,"update_search_performed":True,
+            "updates":edits,"status":"UPDATES_FOUND" if edits else "NO_UPDATES_RETURNED",
+            "retraction_clearance":"NOT_ESTABLISHED"}
