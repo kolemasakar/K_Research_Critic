@@ -77,14 +77,27 @@
       "EXT-S04 2024 describes 27 concrete 150-mm cubes, same experimental scenario and cites refs 26/27",
       "2024 states no new data created/analyzed"
     ],
-    "REF27_vs_REF26": "ORIGINAL_RTU_PDF_EXPLICITLY_REPORTS_9_SPECIMENS_USED_IN_PRIOR_ELEVATED_TEMPERATURE_STUDY",
+    "REF27_vs_REF26": "OFFICIAL_RTU_REF27_PDF_AND_PUBLISHER_INDEXED_REF26_TABLE1_SHOW_EXACT_SAME_NINE_SAMPLE_IDS",
     "REF27_fulltext": "ORIGINAL_RTU_8PAGE_PDF_SHA256_VERIFIED",
     "experimental_origin_count_policy": "REF26 and reuse in EXT-S04 count as one origin at most; REF27 excluded from independent count until cohorts traced",
     "scientific_status": "ORIGIN_OVERLAP_RESEARCH_FINDING_ONLY_NOT_ATTESTED",
     "REF27_experiment_scope": "9 cube specimens (15 cm); N/K/KV groups 3 each; specimen identifiers N-1.28, N-2.28, N-7.28, K-9.28, K-11.28, K-12.28, KV-19.28, KV-21.28, KV-24.28; earlier used for elevated-temperature research",
-    "REF27_vs_REF26_evidence": "RTU original journal PDF, printed page 72 (physical PDF p2), Materials section: nine cubes 15x15x15 cm initially used for prior elevated-temperature effects research; same N K KV groups, UK-1401 and 17h/7h cycle. Similarity to REF26 sample cohort very strong, but specimen-by-specimen matching against publisher REF26 PDF awaits binary download.",
-    "REF27_independent_experiment_count_policy": "DO_NOT_DOUBLE_COUNT_REUSED_NINE_SPECIMENS; EXACT_PARTIAL_OVERLAP_WITH_REF26_REQUIRES_MATCHING_ORIGINAL_SAMPLE_IDS",
-    "REF27_confidence": "PRIMARY_ORIGINAL_CONTENT_VERIFIED_NO_INDEPENDENT_HUMAN_ATTESTATION"
+    "REF27_vs_REF26_evidence": "REF26 (2013) Table 1 shows N:1.28,2.28,7.28; K:9.28,11.28,12.28; KV:19.28,21.28,24.28. RTU original REF27 (2013) p3 Table I uses same nine exact IDs and Methods p2 explicitly states reused earlier specimens.",
+    "REF27_independent_experiment_count_policy": "SAME_NINE_SPECIMENS_AS_REF26_CONFIRMED_AT_ID_LEVEL; REF27_ADDS_NEW_MOISTURE_MEASUREMENTS_ON_REUSED_SPECIMENS_BUT_NOT_INDEPENDENT_EXPERIMENTAL_COHORT",
+    "REF27_confidence": "EXACT_NINE_ID_COHORT_MATCH_REF26_PUBLISHER_INDEXED_TABLE_AND_REF27_OFFICIAL_PDF",
+    "REF27_overlap_sample_ids": [
+      "N-1.28",
+      "N-2.28",
+      "N-7.28",
+      "K-9.28",
+      "K-11.28",
+      "K-12.28",
+      "KV-19.28",
+      "KV-21.28",
+      "KV-24.28"
+    ],
+    "REF26_primary_pdf_original_sha256": null,
+    "REF26_access_note": "Publisher PDF independently indexed and source Table1 text available; original bytes not downloaded to KRC host"
   },
   "bibliography_ref27": {
     "crossref": "METADATA_ONLY",
