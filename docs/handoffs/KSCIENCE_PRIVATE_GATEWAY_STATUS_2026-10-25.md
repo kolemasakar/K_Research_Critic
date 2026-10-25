@@ -59,3 +59,13 @@ Run #9: https://github.com/kolemasakar/K_Science/actions/runs/40216975746
 ## Capabilities-only route merge update — 2026-10-25
 
 Sentinel-Remote PR #32 was merged into `main` as merge commit `b07e232d002b656d12afc22d5a6fad04bd57bc9f`. The live gateway source now accepts only `krc_capabilities`; other candidate operations are rejected before backend dispatch. This is a source change only: deployment to `krc-cobalt` and a post-deploy capability probe remain pending. No Research operation or project corpus was sent. The connected ChatGPT KRC R3C surface has returned MEDIA capabilities only; that does not establish Research-handler readiness.
+
+
+## Post-deployment verification — 2026-10-25
+
+- Sentinel-Remote PR #32 merge commit `b07e232d002b656d12afc22d5a6fad04bd57bc9f` is deployed on `krc-cobalt`.
+- Installed gateway module SHA-256: `0a84375e1b38b709fb685edf5972fce832862ead202258a4b5f9afd3bc58eb09`.
+- Deployment reported module updated, service active, expected listener `100.118.132.8:19015`, and unchanged MCP backend listeners.
+- K_Science workflow #10 (run ID `40226898639`, branch `main`, commit `648201864c8320d6e00924fbe1eaf99b52353c33`) completed successfully, including the bounded read-only `krc_capabilities` probe.
+- This confirms the capabilities-only route. No `research.*` operation, scientific corpus, or research result was sent; broader research readiness remains unverified.
+- Deployment-script defect found: committed updater expected SHA-256 `b3da222c9ff0ed00c4c7e0fed1e36b3f8bc626b90e21980de88edac58d4238f9`, which did not match the merged module. Only the temporary on-host updater copy was corrected to the verified digest above. The repository updater still needs a follow-up fix.
