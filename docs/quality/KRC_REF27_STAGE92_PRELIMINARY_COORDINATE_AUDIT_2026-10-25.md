@@ -1,0 +1,9 @@
+# KRC №92 — exploratory REF-27 figure coordinate audit
+
+Source PDF SHA256 `4bca8f7614ea2cf4681524edb39220dc52fd871203c225a19957e060e623289c` verified again. Directly extracted physical-page-4 original Fig1 and Fig2 rasters.
+
+Fig1 calibration: x 104..829 px→0..6% water absorption, y 410..55 px→3900..4900 m/s. Fig2 calibration: x 103..836→0..180 h, y 77..436→200..400 m/s. Vertical axis of Fig2 is **truncated at 200 m/s**, and values are declines, not speed readings. A 5-pixel illustrative localization gives Fig1 ±0.0414 percentage points / ±14.1 m/s and Fig2 ±1.23h / ±2.79m/s, excluding instrument, printing, curve identity and axis uncertainties. NOT a total uncertainty budget.
+
+Twelve visually selected provisional marker pixel locations were converted by affine transformation and stored locally with coordinates, SHA and `admitted_as_scientific_evidence=false` in `stage92_exploratory_points.json`. Some approximate endpoint magnitudes resemble individual Table I entries (e.g. N ~4804 m/s at x~5.56%), but Fig1 does not label specimen identity. These similarities are NOT a defensible row-to-curve mapping. In Figure 2 the author's prose claim of 270m/s decline in first 2h is not directly independently reproduced from the displayed truncated-axis series. The original p2 reports UK-1401 speed/time device accuracy ≤±1%, which does not furnish raw individual measurement precision.
+
+Scientific verdict: PDF source integrity PASS; graph extraction PASS; approximate axes PRELIMINARY_SINGLE_INSPECTOR; markers EXPLORATORY_ONLY; Figure↔Table I quantitative correspondence SHORTFALL / NO_GO. No independent second inspector and no remote full KRC regression in stage92 (previous baseline 249/249). FREE_ONLY, no production/public/MEDIA changes. Next: independent axes review, specimen/series provenance, reproducible point digitization, formal uncertainty budget, then full Critic regression.
