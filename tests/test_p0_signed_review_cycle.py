@@ -40,3 +40,14 @@ def test_mismatched_receipt_denied():
     p["inspection_receipts"][0]["document_sha256"]="e"*64
     with pytest.raises(ValueError):run_review_cycle(p,attestations=signed(fixture()),
         trusted_reviewer_keys={"r1":KEY},researcher_id="author",now=NOW)
+
+def test_contradictory_source_is_visible_and_blocks_gate():
+    p=fixture()
+    contradict={**p["claims"][0]["evidence"][0],
+                "source_id":"S2","origin_id":"O2","support":"CONTRADICTS"}
+    p["claims"][0]["evidence"].append(contradict)
+    r=run_review_cycle(p,attestations=signed(p),
+        trusted_reviewer_keys={"r1":KEY},researcher_id="author",now=NOW)
+    assert r["unresolved_conflicts"]
+    assert r["unresolved_conflicts"][0]["source_id"]=="S2"
+    assert r["final_gate"]=="NO_GO"
