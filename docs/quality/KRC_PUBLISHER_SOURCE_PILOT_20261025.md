@@ -1,0 +1,3 @@
+# KRC: direct publisher-text pilot, 2026-10-25
+
+Source: Li et al., Nano-Micro Letters (2024), DOI 10.1007/s40820-023-01308-x. Publisher full HTML contains Experimental Section (2.1) and Results and Discussion (3). Half-cell experiment at 5 A/g reports 82.5% capacity retention after 1000 cycles, while the pouch full cell at 1 C reports 78.3% after 1000 cycles. These are different tests and must not be combined. Web-text primary reading completed; binary PDF hash, figure reproduction, independent reviewer signature, and retraction clearance remain unverified. No claims from the owner's twelve-claim ledger have been upgraded. Scientific gate SHORTFALL.
