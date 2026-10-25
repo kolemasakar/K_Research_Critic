@@ -24,7 +24,7 @@ The handler intentionally hides exception details. The precise denial stage is u
 
 Run: https://github.com/kolemasakar/K_Science/actions/runs/40206034957
 
-## Next engineering gate
+## Historical next gate before successful probe
 
 1. Sentinel-Remote PR #31 head `e3edf6154256640c3e2442b00af670848b9f7ea8` contains the allow-listed failure codes and bounded request handling. 28/28 synthetic tests passed; the OIDC cryptographic test was not run because PyJWT was unavailable. The P2 thread is resolved. The candidate is not deployed on Cobalt.
 2. Owner-stage the reviewed files and run `deploy/update_gateway.sh` on the gateway service only; keep `:9013` and `:19014` unchanged.
