@@ -29,3 +29,21 @@ def test_no_abstract_only(tmp_path):
 def test_symlink_input_denied(tmp_path):
     p=request(tmp_path);link=tmp_path/"sym";link.symlink_to(p["path"]);p["path"]=link
     with pytest.raises(ValueError):inspect_source_file(**p)
+
+def test_actual_pdf_text_path_without_methods_results_fails_closed(tmp_path):
+    from pypdf import PdfWriter
+    p=tmp_path/"synthetic.pdf"
+    writer=PdfWriter()
+    writer.add_blank_page(width=200,height=250)
+    with p.open("wb") as out:
+        writer.write(out)
+    import hashlib
+    result=inspect_source_file(
+        path=p,approved_root=tmp_path,
+        expected_sha256=hashlib.sha256(p.read_bytes()).hexdigest(),
+        passages=[{"page":1,"section":"METHODS","exact_quote":"sample preparation details"},
+                  {"page":1,"section":"RESULTS","exact_quote":"sample outcomes unavailable"}],
+        access="FULL_TEXT")
+    assert result["access"]=="PDF_TEXT_EXTRACTED"
+    assert result["status"]=="INSPECTION_SHORTFALL"
+    assert not result["scientific_truth_verified"]
