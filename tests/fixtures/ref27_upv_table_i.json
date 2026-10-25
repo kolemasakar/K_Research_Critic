@@ -1,0 +1,92 @@
+[
+  {
+    "specimen_id": "N-1.28",
+    "upv_airdry": 4614,
+    "upv_saturated": 4804,
+    "upv_drying": 4430,
+    "upv_dry": 4032,
+    "reported_delta_sat_dry": 771,
+    "reported_delta_sat_airdry": 190,
+    "reported_delta_airdry_dry": 582
+  },
+  {
+    "specimen_id": "N-2.28",
+    "upv_airdry": 4653,
+    "upv_saturated": 4835,
+    "upv_drying": 4456,
+    "upv_dry": 4111,
+    "reported_delta_sat_dry": 724,
+    "reported_delta_sat_airdry": 183,
+    "reported_delta_airdry_dry": 542
+  },
+  {
+    "specimen_id": "N-7.28",
+    "upv_airdry": 4647,
+    "upv_saturated": 4812,
+    "upv_drying": 4546,
+    "upv_dry": 4137,
+    "reported_delta_sat_dry": 676,
+    "reported_delta_sat_airdry": 165,
+    "reported_delta_airdry_dry": 511
+  },
+  {
+    "specimen_id": "K-9.28",
+    "upv_airdry": 4441,
+    "upv_saturated": 4692,
+    "upv_drying": 4403,
+    "upv_dry": 4075,
+    "reported_delta_sat_dry": 617,
+    "reported_delta_sat_airdry": 250,
+    "reported_delta_airdry_dry": 366
+  },
+  {
+    "specimen_id": "K-11.28",
+    "upv_airdry": 4515,
+    "upv_saturated": 4786,
+    "upv_drying": 4396,
+    "upv_dry": 4051,
+    "reported_delta_sat_dry": 735,
+    "reported_delta_sat_airdry": 271,
+    "reported_delta_airdry_dry": 464
+  },
+  {
+    "specimen_id": "K-12.28",
+    "upv_airdry": 4493,
+    "upv_saturated": 4699,
+    "upv_drying": 4416,
+    "upv_dry": 3931,
+    "reported_delta_sat_dry": 767,
+    "reported_delta_sat_airdry": 205,
+    "reported_delta_airdry_dry": 562
+  },
+  {
+    "specimen_id": "KV-19.28",
+    "upv_airdry": 4555,
+    "upv_saturated": 4753,
+    "upv_drying": 4385,
+    "upv_dry": 4095,
+    "reported_delta_sat_dry": 657,
+    "reported_delta_sat_airdry": 198,
+    "reported_delta_airdry_dry": 460
+  },
+  {
+    "specimen_id": "KV-21.28",
+    "upv_airdry": 4526,
+    "upv_saturated": 4786,
+    "upv_drying": 4451,
+    "upv_dry": 4020,
+    "reported_delta_sat_dry": 766,
+    "reported_delta_sat_airdry": 260,
+    "reported_delta_airdry_dry": 506
+  },
+  {
+    "specimen_id": "KV-24.28",
+    "upv_airdry": 4511,
+    "upv_saturated": 4753,
+    "upv_drying": 4416,
+    "upv_dry": 3918,
+    "reported_delta_sat_dry": 835,
+    "reported_delta_sat_airdry": 242,
+    "reported_delta_airdry_dry": 593
+  }
+]
