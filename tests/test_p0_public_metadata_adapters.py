@@ -31,3 +31,20 @@ def test_one_provider_error_does_not_forge_two_checks():
     r=reconcile_doi(DOI,crossref_fetch=good,europepmc_fetch=bad)
     assert r["metadata_status"]=="PARTIAL"
     assert not r["methods_results_verified"] and r["independent_experiment_origins_verified"]==0
+
+def test_crossref_update_query_tracks_correction():
+    from krc_research.public_metadata_adapters import crossref_editorial_updates
+    seen=[]
+    def fake(u):
+        seen.append(u)
+        return {"status":"ok","message":{"items":[{"DOI":"10.1038/nmat2749",
+            "title":["Correction to: high-performance"],"update-type":"correction"}]}}
+    r=crossref_editorial_updates("10.1038/nmat2725",fetch=fake)
+    assert r["status"]=="UPDATES_FOUND"
+    assert r["retraction_clearance"]=="NOT_ESTABLISHED"
+    assert "updates%3A10.1038%2Fnmat2725" in seen[0]
+
+def test_no_updates_is_not_no_retractions_proof():
+    from krc_research.public_metadata_adapters import crossref_editorial_updates
+    r=crossref_editorial_updates(DOI,fetch=lambda u:{"status":"ok","message":{"items":[]}})
+    assert r["status"]=="NO_UPDATES_RETURNED" and r["retraction_clearance"]=="NOT_ESTABLISHED"
