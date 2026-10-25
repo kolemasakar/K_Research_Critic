@@ -24,7 +24,11 @@ def handle_science_request(message:dict,*,secret:bytes,signature:str,seen:set,
         if "receipt" not in request: raise ValueError("Receipt required")
     else:
         raise ValueError("Not implemented in isolated dispatcher")
-    check_replay(auth["task_id"],seen)
+    # Durable ReplayRegistry is required for deployed gateways; set is test-only.
+    if hasattr(seen, "claim"):
+        seen.claim(message["client"], auth["task_id"])
+    else:
+        check_replay(auth["task_id"], seen)
     if operation=="research.evidence.preflight":
         result=evaluate_payload(request)
     elif operation=="research.bibliography.audit":
