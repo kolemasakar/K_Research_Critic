@@ -9,6 +9,7 @@ from .reviewer_attestation import canonical
 from .disciplinary_critic import scientific_review
 from .research_pipeline_v2 import run_review_cycle
 from .specimen_lineage import audit_specimen_overlap
+from .review_policy import evaluate_review_policy
 
 def sign_scientific_review(review, key):
     if not isinstance(key,bytes) or len(key)<32:
@@ -57,8 +58,11 @@ def run_scientific_cycle(package, *, signed_reviews=(), trusted_reviewer_keys=No
                   and baseline['verified_reviewer_attestations']>0
                   and len(reviews)==len(claim_ids) and bool(claim_ids)
                   and all(x["verdict"]=="CONDITIONAL_REVIEW_PASS" for x in reviews))
+    review_policy=evaluate_review_policy(phase="INTERNAL_VALIDATION",
+        automatic_critic=baseline['critic']['history'][-1]['result'])
     return {"schema":"KRC-SCIENTIFIC-CYCLE-V3","baseline":baseline,
             "disciplinary_reviews":reviews,
+            "review_policy":review_policy,
             "specimen_lineage_audit":lineage,
             "all_claims_reviewed":len(seen)==len(claim_ids),
             "disciplinary_gate":"CONDITIONAL_REVIEW_COMPLETE" if all_complete
