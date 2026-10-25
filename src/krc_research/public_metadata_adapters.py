@@ -10,6 +10,7 @@ MAX_BYTES = 2_000_000
 
 def _fetch_json(url: str, timeout: int = 12) -> dict:
     if not (url.startswith("https://api.crossref.org/works/") or
+            url.startswith("https://api.crossref.org/works?filter=updates%3A") or
             url.startswith("https://www.ebi.ac.uk/europepmc/webservices/rest/search?")):
         raise ValueError("Provider URL not allowlisted")
     req = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
