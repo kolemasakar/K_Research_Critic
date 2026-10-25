@@ -26,7 +26,7 @@ Run: https://github.com/kolemasakar/K_Science/actions/runs/40206034957
 
 ## Next engineering gate
 
-1. Sentinel-Remote PR #31 head `3506d3b3f09fb73de5543c75b10ad74ad57d05f1` contains the allow-listed failure codes and bounded request handling. Thirteen isolated targeted checks passed; the P2 thread is resolved. The candidate is not deployed on Cobalt.
+1. Sentinel-Remote PR #31 head `3506d3b3f09fb73de5543c75b10ad74ad57d05f1` contains the allow-listed failure codes and bounded request handling. 28/28 synthetic tests passed; the OIDC cryptographic test was not run because PyJWT was unavailable. The P2 thread is resolved. The candidate is not deployed on Cobalt.
 2. Owner-stage the reviewed files and run `deploy/update_gateway.sh` on the gateway service only; keep `:9013` and `:19014` unchanged.
 3. Run one new bounded `krc_capabilities` probe and require a matching request/response plus a `dispatch_completed` record.
 4. Verify persistent replay rejection separately. This route test does not complete KRC P0, validate scientific claims, or authorize a K_Science research-data workflow.
