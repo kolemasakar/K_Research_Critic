@@ -26,3 +26,13 @@ def test_replay_blocks_second_call():
     with pytest.raises(ValueError):invoke("research.bibliography.audit",{"dois":["10.1234/example"]},seen=seen)
 def test_unmapped_admin_fails():
     with pytest.raises(ValueError):invoke("research.profile.validate",{})
+
+def test_durable_dispatch_survives_registry_recreation():
+    import tempfile
+    from pathlib import Path
+    from krc_research.replay_registry import ReplayRegistry
+    with tempfile.TemporaryDirectory() as directory:
+        path=Path(directory)/"replay.sqlite3"
+        invoke("research.bibliography.audit",{"dois":["10.1234/example"]},seen=ReplayRegistry(path))
+        with pytest.raises(ValueError):
+            invoke("research.bibliography.audit",{"dois":["10.1234/example"]},seen=ReplayRegistry(path))
