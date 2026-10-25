@@ -15,8 +15,15 @@ def sign_scientific_review(review, key):
     return hmac.new(key, canonical(review),hashlib.sha256).hexdigest()
 
 def run_scientific_cycle(package, *, signed_reviews=(), trusted_reviewer_keys=None,
-                         researcher_id=None, verified_source_ids=frozenset()):
-    baseline=run_review_cycle(package)
+                         researcher_id=None, verified_source_ids=frozenset(),
+                         source_attestations=(), now=None):
+    baseline=run_review_cycle(package,attestations=source_attestations,
+                              trusted_reviewer_keys=trusted_reviewer_keys,
+                              researcher_id=researcher_id,now=now)
+    counted_sources=set()
+    for assessed in baseline['research']['claim_verdicts']:
+        counted_sources.update(assessed['counted_sources'])
+    trusted_sources=frozenset(verified_source_ids).intersection(counted_sources)
     reviews=[]
     if signed_reviews and (not trusted_reviewer_keys or not researcher_id):
         raise ValueError("Missing trusted reviewer configuration")
@@ -41,9 +48,11 @@ def run_scientific_cycle(package, *, signed_reviews=(), trusted_reviewer_keys=No
                     sign_scientific_review(body,key),signature):
             raise ValueError("Invalid scientific review signature")
         seen.add(body["claim_id"])
-        reviews.append(scientific_review(body,verified_source_ids=verified_source_ids,
+        reviews.append(scientific_review(body,verified_source_ids=trusted_sources,
                                          reviewer_authenticated=True))
-    all_complete=(len(reviews)==len(claim_ids) and bool(claim_ids)
+    all_complete=(baseline['research']['preflight']['status']=='READY_FOR_AUTHOR_REVIEW'
+                  and baseline['verified_reviewer_attestations']>0
+                  and len(reviews)==len(claim_ids) and bool(claim_ids)
                   and all(x["verdict"]=="CONDITIONAL_REVIEW_PASS" for x in reviews))
     return {"schema":"KRC-SCIENTIFIC-CYCLE-V3","baseline":baseline,
             "disciplinary_reviews":reviews,
