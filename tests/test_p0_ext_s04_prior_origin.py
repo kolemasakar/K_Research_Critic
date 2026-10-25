@@ -19,5 +19,13 @@ def test_unverified_2013_sources_do_not_pass():
     assert result["verdict"]=="SHORTFALL"
 def test_ref27_remains_not_independent():
     x=data()
-    assert x["overlap"]["REF27_vs_REF26"]=="POSSIBLE_SHARED_COHORT_NOT_PROVEN"
-    assert x["prior"][1]["experiment_origin"]=="UNRESOLVED"
+    assert x["overlap"]["REF27_vs_REF26"].startswith("EXPLICIT_REUSE_OF_NINE_PREVIOUS")
+    assert x["prior"][1]["experiment_origin"]=="POTENTIALLY_SUBSET_OF_REF26_27_CUBE_SERIES"
+    assert x["overlap"]["REF27_confidence"]=="TEXTUAL_PRELIMINARY_SOURCE_COPY_UNATTESTED"
+
+def test_ref27_reports_nine_reused_samples_not_new_independent_cohort():
+    x=data()
+    assert x["prior"][1]["sample_count_reported_transcription"]==9
+    assert x["prior"][1]["prior_study_reuse_reported_transcription"]
+    assert x["overlap"]["REF27_independent_experiment_count_policy"].startswith("ZERO_ADDITIONAL_")
+    assert x["prior"][1]["direct_document_digest"] is None
