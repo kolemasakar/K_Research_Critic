@@ -27,7 +27,7 @@ def test_ref27_reports_nine_reused_samples_not_new_independent_cohort():
     x=data()
     assert x["prior"][1]["sample_count_reported_transcription"]==9
     assert x["prior"][1]["prior_study_reuse_reported_transcription"]
-    assert x["overlap"]["REF27_independent_experiment_count_policy"].startswith("DO_NOT_DOUBLE_COUNT")
+    assert x["overlap"]["REF27_independent_experiment_count_policy"].startswith("SAME_NINE_SPECIMENS_AS_REF26")
     assert x["prior"][1]["direct_document_digest"]=="4bca8f7614ea2cf4681524edb39220dc52fd871203c225a19957e060e623289c"
 
 def test_official_rtu_ref27_is_hash_anchored_but_not_peer_attested():
