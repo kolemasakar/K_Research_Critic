@@ -1,0 +1,104 @@
+{
+  "study_id": "KSCIENCE_EXT-S04_20261025",
+  "registry_origin": "kolemasakar/K_Science/literature/source_register/INTERNATIONAL_SEARCH_2026-10-23.md",
+  "selection": "EXT-S04",
+  "source_metadata": {
+    "title": "Methodology for Determining the Correct Ultrasonic Pulse Velocity in Concrete",
+    "doi": "10.3390/buildings14030720",
+    "publisher_url": "https://www.mdpi.com/2075-5309/14/3/720",
+    "publisher_notes_url": "https://www.mdpi.com/2075-5309/14/3/720/notes",
+    "access_exercised": "PUBLISHER_HTML_METHODS_RESULTS_READ_NO_BINARY_HASH",
+    "source_type": "SINGLE_ORIGIN_SYNTHESIS_OF_PRIOR_STUDIES"
+  },
+  "claims": [
+    {
+      "claim_id": "C01",
+      "assertion": "The paper specifies kV=f(c;t;W;T) to correct measured ultrasonic pulse velocity.",
+      "required": 1,
+      "evidence": [
+        {
+          "source_id": "EXT-S04",
+          "origin_id": "DOI:10.3390/buildings14030720",
+          "access": "FULL_TEXT",
+          "support": "SUPPORTED",
+          "inspected_methods_results": true,
+          "scope_matched": true,
+          "provenance_verified": false,
+          "primary_url": "https://www.mdpi.com/2075-5309/14/3/720"
+        }
+      ]
+    },
+    {
+      "claim_id": "C02",
+      "assertion": "The paper reports a 27-specimen 150 mm cube moisture/elevated temperature investigation and a separate 28-specimen low-temperature investigation; the experiments are not two independent papers.",
+      "required": 1,
+      "evidence": [
+        {
+          "source_id": "EXT-S04",
+          "origin_id": "DOI:10.3390/buildings14030720",
+          "access": "FULL_TEXT",
+          "support": "SUPPORTED",
+          "inspected_methods_results": true,
+          "scope_matched": true,
+          "provenance_verified": false,
+          "primary_url": "https://www.mdpi.com/2075-5309/14/3/720"
+        }
+      ]
+    },
+    {
+      "claim_id": "C03",
+      "assertion": "The publication establishes an independently validated universal relationship that predicts compressive strength solely from corrected UPV.",
+      "required": 2,
+      "evidence": [
+        {
+          "source_id": "EXT-S04",
+          "origin_id": "DOI:10.3390/buildings14030720",
+          "access": "FULL_TEXT",
+          "support": "INSUFFICIENT",
+          "inspected_methods_results": true,
+          "scope_matched": false,
+          "provenance_verified": false,
+          "primary_url": "https://www.mdpi.com/2075-5309/14/3/720"
+        }
+      ]
+    }
+  ],
+  "inspection_receipts": [],
+  "search_runs": [
+    {
+      "provider": "Web search and MDPI publisher page",
+      "query": "10.3390/buildings14030720 Methodology for Determining the Correct Ultrasonic Pulse Velocity in Concrete",
+      "executed_at": null,
+      "hit_count": null,
+      "exported_records": 1,
+      "filter_description": "One article selected from K_Science registry. No exhaustive database-export count."
+    }
+  ],
+  "manuscript_gate": {
+    "journal_policy_checked": false,
+    "search_audit_reproducible": false,
+    "primary_sources_inspected": false,
+    "novelty_reviewed": false,
+    "citations_validated": false,
+    "scientific_methods_audited": false,
+    "rights_and_ai_disclosure_done": false,
+    "human_author_approved": false,
+    "detector_run_records": [],
+    "detector_check_status": "NOT_RUN",
+    "detector_authorized": false
+  },
+  "critic_rounds": [
+    {
+      "round": 1,
+      "revision_id": "KSCIENCE-EXT-S04-PILOT-v1",
+      "critic": "REVISE"
+    }
+  ],
+  "source_limitations": [
+    "Publisher HTML contains Methods and Results; article itself calls itself synthesis/review of prior works.",
+    "Publisher Data Availability states no new data were created or analyzed.",
+    "Publisher HTML version notes show updates in 2025/2026, contents differential not checked.",
+    "Original PDF binary was blocked by publisher HTTP 403 on KRC host; no independent artifact hash.",
+    "No independent reviewer attestation."
+  ]
+}
