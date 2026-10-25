@@ -32,10 +32,22 @@ def run_review_cycle(package, *, attestations=(), trusted_reviewer_keys=None,
             if verified["verified"]:
                 verified_hashes.add(verified["receipt_sha256"])
     research=execute_research(package,attested_receipt_hashes=frozenset(verified_hashes))
+    conflicts=[]
+    for claim in package.get("claims",[]):
+        for evidence in claim.get("evidence",[]):
+            if evidence.get("support") in {"CONTRADICTS","CONTRADICTED"}:
+                conflicts.append({"claim_id":claim.get("claim_id"),
+                                  "source_id":evidence.get("source_id"),
+                                  "issue":"UNRESOLVED_CONTRADICTION"})
+    for raw in package.get("inspection_receipts",[]):
+        if raw.get("evidence_relation")=="CONTRADICTS":
+            conflicts.append({"claim_id":None,"source_id":raw.get("source_id"),
+                              "issue":"CONTRADICTORY_INSPECTION"})
     critic=iterate_critic(research)
-    passed=critic["history"][-1]["result"]["verdict"]!="REVISE"
+    passed=critic["history"][-1]["result"]["verdict"]!="REVISE" and not conflicts
     return {"schema":"KRC-RESEARCH-V2","research":research,"critic":critic,
             "verified_reviewer_attestations":len(verified_hashes),
+            "unresolved_conflicts":conflicts,
             "attestation_limit":"REVIEWER_IDENTITY_AND_DOCUMENT_BINDING_NOT_SCIENTIFIC_TRUTH",
             "final_gate":"AWAIT_INDEPENDENT_SCIENTIFIC_REVIEW" if passed else "NO_GO",
             "publication_ready":False}
