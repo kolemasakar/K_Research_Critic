@@ -4,7 +4,7 @@ Precedence: this document supersedes the execution priorities of KRC_OWNER_PRIOR
 
 ## Principles and product boundary
 - FREE_ONLY, Ukrainian by default, evidence traceability, CriticProfile approval, explicit risk floors, external-source cross-checking, Critic and revised final reports.
-- Personal migrated KRC NO_MCP 0.19.8 remains PRIVATE; Research MCP on OCI remains distinct, MEDIA separately frozen.
+- Personal KRC remains PRIVATE. As of owner decision 2026-10-25, **private MCP execution is ALLOWED** where a supported, securely registered ChatGPT app exists; no public plugin distribution is intended. Public Research MCP and MEDIA remain distinct and frozen. Skill-only private release 0.19.14 has no bound private MCP app yet.
 - The scientific-writing workflow aims for original, independently verifiable, publishable scholarly work in compliance with journals' AI disclosure/authorship rules. No promise to pass AI-text detectors, no deceptive human-authorship claims, no fabricated citations/data, no detector evasion as an acceptance metric. Detectors can be inaccurate and vary by provider; use editorial validation, provenance and reproducibility instead.
 - Roadmap labels: P0 first priority; P1 implement after P0; P2 planned; HOLD paused; PZ last.
 - GitHub and deployed SHA/version mapping maintained continuously when any executable code is changed, and verified during every chat handoff. No deployment requested now.
@@ -52,6 +52,11 @@ Resume only by explicit owner decision.
 PZ.1 Isolated negative behavior tests for research tools and API validation.
 PZ.2 Fault injection (queue exhaustion, worker interruption, SQLite/disk faults, TTL/retention, malformed payloads, rate limit), on isolated copies only; no production experiments.
 This is separate from ordinary safety checks and acceptance validation embedded in P0/P1/P2.
+
+## Private MCP execution authorization — 2026-10-25
+- Owner permitted `With MCP` for PRIVATE KRC; this supersedes earlier blanket NO_MCP preference for private execution only. Do not silently open HTTP endpoints to the public or treat an unauthenticated local service as cloud-accessible.
+- Loopback test executor and dedicated virtual environment created under `/home/krcops/krc-research-private/` on `krc-cobalt`; localhost `127.0.0.1:19014`, separate from existing service `9013`. Live SDK tool calls passed; private plugin app binding/secure remote access remains NOT_CONNECTED.
+- Use FREE_ONLY, user-controlled auth and least privilege for any future private app registration. Public catalog publication, MEDIA, load tests and public MCP remain HOLD.
 
 ## Immediate next checkpoint
 Implement P0.1-P0.2 specification and one scientifically honest sample workflow first, then P0.3-P0.7. P1 only after P0 acceptance; P2 planned after P1. Mark tests PASS only when executed.
