@@ -54,3 +54,8 @@ Run #8: https://github.com/kolemasakar/K_Science/actions/runs/40216011229
 Run #9: https://github.com/kolemasakar/K_Science/actions/runs/40216975746
 
 **Accepted boundary:** this private route is verified only for one bounded read-only `krc_capabilities` call and persistent replay rejection. No scientific corpus was transmitted. Other operations, K_Science research-data transfer, KRC P0, scientific conclusions, and publication readiness remain separate gates. FREE_ONLY remains in force; no public endpoint or provider/payment fallback was enabled.
+
+
+## Capabilities-only route merge update — 2026-10-25
+
+Sentinel-Remote PR #32 was merged into `main` as merge commit `b07e232d002b656d12afc22d5a6fad04bd57bc9f`. The live gateway source now accepts only `krc_capabilities`; other candidate operations are rejected before backend dispatch. This is a source change only: deployment to `krc-cobalt` and a post-deploy capability probe remain pending. No Research operation or project corpus was sent. The connected ChatGPT KRC R3C surface has returned MEDIA capabilities only; that does not establish Research-handler readiness.
