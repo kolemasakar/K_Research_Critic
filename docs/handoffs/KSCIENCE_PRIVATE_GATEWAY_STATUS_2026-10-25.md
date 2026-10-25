@@ -48,7 +48,7 @@ The earlier workflow #4 HTTP 403 entry above is historical and is superseded for
 - Workflow #8 (`40216011229`) returned PASS for read-only `krc_capabilities`; Cobalt journal recorded matching `dispatch_completed` for `KS-051748b26b824634b82a308855f94852`.
 - Workflow #9 (`40216975746`) sent the identical signed envelope twice and reported `replay_status=REJECTED`; Cobalt journal recorded `dispatch_completed` for `KS-572b7cac7d0e415fb50571343352372d`, followed by `request_failed / envelope_replay / REPLAY_REJECTED`.
 - The gateway-only updater confirmed the module updated, service active on `100.118.132.8:19015`, and existing backend listeners unchanged.
-- PR #31 remains open and unmerged; implementation baseline `cde52bbabdee34913bafe454f0600418c7447ae0`. Latest GitHub check reported `mergeable=false` without a reason; refresh before any merge decision. The P2 slow-connection thread is resolved/outdated; deployed code has bounded workers and an absolute 10-second request-read deadline.
+- PR #31 remains open and unmerged; implementation baseline `cde52bbabdee34913bafe454f0600418c7447ae0`. Refresh GitHub mergeability before any merge decision. The P2 slow-connection thread is resolved/outdated; deployed code has bounded workers and an absolute 10-second request-read deadline.
 
 Run #8: https://github.com/kolemasakar/K_Science/actions/runs/40216011229  
 Run #9: https://github.com/kolemasakar/K_Science/actions/runs/40216975746
