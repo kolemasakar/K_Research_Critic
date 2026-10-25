@@ -92,3 +92,33 @@ def discover_metadata(query:str,*,provider:str,limit:int=5,fetch=fetch_public_js
                 "error_type":type(exc).__name__,
                 "results_total":None,"exported_records":0,"records":[],
                 "scientific_evidence_verified":False}
+
+def reconcile_discovery(results:list[dict])->dict:
+    """Cross-provider DOI matches are two catalog records, not two studies."""
+    if not isinstance(results,list) or len(results)!=2:
+        raise ValueError("Expected both catalog query outputs")
+    if {x.get("provider") for x in results}!={"Crossref","OpenAlex"}:
+        raise ValueError("Both named catalogs required")
+    if any(x.get("status")!="METADATA_RETRIEVED" for x in results):
+        return {"schema":"KRC-DISCOVERY-CROSSCHECK-1","status":"PARTIAL",
+                "matching_dois":[],"scientific_evidence_verified":False}
+    def dois(row):
+        values=set()
+        for item in row["records"]:
+            doi=item.get("doi")
+            if not isinstance(doi,str):
+                continue
+            doi=doi.lower().strip()
+            for prefix in ("https://doi.org/","http://doi.org/","doi:"):
+                if doi.startswith(prefix):
+                    doi=doi[len(prefix):]
+            if doi.startswith("10.") and "/" in doi:
+                values.add(doi)
+        return values
+    x=next(row for row in results if row["provider"]=="Crossref")
+    y=next(row for row in results if row["provider"]=="OpenAlex")
+    matching=sorted(dois(x)&dois(y))
+    return {"schema":"KRC-DISCOVERY-CROSSCHECK-1",
+            "status":"CROSS_PROVIDER_METADATA_MATCH" if matching else "NO_SHARED_DOIS_IN_RETURNED_PAGE",
+            "matching_dois":matching,"unique_matched_works":len(matching),
+            "scientific_evidence_verified":False,"independent_experimental_origins_verified":0}
