@@ -1,0 +1,11 @@
+# KRC №113 — live gateway read-only audit and research integration readiness
+
+Date 2026-10-25. No deployment, no research provider call, no production file changes. Re-ran isolated KRC tests on krc-cobalt: **334/334 PASS**, 2.71s, exit 0.
+
+Active deployment introspection: `kscience-krc-gateway.service` active PID 105511 as `krcgw`, ExecStart `/opt/krc-public-mcp/venv/bin/python -m bridges.kscience_gateway`; localhost service listening at `127.0.0.1:9012`, public research MCP at `127.0.0.1:9013`; systemd `NoNewPrivileges=yes`, `ProtectSystem=strict`, `PrivateTmp=yes`.
+
+Read-only source audit `/opt/kscience-krc-gateway/bridges/kscience_gateway.py`: pinned GitHub OIDC issuer/audience/repository/workflow/ref claims and GitHub-hosted runner identity; Tailscale whois with fixed peer tag; gateway control enabled check; SQLite peer request rate limit; signed envelope and durable replay guard; upstream MCP read-only list functionality. LIVE_ALLOWED exactly `krc_capabilities`, `krc_tools_list`; MCP_CALL_ALLOWED exactly `krc_capabilities`; tools/list is diagnostic only and does not call research tools. Backend URL is loopback `127.0.0.1:19014/mcp`, not the public MCP on 9013. Durable SQLite guard uses atomic INSERT and permanently retains request ID tombstones. Gateway intentionally rejects all four private operations `research.profile.validate`, `research.evidence.preflight`, `research.bibliography.audit`, `research.inspection.review`.
+
+Separate isolated Python dispatcher has four offline branches with 334 QA tests, but no authenticated live gateway mapping. Owner CriticProfile consent is not independently authenticated. Full stable machine input/output/error contract not yet accepted; external bibliography calls prohibited for zero test. **Live 4/4 acceptance NO_GO**, regardless of active gateway. Future integration gate: approve four-operation schemas and no-leak errors, owner authority attestation, mapping and negative gateway tests in staging, never weaken public allowlist without explicit separate change control.
+
+FREE_ONLY; no production/MEDIA/public edits; no secrets or private science materials published.
