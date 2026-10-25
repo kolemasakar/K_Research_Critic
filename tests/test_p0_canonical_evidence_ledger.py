@@ -55,3 +55,16 @@ def test_legacy_import_does_not_forge_inspection():
 
 def test_import_count_mismatch():
     with pytest.raises(ValueError): adapt_legacy_report({"count":0,"claims":[{"claim_id":"C01"}]})
+
+def test_legacy_missing_url_list_cannot_be_invented():
+    raw={"count":1,"document_version":"v1.4","claims":[{
+        "claim_id":"C09","required":1,"verdict":"PASS","achieved_independent":1,
+        "assertion":"Li crosstalk","source_ids":"[9],[10]"}]}
+    imported=adapt_legacy_report(raw)
+    assert imported["claims"][0]["source_urls"] == []
+    assert imported["claims"][0]["independent_assessment"]["verdict"] == "SHORTFALL"
+
+def test_verified_urls_are_not_proof_without_provenance():
+    r=assess("C09",1,[item(primary_url="https://nature.com/1",provenance_verified=False),
+                      item(source_id="S2",primary_url="https://rsc.org/1",provenance_verified=False)])
+    assert r["achieved_independent"]==0
