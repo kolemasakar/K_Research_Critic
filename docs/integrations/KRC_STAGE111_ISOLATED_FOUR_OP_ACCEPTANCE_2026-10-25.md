@@ -1,0 +1,9 @@
+# KRC №111: private four-operation offline acceptance
+
+2026-10-25. Implemented `private_stage111.py` with scope-limited, sanitized operation-denied response and a sample HMAC-bound receipt for CriticProfile digest, profile ID/version and signer ID. This demonstrates integrity against a previously configured trusted key, **not independent human identity or owner consent**. Existing signed private envelope validates HMAC, TTL and replay separately. No live gateway/listener deployed; public MCP unaffected.
+
+Six added tests include approval digest bind, tamper detection, unknown signer, bad signature, all FOUR private operations through an isolated wrapper with a no-network bibliography stub, and ACL denial. **326/326 PASS** full isolated suite at krc-cobalt (2.91s, exit 0), using `PYTHONPATH=src:/tmp/krc-mcp-sdk-isolated .venv/bin/python -m pytest -q tests/`.
+
+Reported owner `ubuntu` attempted installing `jsonschema==4.26.0` in `/tmp/krc-p0-offline-20261025/.venv` and received `[Errno 13] Permission denied` writing `typing_extensions.py`. Runtime inspection confirms shell user krcops owns `.venv`, jsonschema not installed in it. Avoid sudo pip and broad chmod; operate as directory owner, with a pinned research dependency when authorized. No global/production package change.
+
+Limits: `isolated_dispatch` only classifies operation denial; underlying adapter still maps other exceptions to HANDLER_ERROR; full error taxonomy not independently accepted. Signer registry and human identity attestation remain not ready. Evidence data acceptance is local only. K_Sentinel WAITING_FOR_SENTINEL_READY; FREE_ONLY; scientific NO_GO.
