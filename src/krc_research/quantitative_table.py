@@ -39,7 +39,7 @@ def compare_table_rows(rows,*,approved_root):
             expected_sha256=row["sha256"],access=row["access"],passages=[descriptor])
         quote_found=(check["status"]!="HASH_MISMATCH" and
                      bool(check["inspections"]) and check["inspections"][0]["found"])
-        pattern=r"(?<![\\d.])(-?\\d+(?:\\.\\d+)?)(?![\\d.])\\s*"+re.escape(row["unit"])+r"(?![A-Za-z])"
+        pattern=r"(?<![\d.])(-?\d+(?:\.\d+)?)(?![\d.])\s*"+re.escape(row["unit"])+r"(?![A-Za-z])"
         numeric=any(Decimal(m.group(1))==quantity for m in re.finditer(pattern,quote))
         status="SOURCE_VALUE_MATCH" if quote_found and numeric else "SHORTFALL"
         results.append({"table_id":row["table_id"],"row_id":row["row_id"],
