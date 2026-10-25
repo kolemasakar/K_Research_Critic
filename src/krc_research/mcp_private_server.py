@@ -7,6 +7,7 @@ import os
 from mcp.server.fastmcp import FastMCP
 from krc_research.offline_acceptance import evaluate_payload
 from krc_research.public_metadata_adapters import reconcile_doi, crossref_editorial_updates
+from krc_research.bibliography_audit import audit_bibliography
 
 HOST = "127.0.0.1"
 PORT = int(os.environ.get("KRC_PRIVATE_RESEARCH_PORT", "19014"))
@@ -33,6 +34,11 @@ def krc_doi_metadata(doi: str) -> dict:
 def krc_doi_updates(doi: str) -> dict:
     """Find Crossref editorial corrections; no guarantee of no retractions."""
     return crossref_editorial_updates(doi)
+
+@mcp.tool()
+def krc_bibliography_audit(dois: list[str]) -> dict:
+    """Bounded Crossref/EuropePMC/editorial DOI review. Metadata only; no retraction clearance."""
+    return audit_bibliography(dois)
 
 @mcp.tool()
 def krc_capabilities() -> dict:
