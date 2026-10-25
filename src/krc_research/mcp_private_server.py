@@ -9,6 +9,9 @@ from krc_research.offline_acceptance import evaluate_payload
 from krc_research.public_metadata_adapters import reconcile_doi, crossref_editorial_updates
 from krc_research.bibliography_audit import audit_bibliography
 from krc_research.inspection_receipts import InspectionReceipt, audit_receipt
+from krc_research.replay_registry import ReplayRegistry
+from krc_research.science_dispatch import handle_science_request
+from pathlib import Path
 
 HOST = "127.0.0.1"
 PORT = int(os.environ.get("KRC_PRIVATE_RESEARCH_PORT", "19014"))
@@ -48,6 +51,25 @@ def krc_inspection_receipt_review(receipt: dict) -> dict:
     if not isinstance(receipt, dict) or len(json.dumps(receipt).encode()) > 32000:
         raise ValueError("Invalid receipt payload")
     return audit_receipt(InspectionReceipt(**receipt))
+
+
+@mcp.tool()
+def krc_science_signed_request(envelope: dict, signature: str) -> dict:
+    """Sentinel-governed signed K_Science request. Closed until credentials are provisioned."""
+    key_path=os.environ.get("KRC_SENTINEL_SCIENCE_KEY_FILE")
+    if not key_path:
+        return {"status":"NOT_CONFIGURED", "reason":"Sentinel service identity/key not provisioned"}
+    key_file=Path(key_path)
+    if key_file.is_symlink() or not key_file.is_file() or (key_file.stat().st_mode & 0o077):
+        raise ValueError("Unsafe credential permissions")
+    key=bytes.fromhex(key_file.read_text(encoding="ascii").strip())
+    if len(key)<32:
+        raise ValueError("Invalid Sentinel-issued key")
+    replay=ReplayRegistry(os.environ.get("KRC_SCIENCE_REPLAY_DB",
+                          "/home/krcops/krc-research-private/state/science_replay.sqlite3"))
+    return handle_science_request(envelope,secret=key,signature=signature,
+                    seen=replay,permitted={"research.evidence.preflight",
+                         "research.bibliography.audit","research.inspection.review"})
 
 @mcp.tool()
 def krc_capabilities() -> dict:
