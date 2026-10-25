@@ -19,13 +19,22 @@ def test_unverified_2013_sources_do_not_pass():
     assert result["verdict"]=="SHORTFALL"
 def test_ref27_remains_not_independent():
     x=data()
-    assert x["overlap"]["REF27_vs_REF26"].startswith("EXPLICIT_REUSE_OF_NINE_PREVIOUS")
-    assert x["prior"][1]["experiment_origin"]=="POTENTIALLY_SUBSET_OF_REF26_27_CUBE_SERIES"
-    assert x["overlap"]["REF27_confidence"]=="TEXTUAL_PRELIMINARY_SOURCE_COPY_UNATTESTED"
+    assert x["overlap"]["REF27_vs_REF26"].startswith("ORIGINAL_RTU_PDF_EXPLICITLY_REPORTS")
+    assert x["prior"][1]["experiment_origin"]=="REUSED_ELEVATED_TEMPERATURE_2013_COHORT_9_OF_27_SUSPECTED"
+    assert x["overlap"]["REF27_confidence"]=="PRIMARY_ORIGINAL_CONTENT_VERIFIED_NO_INDEPENDENT_HUMAN_ATTESTATION"
 
 def test_ref27_reports_nine_reused_samples_not_new_independent_cohort():
     x=data()
     assert x["prior"][1]["sample_count_reported_transcription"]==9
     assert x["prior"][1]["prior_study_reuse_reported_transcription"]
-    assert x["overlap"]["REF27_independent_experiment_count_policy"].startswith("ZERO_ADDITIONAL_")
-    assert x["prior"][1]["direct_document_digest"] is None
+    assert x["overlap"]["REF27_independent_experiment_count_policy"].startswith("DO_NOT_DOUBLE_COUNT")
+    assert x["prior"][1]["direct_document_digest"]=="4bca8f7614ea2cf4681524edb39220dc52fd871203c225a19957e060e623289c"
+
+def test_official_rtu_ref27_is_hash_anchored_but_not_peer_attested():
+    x=data()
+    p=x["prior"][1]
+    assert p["access"]=="FULL_TEXT_ORIGINAL_RTU_PDF_SHA256_AND_PAGE_VERIFIED"
+    assert p["pdf_page_count"]==8
+    assert p["inspection"]["status"]=="TEXT_MATCH_WITH_METHODS_RESULTS"
+    assert p["inspection"]["found"]==3
+    assert p["inspection"]["independent_reviewer_signed"] is False
