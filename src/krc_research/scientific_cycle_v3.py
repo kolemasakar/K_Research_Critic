@@ -8,6 +8,7 @@ import hmac
 from .reviewer_attestation import canonical
 from .disciplinary_critic import scientific_review
 from .research_pipeline_v2 import run_review_cycle
+from .specimen_lineage import audit_specimen_overlap
 
 def sign_scientific_review(review, key):
     if not isinstance(key,bytes) or len(key)<32:
@@ -50,12 +51,15 @@ def run_scientific_cycle(package, *, signed_reviews=(), trusted_reviewer_keys=No
         seen.add(body["claim_id"])
         reviews.append(scientific_review(body,verified_source_ids=trusted_sources,
                                          reviewer_authenticated=True))
-    all_complete=(baseline['research']['preflight']['status']=='READY_FOR_AUTHOR_REVIEW'
+    lineage=audit_specimen_overlap(package['specimen_lineage']) if 'specimen_lineage' in package else None
+    lineage_cleared=lineage is None or lineage['verdict']=='NO_ID_OVERLAP_DETECTED'
+    all_complete=(lineage_cleared and baseline['research']['preflight']['status']=='READY_FOR_AUTHOR_REVIEW'
                   and baseline['verified_reviewer_attestations']>0
                   and len(reviews)==len(claim_ids) and bool(claim_ids)
                   and all(x["verdict"]=="CONDITIONAL_REVIEW_PASS" for x in reviews))
     return {"schema":"KRC-SCIENTIFIC-CYCLE-V3","baseline":baseline,
             "disciplinary_reviews":reviews,
+            "specimen_lineage_audit":lineage,
             "all_claims_reviewed":len(seen)==len(claim_ids),
             "disciplinary_gate":"CONDITIONAL_REVIEW_COMPLETE" if all_complete
                        else "REVISE",
