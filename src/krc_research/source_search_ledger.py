@@ -20,6 +20,8 @@ def validate_search_run(run: SearchRun) -> dict:
     for val in (run.hit_count, run.exported_records):
         if val is not None and (not isinstance(val, int) or isinstance(val, bool) or val < 0):
             raise ValueError("Invalid count")
+    if run.hit_count is not None and run.exported_records is not None and run.exported_records > run.hit_count:
+        raise ValueError("Exported records exceed result count")
     if run.executed_at:
         stamp = datetime.fromisoformat(run.executed_at.replace("Z", "+00:00"))
         if stamp.tzinfo is None or stamp.utcoffset() is None:
