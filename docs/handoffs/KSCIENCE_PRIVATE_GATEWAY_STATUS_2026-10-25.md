@@ -1,6 +1,6 @@
 # K_Science → KRC gateway status — 2026-10-25
 
-Status: **PRIVATE GATEWAY DEPLOYED / FIRST READ-ONLY PROBE FAILED / E2E NOT ACCEPTED**
+Status: **PRIVATE krc_capabilities ROUTE PASS / REPLAY REJECTION PASS / SCIENTIFIC WORKFLOW NOT ACCEPTED**
 
 ## KRC backend boundary
 
@@ -8,7 +8,7 @@ Status: **PRIVATE GATEWAY DEPLOYED / FIRST READ-ONLY PROBE FAILED / E2E NOT ACCE
 - Public research MCP remains loopback `127.0.0.1:9013`.
 - The Sentinel-Remote gateway is a separate service on the Cobalt Tailscale address `100.118.132.8:19015`; it calls only the existing private backend and carries a six-tool allowlist.
 - Existing MCP services and scientific data were not changed by the route setup. The route probe sent only `krc_capabilities` with an empty payload; it did not transmit the K_Science research corpus.
-- The KRC operation response has not been verified through this route.
+- One bounded read-only `krc_capabilities` response has been verified through the route; this is not acceptance of a scientific research task or wider operation scope.
 
 ## Probe evidence
 
@@ -39,3 +39,18 @@ Run: https://github.com/kolemasakar/K_Science/actions/runs/40206034957
 - K_Science next-chat handoff: `docs/BOOTSTRAP_PACKAGE_2026-10-25_KSCIENCE_KRC_GATEWAY.md`
 
 FREE_ONLY remains in force. No provider/payment fallback or public endpoint is authorized.
+
+
+## Superseding live route and replay result — 2026-10-25
+
+The earlier workflow #4 HTTP 403 entry above is historical and is superseded for the bounded capability route by the following verified results:
+
+- Workflow #8 (`40216011229`) returned PASS for read-only `krc_capabilities`; Cobalt journal recorded matching `dispatch_completed` for `KS-051748b26b824634b82a308855f94852`.
+- Workflow #9 (`40216975746`) sent the identical signed envelope twice and reported `replay_status=REJECTED`; Cobalt journal recorded `dispatch_completed` for `KS-572b7cac7d0e415fb50571343352372d`, followed by `request_failed / envelope_replay / REPLAY_REJECTED`.
+- The gateway-only updater confirmed the module updated, service active on `100.118.132.8:19015`, and existing backend listeners unchanged.
+- PR #31 remains open/unmerged at head `cde52bbabdee34913bafe454f0600418c7447ae0`; GitHub reports mergeable. The P2 slow-connection thread is resolved/outdated; deployed code has bounded workers and an absolute 10-second request-read deadline.
+
+Run #8: https://github.com/kolemasakar/K_Science/actions/runs/40216011229  
+Run #9: https://github.com/kolemasakar/K_Science/actions/runs/40216975746
+
+**Accepted boundary:** this private route is verified only for one bounded read-only `krc_capabilities` call and persistent replay rejection. No scientific corpus was transmitted. Other operations, K_Science research-data transfer, KRC P0, scientific conclusions, and publication readiness remain separate gates. FREE_ONLY remains in force; no public endpoint or provider/payment fallback was enabled.
