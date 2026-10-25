@@ -49,9 +49,12 @@
         "Korjakins"
       ],
       "source": "https://ortus0m.rtu.lv/science/en/publications/16677",
-      "access": "ABSTRACT_AND_METADATA_ONLY",
-      "experiment_origin": "UNRESOLVED",
-      "direct_document_digest": null
+      "access": "PUBLISHER_UNIVERSITY_METADATA_PLUS_UNVERIFIED_THIRD_PARTY_TRANSCRIPTION",
+      "experiment_origin": "POTENTIALLY_SUBSET_OF_REF26_27_CUBE_SERIES",
+      "direct_document_digest": null,
+      "sample_count_reported_transcription": 9,
+      "prior_study_reuse_reported_transcription": true,
+      "transcription_url": "https://doczz.net/doc/9018369/moisture-effect-on-the-ultrasonic-pulse-velocity-in-concrete"
     }
   ],
   "overlap": {
@@ -61,10 +64,14 @@
       "EXT-S04 2024 describes 27 concrete 150-mm cubes, same experimental scenario and cites refs 26/27",
       "2024 states no new data created/analyzed"
     ],
-    "REF27_vs_REF26": "POSSIBLE_SHARED_COHORT_NOT_PROVEN",
-    "REF27_fulltext": "NOT_BINARY_VERIFIED",
+    "REF27_vs_REF26": "EXPLICIT_REUSE_OF_NINE_PREVIOUS_TEMPERATURE_EXPERIMENT_SPECIMENS_REPORTED_IN_THIRD_PARTY_TRANSCRIPTION",
+    "REF27_fulltext": "THIRD_PARTY_TRANSCRIPTION_READ_ORIGINAL_PDF_NOT_HASH_VERIFIED",
     "experimental_origin_count_policy": "REF26 and reuse in EXT-S04 count as one origin at most; REF27 excluded from independent count until cohorts traced",
-    "scientific_status": "ORIGIN_OVERLAP_RESEARCH_FINDING_ONLY_NOT_ATTESTED"
+    "scientific_status": "ORIGIN_OVERLAP_RESEARCH_FINDING_ONLY_NOT_ATTESTED",
+    "REF27_experiment_scope": "9 cube specimens (15 cm); N/K/KV groups 3 each; specimen identifiers N-1.28, N-2.28, N-7.28, K-9.28, K-11.28, K-12.28, KV-19.28, KV-21.28, KV-24.28; earlier used for elevated-temperature research",
+    "REF27_vs_REF26_evidence": "Third-party text transcription of REF27 explicitly describes prior use of nine specimens for elevated-temperature UPV, then continued moisture testing of the same cubes at higher ages",
+    "REF27_independent_experiment_count_policy": "ZERO_ADDITIONAL_INDEPENDENT_SAMPLE_COHORTS_BY_DEFAULT_UNTIL_ORIGINAL_DOCUMENT_AND_DATASETS_VERIFIED",
+    "REF27_confidence": "TEXTUAL_PRELIMINARY_SOURCE_COPY_UNATTESTED"
   },
   "bibliography_ref27": {
     "crossref": "METADATA_ONLY",
