@@ -50,3 +50,13 @@ def test_signed_disciplinary_review_without_source_signature_cannot_pass():
     z=run_scientific_cycle(fixture(),signed_reviews=signed(),
         trusted_reviewer_keys={"r-A":KEY},researcher_id="author",verified_source_ids={"S1"})
     assert z["disciplinary_gate"]=="REVISE" and z["final_status"]=="NO_GO"
+
+def test_reused_specimens_block_conditional_scientific_acceptance():
+    p=fixture()
+    p["specimen_lineage"]=[
+        {"source_id":"REF26","specimen_ids":["N-1.28","N-2.28","N-7.28"]},
+        {"source_id":"REF27","specimen_ids":["N-1.28","N-2.28","N-7.28"]}]
+    r=run_scientific_cycle(p)
+    assert r["specimen_lineage_audit"]["shared_sample_pairs"]==1
+    assert r["disciplinary_gate"]=="REVISE"
+    assert r["final_status"]=="NO_GO"
