@@ -8,6 +8,7 @@ from mcp.server.fastmcp import FastMCP
 from krc_research.offline_acceptance import evaluate_payload
 from krc_research.public_metadata_adapters import reconcile_doi, crossref_editorial_updates
 from krc_research.bibliography_audit import audit_bibliography
+from krc_research.inspection_receipts import InspectionReceipt, audit_receipt
 
 HOST = "127.0.0.1"
 PORT = int(os.environ.get("KRC_PRIVATE_RESEARCH_PORT", "19014"))
@@ -39,6 +40,14 @@ def krc_doi_updates(doi: str) -> dict:
 def krc_bibliography_audit(dois: list[str]) -> dict:
     """Bounded Crossref/EuropePMC/editorial DOI review. Metadata only; no retraction clearance."""
     return audit_bibliography(dois)
+
+@mcp.tool()
+def krc_inspection_receipt_review(receipt: dict) -> dict:
+    """Review inspection evidence metadata; cannot authenticate paper content."""
+    import json
+    if not isinstance(receipt, dict) or len(json.dumps(receipt).encode()) > 32000:
+        raise ValueError("Invalid receipt payload")
+    return audit_receipt(InspectionReceipt(**receipt))
 
 @mcp.tool()
 def krc_capabilities() -> dict:
