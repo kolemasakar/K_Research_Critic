@@ -18,7 +18,7 @@ async def main():
             await session.initialize()
             names={t.name for t in (await session.list_tools()).tools}
             expected={"krc_capabilities","krc_scholarly_preflight",
-                      "krc_doi_metadata","krc_doi_updates"}
+                      "krc_doi_metadata","krc_doi_updates","krc_bibliography_audit"}
             assert expected <= names
             capabilities=await session.call_tool("krc_capabilities",{})
             raw=capabilities.structuredContent or json.loads(capabilities.content[0].text)
@@ -34,7 +34,11 @@ async def main():
             check=await session.call_tool("krc_scholarly_preflight",{"payload":payload})
             result=check.structuredContent or json.loads(check.content[0].text)
             assert result["final_publication_status"]=="NO_GO"
-            print("PRIVATE_MCP_SDK_SMOKE=PASS TOOLS="+str(len(expected))+" NO_GO=PASS")
+            batch=await session.call_tool("krc_bibliography_audit",{"dois":["10.1038/nmat2725"]})
+            audit=batch.structuredContent or json.loads(batch.content[0].text)
+            assert audit["count"]==1 and audit["retraction_clearance"]=="NOT_ESTABLISHED"
+            assert audit["records"][0]["methods_results_verified"] is False
+            print("PRIVATE_MCP_SDK_SMOKE=PASS TOOLS="+str(len(expected))+" NO_GO=PASS BATCH=PASS")
 
 if __name__=="__main__":
     asyncio.run(main())
