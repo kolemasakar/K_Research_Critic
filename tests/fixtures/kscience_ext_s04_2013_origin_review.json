@@ -49,12 +49,25 @@
         "Korjakins"
       ],
       "source": "https://ortus0m.rtu.lv/science/en/publications/16677",
-      "access": "PUBLISHER_UNIVERSITY_METADATA_PLUS_UNVERIFIED_THIRD_PARTY_TRANSCRIPTION",
-      "experiment_origin": "POTENTIALLY_SUBSET_OF_REF26_27_CUBE_SERIES",
-      "direct_document_digest": null,
+      "access": "FULL_TEXT_ORIGINAL_RTU_PDF_SHA256_AND_PAGE_VERIFIED",
+      "experiment_origin": "REUSED_ELEVATED_TEMPERATURE_2013_COHORT_9_OF_27_SUSPECTED",
+      "direct_document_digest": "4bca8f7614ea2cf4681524edb39220dc52fd871203c225a19957e060e623289c",
       "sample_count_reported_transcription": 9,
       "prior_study_reuse_reported_transcription": true,
-      "transcription_url": "https://doczz.net/doc/9018369/moisture-effect-on-the-ultrasonic-pulse-velocity-in-concrete"
+      "transcription_url": "https://doczz.net/doc/9018369/moisture-effect-on-the-ultrasonic-pulse-velocity-in-concrete",
+      "original_pdf_url": "https://ortus.rtu.lv/science/en/publications/16677/fulltext",
+      "pdf_page_count": 8,
+      "pdf_bytes": 230806,
+      "inspection": {
+        "status": "TEXT_MATCH_WITH_METHODS_RESULTS",
+        "physical_pages": [
+          2,
+          3
+        ],
+        "found": 3,
+        "expected": 3,
+        "independent_reviewer_signed": false
+      }
     }
   ],
   "overlap": {
@@ -64,14 +77,14 @@
       "EXT-S04 2024 describes 27 concrete 150-mm cubes, same experimental scenario and cites refs 26/27",
       "2024 states no new data created/analyzed"
     ],
-    "REF27_vs_REF26": "EXPLICIT_REUSE_OF_NINE_PREVIOUS_TEMPERATURE_EXPERIMENT_SPECIMENS_REPORTED_IN_THIRD_PARTY_TRANSCRIPTION",
-    "REF27_fulltext": "THIRD_PARTY_TRANSCRIPTION_READ_ORIGINAL_PDF_NOT_HASH_VERIFIED",
+    "REF27_vs_REF26": "ORIGINAL_RTU_PDF_EXPLICITLY_REPORTS_9_SPECIMENS_USED_IN_PRIOR_ELEVATED_TEMPERATURE_STUDY",
+    "REF27_fulltext": "ORIGINAL_RTU_8PAGE_PDF_SHA256_VERIFIED",
     "experimental_origin_count_policy": "REF26 and reuse in EXT-S04 count as one origin at most; REF27 excluded from independent count until cohorts traced",
     "scientific_status": "ORIGIN_OVERLAP_RESEARCH_FINDING_ONLY_NOT_ATTESTED",
     "REF27_experiment_scope": "9 cube specimens (15 cm); N/K/KV groups 3 each; specimen identifiers N-1.28, N-2.28, N-7.28, K-9.28, K-11.28, K-12.28, KV-19.28, KV-21.28, KV-24.28; earlier used for elevated-temperature research",
-    "REF27_vs_REF26_evidence": "Third-party text transcription of REF27 explicitly describes prior use of nine specimens for elevated-temperature UPV, then continued moisture testing of the same cubes at higher ages",
-    "REF27_independent_experiment_count_policy": "ZERO_ADDITIONAL_INDEPENDENT_SAMPLE_COHORTS_BY_DEFAULT_UNTIL_ORIGINAL_DOCUMENT_AND_DATASETS_VERIFIED",
-    "REF27_confidence": "TEXTUAL_PRELIMINARY_SOURCE_COPY_UNATTESTED"
+    "REF27_vs_REF26_evidence": "RTU original journal PDF, printed page 72 (physical PDF p2), Materials section: nine cubes 15x15x15 cm initially used for prior elevated-temperature effects research; same N K KV groups, UK-1401 and 17h/7h cycle. Similarity to REF26 sample cohort very strong, but specimen-by-specimen matching against publisher REF26 PDF awaits binary download.",
+    "REF27_independent_experiment_count_policy": "DO_NOT_DOUBLE_COUNT_REUSED_NINE_SPECIMENS; EXACT_PARTIAL_OVERLAP_WITH_REF26_REQUIRES_MATCHING_ORIGINAL_SAMPLE_IDS",
+    "REF27_confidence": "PRIMARY_ORIGINAL_CONTENT_VERIFIED_NO_INDEPENDENT_HUMAN_ATTESTATION"
   },
   "bibliography_ref27": {
     "crossref": "METADATA_ONLY",
