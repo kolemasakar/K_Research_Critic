@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KRC Stage131 response v1 DRAFT",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "status",
+        "operation",
+        "result",
+        "scientific_approval"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "pattern": "^KS-[0-9a-fA-F]{32}$"
+        },
+        "status": {
+          "const": "OK"
+        },
+        "operation": {
+          "enum": [
+            "research.profile.validate",
+            "research.evidence.preflight",
+            "research.bibliography.audit",
+            "research.inspection.review"
+          ]
+        },
+        "result": {
+          "type": "object"
+        },
+        "scientific_approval": {
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "status",
+        "error_code",
+        "scientific_approval"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "pattern": "^KS-[0-9a-fA-F]{32}$"
+        },
+        "status": {
+          "const": "ERROR"
+        },
+        "error_code": {
+          "enum": [
+            "UNAUTHORIZED",
+            "OPERATION_DENIED",
+            "CONSENT_REQUIRED",
+            "CONSENT_EXPIRED",
+            "REPLAY_DENIED",
+            "INVALID_REQUEST",
+            "INVALID_SCHEMA",
+            "ARTIFACT_NOT_FOUND",
+            "ARTIFACT_EXPIRED",
+            "PROVIDER_UNAVAILABLE",
+            "INTERNAL_ERROR"
+          ]
+        },
+        "scientific_approval": {
+          "const": false
+        }
+      }
+    }
+  ]
+}
