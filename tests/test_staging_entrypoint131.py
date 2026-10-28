@@ -39,6 +39,15 @@ class Stage131ConfigTests(unittest.TestCase):
                 load_stage131_config(str(self.cfg))
     def test_science_signer_requires_explicit_separate_gate(self):
         self.check_reject(enable_internal_science_signing=True)
+    def test_missing_private_state_is_fail_closed(self):
+        self.write()
+        with patch("krc_research.staging_entrypoint131.os.geteuid", return_value=os.getuid()):
+            with self.assertRaises(Stage131ConfigurationError):
+                load_stage131_config(str(self.cfg))
+    def test_peer_uid_boolean_is_denied(self):
+        self.check_reject(peer_uid=True)
+    def test_peer_uid_string_is_denied(self):
+        self.check_reject(peer_uid="987")
     def test_old_socket_is_denied(self):
         self.check_reject(socket_path="/run/krc-research-v2/backend.sock")
     def test_old_state_is_denied(self):
