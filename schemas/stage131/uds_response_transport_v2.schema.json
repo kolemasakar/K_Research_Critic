@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KRC actual UDS krc-transport/2 responses, staging draft inventory",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "request_id",
+        "status",
+        "delivery",
+        "result"
+      ],
+      "properties": {
+        "version": {
+          "const": "krc-transport/2"
+        },
+        "request_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "status": {
+          "const": "completed"
+        },
+        "delivery": {
+          "const": "inline"
+        },
+        "result": {
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "request_id",
+        "status",
+        "delivery",
+        "artifact"
+      ],
+      "properties": {
+        "version": {
+          "const": "krc-transport/2"
+        },
+        "request_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "status": {
+          "const": "completed"
+        },
+        "delivery": {
+          "const": "artifact"
+        },
+        "artifact": {
+          "type": "object",
+          "required": [
+            "artifact_id",
+            "sha256",
+            "size_bytes"
+          ],
+          "properties": {
+            "artifact_id": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{48}$"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "size_bytes": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "status",
+        "error"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "rejected",
+            "pending_reconciliation"
+          ]
+        },
+        "request_id": {
+          "type": "string"
+        },
+        "error": {
+          "type": "object",
+          "required": [
+            "code"
+          ],
+          "properties": {
+            "code": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
