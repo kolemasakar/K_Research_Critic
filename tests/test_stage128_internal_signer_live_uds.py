@@ -34,7 +34,9 @@ def test_optin_authorized_and_negative_replay(tmp_path):
           "enable_internal_science_signing":True,"consent_approvals_dir":str(approvals)}
     from krc_research import consent_custody128
     Original=consent_custody128.ConsentCustody128
-    def fixture_custody(path,*,approvals_dir):\n        assert approvals_dir==str(approvals)\n        return Original(path,approvals_dir=approvals_dir)
+    def fixture_custody(path,*,approvals_dir):
+        assert approvals_dir==str(approvals)
+        return Original(path,approvals_dir=approvals_dir)
     with patch.object(Path,"lstat",root_dir_stat),patch("os.fstat",root_file_stat),patch("krc_research.staging_service123c.ConsentCustody128",fixture_custody):
         def serve_once(data,sock_name):
             sock=tmp_path/sock_name
