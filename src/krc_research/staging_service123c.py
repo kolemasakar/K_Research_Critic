@@ -16,7 +16,9 @@ def make_staging_server(socket_path, state_root, *,peer_principals,uid_keys,clai
     science=ScienceAdapter122(secret=science_secret,allowed_principals=set(peer_principals.values()),bibliography_fn=bibliography_fn)
     science.seen=ReplayRegistry(root/"signed-science-replay.sqlite")
     if enable_internal_science_signing:
-        if consent_approvals_dir is None:\n            raise ValueError('EXPLICIT_CONSENT_APPROVALS_DIRECTORY_REQUIRED')\n        custody=ConsentCustody128(root/'consent-approvals.sqlite',approvals_dir=consent_approvals_dir)
+        if consent_approvals_dir is None:
+            raise ValueError('EXPLICIT_CONSENT_APPROVALS_DIRECTORY_REQUIRED')
+        custody=ConsentCustody128(root/'consent-approvals.sqlite',approvals_dir=consent_approvals_dir)
         signer=KRCInternalScienceSigner(science_key=science_secret,authorizer=custody,
                 dispatcher=science,bibliography_enabled=bibliography_fn is not None)
         class InternalAuthorizedDispatch:
