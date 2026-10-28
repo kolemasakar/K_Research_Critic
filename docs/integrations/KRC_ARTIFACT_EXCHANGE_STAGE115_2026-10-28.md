@@ -1,0 +1,9 @@
+# KRC Stage115 — hybrid artifact exchange isolated code
+
+Date: 2026-10-28. Implemented `src/krc_research/artifact_exchange.py` and `tests/test_artifact_exchange.py` in KRC branch `agent/krc-public-media-r3-integration`.
+
+Local standalone test: **16/16 PASS**, ~0.19 seconds in isolated Python environment. Code ported to GitHub with package-qualified imports in test file; full historical KRC regression is **not rerun** since a reboot removed temporary `/tmp/krc-p0-offline-20261025` checkout. No service installation or listener.
+
+Features: direct inline UTF-8 JSON response when full serialized wire <=1 MiB; larger JSON stored with random opaque ID, SHA-256 and metadata in SQLite WAL + private 0700 filesystem and 0600 file permissions; ownership scoped by `principal` and `request_id`; checks hash and size on read, expiry, quota, malformed paths/IDs, symlinks. Explicit (not automatic) orphan reconciliation, to avoid deleting a concurrent pending file on startup. Provides `iter_chunks` convenience method, but it first loads and hashes the complete file in RAM; **not genuine bounded-memory streaming**.
+
+Current design blockers: no trusted authenticated principal from UDS/transport, no network endpoint, no durable idempotency, no streaming limited-memory IO, no robust multi-process crash recovery/cleanup races, no disk-free guard, no atomic metadata+filesystem transaction, no document exporter, not validated against Stage114 or transport v2. Any claim of ready production E2E is invalid. Must not run manual orphan reconciliation concurrently with writes. **Staging code only; production, public MCP, K_Sentinel Stage114 unchanged; FREE_ONLY**.
