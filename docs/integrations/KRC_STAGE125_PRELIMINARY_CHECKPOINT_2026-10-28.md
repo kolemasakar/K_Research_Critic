@@ -1,0 +1,9 @@
+# KRC Stage125 preliminary checkpoint — 2026-10-28
+
+Scope: development branch and isolated `krc-cobalt` test checkout, no staging service activation, no production or Stage114 v1 changes.
+
+Completed: validated a copy of `krc-research-v2.staging.service.example` renamed to `.service` with `systemd-analyze verify`; command completed without diagnostic output. This validates unit syntax only, not paths, service accounts, runtime dependencies, permissions or startup. Added `tests/test_stage125_four_operation_contract_inventory.py`: four-operation inventory matches KRC `OPS`, each has declared input/output contract, and scientific approval remains false. New contract inventory plus Stage124 config tests and Stage123C real profile/restart test: **10/10 PASS (1.74 s)** in isolated checkout.
+
+**Not accepted:** four-operation end-to-end positive/negative tests over verified UDS have not been completed. An attempted comprehensive new test file was blocked by the remote file tool; no pass is claimed. Existing Stage123C test proves *only profile.validate* through the full signed UDS route, and Stage125 inventory verifies only schemas, NOT operation execution. Real service with dedicated krcresearch account, IPC group, secure socket and credentials remains unprovisioned and unstarted. No Sentinel OIDC authenticated E2E or full regression. Last broad focused Stage124 run was 76/76 PASS. Production NO-GO.
+
+Next KRC-owned tasks: add and execute separate real UDS tests for evidence preflight, offline bibliography with provider stub, inspection review and negative cases; review path/security, generate launch fixtures without secrets in GitHub, dry-run as dedicated low-privilege staging account, test error/restart/stream failures. Then coordinate with Sentinel for E2E-01..05. No production change without distinct approval.
