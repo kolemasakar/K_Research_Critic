@@ -1,0 +1,6 @@
+# Isolated scientific artifact/PDF inventory test dependencies only.
+# Install with: python -m pip install -r requirements-stage131-test.txt
+-r requirements.txt
+jsonschema>=4.20,<5
+pypdf>=5,<7
+Pillow>=10,<13
