@@ -26,7 +26,8 @@ class ResearchBoundary:
         if claim["decision"]=="AMBIGUOUS":
             return {"status":"pending_reconciliation","request_id":request_id,"error":{"code":"AMBIGUOUS_REQUEST"}}
         try:
-            result=self.dispatch(operation,payload,trusted_principal)
+            result=(self.dispatch.execute_authorized(operation,payload,trusted_principal,request_id=request_id)
+                    if hasattr(self.dispatch,'execute_authorized') else self.dispatch(operation,payload,trusted_principal))
             output=deliver_result(result,exchange=self.exchange,principal=trusted_principal,request_id=request_id)
             self.ledger.complete(principal=trusted_principal,request_id=request_id,operation=operation,payload=payload,result=output)
             return output
