@@ -25,7 +25,7 @@ FORBIDDEN_EXISTING = {
     "/etc/krc-research-v2",
 }
 
-def _private_dir(path, uid):
+def _private_dir(path, uid, *, allow_group_traverse=False):
     p = Path(path)
     if not p.is_absolute() or p.is_symlink():
         raise Stage131ConfigurationError("UNSAFE_DIRECTORY")
@@ -33,7 +33,7 @@ def _private_dir(path, uid):
         s = p.lstat()
     except OSError as exc:
         raise Stage131ConfigurationError("UNSAFE_DIRECTORY") from exc
-    if not stat.S_ISDIR(s.st_mode) or s.st_uid != uid or s.st_mode & 0o077:
+    if not stat.S_ISDIR(s.st_mode) or s.st_uid != uid or s.st_mode & (0o027 if allow_group_traverse else 0o077):
         raise Stage131ConfigurationError("UNSAFE_DIRECTORY")
     return p
 
@@ -80,7 +80,7 @@ def load_stage131_config(path):
                 secret_path.name in (".", "..") or
                 secret_path.is_symlink()):
             raise Stage131ConfigurationError("ISOLATED_SECRET_PATH_REQUIRED")
-    _private_dir(sock.parent, os.geteuid())
+    _private_dir(sock.parent, os.geteuid(), allow_group_traverse=True)
     _private_dir(c["state_root"], os.geteuid())
     return c
 
