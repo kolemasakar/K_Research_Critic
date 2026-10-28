@@ -74,7 +74,11 @@ def load_stage131_config(path):
     if sock.exists() or sock.is_symlink():
         raise Stage131ConfigurationError("SOCKET_ALREADY_EXISTS")
     for key in ("transport_key_file", "science_key_file"):
-        if not Path(c[key]).is_absolute() or not c[key].startswith("/etc/krc-stage131/"):
+        secret_path = Path(c[key])
+        if (not secret_path.is_absolute() or
+                secret_path.parent != Path("/etc/krc-stage131") or
+                secret_path.name in (".", "..") or
+                secret_path.is_symlink()):
             raise Stage131ConfigurationError("ISOLATED_SECRET_PATH_REQUIRED")
     _private_dir(sock.parent, os.geteuid())
     _private_dir(c["state_root"], os.geteuid())
