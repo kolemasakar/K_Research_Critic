@@ -1,0 +1,34 @@
+# REVIEW-ONLY SAMPLE. NOT INSTALLED. Stage131 / STAGING ONLY / NO-GO.
+# Pin the immutable source release SHA and verify file ownership before installing.
+# Never change Stage126/Stage114 units or legacy transport ports.
+[Unit]
+Description=KRC isolated Stage131 staging backend (manual, no auto-enable)
+After=network.target
+
+[Service]
+Type=simple
+User=krcresearch
+Group=krc-sentinel-ipc
+WorkingDirectory=/opt/krc-stage131/REPLACE_WITH_REVIEWED_FULL_SHA
+Environment=PYTHONPATH=/opt/krc-stage131/REPLACE_WITH_REVIEWED_FULL_SHA/src
+ExecStart=/opt/krc-stage131/REPLACE_WITH_REVIEWED_FULL_SHA/.venv/bin/python -m krc_research.staging_entrypoint131 --config /etc/krc-stage131/staging.json
+Restart=no
+UMask=0077
+RuntimeDirectory=krc-stage131
+RuntimeDirectoryMode=0700
+StateDirectory=krc-stage131
+StateDirectoryMode=0700
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+LockPersonality=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_UNIX
+ReadWritePaths=/run/krc-stage131 /var/lib/krc-stage131
+# Do not grant write access to /etc/krc-stage131 or Stage126.
+# DO NOT add [Install] WantedBy: this is intended for controlled manual start only.
