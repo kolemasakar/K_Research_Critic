@@ -1,0 +1,7 @@
+# KRC Stage122 — real scientific dispatcher staging adapter (2026-10-28)
+
+Added `src/krc_research/science_adapter122.py` and `tests/test_science_adapter122.py` on KRC development branch. The adapter validates an allowed local principal, checks the approved four-operation name set, requires signed `krc-science/1` envelope and signature, and invokes the existing real `private_stage112.dispatch_coded` / `science_dispatch` engine (not a synthetic science handler). External bibliography provider is denied unless an explicit test-safe function is supplied.
+
+Isolated krc-cobalt tests: new adapter 6/6 PASS (0.40 s); seven-module focused suite **53/53 PASS (4.47 s)**. Tests prove real profile-validation call, invalid signature, in-process replay denial, foreign principal rejection, unsupported operation rejection and bibliography offline default. No network or provider access.
+
+**Not complete:** No UDS `SO_PEERCRED` to verified GitHub OIDC identity mapping and no UDS->real four-operation end-to-end acceptance. The adapter has in-memory replay `set` and is NOT durable after restart. Stage119 SQLite ledger remains separate and isn't transactional with Stage112 signed-task replay. Full profile/evidence/bibliography/inspection operation-by-operation E2E not tested. UDS artifact GET/streaming, encoded 1MiB response cap and 200MiB stress tests remain unfinished. Do not enable in production. Sentinel Stage114 v1, production, public MCP and MEDIA untouched. FREE_ONLY. Status PARTIAL / E2E NO-GO.
