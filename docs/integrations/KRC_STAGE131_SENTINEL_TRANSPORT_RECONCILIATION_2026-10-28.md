@@ -1,4 +1,15 @@
 # Stage131 ↔ K_Sentinel transport reconciliation — 2026-10-28
+
+## SUPERSEDING OWNER-APPROVED ADR — 2026-10-28
+**This section supersedes the earlier candidate ranking below.** Sentinel ADR `docs/ADR_STAGE127_CANONICAL_MINIMAL_TRANSPORT_2026-10-28.md` at Sentinel commit `1fa5a04c02db02c801fa73b93b366ed0ce8e885f` approves **existing Stage127 100.118.132.8:19017 as the sole canonical minimum staging K_Science↔KRC transport candidate**. Stage127 is already installed/running. Stage131 remains a private/local UDS scientific backend, not another ingress.
+
+- Existing gateway :19015 and Stage114 :19016 stay active unchanged; no new ports, no automatic repoint or retirement.
+- T0 local listener + no-bearer HTTP403 and 189 isolated Sentinel tests PASS (previous checkpoint evidence). T1 actual main runner Tailnet HTTP403 NOT_RUN; T2 genuine pinned GitHub OIDC + HMAC/UDS synthetic request NOT_RUN; T3 claims/tag/replay negatives pending; T4 isolated Stage127 durable replay/restart pending; T5 final transport contract signoff pending.
+- K_Science main manual opt-in network-only workflow exists; it sends **no bearer** and cannot prove authenticated E2E. Draft PR #6 overlaps that workflow path; do not merge wholesale.
+- KRC Stage131 owner-consent, internal Science signer, evidence/CriticProfile and bibliography stay independent of transport. Do not interpret T0/T1 as scientific authorization.
+- Original wording below calling :19015 the preferred candidate or :19017 diagnostic-only is **SUPERSEDED**. Do not implement new :19015 adapter based on it.
+- **STAGING ONLY / FREE_ONLY / Production NO-GO.**
+
 **STAGING ONLY / FREE_ONLY / Production NO-GO.**
 
 ## Source of authoritative correction
