@@ -1,0 +1,11 @@
+# KRC Stage116 — streamed Artifact Exchange hardening (2026-10-28)
+
+Status: ISOLATED STAGING PROTOTYPE, NETWORK ACCEPTANCE NO-GO. Source `src/krc_research/artifact_stream116.py`, tests `tests/test_artifact_stream116.py`, branch `agent/krc-public-media-r3-integration`.
+
+Local tests: prior 16 Artifact Exchange + six new streaming tests **22/22 PASS** (0.22s, CPython 3.13), using package-qualified module imports in local isolated test directory. An initial attempt to execute both test files returned ModuleNotFoundError due to older local test file importing `artifact_exchange` from root; corrected local import to `krc_research.artifact_exchange` and reran. Repository test `tests/test_artifact_exchange.py` was already package-qualified. No complete server regression ran; after reboot the previous `/tmp/krc-p0-offline-20261025` checkout did not exist. No active KRC/Sentinel service changed.
+
+Stage116 adds: bounded-RAM generator for upload, chunked download, independent hash pre-verification pass, writer coordination using POSIX `flock`, atomic SQLite quota check under lock, manual pending-file cleanup (only when all legacy writers stopped). Tests cover integrity, access scoping by supplied principal/request, file-size rejection, tampering, two concurrent writes sharing a quota and orphan cleanup.
+
+Important gaps: `read_stream` is two-pass, must guarantee no writer/mutator can alter bytes after hash pass before outgoing bytes (file immutability, trusted FS, coordination). POSIX lock does not cover legacy `ArtifactExchange.store_bytes`/cleanup: all writers must migrate. No durable reservation/atomic filesystem+SQLite transaction on crashes; no recovery of committed-file/uncommitted-db record aside from manual orphan process. No free-disk guard, no streaming authenticated UDS endpoint or proven K_Sentinel principal binding, no idempotent results, no verified parallel cleanup/read races, no full 200 MiB stress test. No external bibliography by default. FREE_ONLY; Stage114 v1 / production / public MCP / MEDIA unchanged.
+
+Next: authorize staging checkout reconstitution, run full KRC suite, harden verified immutable reads and crash recovery, integrate a separate UDS service and test Sentinel v2 without modifying v1.
