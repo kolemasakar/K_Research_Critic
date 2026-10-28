@@ -1,0 +1,9 @@
+# Stage117 — Artifact Exchange isolated hardening and K_Sentinel Issue #28
+
+Date: 2026-10-28. KRC responded to Sentinel's Issue #28 in comment https://github.com/kolemasakar/K_Research_Critic/issues/28#issuecomment-6467547499 (provisional staging IPC contract; NOT an active endpoint).
+
+Developed **locally** `krc_research/artifact_stage117.py` subclass `HardenedExchange` and six tests. Adds per-chunk free-space checks (`statvfs`), POSIX advisory shared-class writer/read/cleanup lock, two-pass hash-verified bounded-memory downloads, pre/post descriptor metadata verification, and manual locked cleanup of orphan pending/unindexed 48-hex file names. Existing production and Stage114 remain unchanged.
+
+Local test command: `cd /mnt/data/krc_stage116 && PYTHONPATH=. pytest -q test_artifact_exchange.py test_artifact_stream116.py test_artifact_stage117.py` => **28 passed in 0.26s** (16 previous + 6 stream + 6 stage117). Full KRC test suite was NOT run; the old `/tmp` research checkout was removed by reboot. Stage117 module and tests currently exist in local conversation ZIP `krc_stage117_local_verified.zip`, and have **not been committed to GitHub**. Do not interpret this documentation commit as a source code commit.
+
+Outstanding: advisory locks protect only cooperating `HardenedExchange` code; legacy writers and untrusted filesystem mutators can race. Post-read metadata checks can detect modification only after bytes were yielded; no immutable staging snapshot or prevention of malicious same-size rewrite is guaranteed. Cleanup and file/index crash atomicity not proven; no independently authenticated UDS peer, no restart-safe idempotency, no live endpoint, no 200MiB test. Disk free-space guard is a staging prototype; reserve and quota behavior need production engineering. NO-GO for Sentinel v2 live E2E. FREE_ONLY, no production/public/MEDIA changes.
