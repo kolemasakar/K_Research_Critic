@@ -1,0 +1,1 @@
+Stage125 local UDS scientific operations: 4/4 PASS. Combined isolated focused KRC suite: 81/81 PASS (11.65 s) on krc-cobalt. Tests use temporary UDS and offline bibliography function. Dedicated krcresearch user and IPC group unavailable; staging runtime and socket not deployed. No Sentinel OIDC E2E. Production NO-GO. Stage114 v1 unchanged.
