@@ -19,7 +19,7 @@ def root_file_stat(fd):
 class ConsentCustodyTests(unittest.TestCase):
  def setUp(self):
   self.t=tempfile.TemporaryDirectory();self.addCleanup(self.t.cleanup)
-  self.root=Path(self.t.name);self.d=self.root/"approvals";self.d.mkdir()
+  self.root=Path(self.t.name);self.d=self.root/"approvals";self.d.mkdir();self.d.chmod(0o755)
   self.ctx=dict(consent_ref="owner-approval-0001",request_id="KS-"+"1"*32,task_id="ks126-"+"2"*32,operation="research.profile.validate",principal="K_Science",profile_ref="P1",evidence_refs=[],payload_sha256="a"*64)
   self.p1=patch.object(Path,"lstat",root_dir_stat);self.p2=patch("os.fstat",root_file_stat)
   self.p1.start();self.p2.start();self.addCleanup(self.p1.stop);self.addCleanup(self.p2.stop)
