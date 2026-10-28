@@ -1,0 +1,25 @@
+[Unit]
+Description=KRC Research v2 isolated staging backend (NOT production)
+After=network.target
+ConditionPathExists=/etc/krc-research-v2/staging.json
+
+[Service]
+Type=simple
+User=krcresearch
+Group=krcresearch
+SupplementaryGroups=krc-sentinel-ipc
+WorkingDirectory=/opt/krc-research-v2
+Environment=PYTHONPATH=/opt/krc-research-v2/src
+ExecStart=/usr/bin/python3 -m krc_research.staging_entrypoint124 --config /etc/krc-research-v2/staging.json
+Restart=on-failure
+RestartSec=5s
+UMask=0007
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+RestrictAddressFamilies=AF_UNIX
+ReadWritePaths=/run/krc-research-v2 /var/lib/krc-research-v2
+
+[Install]
+WantedBy=multi-user.target
