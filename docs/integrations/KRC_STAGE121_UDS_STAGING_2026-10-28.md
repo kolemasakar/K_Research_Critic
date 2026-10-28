@@ -1,0 +1,9 @@
+# KRC Stage121 — Unix socket staging backend, 2026-10-28
+
+Committed `src/krc_research/uds_stage121.py` and `tests/test_uds_stage121.py` to KRC development branch. UDS-only Python stdlib HTTP/1.1 handler with `SO_PEERCRED` UID allowlist, `POST /v1/execute`, `GET /healthz`, input JSON Content-Length <=256 KiB, KRC science operation name allowlist and denial of unapproved peer. Caller-supplied `identity.principal` is not trusted; server passes a trusted `uid:<peer-uid>` to ResearchBoundary. Does NOT bind to a public TCP interface and no daemon was installed. Socket was created under pytest temporary directory and torn down at test end.
+
+Focused test suite on isolated krc-cobalt checkout **47 passed, 4.25s**: 4 new UDS tests + 7 boundary + 8 ledger + 28 artifact. UDS tests cover authorized peer identity ignores spoofed principal, denied UID/health, unknown operation, and healthy authorized peer.
+
+**Crucial limitations:** UDS tests use dependency-injected synthetic dispatcher, not all four real Research Engine operations. UDS client privilege is only UID, not real OIDC workflow principal; Sentinel must supply verified identity via independently authenticated protected channel with peer identity binding, and KRC must implement operation-specific ACL. Current handler buffers request in memory up to 256 KiB, and response uses JSON helper without enforcing 1 MiB after serialization. No artifact GET streaming endpoint yet. No systemd service installed, no network transport E2E, no real scientific approval, no durable atomicity of external research side effects; Stage114 v1, production/public/MEDIA unchanged, FREE_ONLY.
+
+NEXT: wire real four science dispatchers after schema/ACL and verified principal mapping; add response-size guard + authorized stream; Sentinel transport staging E2E. Status STAGING PARTIAL / E2E NO-GO.
