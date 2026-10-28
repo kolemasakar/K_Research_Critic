@@ -16,3 +16,6 @@
 2. Determine whether GPT Store overlength is preexisting test fixture or code issue; keep public publication paused, do not edit its instructions merely to force PASS.
 3. Complete local Stage131 integration regression with actual new code and explicit approvals_dir.
 4. Finalize private science schemas and artifact exchange and stage public DOI-only metadata smoke.
+
+## Additional independent broad run
+- Command with `--ignore=tests/test_gpt_store_package.py` and `--maxfail=1`: **133 passed, 1 failed** (separate run, not additive count). Failed `tests/test_krc_mcp_canary.py::test_existing_core_skill_snapshot_remains_exact`: current Core Skill snapshot differs from canonical Core. Do not auto-rewrite skill because historical continuity and publication constraints need review. The suite again stopped at first failure; not whole-suite acceptance.
