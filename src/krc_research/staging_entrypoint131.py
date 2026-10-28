@@ -29,7 +29,10 @@ def _private_dir(path, uid):
     p = Path(path)
     if not p.is_absolute() or p.is_symlink():
         raise Stage131ConfigurationError("UNSAFE_DIRECTORY")
-    s = p.lstat()
+    try:
+        s = p.lstat()
+    except OSError as exc:
+        raise Stage131ConfigurationError("UNSAFE_DIRECTORY") from exc
     if not stat.S_ISDIR(s.st_mode) or s.st_uid != uid or s.st_mode & 0o077:
         raise Stage131ConfigurationError("UNSAFE_DIRECTORY")
     return p
@@ -54,7 +57,9 @@ def load_stage131_config(path):
     )):
         raise Stage131ConfigurationError("INVALID_CONFIG_VALUE")
     try:
-        uid = int(c["peer_uid"])
+        if type(c["peer_uid"]) is not int:
+            raise ValueError("Peer UID must be an integer")
+        uid = c["peer_uid"]
     except (ValueError, TypeError):
         raise Stage131ConfigurationError("INVALID_PEER_UID") from None
     if uid < 1 or uid == os.geteuid():
