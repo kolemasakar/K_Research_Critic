@@ -11,7 +11,7 @@ class BibliographyUnavailable(RuntimeError):pass
 
 class BoundedBibliography129:
     def __init__(self, *, crossref_fetch, europepmc_fetch, updates_fetch,
-                 min_interval=1.0, clock=None, sleeper=None):
+                 min_interval=1.0, clock=None, sleeper=None, metadata_store=None):
         if not all(callable(x) for x in (crossref_fetch,europepmc_fetch,updates_fetch)):
             raise ValueError("PROVIDERS_NOT_CONFIGURED")
         if not 0<=min_interval<=60:raise ValueError("INVALID_RATE")
@@ -20,16 +20,23 @@ class BoundedBibliography129:
         self.clock=clock or time.monotonic
         self.sleep=sleeper or time.sleep
         self.next_slot=0.0
-        self.cache={}
-    def _bounded(self,fn):
+        self.store=metadata_store
+    def _bounded(self,fn,provider):
         def invoke(url):
+            if self.store is not None:
+                cached=self.store.load(provider,url)
+                if cached is not None:return cached
             now=self.clock()
             if now<self.next_slot:self.sleep(self.next_slot-now)
             self.next_slot=self.clock()+self.interval
-            result=fn(url)
+            try:result=fn(url)
+            except Exception:
+                if self.store is not None:self.store.error(provider,url)
+                raise
             if not isinstance(result,dict):raise BibliographyUnavailable("INVALID_PROVIDER_RESPONSE")
             if len(json.dumps(result,ensure_ascii=False).encode("utf-8"))>2_000_000:
                 raise BibliographyUnavailable("OVERSIZED_METADATA")
+            if self.store is not None:self.store.put(provider,url,result)
             return result
         return invoke
     def __call__(self,dois):
@@ -39,9 +46,9 @@ class BoundedBibliography129:
         if len(set(normalized))!=len(normalized):raise ValueError("DUPLICATE_DOI")
         # cache only for same adapter lifetime; no persistent personal data.
         result=audit_bibliography(normalized,
-            crossref_fetch=self._bounded(self.transports[0]),
-            europepmc_fetch=self._bounded(self.transports[1]),
-            updates_fetch=self._bounded(self.transports[2]))
+            crossref_fetch=self._bounded(self.transports[0],'crossref'),
+            europepmc_fetch=self._bounded(self.transports[1],'europepmc'),
+            updates_fetch=self._bounded(self.transports[2],'editorial_updates'))
         result["evidence_level"]="METADATA_ONLY"
         result["scientific_approval"]=False
         return result
