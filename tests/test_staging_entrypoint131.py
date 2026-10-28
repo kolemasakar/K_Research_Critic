@@ -48,6 +48,8 @@ class Stage131ConfigTests(unittest.TestCase):
         self.check_reject(peer_uid=True)
     def test_peer_uid_string_is_denied(self):
         self.check_reject(peer_uid="987")
+    def test_secret_path_traversal_is_denied(self):
+        self.check_reject(science_key_file="/etc/krc-stage131/../krc-research-v2/science.key")
     def test_old_socket_is_denied(self):
         self.check_reject(socket_path="/run/krc-research-v2/backend.sock")
     def test_old_state_is_denied(self):
