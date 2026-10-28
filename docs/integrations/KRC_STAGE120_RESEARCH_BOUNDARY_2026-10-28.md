@@ -1,0 +1,7 @@
+# KRC Stage120 — in-process Research Boundary (2026-10-28)
+
+Implemented `src/krc_research/research_boundary120.py` and seven tests `tests/test_research_boundary120.py`. Combined **43/43 PASS** (2.35 s) on isolated krc-cobalt test checkout (7 boundary + 8 ledger + 28 artifact). No production or Stage114 v1 changes.
+
+The boundary accepts `krc-transport/2` in-process messages plus caller-provided `trusted_principal`, admits operation/payload to Stage119 SQLite ledger, invokes a *dependency-injected* research dispatcher, performs hybrid result routing (`inline` <=1MiB serialized JSON or private `artifact` manifest), commits completed results and returns deterministic replay. Duplicate request with differing body yields `IDEMPOTENCY_CONFLICT`; incomplete state yields `AMBIGUOUS_REQUEST` and is not automatically retried. Synthetic test dispatcher is NOT the actual four-operation KRC Research Engine; no live science claim or scientific approval asserted.
+
+**Blockers**: no deployed UDS listener, no `SO_PEERCRED` trusted identity binding (principal remains caller supplied), no backend-scoped per-operation authorization, no integration of signed Stage114 science dispatcher, no atomic coupling of scientific side effects to ledger completion, no multi-process crash recovery, no fully immutable artifact download/snapshot, no E2E Sentinel v2. Earlier complete KRC regression baseline 884 pass, 8 legacy Core/Builder failures, 17 skipped was not rerun after Stage120. Status STAGING PARTIAL / NETWORK E2E NO-GO; FREE_ONLY.
