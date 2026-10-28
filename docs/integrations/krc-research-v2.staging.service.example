@@ -6,8 +6,7 @@ ConditionPathExists=/etc/krc-research-v2/staging.json
 [Service]
 Type=simple
 User=krcresearch
-Group=krcresearch
-SupplementaryGroups=krc-sentinel-ipc
+Group=krc-sentinel-ipc
 WorkingDirectory=/opt/krc-research-v2
 Environment=PYTHONPATH=/opt/krc-research-v2/src
 ExecStart=/usr/bin/python3 -m krc_research.staging_entrypoint124 --config /etc/krc-research-v2/staging.json
