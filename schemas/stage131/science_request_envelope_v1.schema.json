@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/kolemasakar/K_Research_Critic/schemas/stage131/science_request_envelope_v1.schema.json",
+  "title": "KRC Stage131 authenticated scientific request v1 DRAFT",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "request_id",
+    "task_id",
+    "operation",
+    "principal",
+    "profile_ref",
+    "evidence_refs",
+    "consent_ref",
+    "science_payload"
+  ],
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "pattern": "^KS-[0-9a-fA-F]{32}$"
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 6,
+      "maxLength": 100
+    },
+    "operation": {
+      "enum": [
+        "research.profile.validate",
+        "research.evidence.preflight",
+        "research.bibliography.audit",
+        "research.inspection.review"
+      ]
+    },
+    "principal": {
+      "const": "K_Science"
+    },
+    "profile_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "evidence_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 64,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+      }
+    },
+    "consent_ref": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 200
+    },
+    "science_payload": {
+      "type": "object",
+      "maxProperties": 32
+    }
+  }
+}
