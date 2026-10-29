@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Observed signed internal UDS POST /v1/execute request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "request_id",
+    "operation",
+    "identity",
+    "payload",
+    "transport_auth"
+  ],
+  "properties": {
+    "version": {
+      "const": "krc-transport/2"
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "operation": {
+      "enum": [
+        "research.profile.validate",
+        "research.evidence.preflight",
+        "research.bibliography.audit",
+        "research.inspection.review"
+      ]
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "client",
+        "principal",
+        "repository",
+        "workflow_ref"
+      ],
+      "properties": {
+        "client": {
+          "type": "string",
+          "minLength": 1
+        },
+        "principal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repository": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workflow_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "payload": {
+      "type": "object"
+    },
+    "transport_auth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "alg",
+        "key_id",
+        "issued_at",
+        "mac"
+      ],
+      "properties": {
+        "alg": {
+          "const": "HMAC-SHA256"
+        },
+        "key_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "mac": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    }
+  }
+}
