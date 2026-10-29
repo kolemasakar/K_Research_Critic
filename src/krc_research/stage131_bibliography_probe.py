@@ -8,7 +8,7 @@ def europe_pmc_query_url(doi):
     return "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query="+quote("DOI:"+doi,safe="")+"&format=json&pageSize=1"
 
 def classify_europe_pmc(doi, payload):
-    if not isinstance(payload,dict):raise ValueError("INVALID_PROVIDER_RESPONSE")
+    if not isinstance(payload,dict) or not isinstance(payload.get("resultList"),dict) or "result" not in payload["resultList"]:raise ValueError("INVALID_PROVIDER_RESPONSE")
     items=payload.get("resultList",{}).get("result",[])
     if not isinstance(items,list):raise ValueError("INVALID_PROVIDER_RESPONSE")
     matches=[x for x in items if isinstance(x,dict) and str(x.get("doi","")).casefold()==doi.casefold()]
