@@ -1,0 +1,84 @@
+{
+  "schema": "KRC-STAGE131-HTTP-OBSERVED-MAP-1",
+  "source": "uds_verified123b.py + uds_stage123.py",
+  "scope": "internal UDS only; external Sentinel HTTP mapping is not approved",
+  "rows": [
+    {
+      "http": 200,
+      "case": "completed inline or artifact",
+      "body": "krc-transport/2 completed"
+    },
+    {
+      "http": 200,
+      "case": "GET /healthz for trusted peer",
+      "body": {
+        "status": "staging",
+        "production": false
+      }
+    },
+    {
+      "http": 400,
+      "case": "malformed JSON",
+      "body": {
+        "error": "INVALID_REQUEST"
+      }
+    },
+    {
+      "http": 403,
+      "case": "untrusted peer or assertion",
+      "body": {
+        "error": "UNAUTHORIZED or transport error"
+      }
+    },
+    {
+      "http": 403,
+      "case": "operation not allowlisted, before ledger",
+      "body": {
+        "error": "OPERATION_DENIED"
+      }
+    },
+    {
+      "http": 404,
+      "case": "unknown route or scoped artifact not found",
+      "body": {
+        "error": "NOT_FOUND or ExchangeError code"
+      }
+    },
+    {
+      "http": 409,
+      "case": "ResearchBoundary status not completed",
+      "body": "rejected/pending_reconciliation object"
+    },
+    {
+      "http": 413,
+      "case": "request too large",
+      "body": {
+        "error": "REQUEST_TOO_LARGE"
+      }
+    },
+    {
+      "http": 415,
+      "case": "unsupported content type",
+      "body": {
+        "error": "UNSUPPORTED_MEDIA_TYPE"
+      }
+    },
+    {
+      "http": 507,
+      "case": "serialized response larger than one MiB",
+      "body": {
+        "status": "error",
+        "error": {
+          "code": "RESPONSE_TOO_LARGE"
+        }
+      }
+    }
+  ],
+  "early_errors_may_omit": [
+    "version",
+    "request_id"
+  ],
+  "external_artifact_GET_approved": false,
+  "science_signer_enabled": false,
+  "final_partner_ack": false
+}
