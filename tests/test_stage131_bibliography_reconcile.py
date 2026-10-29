@@ -16,5 +16,5 @@ def test_year_mismatch_review():
 def test_no_claim_on_missing_fields():
     assert reconcile_metadata(DOI,crossref(title=""),pmc())["field_checks"]["title"]=="MISSING"
 def test_invalid_and_doi_mismatch():
-    assert reconcile_metadata(DOI,{},pmc())["status"]=="DOI_MISMATCH_OR_ABSENT"
+    assert reconcile_metadata(DOI,{},pmc())["status"]=="INVALID_PROVIDER_RESPONSE"
     assert reconcile_metadata(DOI,crossref(),{"resultList":{"result":[]}})["status"]=="DOI_MISMATCH_OR_ABSENT"
