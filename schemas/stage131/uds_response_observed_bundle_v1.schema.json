@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KRC Stage131 UDS observed outbound response bundle, source contract candidate",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "version",
+        "request_id",
+        "status",
+        "delivery",
+        "result"
+      ],
+      "properties": {
+        "version": {
+          "const": "krc-transport/2"
+        },
+        "request_id": {
+          "type": "string"
+        },
+        "status": {
+          "const": "completed"
+        },
+        "delivery": {
+          "const": "inline"
+        },
+        "result": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "version",
+        "request_id",
+        "status",
+        "delivery",
+        "artifact"
+      ],
+      "properties": {
+        "version": {
+          "const": "krc-transport/2"
+        },
+        "request_id": {
+          "type": "string"
+        },
+        "status": {
+          "const": "completed"
+        },
+        "delivery": {
+          "const": "artifact"
+        },
+        "artifact": {
+          "type": "object",
+          "required": [
+            "artifact_id",
+            "sha256",
+            "size_bytes"
+          ],
+          "properties": {
+            "artifact_id": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{48}$"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "size_bytes": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "status",
+        "error"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "rejected",
+            "pending_reconciliation"
+          ]
+        },
+        "request_id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "error": {
+          "type": "object",
+          "required": [
+            "code"
+          ],
+          "properties": {
+            "code": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    {
+      "type": "object",
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "status",
+        "error"
+      ],
+      "properties": {
+        "status": {
+          "const": "error"
+        },
+        "error": {
+          "type": "object",
+          "required": [
+            "code"
+          ],
+          "properties": {
+            "code": {
+              "const": "RESPONSE_TOO_LARGE"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  ]
+}
