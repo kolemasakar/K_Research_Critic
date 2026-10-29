@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KRC Stage127 consumer external request candidate (Sentinel-boundary, not direct KRC UDS)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "request_id",
+    "operation",
+    "payload"
+  ],
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "pattern": "^KS-[0-9a-fA-F]{32}$"
+    },
+    "operation": {
+      "enum": [
+        "research.profile.validate",
+        "research.evidence.preflight",
+        "research.bibliography.audit",
+        "research.inspection.review"
+      ]
+    },
+    "payload": {
+      "type": "object"
+    }
+  }
+}
