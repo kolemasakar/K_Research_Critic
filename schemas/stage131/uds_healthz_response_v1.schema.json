@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KRC Stage123 UDS GET /healthz response (trusted peer only)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "production"
+  ],
+  "properties": {
+    "status": {
+      "const": "staging"
+    },
+    "production": {
+      "const": false
+    }
+  }
+}
