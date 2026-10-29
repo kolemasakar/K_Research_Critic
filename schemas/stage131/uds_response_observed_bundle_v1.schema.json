@@ -25,7 +25,42 @@
           "const": "inline"
         },
         "result": {
-          "type": "object"
+          "type": "object",
+          "allOf": [
+            {
+              "if": {
+                "required": [
+                  "scientific_approval"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "scientific_approval": {
+                    "const": false
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "required": [
+                  "engine_result"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "engine_result": {
+                    "type": "object",
+                    "properties": {
+                      "scientific_approval": {
+                        "const": false
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
         }
       },
       "additionalProperties": false
@@ -148,6 +183,22 @@
         }
       },
       "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "production"
+      ],
+      "properties": {
+        "status": {
+          "const": "staging"
+        },
+        "production": {
+          "const": false
+        }
+      }
     }
   ]
 }
