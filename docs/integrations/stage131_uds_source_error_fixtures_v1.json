@@ -1,0 +1,53 @@
+[
+  {
+    "body": {
+      "error": {
+        "code": "INVALID_REQUEST"
+      },
+      "status": "rejected"
+    },
+    "case": "INVALID_REQUEST_EARLY",
+    "http_status": 409
+  },
+  {
+    "body": {
+      "error": {
+        "code": "HANDLER_ERROR"
+      },
+      "request_id": "R-SYN",
+      "status": "pending_reconciliation"
+    },
+    "case": "HANDLER_ERROR",
+    "http_status": 409
+  },
+  {
+    "body": {
+      "error": {
+        "code": "AMBIGUOUS_REQUEST"
+      },
+      "request_id": "R-SYN",
+      "status": "pending_reconciliation"
+    },
+    "case": "AMBIGUOUS_REQUEST",
+    "http_status": 409
+  },
+  {
+    "body": {
+      "error": "OPERATION_DENIED"
+    },
+    "case": "OPERATION_DENIED_EARLY",
+    "http_status": 403,
+    "origin": "literal VerifiedStage123Handler branch"
+  },
+  {
+    "body": {
+      "error": {
+        "code": "RESPONSE_TOO_LARGE"
+      },
+      "status": "error"
+    },
+    "case": "RESPONSE_TOO_LARGE",
+    "http_status": 507,
+    "origin": "literal Stage123Handler.send_json fallback"
+  }
+]
