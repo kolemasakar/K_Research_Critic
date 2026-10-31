@@ -59,6 +59,44 @@
                   }
                 }
               }
+            },
+            {
+              "if": {
+                "required": [
+                  "scientific_approval"
+                ]
+              },
+              "then": {
+                "required": [
+                  "task_id",
+                  "operation",
+                  "status",
+                  "engine_result"
+                ],
+                "properties": {
+                  "task_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "operation": {
+                    "enum": [
+                      "research.profile.validate",
+                      "research.evidence.preflight",
+                      "research.bibliography.audit",
+                      "research.inspection.review"
+                    ]
+                  },
+                  "status": {
+                    "enum": [
+                      "PENDING",
+                      "REVISE"
+                    ]
+                  },
+                  "engine_result": {
+                    "type": "object"
+                  }
+                }
+              }
             }
           ]
         }
@@ -91,8 +129,11 @@
           "type": "object",
           "required": [
             "artifact_id",
+            "filename",
+            "media_type",
+            "size_bytes",
             "sha256",
-            "size_bytes"
+            "expires_at_epoch"
           ],
           "properties": {
             "artifact_id": {
@@ -106,6 +147,18 @@
             "size_bytes": {
               "type": "integer",
               "minimum": 0
+            },
+            "filename": {
+              "type": "string",
+              "minLength": 1
+            },
+            "media_type": {
+              "type": "string",
+              "minLength": 1
+            },
+            "expires_at_epoch": {
+              "type": "number",
+              "exclusiveMinimum": 0
             }
           },
           "additionalProperties": true
