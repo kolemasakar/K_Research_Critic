@@ -27,8 +27,16 @@ class HardenedExchange(StreamExchange):
                 if available-len(b)<self.free_bytes_min:
                     raise ExchangeError('LOW_DISK_SPACE')
                 yield b
-        return super().store_stream(checked(),principal=principal,request_id=request_id,
-                                    filename=filename,media_type=media_type)
+        descriptor=super().store_stream(checked(),principal=principal,request_id=request_id,
+                                        filename=filename,media_type=media_type)
+        # Read the committed expiry; never derive a different timestamp from the clock.
+        with self._locked():
+            with self._connect() as db:
+                row=db.execute('SELECT expires FROM objects WHERE id=? AND principal=? AND request_id=?',
+                    (descriptor['artifact_id'],principal,request_id)).fetchone()
+        if row is None:
+            raise ExchangeError('ARTIFACT_UNAVAILABLE')
+        return {**descriptor,'expires_at_epoch':row[0]}
 
     def read_stream(self, artifact_id, *, principal,request_id,chunk_size=256*1024):
         self._assert_scope(principal,request_id)
