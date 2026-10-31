@@ -1,0 +1,264 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KRC Stage131 source-derived operation-specific inner success V1 candidate",
+  "description": "Four operations, source-derived top-level engine fields; no authorization or full scientific semantics. Errors are boundary 409, not invented inner ERROR.",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "operation",
+        "status",
+        "engine_result",
+        "scientific_approval"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operation": {
+          "const": "research.profile.validate"
+        },
+        "status": {
+          "enum": [
+            "PENDING"
+          ]
+        },
+        "scientific_approval": {
+          "const": false
+        },
+        "engine_result": {
+          "type": "object",
+          "required": [
+            "schema",
+            "profile_id",
+            "profile_version",
+            "protocol",
+            "validation",
+            "approval_claimed",
+            "approval_independently_verified",
+            "scientific_approval"
+          ],
+          "properties": {
+            "schema": {
+              "const": "KRC-CRITICPROFILE-1"
+            },
+            "profile_id": {
+              "type": "string"
+            },
+            "profile_version": {
+              "type": "string"
+            },
+            "protocol": {
+              "enum": [
+                "KRC Core",
+                "Scholarly Research"
+              ]
+            },
+            "validation": {
+              "const": "STRUCTURE_VALID"
+            },
+            "approval_claimed": {
+              "type": "boolean"
+            },
+            "approval_independently_verified": {
+              "const": false
+            },
+            "scientific_approval": {
+              "const": false
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "operation",
+        "status",
+        "engine_result",
+        "scientific_approval"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operation": {
+          "const": "research.evidence.preflight"
+        },
+        "status": {
+          "enum": [
+            "PENDING",
+            "REVISE"
+          ]
+        },
+        "scientific_approval": {
+          "const": false
+        },
+        "engine_result": {
+          "type": "object",
+          "required": [
+            "schema",
+            "result",
+            "historical_report",
+            "final_publication_status"
+          ],
+          "properties": {
+            "schema": {
+              "const": "KRC-P0D-1"
+            },
+            "result": {
+              "type": "object"
+            },
+            "historical_report": {
+              "type": [
+                "object",
+                "null"
+              ]
+            },
+            "final_publication_status": {
+              "enum": [
+                "NO_GO",
+                "AWAIT_AUTHOR_JOURNAL_SIGNOFF"
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "operation",
+        "status",
+        "engine_result",
+        "scientific_approval"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operation": {
+          "const": "research.bibliography.audit"
+        },
+        "status": {
+          "enum": [
+            "PENDING"
+          ]
+        },
+        "scientific_approval": {
+          "const": false
+        },
+        "engine_result": {
+          "type": "object",
+          "required": [
+            "schema",
+            "count",
+            "two_provider_metadata_matches",
+            "updates_detected",
+            "retraction_clearance",
+            "full_texts_inspected",
+            "records"
+          ],
+          "properties": {
+            "schema": {
+              "const": "KRC-BIB-1"
+            },
+            "count": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 24
+            },
+            "two_provider_metadata_matches": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "updates_detected": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "retraction_clearance": {
+              "const": "NOT_ESTABLISHED"
+            },
+            "full_texts_inspected": {
+              "const": 0
+            },
+            "records": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "operation",
+        "status",
+        "engine_result",
+        "scientific_approval"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operation": {
+          "const": "research.inspection.review"
+        },
+        "status": {
+          "enum": [
+            "PENDING"
+          ]
+        },
+        "scientific_approval": {
+          "const": false
+        },
+        "engine_result": {
+          "type": "object",
+          "required": [
+            "receipt_sha256",
+            "eligible_for_independent_claim_review",
+            "shortfalls",
+            "scientific_truth_verified"
+          ],
+          "properties": {
+            "receipt_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "eligible_for_independent_claim_review": {
+              "type": "boolean"
+            },
+            "shortfalls": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "scientific_truth_verified": {
+              "const": false
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  ]
+}
