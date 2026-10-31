@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KRC Stage131 science dispatcher inner result observed SUCCESS ONLY v1",
+  "description": "Conservative four-operation schema; ERROR wire not observed and is deliberately excluded. Shape is not scientific approval.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id",
+    "operation",
+    "status",
+    "engine_result",
+    "scientific_approval"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "operation": {
+      "enum": [
+        "research.profile.validate",
+        "research.evidence.preflight",
+        "research.bibliography.audit",
+        "research.inspection.review"
+      ]
+    },
+    "status": {
+      "enum": [
+        "PENDING",
+        "REVISE"
+      ]
+    },
+    "scientific_approval": {
+      "const": false
+    },
+    "engine_result": {
+      "type": "object"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "research.evidence.preflight"
+          }
+        },
+        "required": [
+          "operation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "enum": [
+              "PENDING",
+              "REVISE"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "enum": [
+              "research.profile.validate",
+              "research.bibliography.audit",
+              "research.inspection.review"
+            ]
+          }
+        },
+        "required": [
+          "operation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "PENDING"
+          }
+        }
+      }
+    }
+  ]
+}
