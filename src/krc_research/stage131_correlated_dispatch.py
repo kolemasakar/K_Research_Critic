@@ -2,6 +2,7 @@
 
 Not installed or registered with running Stage131. No scientific dispatch here.
 """
+from copy import deepcopy
 from .stage131_consumer_boundary_checks import validate_science_result
 
 class ScienceResultContractError(ValueError):
@@ -17,8 +18,10 @@ def execute_correlated(dispatch, *, operation, payload, principal, request_id):
         raise ScienceResultContractError("DISPATCH_UNAVAILABLE")
     if not isinstance(payload,dict) or not isinstance(payload.get("task_id"),str) or not payload["task_id"]:
         raise ScienceResultContractError("INVALID_REQUEST")
-    result=dispatch(operation,payload,principal,request_id=request_id)
-    decision=validate_science_result(result,expected_task_id=payload["task_id"],expected_operation=operation)
+    expected_task_id=payload["task_id"]
+    admitted_payload=deepcopy(payload)
+    result=dispatch(operation,admitted_payload,principal,request_id=request_id)
+    decision=validate_science_result(result,expected_task_id=expected_task_id,expected_operation=operation)
     if decision!="VALID_SHAPE_ONLY":
         raise ScienceResultContractError(decision)
     return result
