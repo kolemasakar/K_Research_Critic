@@ -1,0 +1,120 @@
+{
+  "research.bibliography.audit": {
+    "engine_result": {
+      "count": 1,
+      "full_texts_inspected": 0,
+      "records": [
+        {
+          "doi": "10.1000/synthetic",
+          "experimental_origins_verified": 0,
+          "has_recorded_updates": false,
+          "metadata_status": "PARTIAL",
+          "methods_results_verified": false,
+          "providers": {
+            "crossref": {
+              "detail": "Invalid Crossref reply",
+              "error_type": "ValueError",
+              "status": "ERROR"
+            },
+            "editorial_updates": {
+              "detail": "Invalid Crossref search",
+              "error_type": "ValueError",
+              "status": "ERROR"
+            },
+            "europepmc": {
+              "doi": "10.1000/synthetic",
+              "provider": "EuropePMC",
+              "retraction_status": "NOT_CLEARED",
+              "source_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI%3A10.1000%2Fsynthetic&format=json&resultType=core&pageSize=3",
+              "status": "NOT_FOUND"
+            }
+          },
+          "retraction_clearance": "NOT_ESTABLISHED",
+          "updates_status": "ERROR"
+        }
+      ],
+      "retraction_clearance": "NOT_ESTABLISHED",
+      "schema": "KRC-BIB-1",
+      "two_provider_metadata_matches": 0,
+      "updates_detected": 0
+    },
+    "operation": "research.bibliography.audit",
+    "scientific_approval": false,
+    "semantic_decision": "SEMANTIC_SHAPE_VALID_ONLY_NOT_SCIENTIFIC_APPROVAL",
+    "status": "PENDING",
+    "task_id": "synthetic-task-no-dispatch"
+  },
+  "research.evidence.preflight": {
+    "engine_result": {
+      "final_publication_status": "NO_GO",
+      "historical_report": null,
+      "result": {
+        "claim_ledger": {
+          "count": 0,
+          "pass": 0,
+          "shortfall": 0,
+          "status": "PASS"
+        },
+        "manuscript_gate": {
+          "detector_results_count": 0,
+          "detector_status": "NOT_RUN",
+          "missing_gates": [
+            "citations_validated",
+            "human_author_approved",
+            "journal_policy_checked",
+            "novelty_reviewed",
+            "primary_sources_inspected",
+            "rights_and_ai_disclosure_done",
+            "scientific_methods_audited",
+            "search_audit_reproducible"
+          ],
+          "status": "REVISE"
+        },
+        "reason": "Human author and journal signoff require explicit separate acceptance",
+        "search_logs": [],
+        "search_reproducibility": "SHORTFALL",
+        "status": "REVISE",
+        "submission_ready": false
+      },
+      "schema": "KRC-P0D-1"
+    },
+    "operation": "research.evidence.preflight",
+    "scientific_approval": false,
+    "semantic_decision": "SEMANTIC_SHAPE_VALID_ONLY_NOT_SCIENTIFIC_APPROVAL",
+    "status": "REVISE",
+    "task_id": "synthetic-task-no-dispatch"
+  },
+  "research.inspection.review": {
+    "engine_result": {
+      "eligible_for_independent_claim_review": false,
+      "receipt_sha256": "35c3e0521a905895a7d5d90eafffcdcd720a497218bcf6f61b0697d762a5deaf",
+      "scientific_truth_verified": false,
+      "shortfalls": [
+        "inspected_passages_missing",
+        "external_trace_not_verified"
+      ]
+    },
+    "operation": "research.inspection.review",
+    "scientific_approval": false,
+    "semantic_decision": "SEMANTIC_SHAPE_VALID_ONLY_NOT_SCIENTIFIC_APPROVAL",
+    "status": "PENDING",
+    "task_id": "synthetic-task-no-dispatch"
+  },
+  "research.profile.validate": {
+    "engine_result": {
+      "approval_claimed": false,
+      "approval_independently_verified": false,
+      "profile_id": "P-SYN",
+      "profile_version": "1",
+      "protocol": "KRC Core",
+      "schema": "KRC-CRITICPROFILE-1",
+      "scientific_approval": false,
+      "validation": "STRUCTURE_VALID"
+    },
+    "operation": "research.profile.validate",
+    "scientific_approval": false,
+    "semantic_decision": "SEMANTIC_SHAPE_VALID_ONLY_NOT_SCIENTIFIC_APPROVAL",
+    "status": "PENDING",
+    "task_id": "synthetic-task-no-dispatch"
+  }
+}
