@@ -7,6 +7,7 @@ Not wired into the installed Stage131 or Stage127 transport.
 from .stage131_signed_artifact_read import verify_signed_read, ArtifactReadDenied
 from .artifact_exchange import ExchangeError
 import tempfile
+import hashlib
 
 class SignedArtifactReadBoundary:
     def __init__(self, *, exchange, ledger, nonce_registry, keyring, trusted_peer_identities,
@@ -49,6 +50,7 @@ class SignedArtifactReadBoundary:
         # before an HTTP adapter may send headers or the first byte.
         spool=tempfile.TemporaryFile(mode="w+b")
         size=0
+        digest=hashlib.sha256()
         try:
             chunks=self.exchange.read_stream(scope["artifact_id"],
                     principal=principal,request_id=request_id)
@@ -56,9 +58,11 @@ class SignedArtifactReadBoundary:
                 if not isinstance(part,bytes):raise ExchangeError("ARTIFACT_CORRUPTED")
                 size+=len(part)
                 if size>self.max_artifact_bytes:raise ExchangeError("REQUEST_TOO_LARGE")
+                digest.update(part)
                 spool.write(part)
             spool.flush()
             spool.seek(0)
+            sha256=digest.hexdigest()
         except ExchangeError as exc:
             spool.close()
             if exc.code=="ARTIFACT_EXPIRED":return err(410,"GONE")
@@ -72,7 +76,7 @@ class SignedArtifactReadBoundary:
             data=spool.read()
             spool.close()
             return {"http_status":200,"content_type":"application/octet-stream",
-                    "body_bytes":data,"size_bytes":size,"request_id":request_id}
+                    "body_bytes":data,"size_bytes":size,"sha256":sha256,"request_id":request_id}
         # Caller MUST close spool after streamed transfer, including interrupted transfers.
         return {"http_status":200,"content_type":"application/octet-stream",
                 "body_file":spool,"size_bytes":size,"request_id":request_id}
