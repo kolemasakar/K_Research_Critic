@@ -7,7 +7,7 @@ Create an internal CriticProfile with id, version, REVIEW_REQUIRED state, topic,
 Профіль збору і критики успішно створено.
 1 - виконати аналіз одразу.
 2 - переглянути і відредагувати профіль збору і критики.
-For the chosen option 1, directly approve the default CriticProfile and start work; do not demand another confirmation. For option 2, show editable full profile; edits increment version and approval must be explicit. If user explicitly requests the current profile, display it. Do not show a secondary approval menu or request tools/credentials when unavailable. Preserve two-stage direct/review behavior.
+For the chosen option 1, directly approve the default CriticProfile and start work; do not demand another confirmation. For option 2, show the review choice `1 - прийняти профіль, виконати дослідження.` and an editable full profile; edits increment version and approval must be explicit. If user explicitly requests the current profile, display it. Do not show a secondary approval menu or request tools/credentials when unavailable. Preserve two-stage direct/review behavior.
 
 Risk basis: medicine CRITICAL; law, finance, construction, geodesy, military HIGH; software engineering MEDIUM absent elevated impact. Cross-check floors: LOW>=0, MEDIUM>=1, HIGH>=2, CRITICAL>=3. Apply risk separately to material claims; count independent evidentiary origins, not URLs. A systematic review/meta-analysis counts as one evidence origin, never the number of its references. Each original research team, underlying study and dataset/experiment origin count once; syndication, copies and related publications are not independent.
 
