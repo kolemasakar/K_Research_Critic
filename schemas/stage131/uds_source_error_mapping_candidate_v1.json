@@ -1,0 +1,70 @@
+{
+  "version": "stage131-uds-source-error-mapping-candidate/1",
+  "scope": "INTERNAL_UDS_ONLY",
+  "science_error_variant": "NOT_OBSERVED_NOT_APPROVED",
+  "cases": [
+    {
+      "source": "ResearchBoundary.execute invalid envelope",
+      "http_status": 409,
+      "body": {
+        "status": "rejected",
+        "error": {
+          "code": "INVALID_REQUEST"
+        }
+      }
+    },
+    {
+      "source": "ResearchBoundary ledger conflict",
+      "http_status": 409,
+      "body": {
+        "status": "rejected",
+        "error": {
+          "code": "IDEMPOTENCY_CONFLICT"
+        }
+      }
+    },
+    {
+      "source": "ResearchBoundary ambiguous/replay ambiguity",
+      "http_status": 409,
+      "body": {
+        "status": "pending_reconciliation",
+        "error": {
+          "code": "AMBIGUOUS_REQUEST"
+        }
+      }
+    },
+    {
+      "source": "ResearchBoundary science handler exception",
+      "http_status": 409,
+      "body": {
+        "status": "pending_reconciliation",
+        "error": {
+          "code": "HANDLER_ERROR"
+        }
+      }
+    },
+    {
+      "source": "VerifiedStage123Handler pre-boundary denied operation",
+      "http_status": 403,
+      "body": {
+        "error": "OPERATION_DENIED"
+      }
+    },
+    {
+      "source": "Stage123Handler oversize JSON fallback",
+      "http_status": 507,
+      "body": {
+        "status": "error",
+        "error": {
+          "code": "RESPONSE_TOO_LARGE"
+        }
+      }
+    }
+  ],
+  "notes": [
+    "409 outcomes do not imply safe automatic retry",
+    "request_id may be absent for early responses",
+    "error code shapes are illustrative source-supported branches, not live service observations",
+    "no external Sentinel HTTP mapping is approved"
+  ]
+}
