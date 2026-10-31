@@ -7,7 +7,7 @@ def test_schema_itself_valid(): Draft202012Validator.check_schema(SCHEMA)
 def test_all_observed_response_shapes():
     cases=[
       {"version":"krc-transport/2","request_id":"KS-"+"a"*32,"status":"completed","delivery":"inline","result":{}},
-      {"version":"krc-transport/2","request_id":"KS-"+"a"*32,"status":"completed","delivery":"artifact","artifact":{"artifact_id":"a"*48,"sha256":"b"*64,"size_bytes":4}},
+      {"version":"krc-transport/2","request_id":"KS-"+"a"*32,"status":"completed","delivery":"artifact","artifact":{"artifact_id":"a"*48,"filename":"research-result.json","media_type":"application/json","sha256":"b"*64,"size_bytes":4,"expires_at_epoch":1800000000}},
       {"status":"rejected","error":{"code":"OPERATION_DENIED"}},
       {"status":"pending_reconciliation","error":{"code":"AMBIGUOUS"},"request_id":"KS-"+"b"*32},
       {"error":"OPERATION_DENIED"},
