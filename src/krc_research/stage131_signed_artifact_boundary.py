@@ -79,4 +79,4 @@ class SignedArtifactReadBoundary:
                     "body_bytes":data,"size_bytes":size,"sha256":sha256,"request_id":request_id}
         # Caller MUST close spool after streamed transfer, including interrupted transfers.
         return {"http_status":200,"content_type":"application/octet-stream",
-                "body_file":spool,"size_bytes":size,"request_id":request_id}
+                "body_file":spool,"size_bytes":size,"sha256":sha256,"request_id":request_id}
