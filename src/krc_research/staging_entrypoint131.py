@@ -71,7 +71,11 @@ def load_stage131_config(path):
     if any(c[k].startswith(v) for k in ("socket_path", "state_root") for v in FORBIDDEN_EXISTING):
         raise Stage131ConfigurationError("EXISTING_SERVICE_PATH_DENIED")
     sock = Path(c["socket_path"])
-    if sock.exists() or sock.is_symlink():
+    try:
+        occupied = sock.exists() or sock.is_symlink()
+    except OSError as exc:
+        raise Stage131ConfigurationError("SOCKET_UNINSPECTABLE") from exc
+    if occupied:
         raise Stage131ConfigurationError("SOCKET_ALREADY_EXISTS")
     for key in ("transport_key_file", "science_key_file"):
         secret_path = Path(c[key])
