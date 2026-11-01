@@ -28,3 +28,8 @@
 5. Installed ACL/key/runtime parity, rollout/rollback and explicit owner authorization before activation.
 
 **No source-only PASS implies deployment approval.**
+
+## Owner decision, 2026-11-01
+- Actual 200 MiB artifact load/transfer test explicitly waived by owner: `NOT_TESTED / OWNER_WAIVED`. Do not run it. Configured file limit remains 200 MiB; no performance acceptance is implied.
+- Continue small synthetic negative tests for TTL equality/expiry, quota boundary, SHA256 tampering, cleanup, and HTTP/UDS semantics. Existing coverage added in `tests/test_artifact_exchange.py`; 25/25 targeted storage+HTTP tests PASS at `bb972aabc2e4c3efe309e01c12959c6a00d361d8`.
+- Full source regression after these added tests must be separately recorded; partner acceptance and production release remain NO-GO.
