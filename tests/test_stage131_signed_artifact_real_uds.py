@@ -25,6 +25,7 @@ def test_actual_uds_signed_headers_and_bytes():
    def request():
     s=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM);s.connect(str(sock))
     s.sendall(b"POST /v1/artifacts/read HTTP/1.1\r\nHost: localhost\r\nContent-Type: application/json\r\nContent-Length: "+str(len(raw)).encode()+b"\r\nConnection: close\r\n\r\n"+raw)
+    s.shutdown(socket.SHUT_WR)
     data=b""
     while True:
      chunk=s.recv(256*1024)
