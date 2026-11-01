@@ -44,7 +44,7 @@ def test_slow_client_does_not_block_concurrent_request():
 def test_worker_cap_sends_503_without_spawning_more_workers():
     with tempfile.TemporaryDirectory() as d:
         sock=Path(d)/"s.sock";srv=SignedArtifactUDSServer(sock,boundary=Boundary())
-        srv.max_active_workers=2
+        srv._worker_slots=threading.BoundedSemaphore(2)
         th=threading.Thread(target=srv.serve_forever,daemon=True);th.start()
         clients=[]
         try:
