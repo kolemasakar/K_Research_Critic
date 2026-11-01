@@ -122,6 +122,10 @@ class ArtifactExchange:
         for offset in range(0,len(data),chunk_size):
             yield data[offset:offset+chunk_size]
 
+    def read_stream(self, artifact_id, *, principal, request_id):
+        """Scoped signed-read bridge; verifies stored size/SHA/TTL before yielding."""
+        yield from self.iter_chunks(artifact_id,principal=principal,request_id=request_id)
+
     def reconcile_orphans(self):
         """Manual single-process maintenance only. Never run during concurrent writes."""
         with self._connect() as db:

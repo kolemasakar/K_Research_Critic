@@ -27,3 +27,28 @@ def test_inspection_false_promotion():
 def test_handler_error_not_science_error():
     v=copy.deepcopy(R);v["status"]="ERROR"
     with pytest.raises(SemanticContractError):validate_operation_result(v,task_id="t",operation=v["operation"])
+
+
+@pytest.mark.parametrize("case",["empty_provider","empty_query","negative_hits","detector_approved","ready_missing","origin_bool"])
+def test_consumer_semantic_mismatch_regressions(case):
+    v=copy.deepcopy(B if case=="origin_bool" else P)
+    if case=="origin_bool":
+        v["engine_result"]["records"][0]["experimental_origins_verified"]=False
+    elif case=="detector_approved":
+        v["engine_result"]["result"]["manuscript_gate"]["detector_status"]="APPROVED"
+    elif case=="ready_missing":
+        r=v["engine_result"]["result"]
+        r["search_logs"]=[{"provider":"test","query":"test","hit_count":1,"status":"REPRODUCIBLE_LOG"}]
+        r["search_reproducibility"]="PASS"
+        r["manuscript_gate"]["status"]="READY_FOR_AUTHOR_REVIEW"
+        r["status"]="READY_FOR_AUTHOR_REVIEW"
+        v["engine_result"]["final_publication_status"]="AWAIT_AUTHOR_JOURNAL_SIGNOFF"
+        v["status"]="PENDING"
+    else:
+        log={"provider":"test","query":"test","hit_count":1,"status":"REPRODUCIBLE_LOG"}
+        if case=="empty_provider":log["provider"]=" "
+        if case=="empty_query":log["query"]=""
+        if case=="negative_hits":log["hit_count"]=-1
+        v["engine_result"]["result"]["search_logs"]=[log]
+    with pytest.raises(SemanticContractError):
+        validate_operation_result(v,task_id="t",operation=v["operation"])

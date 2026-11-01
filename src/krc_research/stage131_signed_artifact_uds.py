@@ -1,13 +1,40 @@
 """Isolated disabled-by-default UDS HTTP server for signed Artifact GET. Never auto-start."""
-import json, os, socket, socketserver, struct
+import json, os, socket, socketserver, struct, threading
 from http.server import BaseHTTPRequestHandler
 
 class SignedArtifactUDSServer(socketserver.ThreadingMixIn, socketserver.UnixStreamServer):
     daemon_threads=True
     block_on_close=False
     request_queue_size=16
+    max_active_workers=4
+    request_deadline_seconds=20
+    def process_request(self, request, client_address):
+        # Acquire before creating a worker thread: slow clients cannot exhaust threads.
+        if not self._worker_slots.acquire(blocking=False):
+            try:
+                request.sendall(
+                    b"HTTP/1.1 503 Service Unavailable\r\n"
+                    b"Content-Length: 0\r\nConnection: close\r\n\r\n"
+                )
+            except OSError:
+                pass
+            finally:
+                self.shutdown_request(request)
+            return
+        try:
+            super().process_request(request, client_address)
+        except BaseException:
+            self._worker_slots.release()
+            raise
+
+    def process_request_thread(self, request, client_address):
+        try:
+            super().process_request_thread(request, client_address)
+        finally:
+            self._worker_slots.release()
     def __init__(self,path,*,boundary):
         self.boundary=boundary
+        self._worker_slots=threading.BoundedSemaphore(self.max_active_workers)
         super().__init__(str(path),SignedArtifactUDSHandler)
 
 class SignedArtifactUDSHandler(BaseHTTPRequestHandler):
@@ -16,6 +43,29 @@ class SignedArtifactUDSHandler(BaseHTTPRequestHandler):
     def setup(self):
         super().setup()
         self.connection.settimeout(5)
+        self._deadline_expired=threading.Event()
+        # Absolute cap, independent of byte-by-byte socket activity.
+        # Timer is cancelled when the handler finishes, including error paths.
+        self._deadline_timer=threading.Timer(
+            self.server.request_deadline_seconds, self._expire_connection
+        )
+        self._deadline_timer.daemon=True
+        self._deadline_timer.start()
+
+    def _expire_connection(self):
+        self._deadline_expired.set()
+        try:
+            self.connection.shutdown(socket.SHUT_RDWR)
+        except OSError:
+            pass
+
+    def finish(self):
+        try:
+            super().finish()
+        finally:
+            timer=getattr(self,"_deadline_timer",None)
+            if timer is not None:
+                timer.cancel()
     def handle_one_request(self):
         try:
             super().handle_one_request()
@@ -27,6 +77,7 @@ class SignedArtifactUDSHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Type","application/json")
         self.send_header("Content-Length",str(len(data)))
         self.send_header("Cache-Control","no-store")
+        self.send_header("X-Content-Type-Options","nosniff")
         self.send_header("Connection","close")
         self.end_headers()
         self.wfile.write(data)
@@ -43,8 +94,26 @@ class SignedArtifactUDSHandler(BaseHTTPRequestHandler):
         try:n=int(raw_length)
         except ValueError:n=-1
         if n<1 or n>262144:return self.respond(413,{"error":"REQUEST_TOO_LARGE"})
-        try: message=json.loads(self.rfile.read(n))
-        except (ValueError,UnicodeDecodeError):return self.respond(400,{"error":"INVALID_REQUEST"})
+        try:
+            body=self.rfile.read(n)
+            if len(body)!=n:
+                return self.respond(400,{"error":"INVALID_REQUEST"})
+            message=json.loads(body)
+            if not isinstance(message,dict):
+                return self.respond(400,{"error":"INVALID_REQUEST"})
+            # Source-only UDS retrieval requires a write-half-close from the peer.
+            # Never dispatch until EOF is observed after the declared body:
+            # late/undeclared bytes fail closed, not merely bytes already buffered.
+            # The absolute connection deadline closes peers withholding EOF.
+            extra=self.rfile.read(1)
+            if self._deadline_expired.is_set():
+                return self.respond(408,{"error":"REQUEST_TIMEOUT"})
+            if extra != b"":
+                return self.respond(400,{"error":"INVALID_REQUEST"})
+        except (ValueError, UnicodeDecodeError, OSError):
+            return self.respond(400,{"error":"INVALID_REQUEST"})
+        if self._deadline_expired.is_set():
+            return self.respond(408,{"error":"REQUEST_TIMEOUT"})
         try: uid=struct.unpack("3i",self.connection.getsockopt(socket.SOL_SOCKET,socket.SO_PEERCRED,12))[1]
         except (OSError,struct.error):return self.respond(403,{"error":"FORBIDDEN"})
         try:
@@ -60,6 +129,7 @@ class SignedArtifactUDSHandler(BaseHTTPRequestHandler):
             self.send_header("Content-Length",str(outcome["size_bytes"]))
             self.send_header("X-Content-SHA256",outcome["sha256"])
             self.send_header("Cache-Control","no-store")
+            self.send_header("X-Content-Type-Options","nosniff")
             self.send_header("Connection","close")
             self.end_headers()
             if f is None:self.wfile.write(outcome["body_bytes"])
