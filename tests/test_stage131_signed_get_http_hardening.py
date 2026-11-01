@@ -161,3 +161,58 @@ def test_disconnected_client_closes_spooled_file():
             client.close()
             assert finished.wait(2),"response spool must close even on disconnect"
         finally:srv.shutdown();srv.server_close();th.join(timeout=2)
+
+
+def test_late_undeclared_bytes_cannot_reach_boundary():
+    class Count:
+        calls=0
+        def execute(self,*args,**kwargs):
+            self.calls+=1
+            return {"http_status":403,"body":{"error":"FORBIDDEN"}}
+    with tempfile.TemporaryDirectory() as d:
+        boundary=Count();sock=Path(d)/"s.sock"
+        srv=SignedArtifactUDSServer(sock,boundary=boundary)
+        th=threading.Thread(target=srv.serve_forever,daemon=True);th.start()
+        client=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+        client.settimeout(3)
+        try:
+            client.connect(str(sock))
+            client.sendall(b"POST /v1/artifacts/read HTTP/1.1\r\nHost: x\r\nContent-Type: application/json\r\nContent-Length: 2\r\n\r\n{}")
+            time.sleep(.15)  # Delayed smuggling, after body has been read.
+            assert boundary.calls==0
+            client.sendall(b"EXTRA")
+            client.shutdown(socket.SHUT_WR)
+            data=b""
+            while True:
+                chunk=client.recv(4096)
+                if not chunk:break
+                data+=chunk
+            assert b"400 Bad Request" in data
+            assert boundary.calls==0
+        finally:
+            client.close();srv.shutdown();srv.server_close();th.join(timeout=2)
+
+def test_missing_write_eof_never_dispatches_before_deadline():
+    class Count:
+        calls=0
+        def execute(self,*args,**kwargs):
+            self.calls+=1
+            return {"http_status":200,"body_bytes":b"ok","size_bytes":2,"sha256":"0"*64}
+    with tempfile.TemporaryDirectory() as d:
+        boundary=Count();sock=Path(d)/"s.sock"
+        srv=SignedArtifactUDSServer(sock,boundary=boundary)
+        srv.request_deadline_seconds=.3
+        th=threading.Thread(target=srv.serve_forever,daemon=True);th.start()
+        client=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+        client.settimeout(2)
+        try:
+            client.connect(str(sock))
+            client.sendall(b"POST /v1/artifacts/read HTTP/1.1\r\nHost: x\r\nContent-Type: application/json\r\nContent-Length: 2\r\n\r\n{}")
+            time.sleep(.5)
+            assert boundary.calls==0
+            try:
+                assert client.recv(4096)==b""
+            except ConnectionResetError:
+                pass
+        finally:
+            client.close();srv.shutdown();srv.server_close();th.join(timeout=2)
