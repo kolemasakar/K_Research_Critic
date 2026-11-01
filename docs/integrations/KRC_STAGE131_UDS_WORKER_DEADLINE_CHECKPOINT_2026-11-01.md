@@ -33,3 +33,13 @@
 - Actual 200 MiB artifact load/transfer test explicitly waived by owner: `NOT_TESTED / OWNER_WAIVED`. Do not run it. Configured file limit remains 200 MiB; no performance acceptance is implied.
 - Continue small synthetic negative tests for TTL equality/expiry, quota boundary, SHA256 tampering, cleanup, and HTTP/UDS semantics. Existing coverage added in `tests/test_artifact_exchange.py`; 25/25 targeted storage+HTTP tests PASS at `bb972aabc2e4c3efe309e01c12959c6a00d361d8`.
 - Full source regression after these added tests must be separately recorded; partner acceptance and production release remain NO-GO.
+
+## Actual isolated HTTP fixture acceptance and regression — 2026-11-01 (subsequent)
+
+- Code/test pinned SHA: `5a5fa6db5787c4edeecf99d95ad0093d49c86590`.
+- Actual AF_UNIX synthetic HTTP checks: `tests/test_stage131_signed_get_http_hardening.py` **7/7 PASS**.
+- Scenarios: small 200 response with SHA-256/Content-Length, denied 403, malformed CL+TE 400, disconnect causing spool closure, worker exhaustion, slow header and exception sanitization.
+- Full repository source regression after these tests: **1125 passed, 17 skipped, 0 failed in 47.60 s**, isolated `krc-cobalt` checkout.
+- Small synthetic artifact only. No 200 MiB workload performed (**OWNER_WAIVED**).
+- The fixture test validates actual wire response invariants but does not yet publish an independent captured byte-for-byte fixture bundle. It uses synthetic stub for the 200/403 cases and separate signed-boundary positive/replay test.
+- Open blocking gates: delayed post-check request bytes; source/storage mutation race and installed ACL/keys; immutable wire capture bundle; partner independent ACK/MISMATCH; Sentinel 40 and Science 48 real E2E (NOT_RUN). No deployment or activation.
