@@ -63,3 +63,11 @@
 - Partner review is a distinct gate: **ACK/MISMATCH not implied by comment publication**. The new write-half-close contract must be implemented/approved by an independent client owner before external adapter integration.
 - Actual 200 MiB load test remains **OWNER_WAIVED / NOT_TESTED**, not an acceptance assertion.
 - Production remains **NO-GO**, installed Stage127 and Stage131 unchanged, science signer OFF, external GET OFF.
+
+## K_Science receiver policy alignment — latest source pin
+
+- K_Science independently reported missing `X-Content-Type-Options: nosniff` header in KRC success responses. KRC added it to success and JSON error responses and refreshed the normalized observed capture bundle.
+- Latest KRC source+fixture SHA: `54a6fbbeb3bf610d8a8f67ebf7bbb14b9211a72c`.
+- On `krc-cobalt`, focused tests **33/33 PASS**; complete source pytest regression **1130 PASS / 17 SKIP / 0 FAIL in 48.04 s** after this header fix.
+- K_Science consumer must still independently require equality of HTTP `X-Content-SHA256` and trusted descriptor SHA-256. This client-side remedy is outside KRC source and is NOT acknowledged as completed.
+- Independent K_Sentinel and K_Science final ACK/MISMATCH remains pending. Production NO-GO, GET OFF, signer OFF, Stage127 unchanged, 200 MiB load test OWNER_WAIVED.
