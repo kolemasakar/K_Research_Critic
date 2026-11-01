@@ -43,6 +43,7 @@ class SignedArtifactUDSHandler(BaseHTTPRequestHandler):
     def setup(self):
         super().setup()
         self.connection.settimeout(5)
+        self._deadline_expired=threading.Event()
         # Absolute cap, independent of byte-by-byte socket activity.
         # Timer is cancelled when the handler finishes, including error paths.
         self._deadline_timer=threading.Timer(
@@ -52,6 +53,7 @@ class SignedArtifactUDSHandler(BaseHTTPRequestHandler):
         self._deadline_timer.start()
 
     def _expire_connection(self):
+        self._deadline_expired.set()
         try:
             self.connection.shutdown(socket.SHUT_RDWR)
         except OSError:
@@ -102,10 +104,15 @@ class SignedArtifactUDSHandler(BaseHTTPRequestHandler):
             # Never dispatch until EOF is observed after the declared body:
             # late/undeclared bytes fail closed, not merely bytes already buffered.
             # The absolute connection deadline closes peers withholding EOF.
-            if self.rfile.read(1) != b"":
+            extra=self.rfile.read(1)
+            if self._deadline_expired.is_set():
+                return self.respond(408,{"error":"REQUEST_TIMEOUT"})
+            if extra != b"":
                 return self.respond(400,{"error":"INVALID_REQUEST"})
         except (ValueError, UnicodeDecodeError, OSError):
             return self.respond(400,{"error":"INVALID_REQUEST"})
+        if self._deadline_expired.is_set():
+            return self.respond(408,{"error":"REQUEST_TIMEOUT"})
         try: uid=struct.unpack("3i",self.connection.getsockopt(socket.SOL_SOCKET,socket.SO_PEERCRED,12))[1]
         except (OSError,struct.error):return self.respond(403,{"error":"FORBIDDEN"})
         try:
