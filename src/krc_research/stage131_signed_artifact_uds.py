@@ -91,8 +91,26 @@ class SignedArtifactUDSHandler(BaseHTTPRequestHandler):
         try:n=int(raw_length)
         except ValueError:n=-1
         if n<1 or n>262144:return self.respond(413,{"error":"REQUEST_TOO_LARGE"})
-        try: message=json.loads(self.rfile.read(n))
-        except (ValueError,UnicodeDecodeError):return self.respond(400,{"error":"INVALID_REQUEST"})
+        try:
+            body=self.rfile.read(n)
+            if len(body)!=n:
+                return self.respond(400,{"error":"INVALID_REQUEST"})
+            message=json.loads(body)
+            if not isinstance(message,dict):
+                return self.respond(400,{"error":"INVALID_REQUEST"})
+            # Fail closed on already-buffered or currently pending undeclared bytes.
+            # This is not a proof against bytes arriving after the dispatch check.
+            original_timeout=self.connection.gettimeout()
+            try:
+                self.connection.settimeout(0.001)
+                if self.rfile.peek(1):
+                    return self.respond(400,{"error":"INVALID_REQUEST"})
+            except (BlockingIOError, TimeoutError, socket.timeout):
+                pass
+            finally:
+                self.connection.settimeout(original_timeout)
+        except (ValueError, UnicodeDecodeError, OSError):
+            return self.respond(400,{"error":"INVALID_REQUEST"})
         try: uid=struct.unpack("3i",self.connection.getsockopt(socket.SOL_SOCKET,socket.SO_PEERCRED,12))[1]
         except (OSError,struct.error):return self.respond(403,{"error":"FORBIDDEN"})
         try:
