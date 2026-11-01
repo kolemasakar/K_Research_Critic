@@ -132,3 +132,39 @@ def test_seven_day_default_ttl_contract(tmp_path):
     assert TTL==604800
     assert MAX_ARTIFACT==200*1024*1024
     assert MAX_TOTAL==2*1024*1024*1024
+
+
+def test_mutation_before_artifact_open_is_not_served(tmp_path,monkeypatch):
+    import os
+    s=ArtifactExchange(tmp_path/"store")
+    obj=s.store_bytes(b"original",principal="p",request_id="r",filename="f")
+    original_open=os.open
+    changed=[False]
+    def replace_first(path,flags,*args,**kwargs):
+        if not changed[0] and str(path)==str(s.data/obj["artifact_id"]):
+            changed[0]=True
+            (s.data/obj["artifact_id"]).write_bytes(b"tampered")
+        return original_open(path,flags,*args,**kwargs)
+    monkeypatch.setattr(os,"open",replace_first)
+    with pytest.raises(ExchangeError,match="ARTIFACT_CORRUPTED"):
+        s.get_bytes(obj["artifact_id"],principal="p",request_id="r")
+    assert changed[0]
+
+def test_atomic_path_replacement_after_open_keeps_verified_fd(tmp_path,monkeypatch):
+    import os
+    s=ArtifactExchange(tmp_path/"store")
+    obj=s.store_bytes(b"original",principal="p",request_id="r",filename="f")
+    original_fdopen=os.fdopen
+    swapped=[False]
+    def swap_after_open(fd,*args,**kwargs):
+        if not swapped[0] and args and args[0]=="rb":
+            swapped[0]=True
+            replacement=s.data/"replacement"
+            replacement.write_bytes(b"tampered")
+            os.replace(replacement,s.data/obj["artifact_id"])
+        return original_fdopen(fd,*args,**kwargs)
+    monkeypatch.setattr(os,"fdopen",swap_after_open)
+    assert s.get_bytes(obj["artifact_id"],principal="p",request_id="r")==b"original"
+    assert swapped[0]
+    with pytest.raises(ExchangeError,match="ARTIFACT_CORRUPTED"):
+        s.get_bytes(obj["artifact_id"],principal="p",request_id="r")
