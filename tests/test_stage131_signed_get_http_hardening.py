@@ -39,3 +39,46 @@ def test_slow_client_does_not_block_concurrent_request():
             assert time.monotonic()-started<3
             slow.close()
         finally:srv.shutdown();srv.server_close();th.join(timeout=2)
+
+
+def test_worker_cap_sends_503_without_spawning_more_workers():
+    with tempfile.TemporaryDirectory() as d:
+        sock=Path(d)/"s.sock";srv=SignedArtifactUDSServer(sock,boundary=Boundary())
+        srv.max_active_workers=2
+        th=threading.Thread(target=srv.serve_forever,daemon=True);th.start()
+        clients=[]
+        try:
+            for _ in range(2):
+                clients.append(request(sock,b"POST /v1/artifacts/read HTTP/1.1\r\nHost: x\r\n",False))
+            time.sleep(.1)
+            rejected=request(sock,b"POST /v1/artifacts/read HTTP/1.1\r\nHost: x\r\nContent-Type: application/json\r\nContent-Length: 2\r\n\r\n{}")
+            assert b"503 Service Unavailable" in rejected
+            assert srv._worker_slots._value==0
+        finally:
+            for client in clients:client.close()
+            srv.shutdown();srv.server_close();th.join(timeout=2)
+
+def test_absolute_deadline_closes_trickling_header():
+    with tempfile.TemporaryDirectory() as d:
+        sock=Path(d)/"s.sock";srv=SignedArtifactUDSServer(sock,boundary=Boundary())
+        srv.request_deadline_seconds=.35
+        th=threading.Thread(target=srv.serve_forever,daemon=True);th.start()
+        client=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+        client.settimeout(2)
+        try:
+            client.connect(str(sock))
+            client.sendall(b"POST /v1/artifacts/read HTTP/1.1\r\nX-Slow: ")
+            started=time.monotonic()
+            while time.monotonic()-started<1:
+                try:
+                    client.sendall(b"x")
+                except OSError:
+                    break
+                time.sleep(.07)
+            assert time.monotonic()-started<1.5
+            try:
+                assert client.recv(1024)==b""
+            except (ConnectionResetError,BrokenPipeError):
+                pass
+        finally:
+            client.close();srv.shutdown();srv.server_close();th.join(timeout=2)
