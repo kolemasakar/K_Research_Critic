@@ -20,3 +20,7 @@
 - KRC source-only tests do not establish Stage127 external ingress OIDC/JWKS trust, Tailnet ACL, deployed key parity, external N01–N40 FULL PASS, or K_Science independent final ACK.
 - K_Sentinel should replace only synthetic KRC backend in its isolated joined harness, run N01–N40 against real components and publish exact per-case PASS/PARTIAL/NOT_RUN with immutable pins.
 - 200 MiB performance workload explicitly OWNER_WAIVED/NOT_TESTED. Production NO-GO; Stage127 GET OFF, signer OFF; no installed service changes.
+
+## Post-fixture full source regression
+- Complete KRC isolated repository suite on krc-cobalt at source/test SHA `08536070f51d6e38debed26741e6a560b5f0073b`: **1134 passed, 17 skipped, 0 failed in 54.72 seconds**. Documentation-only handoff commits followed the tested source.
+- This is a KRC source regression, not N01–N40 external acceptance.
