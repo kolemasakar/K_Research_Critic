@@ -104,3 +104,34 @@ def test_rejects_undeclared_body_bytes_before_backend_dispatch():
             assert b"400 Bad Request" in result
             assert boundary.calls==0
         finally:srv.shutdown();srv.server_close();th.join(timeout=2)
+
+
+def test_actual_http_fixture_positive_and_negative_sha_contract():
+    import hashlib,json
+    class Stub:
+        def execute(self,message,*,peer_uid):
+            if message.get("artifact_id")=="ok":
+                payload=b"synthetic-small-artifact"
+                return {"http_status":200,"size_bytes":len(payload),
+                        "sha256":hashlib.sha256(payload).hexdigest(),"body_bytes":payload}
+            return {"http_status":403,"body":{"error":"FORBIDDEN"}}
+    with tempfile.TemporaryDirectory() as d:
+        sock=Path(d)/"s.sock";srv=SignedArtifactUDSServer(sock,boundary=Stub())
+        th=threading.Thread(target=srv.serve_forever,daemon=True);th.start()
+        try:
+            def get(body):
+                raw=json.dumps(body,separators=(",",":")).encode()
+                return request(sock,b"POST /v1/artifacts/read HTTP/1.1\r\nHost: localhost\r\nContent-Type: application/json\r\nContent-Length: "+str(len(raw)).encode()+b"\r\nConnection: close\r\n\r\n"+raw)
+            ok=get({"artifact_id":"ok"})
+            status,body=ok.split(b"\r\n\r\n",1)
+            assert b"200 OK" in status
+            assert b"Content-Length: 24\r\n" in status
+            assert b"X-Content-SHA256: "+hashlib.sha256(body).hexdigest().encode() in status
+            assert body==b"synthetic-small-artifact"
+            denied=get({"artifact_id":"deny"})
+            head,data=denied.split(b"\r\n\r\n",1)
+            assert b"403 Forbidden" in head
+            assert json.loads(data)=={"error":"FORBIDDEN"}
+            invalid=request(sock,b"POST /v1/artifacts/read HTTP/1.1\r\nHost: localhost\r\nContent-Type: application/json\r\nContent-Length: 2\r\nTransfer-Encoding: chunked\r\n\r\n{}")
+            assert b"400 Bad Request" in invalid
+        finally:srv.shutdown();srv.server_close();th.join(timeout=2)
