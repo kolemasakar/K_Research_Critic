@@ -86,3 +86,21 @@ def test_absolute_deadline_closes_trickling_header():
                 pass
         finally:
             client.close();srv.shutdown();srv.server_close();th.join(timeout=2)
+
+
+def test_rejects_undeclared_body_bytes_before_backend_dispatch():
+    class CountingBoundary:
+        def __init__(self):self.calls=0
+        def execute(self,*args,**kwargs):
+            self.calls+=1
+            return {"http_status":404,"body":{"error":"NOT_FOUND"}}
+    with tempfile.TemporaryDirectory() as d:
+        boundary=CountingBoundary()
+        sock=Path(d)/"s.sock";srv=SignedArtifactUDSServer(sock,boundary=boundary)
+        th=threading.Thread(target=srv.serve_forever,daemon=True);th.start()
+        try:
+            prefix=b"POST /v1/artifacts/read HTTP/1.1\r\nHost: localhost\r\nContent-Type: application/json\r\nContent-Length: 2\r\n\r\n"
+            result=request(sock,prefix+b"{}EXTRA")
+            assert b"400 Bad Request" in result
+            assert boundary.calls==0
+        finally:srv.shutdown();srv.server_close();th.join(timeout=2)
