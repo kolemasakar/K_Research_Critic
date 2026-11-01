@@ -1,13 +1,40 @@
 """Isolated disabled-by-default UDS HTTP server for signed Artifact GET. Never auto-start."""
-import json, os, socket, socketserver, struct
+import json, os, socket, socketserver, struct, threading
 from http.server import BaseHTTPRequestHandler
 
 class SignedArtifactUDSServer(socketserver.ThreadingMixIn, socketserver.UnixStreamServer):
     daemon_threads=True
     block_on_close=False
     request_queue_size=16
+    max_active_workers=4
+    request_deadline_seconds=20
+    def process_request(self, request, client_address):
+        # Acquire before creating a worker thread: slow clients cannot exhaust threads.
+        if not self._worker_slots.acquire(blocking=False):
+            try:
+                request.sendall(
+                    b"HTTP/1.1 503 Service Unavailable\r\n"
+                    b"Content-Length: 0\r\nConnection: close\r\n\r\n"
+                )
+            except OSError:
+                pass
+            finally:
+                self.shutdown_request(request)
+            return
+        try:
+            super().process_request(request, client_address)
+        except BaseException:
+            self._worker_slots.release()
+            raise
+
+    def process_request_thread(self, request, client_address):
+        try:
+            super().process_request_thread(request, client_address)
+        finally:
+            self._worker_slots.release()
     def __init__(self,path,*,boundary):
         self.boundary=boundary
+        self._worker_slots=threading.BoundedSemaphore(self.max_active_workers)
         super().__init__(str(path),SignedArtifactUDSHandler)
 
 class SignedArtifactUDSHandler(BaseHTTPRequestHandler):
@@ -16,6 +43,27 @@ class SignedArtifactUDSHandler(BaseHTTPRequestHandler):
     def setup(self):
         super().setup()
         self.connection.settimeout(5)
+        # Absolute cap, independent of byte-by-byte socket activity.
+        # Timer is cancelled when the handler finishes, including error paths.
+        self._deadline_timer=threading.Timer(
+            self.server.request_deadline_seconds, self._expire_connection
+        )
+        self._deadline_timer.daemon=True
+        self._deadline_timer.start()
+
+    def _expire_connection(self):
+        try:
+            self.connection.shutdown(socket.SHUT_RDWR)
+        except OSError:
+            pass
+
+    def finish(self):
+        try:
+            super().finish()
+        finally:
+            timer=getattr(self,"_deadline_timer",None)
+            if timer is not None:
+                timer.cancel()
     def handle_one_request(self):
         try:
             super().handle_one_request()
