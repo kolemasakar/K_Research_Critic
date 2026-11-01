@@ -22,3 +22,7 @@ Tests: `tests/test_stage131_real_store_ledger_authorization.py` **3/3 PASS**, is
 
 ## Partner action
 Independently review signed UDS + real ArtifactExchange/RequestLedger/nonce integration at immutable pin, confirm exact auth/TTL/descriptor assertions and source-only acceptance. Do not interpret as deployment approval.
+
+## Post-integration full source regression
+
+On isolated `krc-cobalt` checkout, source/test pin `dccdf677e6418526e0b0a3470fbeb312a9861d40`: `PYTHONPATH=src /home/krcops/stage131-test-venv/bin/python -m pytest -q` -> **1133 passed, 17 skipped, 0 failed in 50.06 s**. This run preceded only documentation changes.
