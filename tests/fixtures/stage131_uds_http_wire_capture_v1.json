@@ -10,7 +10,8 @@
         "connection": "close",
         "content-length": "19",
         "content-type": "application/octet-stream",
-        "x-content-sha256": "ecc91e0baf4ec1c0fcbc64341b656abfa2d47201111d7ed7b5ee0b5883c95431"
+        "x-content-sha256": "ecc91e0baf4ec1c0fcbc64341b656abfa2d47201111d7ed7b5ee0b5883c95431",
+        "x-content-type-options": "nosniff"
       },
       "body_hex": "666978747572652d61727469666163742d7631",
       "body_length": 19,
@@ -22,7 +23,8 @@
         "cache-control": "no-store",
         "connection": "close",
         "content-length": "21",
-        "content-type": "application/json"
+        "content-type": "application/json",
+        "x-content-type-options": "nosniff"
       },
       "body_hex": "7b226572726f72223a22464f5242494444454e227d",
       "body_length": 21,
@@ -34,7 +36,8 @@
         "cache-control": "no-store",
         "connection": "close",
         "content-length": "27",
-        "content-type": "application/json"
+        "content-type": "application/json",
+        "x-content-type-options": "nosniff"
       },
       "body_hex": "7b226572726f72223a22494e56414c49445f52455155455354227d",
       "body_length": 27,
