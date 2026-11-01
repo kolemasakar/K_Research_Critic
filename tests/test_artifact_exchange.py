@@ -98,3 +98,37 @@ def test_unindexed_file_not_served(tmp_path):
     (s.data/("a"*48)).write_bytes(b"foo")
     with pytest.raises(ExchangeError,match="NOT_FOUND"):
         s.get_bytes("a"*48,principal="p",request_id="r")
+
+def test_exact_ttl_expiry_boundary(tmp_path):
+    now=[1000]
+    s=ArtifactExchange(tmp_path/"store",ttl=10,clock=lambda:now[0])
+    x=s.store_bytes(b"expiry",principal="p",request_id="r",filename="f")
+    now[0]=1009.999
+    assert s.get_bytes(x["artifact_id"],principal="p",request_id="r")==b"expiry"
+    now[0]=1010
+    with pytest.raises(ExchangeError,match="ARTIFACT_EXPIRED"):
+        s.get_bytes(x["artifact_id"],principal="p",request_id="r")
+    assert s.cleanup_expired()==1
+
+def test_quota_equal_boundary_and_temp_cleanup(tmp_path):
+    s=ArtifactExchange(tmp_path/"store",max_artifact=5,max_total=8)
+    first=s.store_bytes(b"12345",principal="p",request_id="r",filename="f1")
+    second=s.store_bytes(b"123",principal="p",request_id="r",filename="f2")
+    assert len(s.get_bytes(first["artifact_id"],principal="p",request_id="r"))==5
+    assert len(s.get_bytes(second["artifact_id"],principal="p",request_id="r"))==3
+    with pytest.raises(ExchangeError,match="STORAGE_QUOTA_EXCEEDED"):
+        s.store_bytes(b"x",principal="p",request_id="r",filename="f3")
+    assert sorted(p.name for p in s.data.iterdir())==sorted([first["artifact_id"],second["artifact_id"]])
+
+def test_corruption_rejects_same_size_mutation(tmp_path):
+    s=ArtifactExchange(tmp_path/"store")
+    x=s.store_bytes(b"correct",principal="p",request_id="r",filename="f")
+    (s.data/x["artifact_id"]).write_bytes(b"changed")
+    with pytest.raises(ExchangeError,match="ARTIFACT_CORRUPTED"):
+        list(s.iter_chunks(x["artifact_id"],principal="p",request_id="r"))
+
+def test_seven_day_default_ttl_contract(tmp_path):
+    from krc_research.artifact_exchange import TTL,MAX_ARTIFACT,MAX_TOTAL
+    assert TTL==604800
+    assert MAX_ARTIFACT==200*1024*1024
+    assert MAX_TOTAL==2*1024*1024*1024
