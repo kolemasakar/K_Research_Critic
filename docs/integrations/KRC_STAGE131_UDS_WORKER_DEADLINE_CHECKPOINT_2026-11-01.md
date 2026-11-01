@@ -53,3 +53,13 @@
 - Focused combined tests **33/33 PASS** at `ab2e4bf3a9038e27e1aca96ca571d741c89baf4a`.
 - 200 MiB performance test remains **OWNER_WAIVED / NOT_TESTED**; configured maximum unchanged.
 - **Pending independent acceptance:** Sentinel needs to ACK the mandatory request write-half-close, error status/headers, source-to-client interoperability, disabled external adapter and 40 negatives. Science needs independent semantic 23-case review and end-to-end receiver acceptance. Installed runtime parity and consent gates remain separate. Production NO-GO.
+
+## Final source validation record for isolated hardening (2026-11-01)
+
+- Code, captured fixture and tests at immutable commit `ab2e4bf3a9038e27e1aca96ca571d741c89baf4a`.
+- Focused tests: **33 PASS / 0 FAIL**.
+- Entire KRC source pytest suite on isolated `krc-cobalt`: **1130 PASS / 17 SKIP / 0 FAIL, 48.16 s**.
+- Handoff dispatched to Sentinel PR #38 comment `6554195420`, K_Science PR #7 comment `6554195755`, KRC Draft PR #29 comment `6554196169`.
+- Partner review is a distinct gate: **ACK/MISMATCH not implied by comment publication**. The new write-half-close contract must be implemented/approved by an independent client owner before external adapter integration.
+- Actual 200 MiB load test remains **OWNER_WAIVED / NOT_TESTED**, not an acceptance assertion.
+- Production remains **NO-GO**, installed Stage127 and Stage131 unchanged, science signer OFF, external GET OFF.
