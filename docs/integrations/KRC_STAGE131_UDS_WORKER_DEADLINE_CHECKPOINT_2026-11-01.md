@@ -43,3 +43,13 @@
 - Small synthetic artifact only. No 200 MiB workload performed (**OWNER_WAIVED**).
 - The fixture test validates actual wire response invariants but does not yet publish an independent captured byte-for-byte fixture bundle. It uses synthetic stub for the 200/403 cases and separate signed-boundary positive/replay test.
 - Open blocking gates: delayed post-check request bytes; source/storage mutation race and installed ACL/keys; immutable wire capture bundle; partner independent ACK/MISMATCH; Sentinel 40 and Science 48 real E2E (NOT_RUN). No deployment or activation.
+
+## Stage131 isolated protocol closure candidate, 2026-11-01
+
+- **New source-only wire requirement:** the trusted AF_UNIX client MUST call `shutdown(SHUT_WR)` after transmitting exactly the declared request bytes, then read the response. The server now waits for EOF before calling the signed artifact boundary. Any undeclared extra bytes, including bytes delayed after the body, yield 400. Without EOF no dispatch occurs; deadline-driven EOF has a separate expired flag and is never accepted as peer confirmation. This is a **breaking internal wire contract** requiring Sentinel independent ACK/client update prior to any integration.
+- Source regression negative tests include delayed extra bytes with zero boundary calls, missing write-half-close/deadline, incomplete body, CL+TE ambiguity, worker exhaustion.
+- Artifact Exchange source race tests: same-size mutation before open is rejected by trusted SHA; atomic path replacement after open retains verified original open descriptor; subsequent corrupt path is rejected.
+- Versioned reproducible **actual AF_UNIX HTTP captures (synthetic boundary)** in `tests/fixtures/stage131_uds_http_wire_capture_v1.json`, produced by `tools/capture_stage131_uds_fixtures.py` and independently compared by `tests/test_stage131_wire_capture_fixture.py`: success 200 with length/hash, denied 403, undeclared-trailer 400. These are normalized captures (volatile Date and Server headers removed), NOT raw complete packets or deployed ingress evidence.
+- Focused combined tests **33/33 PASS** at `ab2e4bf3a9038e27e1aca96ca571d741c89baf4a`.
+- 200 MiB performance test remains **OWNER_WAIVED / NOT_TESTED**; configured maximum unchanged.
+- **Pending independent acceptance:** Sentinel needs to ACK the mandatory request write-half-close, error status/headers, source-to-client interoperability, disabled external adapter and 40 negatives. Science needs independent semantic 23-case review and end-to-end receiver acceptance. Installed runtime parity and consent gates remain separate. Production NO-GO.
