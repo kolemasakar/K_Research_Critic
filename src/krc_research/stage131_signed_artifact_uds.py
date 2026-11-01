@@ -129,7 +129,7 @@ class SignedArtifactUDSHandler(BaseHTTPRequestHandler):
             self.send_header("Content-Length",str(outcome["size_bytes"]))
             self.send_header("X-Content-SHA256",outcome["sha256"])
             self.send_header("Cache-Control","no-store")
-        self.send_header("X-Content-Type-Options","nosniff")
+            self.send_header("X-Content-Type-Options","nosniff")
             self.send_header("Connection","close")
             self.end_headers()
             if f is None:self.wfile.write(outcome["body_bytes"])
