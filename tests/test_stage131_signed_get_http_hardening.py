@@ -7,6 +7,7 @@ def request(sock,raw,read=True):
     s=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
     s.settimeout(3);s.connect(str(sock));s.sendall(raw)
     if not read:return s
+    s.shutdown(socket.SHUT_WR)
     data=b""
     while True:
         x=s.recv(4096)
