@@ -18,9 +18,10 @@ def validate_operation_result(obj, *, task_id, operation):
         ledger=r["claim_ledger"]; logs=r["search_logs"]; gate=r["manuscript_gate"]
         _require(isinstance(ledger,dict) and set(ledger)=={"count","pass","shortfall","status"},"INVALID_CLAIM_LEDGER")
         _require(all(type(ledger[k]) is int and ledger[k]>=0 for k in ("count","pass","shortfall")) and ledger["count"]==ledger["pass"]+ledger["shortfall"] and ledger["status"]=="PASS","LEDGER_COUNT_MISMATCH")
-        _require(isinstance(logs,list) and all(isinstance(x,dict) and x.get("status") in ("REPRODUCIBLE_LOG","PARTIAL_LOG") and all(k in x for k in ("provider","query","hit_count")) for x in logs),"INVALID_SEARCH_LOG")
+        _require(isinstance(logs,list) and all(isinstance(x,dict) and x.get("status") in ("REPRODUCIBLE_LOG","PARTIAL_LOG") and isinstance(x.get("provider"),str) and bool(x["provider"].strip()) and isinstance(x.get("query"),str) and bool(x["query"].strip()) and type(x.get("hit_count")) is int and x["hit_count"]>=0 for x in logs),"INVALID_SEARCH_LOG")
         _require(r["search_reproducibility"]==("PASS" if logs and all(x["status"]=="REPRODUCIBLE_LOG" for x in logs) else "SHORTFALL"),"SEARCH_STATUS_MISMATCH")
-        _require(isinstance(gate,dict) and set(gate)=={"status","missing_gates","detector_status","detector_results_count"} and gate["status"] in ("READY_FOR_AUTHOR_REVIEW","REVISE") and isinstance(gate["missing_gates"],list) and type(gate["detector_results_count"]) is int and gate["detector_results_count"]>=0,"INVALID_MANUSCRIPT_GATE")
+        _require(isinstance(gate,dict) and set(gate)=={"status","missing_gates","detector_status","detector_results_count"} and gate["status"] in ("READY_FOR_AUTHOR_REVIEW","REVISE") and isinstance(gate["missing_gates"],list) and gate["detector_status"] in ("NOT_RUN","PARTIAL","REVIEW_REQUIRED") and type(gate["detector_results_count"]) is int and gate["detector_results_count"]>=0,"INVALID_MANUSCRIPT_GATE")
+        _require(gate["status"]!="READY_FOR_AUTHOR_REVIEW" or not gate["missing_gates"],"READY_WITH_MISSING_GATES")
         _require(r["submission_ready"] is False and isinstance(r["reason"],str) and bool(r["reason"]),"UNSUPPORTED_SUBMISSION_APPROVAL")
         expected_status="REVISE" if ledger["shortfall"] or r["search_reproducibility"]!="PASS" or gate["status"]!="READY_FOR_AUTHOR_REVIEW" else "READY_FOR_AUTHOR_REVIEW"
         _require(r["status"]==expected_status,"PREFLIGHT_STATUS_MISMATCH")
@@ -32,7 +33,7 @@ def validate_operation_result(obj, *, task_id, operation):
         rows=e["records"]; n=e.get("count")
         _require(type(n) is int and 1<=n<=24 and n==len(rows),"BIBLIOGRAPHY_COUNT_MISMATCH")
         required={"doi","metadata_status","has_recorded_updates","updates_status","retraction_clearance","methods_results_verified","experimental_origins_verified","providers"}
-        _require(all(isinstance(row,dict) and set(row)==required and row["metadata_status"] in ("TWO_PROVIDER_MATCH","PARTIAL") and row["retraction_clearance"]=="NOT_ESTABLISHED" and row["methods_results_verified"] is False and row["experimental_origins_verified"]==0 and isinstance(row["providers"],dict) for row in rows),"INVALID_BIBLIOGRAPHY_RECORD")
+        _require(all(isinstance(row,dict) and set(row)==required and row["metadata_status"] in ("TWO_PROVIDER_MATCH","PARTIAL") and row["retraction_clearance"]=="NOT_ESTABLISHED" and row["methods_results_verified"] is False and type(row["experimental_origins_verified"]) is int and row["experimental_origins_verified"]==0 and isinstance(row["providers"],dict) for row in rows),"INVALID_BIBLIOGRAPHY_RECORD")
         _require(e.get("retraction_clearance")=="NOT_ESTABLISHED" and e.get("full_texts_inspected")==0,"UNVERIFIED_BIBLIOGRAPHY_PROMOTION")
         _require(type(e.get("two_provider_metadata_matches")) is int and e["two_provider_metadata_matches"]==sum(x["metadata_status"]=="TWO_PROVIDER_MATCH" for x in rows),"METADATA_COUNT_MISMATCH")
         _require(type(e.get("updates_detected")) is int and e["updates_detected"]==sum(x["has_recorded_updates"] is True for x in rows),"UPDATE_COUNT_MISMATCH")
