@@ -135,3 +135,28 @@ def test_actual_http_fixture_positive_and_negative_sha_contract():
             invalid=request(sock,b"POST /v1/artifacts/read HTTP/1.1\r\nHost: localhost\r\nContent-Type: application/json\r\nContent-Length: 2\r\nTransfer-Encoding: chunked\r\n\r\n{}")
             assert b"400 Bad Request" in invalid
         finally:srv.shutdown();srv.server_close();th.join(timeout=2)
+
+
+def test_disconnected_client_closes_spooled_file():
+    import io
+    finished=threading.Event()
+    class Tracked(io.BytesIO):
+        def close(self):
+            super().close()
+            finished.set()
+    class Stub:
+        def execute(self,*args,**kwargs):
+            import hashlib
+            data=b"z"*65536
+            return {"http_status":200,"size_bytes":len(data),
+                    "sha256":hashlib.sha256(data).hexdigest(),
+                    "body_file":Tracked(data)}
+    with tempfile.TemporaryDirectory() as d:
+        sock=Path(d)/"s.sock";srv=SignedArtifactUDSServer(sock,boundary=Stub())
+        th=threading.Thread(target=srv.serve_forever,daemon=True);th.start()
+        try:
+            raw=b"POST /v1/artifacts/read HTTP/1.1\r\nHost: localhost\r\nContent-Type: application/json\r\nContent-Length: 2\r\nConnection: close\r\n\r\n{}"
+            client=request(sock,raw,False)
+            client.close()
+            assert finished.wait(2),"response spool must close even on disconnect"
+        finally:srv.shutdown();srv.server_close();th.join(timeout=2)
