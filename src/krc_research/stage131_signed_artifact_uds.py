@@ -98,17 +98,12 @@ class SignedArtifactUDSHandler(BaseHTTPRequestHandler):
             message=json.loads(body)
             if not isinstance(message,dict):
                 return self.respond(400,{"error":"INVALID_REQUEST"})
-            # Fail closed on already-buffered or currently pending undeclared bytes.
-            # This is not a proof against bytes arriving after the dispatch check.
-            original_timeout=self.connection.gettimeout()
-            try:
-                self.connection.settimeout(0.001)
-                if self.rfile.peek(1):
-                    return self.respond(400,{"error":"INVALID_REQUEST"})
-            except (BlockingIOError, TimeoutError, socket.timeout):
-                pass
-            finally:
-                self.connection.settimeout(original_timeout)
+            # Source-only UDS retrieval requires a write-half-close from the peer.
+            # Never dispatch until EOF is observed after the declared body:
+            # late/undeclared bytes fail closed, not merely bytes already buffered.
+            # The absolute connection deadline closes peers withholding EOF.
+            if self.rfile.read(1) != b"":
+                return self.respond(400,{"error":"INVALID_REQUEST"})
         except (ValueError, UnicodeDecodeError, OSError):
             return self.respond(400,{"error":"INVALID_REQUEST"})
         try: uid=struct.unpack("3i",self.connection.getsockopt(socket.SOL_SOCKET,socket.SO_PEERCRED,12))[1]
