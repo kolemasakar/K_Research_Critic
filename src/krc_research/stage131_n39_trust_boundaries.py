@@ -17,18 +17,24 @@ def _canonical(value):
     return json.dumps(value,sort_keys=True,separators=(",",":"),ensure_ascii=False,allow_nan=False).encode("utf-8")
 
 def _read_root_json(directory, filename):
-    directory=Path(directory)
-    st=directory.lstat()
-    if not stat.S_ISDIR(st.st_mode) or st.st_uid!=0 or st.st_mode & 0o022:
-        raise ValueError("UNTRUSTED_DIRECTORY")
-    fd=os.open(str(directory/filename),os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC)
+    if (not isinstance(filename,str) or "/" in filename or "\\\\" in filename
+        or filename in (".","..") or len(filename)>180):
+        raise ValueError("UNSAFE_RECEIPT_FILENAME")
+    dfd=os.open(str(directory),os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW|os.O_CLOEXEC)
     try:
-        st=os.fstat(fd)
-        if not stat.S_ISREG(st.st_mode) or st.st_uid!=0 or st.st_mode & 0o022 or st.st_size>4096:
-            raise ValueError("UNTRUSTED_RECEIPT")
-        raw=os.read(fd,4097)
+        st=os.fstat(dfd)
+        if not stat.S_ISDIR(st.st_mode) or st.st_uid!=0 or st.st_mode & 0o022:
+            raise ValueError("UNTRUSTED_DIRECTORY")
+        fd=os.open(filename,os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC,dir_fd=dfd)
+        try:
+            st=os.fstat(fd)
+            if not stat.S_ISREG(st.st_mode) or st.st_uid!=0 or st.st_mode & 0o022 or st.st_size>4096:
+                raise ValueError("UNTRUSTED_RECEIPT")
+            raw=os.read(fd,4097)
+        finally:
+            os.close(fd)
     finally:
-        os.close(fd)
+        os.close(dfd)
     if len(raw)>4096:
         raise ValueError("RECEIPT_OVERSIZE")
     obj=json.loads(raw)
@@ -182,9 +188,11 @@ class N39RootRetrievalReceipts:
             if prev is None:
                 return False
             revoke=prev[0]
-            if not (revoke.get("action")=="revoke" and revoke.get("grant_ref")==old
+            if not (revoke.get("version")==1 and revoke.get("action")=="revoke" and revoke.get("grant_ref")==old
                     and revoke.get("principal")==principal and revoke.get("request_id")==request_id
-                    and revoke.get("artifact_id")==artifact_id):
+                    and revoke.get("artifact_id")==artifact_id
+                    and isinstance(revoke.get("issuer"),str) and revoke["issuer"].strip()
+                    and type(revoke.get("revoked_at")) is int and revoke["revoked_at"]<=int(self.clock())):
                 return False
         return True
 
@@ -193,10 +201,11 @@ class N39RootRetrievalReceipts:
         if item is None:
             return False
         rec=item[0]
-        return (rec.get("action")=="revoke" and rec.get("grant_ref")==grant_ref
+        return (rec.get("version")==1 and rec.get("action")=="revoke" and rec.get("grant_ref")==grant_ref
                 and rec.get("principal")==principal and rec.get("request_id")==request_id
                 and rec.get("artifact_id")==artifact_id and isinstance(rec.get("issuer"),str)
-                and bool(rec["issuer"].strip()))
+                and bool(rec["issuer"].strip()) and type(rec.get("revoked_at")) is int
+                and rec["revoked_at"]<=int(self.clock()))
 
 class N39ProtectedReadAuthorizer:
     """Independent root-issued active-grant pointer, never in-process issuer input."""
