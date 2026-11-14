@@ -172,11 +172,11 @@ class N39RootRetrievalReceipts:
             or not grant["issued_at"]<=int(self.clock())<grant["expires_at"]):
             return False
         # Even if an old grant is copied/reissued, immutable revocation wins.
-        if self._read(grant_ref+".revoked.json") is not None:
+        if (self.dir/(grant_ref+".revoked.json")).exists() or (self.dir/(grant_ref+".revoked.json")).is_symlink():
             return False
         old=grant["supersedes"]
         if old is not None:
-            if not _name(old):
+            if not _name(old) or old==grant_ref:
                 return False
             prev=self._read(old+".revoked.json")
             if prev is None:
@@ -216,9 +216,16 @@ class N39ProtectedReadAuthorizer:
         if index_result is None:
             return False
         index=index_result[0]
-        if (set(index)!={"version","principal","request_id","artifact_id","active_grant_ref"}
+        if (set(index)!={"version","principal","request_id","artifact_id","active_grant_ref","previous_grant_ref"}
             or index["version"]!=1 or any(index.get(k)!=v for k,v in scope.items())):
             return False
         ref=index["active_grant_ref"]
+        prev=index["previous_grant_ref"]
+        grant_result=self.receipts._read(str(ref)+".json") if _name(ref) else None
+        if grant_result is None or grant_result[0].get("supersedes") != prev:
+            return False
+        if prev is not None and (not _name(prev) or not self.receipts.revoked(
+                principal=principal,request_id=request_id,artifact_id=artifact_id,grant_ref=prev)):
+            return False
         return self.receipts.permit(principal=principal,request_id=request_id,
                                     artifact_id=artifact_id,attestation=evidence,grant_ref=ref)
