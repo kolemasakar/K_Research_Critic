@@ -28,7 +28,7 @@ def setup(d,*,error=None,enable=True,complete=True):
     return SignedArtifactReadBoundary(exchange=Exchange(error),ledger=ledger,
         nonce_registry=ArtifactNonceRegistry(Path(d)/"nonce.sqlite",clock=lambda:1000),
         keyring={"synthetic-only":KEY},trusted_peer_identities={123:IDENTITY},
-        enabled=enable)
+        enabled=enable,retrieval_authorizer=lambda **scope: True)
 def request():return sign_fixture(BASE,KEY)
 def test_signed_read_success_and_denials():
     with tempfile.TemporaryDirectory() as d:
