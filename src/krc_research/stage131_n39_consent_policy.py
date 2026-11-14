@@ -7,6 +7,7 @@ action, not exposed by UDS, HTTP, or untrusted science payload.
 import sqlite3
 import time
 from pathlib import Path
+from .consent_custody128 import ConsentCustody128
 
 class N39ConsentPolicy:
     def __init__(self, db_path, *, clock=time.time):
@@ -24,7 +25,7 @@ class N39ConsentPolicy:
 
     def record_original(self, *, custody, context):
         """Only pre-execution: independently verify and consume the source grant."""
-        if not callable(custody) or not isinstance(context,dict):
+        if not isinstance(custody,ConsentCustody128) or not isinstance(context,dict):
             return False
         principal=context.get("principal")
         request_id=context.get("request_id")
