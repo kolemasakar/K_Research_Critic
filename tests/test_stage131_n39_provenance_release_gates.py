@@ -96,8 +96,8 @@ def test_protected_receipts_revoke_regrant_and_wrong_binding(tmp_path,monkeypatc
     selector=hashlib.sha256(_canonical({"principal":P,"request_id":R,"artifact_id":A})).hexdigest()+".index.json"
     def put(name,obj):
         (root/name).write_text(json.dumps(obj,sort_keys=True))
-    def point(grant):
-        put(selector,{"version":1,"principal":P,"request_id":R,"artifact_id":A,"active_grant_ref":grant})
+    def point(grant,previous=None):
+        put(selector,{"version":1,"principal":P,"request_id":R,"artifact_id":A,"active_grant_ref":grant,"previous_grant_ref":previous})
     def grant(grant_ref,*,supersedes=None,provenance=None):
         put(grant_ref+".json",{
             "version":1,"action":"grant","grant_ref":grant_ref,
@@ -118,14 +118,14 @@ def test_protected_receipts_revoke_regrant_and_wrong_binding(tmp_path,monkeypatc
       "request_id":R,"artifact_id":A,"issuer":"root-revoker"})
     assert not authorizer(principal=P,request_id=R,artifact_id=A)
     newer="root-grant-0000000002"
-    point(newer)
+    point(newer,previous=ref)
     grant(newer)
-    assert authorizer(principal=P,request_id=R,artifact_id=A)
+    assert not authorizer(principal=P,request_id=R,artifact_id=A)
     # Old revoked grant must not be silently replaced by a new one.
     # This is the current source contract: require explicit supersedes.
     grant(newer,supersedes=ref)
     assert authorizer(principal=P,request_id=R,artifact_id=A)
-    (root/ref+".revoked.json").unlink()
+    (root/(ref+".revoked.json")).unlink()
     assert not authorizer(principal=P,request_id=R,artifact_id=A)
 
 def test_untrusted_receipt_directory_is_rejected_without_mock(tmp_path):
