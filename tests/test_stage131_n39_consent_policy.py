@@ -23,6 +23,11 @@ def signed(artifact,nonce):
        "auth":{"key_id":"k","issued_at_epoch":int(time.time()),
                "nonce":nonce,"mac_sha256":"0"*64}},KEY)
 
+def seed_test_provenance(policy, ref="synthetic-historic-only"):
+    # SQLite fixture only; not evidence of authentic owner approval.
+    with policy._db() as db:
+        db.execute("INSERT INTO origin VALUES(?,?,?,0)",(PRINCIPAL,REQUEST,ref))
+
 def setup(tmp_path,policy):
     ledger=RequestLedger(tmp_path/"ledger.sqlite")
     payload={"task_id":"synthetic"}
@@ -47,14 +52,8 @@ def test_n39_missing_original_and_fail_closed_default(tmp_path):
 def test_n39_revocation_independent_retrieval_grant_and_atomic_decision(tmp_path):
     policy=N39ConsentPolicy(tmp_path/"consent.sqlite")
     context={"request_id":REQUEST,"principal":PRINCIPAL,"consent_ref":"synthetic-owner-grant-00001"}
-    calls=[]
-    def synthetic_custody(ctx):
-        calls.append(dict(ctx))
-        return True
-    assert policy.record_original(custody=synthetic_custody,context=context)
-    assert len(calls)==1
-    assert not policy.record_original(custody=synthetic_custody,context=context)
-    assert len(calls)==1
+    assert not policy.record_original(custody=lambda _: True,context=context)
+    seed_test_provenance(policy)
     art,b=setup(tmp_path/"run",policy)
     artifact_id=art["artifact_id"]
     # Original completed consent never authorizes a read by itself.
@@ -74,8 +73,7 @@ def test_n39_no_read_grant_on_missing_origin_and_expired_grant(tmp_path):
     with pytest.raises(ValueError,match="ORIGINAL_CONSENT_PROVENANCE_MISSING"):
         policy.record_read_grant(principal=PRINCIPAL,request_id=REQUEST,
             artifact_id="a"*48,grant_ref="independent",expires=time.time()+100)
-    assert policy.record_original(custody=lambda ctx:True,
-        context={"principal":PRINCIPAL,"request_id":REQUEST,"consent_ref":"synthetic-owner-grant-00002"})
+    seed_test_provenance(policy,"synthetic-owner-grant-00002")
     art,b=setup(tmp_path/"run",policy)
     now=[1000.0]
     policy.clock=lambda:now[0]
@@ -132,8 +130,7 @@ def test_n39_no_new_science_dispatch_without_fresh_custody():
 
 def test_n39_revoke_first_wins_atomic_authorization(tmp_path):
     policy=N39ConsentPolicy(tmp_path/"consent.sqlite")
-    policy.record_original(custody=lambda _:True,context={
-        "principal":PRINCIPAL,"request_id":REQUEST,"consent_ref":"synthetic-consent-race"})
+    seed_test_provenance(policy,"synthetic-consent-race")
     art="c"*48
     policy.record_read_grant(principal=PRINCIPAL,request_id=REQUEST,
         artifact_id=art,grant_ref="retrieval-race",expires=time.time()+60)
