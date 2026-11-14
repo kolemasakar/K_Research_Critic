@@ -153,3 +153,59 @@ def test_n39_trusted_predispatch_journal_is_one_time_and_recovery_not_dispatch(t
     with pytest.raises(AuthorizationGateDenied,match="CONSENT_DENIED_OR_RECOVERY_HOLD"):
         execute_with_durable_n39_custody(dispatch,**kwargs)
     assert len(sent)==1 and calls[0]==1
+
+
+def test_n39_protected_root_receipt_checks_real_signed_boundary(tmp_path,monkeypatch):
+    """Actual Ledger + ArtifactExchange + nonce, mocked root ownership only."""
+    from krc_research.artifact_exchange import ArtifactExchange
+    from krc_research.request_ledger119 import RequestLedger
+    from krc_research.stage131_artifact_nonce_registry import ArtifactNonceRegistry
+    from krc_research.stage131_signed_artifact_boundary import SignedArtifactReadBoundary
+    from krc_research.stage131_signed_artifact_read import sign_fixture
+    import krc_research.stage131_n39_trust_boundaries as module
+    custody,_,_,evidence=custody_fake(tmp_path,monkeypatch)
+    journal=N39ProvenanceJournal(tmp_path/"private"/"journal.sqlite",custody)
+    assert journal.consume_once(CTX)
+    ledger=RequestLedger(tmp_path/"ledger.sqlite")
+    payload={"task_id":"t"}
+    ledger.admit(principal=P,request_id=R,operation="research.profile.validate",payload=payload)
+    ledger.complete(principal=P,request_id=R,operation="research.profile.validate",payload=payload,result={"status":"completed"})
+    store=ArtifactExchange(tmp_path/"store")
+    original=b"protected-signed-real-artifact"
+    art=store.store_bytes(original,principal=P,request_id=R,filename="artifact.bin")
+    scope={"principal":P,"request_id":R,"artifact_id":art["artifact_id"]}
+    root=tmp_path/"synthetic-root";root.mkdir()
+    def root_mock(directory,name):
+        raw=(Path(directory)/name).read_bytes()
+        return json.loads(raw),hashlib.sha256(raw).hexdigest()
+    monkeypatch.setattr(module,"_read_root_json",root_mock)
+    receipts=N39RootRetrievalReceipts(root)
+    guard=N39ProtectedReadAuthorizer(journal=journal,receipts=receipts)
+    secret=b"synthetic-strong-n39-hmac-key"
+    identity={"principal":P,"repository":"kolemasakar/K_Science","workflow_ref":"refs/heads/main"}
+    boundary=SignedArtifactReadBoundary(exchange=store,ledger=ledger,
+        nonce_registry=ArtifactNonceRegistry(tmp_path/"nonces.sqlite"),
+        keyring={"test":secret},trusted_peer_identities={123:identity},
+        enabled=True,retrieval_authorizer=guard)
+    def message(nonce):
+        return sign_fixture({"version":"krc-artifact-get/1","operation":"artifact.read",
+            "request_id":R,"artifact_id":art["artifact_id"],"identity":identity,
+            "auth":{"key_id":"test","issued_at_epoch":int(time.time()),
+                    "nonce":nonce,"mac_sha256":"0"*64}},secret)
+    assert boundary.execute(message("test-guard-denied-00001"),peer_uid=123)["http_status"]==403
+    ref="root-retrieval-grant-0001"
+    index=hashlib.sha256(_canonical(scope)).hexdigest()+".index.json"
+    (root/index).write_text(json.dumps({"version":1,**scope,
+                    "active_grant_ref":ref,"previous_grant_ref":None}))
+    (root/(ref+".json")).write_text(json.dumps({
+        "version":1,"action":"grant","grant_ref":ref,**scope,
+        "issuer":"synthetic-owner","issued_at":int(time.time())-1,
+        "expires_at":int(time.time())+60,"origin_receipt_sha256":evidence["receipt_sha256"],
+        "supersedes":None}))
+    success=boundary.execute(message("test-guard-allowed-0002"),peer_uid=123)
+    assert success["http_status"]==200 and success["body_bytes"]==original
+    assert success["sha256"]==art["sha256"]
+    (root/(ref+".revoked.json")).write_text(json.dumps({
+        "version":1,"action":"revoke","grant_ref":ref,**scope,
+        "issuer":"synthetic-owner","revoked_at":int(time.time())}))
+    assert boundary.execute(message("test-guard-revoked-0003"),peer_uid=123)["http_status"]==403
