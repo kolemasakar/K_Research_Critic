@@ -45,12 +45,12 @@ def test_n39_missing_original_and_fail_closed_default(tmp_path):
     denied=boundary.execute(signed(art["artifact_id"],"n39-missing-0000001"),peer_uid=os.getuid())
     assert denied=={"http_status":403,"content_type":"application/json","body":{"error":"FORBIDDEN"}}
     assert "body_bytes" not in denied and "body_file" not in denied
-    policy=N39ConsentPolicy(tmp_path/"consent.sqlite")
+    policy=N39ConsentPolicy(tmp_path/"consent.sqlite",synthetic_test_mode=True)
     art2,b2=setup(tmp_path/"other",policy)
     assert b2.execute(signed(art2["artifact_id"],"n39-missing-0000002"),peer_uid=os.getuid())["http_status"]==403
 
 def test_n39_revocation_independent_retrieval_grant_and_atomic_decision(tmp_path):
-    policy=N39ConsentPolicy(tmp_path/"consent.sqlite")
+    policy=N39ConsentPolicy(tmp_path/"consent.sqlite",synthetic_test_mode=True)
     context={"request_id":REQUEST,"principal":PRINCIPAL,"consent_ref":"synthetic-owner-grant-00001"}
     assert not policy.record_original(custody=lambda _: True,context=context)
     seed_test_provenance(policy)
@@ -69,7 +69,7 @@ def test_n39_revocation_independent_retrieval_grant_and_atomic_decision(tmp_path
     assert policy.is_authorized(principal=PRINCIPAL,request_id=REQUEST,artifact_id=artifact_id) is False
 
 def test_n39_no_read_grant_on_missing_origin_and_expired_grant(tmp_path):
-    policy=N39ConsentPolicy(tmp_path/"consent.sqlite")
+    policy=N39ConsentPolicy(tmp_path/"consent.sqlite",synthetic_test_mode=True)
     with pytest.raises(ValueError,match="ORIGINAL_CONSENT_PROVENANCE_MISSING"):
         policy.record_read_grant(principal=PRINCIPAL,request_id=REQUEST,
             artifact_id="a"*48,grant_ref="independent",expires=time.time()+100)
@@ -100,7 +100,7 @@ def test_n39_real_root_owned_custody_fixture(tmp_path):
         "approved_at":now-1,"expires_at":now+60}))
     os.chmod(approvals/(ref+".json"),0o600)
     custody=ConsentCustody128(replay/"consumed.sqlite",approvals_dir=approvals)
-    policy=N39ConsentPolicy(tmp_path/"consent.sqlite")
+    policy=N39ConsentPolicy(tmp_path/"consent.sqlite",synthetic_test_mode=True)
     assert policy.record_original(custody=custody,context=context)
     art,b=setup(tmp_path/"run",policy)
     assert b.execute(signed(art["artifact_id"],"n39-root-no-read-0001"),peer_uid=os.getuid())["http_status"]==403
@@ -129,7 +129,7 @@ def test_n39_no_new_science_dispatch_without_fresh_custody():
     assert not dispatched
 
 def test_n39_revoke_first_wins_atomic_authorization(tmp_path):
-    policy=N39ConsentPolicy(tmp_path/"consent.sqlite")
+    policy=N39ConsentPolicy(tmp_path/"consent.sqlite",synthetic_test_mode=True)
     seed_test_provenance(policy,"synthetic-consent-race")
     art="c"*48
     policy.record_read_grant(principal=PRINCIPAL,request_id=REQUEST,
