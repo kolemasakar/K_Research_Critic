@@ -114,8 +114,8 @@ def test_protected_receipts_revoke_regrant_and_wrong_binding(tmp_path,monkeypatc
     grant(ref,provenance="f"*64)
     assert not authorizer(principal=P,request_id=R,artifact_id=A)
     grant(ref)
-    put(ref+".revoked.json",{"action":"revoke","grant_ref":ref,"principal":P,
-      "request_id":R,"artifact_id":A,"issuer":"root-revoker"})
+    put(ref+".revoked.json",{"version":1,"action":"revoke","grant_ref":ref,"principal":P,
+      "request_id":R,"artifact_id":A,"issuer":"root-revoker","revoked_at":int(time.time())-1})
     assert not authorizer(principal=P,request_id=R,artifact_id=A)
     newer="root-grant-0000000002"
     point(newer,previous=ref)
