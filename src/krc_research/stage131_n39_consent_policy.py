@@ -10,10 +10,11 @@ from pathlib import Path
 from .consent_custody128 import ConsentCustody128
 
 class N39ConsentPolicy:
-    def __init__(self, db_path, *, clock=time.time):
+    def __init__(self, db_path, *, clock=time.time, synthetic_test_mode=False):
         self.path=Path(db_path)
         self.path.parent.mkdir(parents=True,exist_ok=True)
         self.clock=clock
+        self.synthetic_test_mode=synthetic_test_mode
         with self._db() as db:
             db.execute("CREATE TABLE IF NOT EXISTS origin (principal TEXT NOT NULL, request_id TEXT NOT NULL, consent_ref TEXT NOT NULL, revoked INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(principal,request_id))")
             db.execute("CREATE TABLE IF NOT EXISTS retrieval (principal TEXT NOT NULL,request_id TEXT NOT NULL,artifact_id TEXT NOT NULL,grant_ref TEXT NOT NULL,expires REAL NOT NULL,revoked INTEGER NOT NULL DEFAULT 0,PRIMARY KEY(principal,request_id,artifact_id))")
@@ -25,6 +26,8 @@ class N39ConsentPolicy:
 
     def record_original(self, *, custody, context):
         """Only pre-execution: independently verify and consume the source grant."""
+        if not self.synthetic_test_mode:
+            return False
         if not isinstance(custody,ConsentCustody128) or not isinstance(context,dict):
             return False
         principal=context.get("principal")
@@ -47,11 +50,15 @@ class N39ConsentPolicy:
 
     def revoke_original(self, *, principal, request_id):
         """Operator-side test mutation only; no server route exposes this."""
+        if not self.synthetic_test_mode:
+            raise PermissionError("TRUSTED_ISSUER_REQUIRED")
         with self._db() as db:
             db.execute("UPDATE origin SET revoked=1 WHERE principal=? AND request_id=?",(principal,request_id))
 
     def record_read_grant(self, *, principal, request_id, artifact_id, grant_ref, expires):
         """Separate out-of-band retrieval permission: NEVER inferred from origin."""
+        if not self.synthetic_test_mode:
+            raise PermissionError("TRUSTED_ISSUER_REQUIRED")
         if not all(isinstance(x,str) and x for x in (principal,request_id,artifact_id,grant_ref)) or not isinstance(expires,(int,float)) or expires<=self.clock():
             raise ValueError("INVALID_RETRIEVAL_GRANT")
         with self._db() as db:
@@ -64,11 +71,15 @@ class N39ConsentPolicy:
             db.execute("COMMIT")
 
     def revoke_read_grant(self, *, principal, request_id, artifact_id):
+        if not self.synthetic_test_mode:
+            raise PermissionError("TRUSTED_ISSUER_REQUIRED")
         with self._db() as db:
             db.execute("UPDATE retrieval SET revoked=1 WHERE principal=? AND request_id=? AND artifact_id=?",(principal,request_id,artifact_id))
 
     def is_authorized(self, *, principal, request_id, artifact_id):
         """Atomic linearization point for READ; a later revoke affects later reads."""
+        if not self.synthetic_test_mode:
+            return False
         with self._db() as db:
             db.execute("BEGIN IMMEDIATE")
             row=db.execute("""SELECT o.consent_ref,r.grant_ref,r.expires,r.revoked
