@@ -39,7 +39,7 @@ def configured(root,*,clock=time.time,complete=True):
         exchange=store,ledger=ledger,
         nonce_registry=ArtifactNonceRegistry(root/"nonce.sqlite"),
         keyring={"test-only":KEY},
-        trusted_peer_identities={os.getuid():IDENTITY},enabled=True)
+        trusted_peer_identities={os.getuid():IDENTITY},enabled=True,retrieval_authorizer=lambda **scope: True)
     return store,boundary
 
 def test_real_store_signed_read_authorization_ledger_and_hash(tmp_path):
