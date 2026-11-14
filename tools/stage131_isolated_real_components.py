@@ -39,7 +39,7 @@ class RealComponentsFixture:
         self.boundary=SignedArtifactReadBoundary(
             exchange=self.exchange,ledger=self.ledger,nonce_registry=self.nonce,
             keyring={"synthetic-only":TEST_KEY},
-            trusted_peer_identities={os.getuid():TEST_IDENTITY},enabled=True)
+            trusted_peer_identities={os.getuid():TEST_IDENTITY},enabled=True,retrieval_authorizer=lambda **scope: True)
         self.socket_path=self.root/"read.sock"
         self.server=None
         self.thread=None
