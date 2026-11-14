@@ -111,3 +111,34 @@ def test_n39_real_root_owned_custody_fixture(tmp_path):
     policy.revoke_original(principal=PRINCIPAL,request_id=REQUEST)
     assert b.execute(signed(art["artifact_id"],"n39-root-after-revoke"),peer_uid=os.getuid())["http_status"]==200
     assert not policy.record_original(custody=custody,context=context)
+
+
+def test_n39_no_new_science_dispatch_without_fresh_custody():
+    from krc_research.stage131_pre_dispatch_custody_gate import execute_with_custody,AuthorizationGateDenied
+    import hashlib
+    context={"request_id":REQUEST,"task_id":"synthetic","operation":"research.profile.validate",
+        "principal":PRINCIPAL,"profile_ref":"profile","evidence_refs":[],
+        "payload_sha256":hashlib.sha256(b"synthetic").hexdigest(),
+        "consent_ref":"n39-absent-original-consent"}
+    dispatched=[]
+    def dispatch(operation,payload,principal,*,request_id):
+        dispatched.append(request_id)
+        return {"status":"PENDING"}
+    with pytest.raises(AuthorizationGateDenied,match="CONSENT_DENIED"):
+        execute_with_custody(dispatch,authorizer=lambda _:False,context=context,
+            operation="research.profile.validate",payload={"task_id":"synthetic"},
+            principal=PRINCIPAL,request_id=REQUEST)
+    assert not dispatched
+
+def test_n39_revoke_first_wins_atomic_authorization(tmp_path):
+    policy=N39ConsentPolicy(tmp_path/"consent.sqlite")
+    policy.record_original(custody=lambda _:True,context={
+        "principal":PRINCIPAL,"request_id":REQUEST,"consent_ref":"synthetic-consent-race"})
+    art="c"*48
+    policy.record_read_grant(principal=PRINCIPAL,request_id=REQUEST,
+        artifact_id=art,grant_ref="retrieval-race",expires=time.time()+60)
+    # A read authorized before revocation has an earlier linearization point.
+    assert policy.is_authorized(principal=PRINCIPAL,request_id=REQUEST,artifact_id=art)
+    policy.revoke_read_grant(principal=PRINCIPAL,request_id=REQUEST,artifact_id=art)
+    # Revocation committed first: future authorization must fail.
+    assert not policy.is_authorized(principal=PRINCIPAL,request_id=REQUEST,artifact_id=art)
