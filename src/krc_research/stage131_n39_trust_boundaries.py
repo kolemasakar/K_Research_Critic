@@ -125,13 +125,18 @@ class N39ProvenanceJournal:
         return self.reconcile(context["principal"],context["request_id"])=="RECOVERED"
 
     def attestation(self, principal, request_id):
+        """Fail closed if the root receipt or consumed evidence has since changed."""
         with self._db() as db:
-            row=db.execute("SELECT consent_ref,context_sha256,receipt_sha256,approver,consumed_at FROM provenance WHERE principal=? AND request_id=? AND state='COMMITTED'",
+            row=db.execute("SELECT consent_ref,context_json,context_sha256,receipt_sha256,approver,consumed_at FROM provenance WHERE principal=? AND request_id=? AND state='COMMITTED'",
                            (principal,request_id)).fetchone()
-        if not row or not all(row[:4]) or type(row[4]) is not int:
+        if not row or not all((row[0],row[1],row[2],row[3],row[4])) or type(row[5]) is not int:
             return None
-        return {"consent_ref":row[0],"context_sha256":row[1],
-                "receipt_sha256":row[2],"approver":row[3],"consumed_at":row[4]}
+        observed=self.custody.inspect_consumed(json.loads(row[1]))
+        if not observed or (observed["consent_ref"],observed["context_sha256"],
+                           observed["receipt_sha256"],observed["approver"],observed["consumed_at"]) != (
+                           row[0],row[2],row[3],row[4],row[5]):
+            return None
+        return observed
 
 class N39RootRetrievalReceipts:
     """Read-only root-owned retrieval grant and revocation source.
@@ -192,3 +197,28 @@ class N39RootRetrievalReceipts:
                 and rec.get("principal")==principal and rec.get("request_id")==request_id
                 and rec.get("artifact_id")==artifact_id and isinstance(rec.get("issuer"),str)
                 and bool(rec["issuer"].strip()))
+
+class N39ProtectedReadAuthorizer:
+    """Independent root-issued active-grant pointer, never in-process issuer input."""
+    def __init__(self, *, journal, receipts):
+        if not isinstance(journal,N39ProvenanceJournal) or not isinstance(receipts,N39RootRetrievalReceipts):
+            raise ValueError("TRUSTED_N39_DEPENDENCIES_REQUIRED")
+        self.journal=journal
+        self.receipts=receipts
+
+    def __call__(self, *, principal, request_id, artifact_id):
+        evidence=self.journal.attestation(principal,request_id)
+        if evidence is None:
+            return False
+        scope={"principal":principal,"request_id":request_id,"artifact_id":artifact_id}
+        selector=hashlib.sha256(_canonical(scope)).hexdigest()+".index.json"
+        index_result=self.receipts._read(selector)
+        if index_result is None:
+            return False
+        index=index_result[0]
+        if (set(index)!={"version","principal","request_id","artifact_id","active_grant_ref"}
+            or index["version"]!=1 or any(index.get(k)!=v for k,v in scope.items())):
+            return False
+        ref=index["active_grant_ref"]
+        return self.receipts.permit(principal=principal,request_id=request_id,
+                                    artifact_id=artifact_id,attestation=evidence,grant_ref=ref)
