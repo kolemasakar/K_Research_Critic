@@ -135,3 +135,21 @@ def test_untrusted_receipt_directory_is_rejected_without_mock(tmp_path):
     if directory.stat().st_uid != 0:
         with pytest.raises(ValueError,match="UNTRUSTED_DIRECTORY"):
             _read_root_json(directory,"fake.json")
+
+
+def test_n39_trusted_predispatch_journal_is_one_time_and_recovery_not_dispatch(tmp_path,monkeypatch):
+    from krc_research.stage131_pre_dispatch_custody_gate import execute_with_durable_n39_custody,AuthorizationGateDenied
+    custody,consumed,calls,_=custody_fake(tmp_path,monkeypatch)
+    journal=N39ProvenanceJournal(tmp_path/"private"/"journal.sqlite",custody)
+    sent=[]
+    def dispatch(operation,payload,principal,*,request_id):
+        sent.append((operation,request_id))
+        return {"task_id":payload["task_id"],"operation":operation,"status":"PENDING","engine_result":{},"scientific_approval":False}
+    kwargs={"journal":journal,"context":CTX,"operation":CTX["operation"],
+            "payload":{"task_id":CTX["task_id"]},"principal":P,"request_id":R}
+    result=execute_with_durable_n39_custody(dispatch,**kwargs)
+    assert result["status"]=="PENDING"
+    assert len(sent)==1 and calls[0]==1
+    with pytest.raises(AuthorizationGateDenied,match="CONSENT_DENIED_OR_RECOVERY_HOLD"):
+        execute_with_durable_n39_custody(dispatch,**kwargs)
+    assert len(sent)==1 and calls[0]==1
