@@ -27,3 +27,9 @@
 **K_Science:** independently verify consent origin/issue/revoke auditing, descriptor provenance, distinct independent retrieval grant, and receiver behavior for 403/410/200. Report ACK/MISMATCH.
 
 **Release state:** SOURCE IMPLEMENTATION / INDEPENDENT ROOT-OWNED CUSTODY AND EXTERNAL ACCEPTANCE PENDING. Production NO-GO.
+
+## Verified source snapshot
+- Code/tests pinned at `b1091d58c5c0ff4262322953a679d8c9c2889349`.
+- Isolated `krc-cobalt` nonprivileged full suite: **1139 PASS / 18 SKIP / 0 FAIL in 54.23s**.
+- N39 targeted: **5 PASS / 1 SKIP**, the skipped root-owned ConsentCustody fixture is not accepted as tested.
+- This report is documentation-only beyond the tested source pin.
