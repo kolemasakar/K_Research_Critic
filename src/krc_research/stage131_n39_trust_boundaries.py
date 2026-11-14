@@ -17,7 +17,7 @@ def _canonical(value):
     return json.dumps(value,sort_keys=True,separators=(",",":"),ensure_ascii=False,allow_nan=False).encode("utf-8")
 
 def _read_root_json(directory, filename):
-    if (not isinstance(filename,str) or "/" in filename or "\\\\" in filename
+    if (not isinstance(filename,str) or "/" in filename or chr(92) in filename
         or filename in (".","..") or len(filename)>180):
         raise ValueError("UNSAFE_RECEIPT_FILENAME")
     dfd=os.open(str(directory),os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW|os.O_CLOEXEC)
