@@ -1,0 +1,10 @@
+{
+  "schema": "KRC_N39_AUDIT_WITNESS_GENESIS_V1",
+  "journal_id": "n39-staging-unbound",
+  "chain_seq": 0,
+  "chain_head_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "purpose": "bootstrap-only; no real consent, grant or audit event",
+  "source_code_commit": "8c9fdaf05bdc3b577fcbc8b50162113e89ba4020",
+  "witness_status": "UNPROTECTED_NOT_IMMUTABLE",
+  "independent_approver_ack": false
+}
