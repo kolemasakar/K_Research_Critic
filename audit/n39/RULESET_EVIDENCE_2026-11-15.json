@@ -1,0 +1,29 @@
+{
+  "schema": "KRC_N39_RULESET_ATTESTATION_V1",
+  "repo": "kolemasakar/K_Research_Critic",
+  "target_branch": "audit/n39-anchor-ledger",
+  "ruleset_id": 27332825,
+  "ruleset_name": "KRC-N39-AUDIT-PROTECTION",
+  "enforcement": "active",
+  "bypass_actors": [],
+  "rules_verified": [
+    "deletion",
+    "non_fast_forward",
+    "required_linear_history",
+    "pull_request"
+  ],
+  "pull_request": {
+    "required_approving_review_count": 0,
+    "require_last_push_approval": false,
+    "required_review_thread_resolution": true,
+    "allowed_merge_methods": [
+      "rebase"
+    ]
+  },
+  "parent_anchor_commit": "179a4429747e5ee5718ec42db61ebe280a5626da",
+  "genesis_only": true,
+  "not_a_science_consent": true,
+  "not_an_audit_event": true,
+  "independent_worm_guarantee": false,
+  "verification_source": "GitHub GET /repos/kolemasakar/K_Research_Critic/rulesets/27332825"
+}
