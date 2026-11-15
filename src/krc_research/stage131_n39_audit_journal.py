@@ -120,3 +120,52 @@ class N39AuditJournal:
         if record.get("kind")!="INTENT" or record.get("event_id")!=event_id:
             raise AuditDenied("AUDIT_INTENT_MISMATCH")
         return True
+
+
+    def record_outcome(self, *, intent_seq, event_id, outcome, receipt_sha256, operator_id):
+        """Record outcome after independently anchored intent; no grant issuance.
+
+        An OUTCOME is not a permission. It also requires independent anchoring
+        before an external, privileged operator may consider it audit-accepted.
+        """
+        if outcome not in ("INSTALLED","DENIED","FAILED"):
+            raise AuditDenied("INVALID_AUDIT_OUTCOME")
+        if not isinstance(operator_id,str) or not operator_id.strip():
+            raise AuditDenied("INVALID_AUDIT_OPERATOR")
+        if (not isinstance(receipt_sha256,str) or len(receipt_sha256)!=64
+            or any(c not in "0123456789abcdef" for c in receipt_sha256)):
+            raise AuditDenied("INVALID_RECEIPT_DIGEST")
+        state=self.verify()
+        if state["seq"]!=intent_seq:
+            raise AuditDenied("AUDIT_INTENT_NOT_HEAD")
+        self.check_anchored_intent(seq=intent_seq,event_id=event_id)
+        record={"kind":"OUTCOME","event_id":event_id,"intent_seq":intent_seq,
+                "outcome":outcome,"receipt_sha256":receipt_sha256,
+                "operator_id":operator_id,"time_epoch":int(self.clock())}
+        encoded=canonical(record).decode()
+        with self._db() as db:
+            db.execute("BEGIN IMMEDIATE")
+            count,head=self._scan(db)
+            if count!=intent_seq or head!=state["head_sha256"]:
+                db.execute("ROLLBACK")
+                raise AuditDenied("AUDIT_CONCURRENT_CHANGE")
+            seq=count+1
+            digest=hashlib.sha256(canonical({"seq":seq,"prev_hash":head,"event":record})).hexdigest()
+            db.execute("INSERT INTO events VALUES(?,?,?,?)",(seq,encoded,head,digest))
+            db.execute("COMMIT")
+        return {"seq":seq,"head_sha256":digest,"event_id":event_id}
+
+    def check_anchored_outcome(self, *, seq, event_id, receipt_sha256):
+        state=self.verify()
+        if state["seq"]!=seq:
+            raise AuditDenied("AUDIT_OUTCOME_NOT_HEAD")
+        with self._db() as db:
+            row=db.execute("SELECT event_json FROM events WHERE seq=?",(seq,)).fetchone()
+        if row is None:
+            raise AuditDenied("AUDIT_MISSING_OUTCOME")
+        event=json.loads(row[0])
+        if (event.get("kind")!="OUTCOME" or event.get("event_id")!=event_id
+            or event.get("receipt_sha256")!=receipt_sha256
+            or event.get("outcome")!="INSTALLED"):
+            raise AuditDenied("AUDIT_OUTCOME_MISMATCH")
+        return True
