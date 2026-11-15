@@ -23,3 +23,23 @@ K_Sentinel's independent report dated 2026-11-14 confirms root-owned **synthetic
 - K_Sentinel source-to-installed parity, Tailnet/UID/ACL/OIDC and external N01–N40 acceptance only after separate approved staging activation.
 
 **Until independently verified:** OPERATIONAL_HUMAN_ISSUANCE_AND_AUDIT = HOLD. Installed services stay untouched, 200 MiB load test OWNER_WAIVED, 48 science E2E not authorized, external N01–N40 full PASS = 0/40.
+
+## GitHub audit witness created — 2026-11-15
+
+A separate branch `audit/n39-anchor-ledger` now contains `audit/n39/README.md`, `GENESIS.json` and `ANCHOR_FORMAT.json`. Genesis is EMPTY: seq=0 and a 64-zero digest. Commit `179a4429747e5ee5718ec42db61ebe280a5626da` records the storage structure, not a real grant or even an operating anchor.
+
+This repository is public. Publish ONLY nonidentifying sequence/digest/commit references; keep the real owner's identity, private ticket, consent/grant documents and sensitive request details OUT of GitHub.
+
+**NOT IMMUTABLE YET**: GitHub rulesets currently return `[]`. The connected GitHub app cannot configure branch rulesets or access admin-only branch protection settings. The owner must configure deletion/force-push restrictions and independent reviewed changes, ensure no admin bypass where supported, and appoint an independent checkpoint witness. Same-repository Git objects are not legal WORM storage and can be made unreachable by a repo admin.
+
+### Concrete approval and issuance sequence
+1. Approve *this procedure only* by explicit owner instruction, identify owner verifier and independent root operator, and approve allowed retention period and identity verification channel. Approval of the procedure itself does not approve ANY scientific task or artifact read.
+2. For each operation, owner authorizes its exact action, principal, request ID, artifact ID (for read/revoke), expiry and reason through the agreed authenticated channel; trusted operator creates a private ticket and its SHA-256.
+3. Authorizer prepares a local N39 audit `INTENT`; publish its chain-head digest and sequence as a NEW GitHub anchor file; verify GitHub commit ancestry and capture an independent witness of commit SHA. Fail closed if either write/verification fails.
+4. Independently privileged operator installs one root-owned receipt in the isolated authorized environment; never place real consent or ticket content in this public repo. Validate UID/mode/scope/expiry and fsync; rollback/deny on mismatch.
+5. Operator records `OUTCOME` and installed receipt SHA-256 in local audit; publish another NEW GitHub checkpoint, independently verify and witness it before treating the operation as audit accepted.
+6. When revoking, preserve historic root-owned original consent evidence, create a separate root-owned revocation tombstone, anchor before/after, and deny new reads. A regrant needs a distinct reference, an independently approved new ticket and explicit supersedes.
+7. During restart or recovery, reconcile local N39 journal with root-owned evidence AND the independent GitHub-witnessed chain; never re-consume consent or re-dispatch science; ambiguous cases remain `HOLD_UNVERIFIED`.
+8. Partner Sentinel and Science must independently verify issuance/recovery evidence and final client status before deployment approval.
+
+**No real issuance without separate action-scoped owner consent and verified controls.**
