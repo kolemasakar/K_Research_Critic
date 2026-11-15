@@ -44,3 +44,9 @@ Two partner repository files record the exact **synthetic anchor** SHA-256 and p
 4. K_Sentinel and K_Science independent acceptance of the new audit anchor path; external N01-N40 integration and installed parity.
 
 GET/signer OFF. Stage127/131/Research v2 unchanged. 200 MiB load test OWNER_WAIVED/NOT_TESTED. Production NO-GO.
+
+## Validation after exporter source update
+- Isolated `krc-cobalt` source/test pin `20f3dc1075f27e969d97c3cdf4f0f99ecb926449`:
+  - Focused audit + export: **11 PASS / 0 FAIL**.
+  - Entire KRC source regression: **1157 PASS / 18 SKIP / 0 FAIL in 48.50s**.
+- Documentation-only commit followed the tested source. No installed services changed.
