@@ -1,0 +1,12 @@
+{
+  "chain_head_sha256": "f1161aa6c54d8b629323af72057fe5726811c2a75d707d121eaaaf5a16d225e4",
+  "immutable_witness_not_established": true,
+  "journal_id": "n39-isolated-demo-20261115",
+  "no_science_consent_or_grant": true,
+  "phase": "INTENT",
+  "previous_anchor_commit_sha": "bf36d01cce9566d5486023ea542deeef02d2eae5",
+  "schema_version": "KRC_N39_GITHUB_ANCHOR_V1",
+  "sequence": 1,
+  "source_commit_sha": "20f3dc1075f27e969d97c3cdf4f0f99ecb926449",
+  "synthetic_test_only": true
+}
