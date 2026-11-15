@@ -1,0 +1,28 @@
+{
+  "schema_version": "KRC_N39_GITHUB_ANCHOR_V1",
+  "required": [
+    "journal_id",
+    "sequence",
+    "chain_head_sha256",
+    "previous_anchor_commit_sha",
+    "source_commit_sha",
+    "recorded_at_utc",
+    "phase"
+  ],
+  "properties": {
+    "journal_id": "Opaque public nonidentifying identifier; not a consent_ref",
+    "sequence": "Positive integer, strictly increasing for a given journal",
+    "chain_head_sha256": "64 lowercase hexadecimal characters; computed from private local N39AuditJournal",
+    "previous_anchor_commit_sha": "Full 40-character SHA of previous independently witnessed anchor commit, except first anchor",
+    "source_commit_sha": "Full source commit SHA for the audit journal logic",
+    "recorded_at_utc": "RFC3339 timestamp, observed at publication; no retroactive time claim",
+    "phase": "INTENT or OUTCOME; never signifies actual owner approval by itself"
+  },
+  "restrictions": [
+    "No names, email addresses, approval tickets, consent references, secrets, HMAC, raw grant files, or artifact payloads",
+    "One new file per checkpoint; no overwrite/delete",
+    "Commit must be confirmed as descendant of prior witnessed commit",
+    "Requires an external independently held commit witness and protected GitHub branch",
+    "Do not treat GENESIS as a genuine grant or operational audit"
+  ]
+}
