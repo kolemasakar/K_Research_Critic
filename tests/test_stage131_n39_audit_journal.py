@@ -60,3 +60,30 @@ def test_n39_audit_restart_does_not_create_unanchored_permission(tmp_path):
         restarted.check_anchored_intent(seq=event["seq"],event_id=args["event_id"])
     anchor[0]=(event["seq"],event["head_sha256"])
     assert restarted.check_anchored_intent(seq=event["seq"],event_id=args["event_id"])
+
+
+def test_audit_outcome_requires_two_independent_anchors(tmp_path):
+    journal,anchor,args=create(tmp_path)
+    intent=journal.record_intent(**args)
+    with pytest.raises(AuditDenied,match="AUDIT_ANCHOR_UNVERIFIED"):
+        journal.record_outcome(intent_seq=intent["seq"],event_id=args["event_id"],
+                               outcome="INSTALLED",receipt_sha256="b"*64,operator_id="operator")
+    anchor[0]=(intent["seq"],intent["head_sha256"])
+    outcome=journal.record_outcome(intent_seq=intent["seq"],event_id=args["event_id"],
+                                  outcome="INSTALLED",receipt_sha256="b"*64,operator_id="operator")
+    with pytest.raises(AuditDenied,match="AUDIT_ANCHOR_UNVERIFIED"):
+        journal.check_anchored_outcome(seq=outcome["seq"],event_id=args["event_id"],receipt_sha256="b"*64)
+    anchor[0]=(outcome["seq"],outcome["head_sha256"])
+    assert journal.check_anchored_outcome(seq=outcome["seq"],event_id=args["event_id"],receipt_sha256="b"*64)
+    with pytest.raises(AuditDenied,match="AUDIT_OUTCOME_MISMATCH"):
+        journal.check_anchored_outcome(seq=outcome["seq"],event_id=args["event_id"],receipt_sha256="c"*64)
+
+def test_failed_operation_is_never_accepted_as_installed(tmp_path):
+    journal,anchor,args=create(tmp_path)
+    intent=journal.record_intent(**args)
+    anchor[0]=(intent["seq"],intent["head_sha256"])
+    result=journal.record_outcome(intent_seq=intent["seq"],event_id=args["event_id"],
+                                  outcome="FAILED",receipt_sha256="0"*64,operator_id="operator")
+    anchor[0]=(result["seq"],result["head_sha256"])
+    with pytest.raises(AuditDenied,match="AUDIT_OUTCOME_MISMATCH"):
+        journal.check_anchored_outcome(seq=result["seq"],event_id=args["event_id"],receipt_sha256="0"*64)
