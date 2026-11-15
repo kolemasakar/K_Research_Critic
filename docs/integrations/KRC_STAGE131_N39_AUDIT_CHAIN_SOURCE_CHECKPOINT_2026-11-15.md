@@ -27,3 +27,8 @@
 4. Independent Sentinel N39 ACK/MISMATCH on this audit source and K_Science consumer/provenance verification.
 
 **Status:** AUDIT_SOURCE_TESTED / OPERATIONAL_ISSUER_AND_EXTERNAL_ANCHOR_HOLD / Production NO-GO.
+
+## Test evidence
+- Isolated KRC full pytest on `krc-cobalt`, source/test pin `8c9fdaf05bdc3b577fcbc8b50162113e89ba4020`: **1153 PASS / 18 SKIP / 0 FAIL in 51.03 s**.
+- New audit-focused tests: **7/7 PASS**.
+- Documentation update follows the tested source only.
