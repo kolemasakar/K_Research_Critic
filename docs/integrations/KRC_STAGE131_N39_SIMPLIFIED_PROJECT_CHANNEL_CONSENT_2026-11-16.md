@@ -32,3 +32,11 @@ The **only necessary identity boundary is the already-authenticated ChatGPT Proj
 ## Scope and gate
 
 **OWNER SIMPLIFICATION APPROVED / SOURCE-ONLY ADAPTER IMPLEMENTED / ACTUAL TRUSTED CHATGPT PROJECT HANDLER NOT YET CONNECTED / STAGING EXTERNAL GET OFF / PRODUCTION NO-GO.** This permission decision does not approve installed runtime or production deployment, and the current source tests do not establish that a live ChatGPT message reached KRC through an authenticated connector.
+
+## Verified isolated test checkpoint
+
+- Source/test head before this documentation update: `d9b4062695d2b31f9ae4cadea345c13ae78113e9`.
+- Isolated focus: **12 PASS, 0 FAIL** (5 simplified project-channel cases + 7 earlier personal consent cases).
+- Full KRC pytest on isolated `krc-cobalt`: **1169 PASS, 18 SKIP, 0 FAIL, 55.01s**.
+- No actual ChatGPT-to-KRC authenticated project action was observed or deployed. Only source-level Python internal-channel adapter was tested. Existing installed Stage127/131/Research v2, GET/signer remained unchanged.
+- Partner PRs: KRC #29, Sentinel #38, Science #7 informed of the owner simplification. Formal independent runtime N39 acceptance pending.
