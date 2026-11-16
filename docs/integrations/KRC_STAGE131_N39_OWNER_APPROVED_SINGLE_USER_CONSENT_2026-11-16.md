@@ -1,3 +1,5 @@
+> **OWNER AMENDMENT 2026-11-16 — simplified project-channel identity policy:** [KRC_STAGE131_N39_SIMPLIFIED_PROJECT_CHANNEL_CONSENT_2026-11-16.md](KRC_STAGE131_N39_SIMPLIFIED_PROJECT_CHANNEL_CONSENT_2026-11-16.md). Current personal workflow uses the existing logged-in ChatGPT Project access with **NO second human identity verification, extra login, or per-response signature**. The earlier mandatory signed-gateway identity assertion is superseded for the trusted *internal* project channel. Never expose an unauthenticated public consent endpoint or treat arbitrary caller-provided text as a project action. All original profile/one-time/24h/cancellation/read safeguards remain.
+
 # KRC N39 — OWNER APPROVED SINGLE-USER CONSENT MODEL (2026-11-16)
 
 Decision status: **APPROVED BY KRC OWNER IN CHAT**, limited to the personal-use phase. This decision replaces the contradictory multi-user, independently administered issuer and off-platform witness *requirements* in the earlier DRAFT SOP. It does **NOT** authorize deployment, grant the assistant permission to impersonate chat authentication, or waive N39 authorization, cancellation, crash, and provenance tests.
