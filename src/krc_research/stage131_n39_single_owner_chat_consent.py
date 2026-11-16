@@ -154,6 +154,12 @@ class SingleOwnerConsentLedger:
             db.execute("COMMIT")
             return True
 
+    def can_continue(self, request_id):
+        """Workers must check before each new step; cancel or 24h expiry denies."""
+        with self._db() as db:
+            row=db.execute("SELECT status,expires_at FROM approvals WHERE request_id=?",(request_id,)).fetchone()
+        return bool(row and row[0]=="RUNNING" and row[1]>int(self.clock()))
+
     def complete(self, request_id):
         with self._db() as db:
             db.execute("BEGIN IMMEDIATE")
