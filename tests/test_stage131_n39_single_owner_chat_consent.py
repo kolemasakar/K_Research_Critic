@@ -134,3 +134,18 @@ def test_authenticated_chat_consent_with_real_artifact_scope(tmp_path):
         event=sign(now[0],"CANCEL",event_ref="authenticated-cancel-0001"))
     denied=boundary.execute(signed("owner-chat-nonce-000002"),peer_uid=98765)
     assert denied["http_status"]==403 and "body_bytes" not in denied
+
+
+def test_running_research_checks_cancel_and_24h_during_execution(tmp_path):
+    ledger,now=env(tmp_path)
+    assert ledger.propose(request_id=REQUEST,chat_id=CHAT,profile=PROFILE)
+    assert ledger.decide(request_id=REQUEST,chat_id=CHAT,event=sign(now[0]))
+    assert ledger.claim_execution(REQUEST) and ledger.can_continue(REQUEST)
+    now[0]+=86400
+    assert not ledger.can_continue(REQUEST)
+    assert not ledger.complete(REQUEST)
+    now[0]-=86400
+    assert ledger.decide(request_id=REQUEST,chat_id=CHAT,
+        event=sign(now[0],"CANCEL",event_ref="cancel-during-research-001"))
+    assert not ledger.can_continue(REQUEST)
+    assert not ledger.complete(REQUEST)
