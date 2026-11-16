@@ -68,10 +68,13 @@ class SignedChatEventVerifier:
 
 class SingleOwnerConsentLedger:
     MAX_SECONDS=86400
-    def __init__(self, db_path, *, verifier, clock=time.time):
+    def __init__(self, db_path, *, verifier, authorized_principal, clock=time.time):
         if not isinstance(verifier,SignedChatEventVerifier):
             raise ConsentDenied("TRUSTED_CHAT_EVENT_VERIFIER_REQUIRED")
+        if not isinstance(authorized_principal,str) or not authorized_principal:
+            raise ConsentDenied("INVALID_AUTHORIZED_PRINCIPAL")
         self.verifier=verifier
+        self.authorized_principal=authorized_principal
         self.clock=clock
         self.path=Path(db_path)
         if not self.path.is_absolute() or self.path.is_symlink():
@@ -178,7 +181,7 @@ class SingleOwnerConsentLedger:
                 return False
 
     def is_authorized(self, *, principal, request_id, artifact_id):
-        if principal!=self.verifier.owner_ref:
+        if principal!=self.authorized_principal:
             return False
         with self._db() as db:
             row=db.execute("""SELECT a.status FROM approvals a JOIN artifacts b
