@@ -1,3 +1,7 @@
+> **SUPERSEDED FOR PERSONAL SINGLE-OWNER MODE (2026-11-16).**
+> Owner-approved authoritative decision: [KRC_STAGE131_N39_OWNER_APPROVED_SINGLE_USER_CONSENT_2026-11-16.md](KRC_STAGE131_N39_OWNER_APPROVED_SINGLE_USER_CONSENT_2026-11-16.md).
+> A separate human operator, separate human retrieval approval, independently administered GitHub/WORM storage, and multi-user issuance are **deferred, not current release blockers**. This historical SOP remains a reference for potential future multi-user releases. The owner's decision does NOT bypass explicit post-profile chat confirmation, authenticated event provenance, 24h execution cap, cancellation, record scopes or partner N39 validation.
+>
 # N39 owner-authorized receipt issuance and audit SOP — DRAFT / 2026-11-15
 
 Status: OPERATIONAL OWNER APPROVAL NOT YET OBTAINED. This document is a proposed policy only, not a grant, acknowledgement of human consent, production runbook sign-off or staging activation. GET / signer OFF; Production NO-GO.
