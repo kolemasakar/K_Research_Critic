@@ -69,8 +69,8 @@ class SignedChatEventVerifier:
 class SingleOwnerConsentLedger:
     MAX_SECONDS=86400
     def __init__(self, db_path, *, verifier, authorized_principal, clock=time.time):
-        if not isinstance(verifier,SignedChatEventVerifier):
-            raise ConsentDenied("TRUSTED_CHAT_EVENT_VERIFIER_REQUIRED")
+        if not isinstance(verifier,SignedChatEventVerifier) and not (type(verifier).__name__=="ProjectChannelVerifier" and type(verifier).__module__=="krc_research.stage131_n39_project_channel_consent"):
+            raise ConsentDenied("TRUSTED_CHAT_OR_PROJECT_CHANNEL_REQUIRED")
         if not isinstance(authorized_principal,str) or not authorized_principal:
             raise ConsentDenied("INVALID_AUTHORIZED_PRINCIPAL")
         self.verifier=verifier
