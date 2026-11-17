@@ -62,6 +62,6 @@ def test_tamper_journal_or_profile_fails_closed(tmp_path):
   db.execute("UPDATE journal SET head=?",("0"*64,))
  with pytest.raises(ValueError,match="AUDIT_CHAIN_MISMATCH"):o.status()
  with sqlite3.connect(r.root/"consent.sqlite") as db:
-  db.execute("UPDATE project_profiles SET profile_json='{}'")
+  db.execute("UPDATE project_profiles SET profile_json=?", (json.dumps({"different":"profile"}),))
  with pytest.raises(ValueError,match="PROFILE_MISMATCH"):
   o.prepare(r.root,base_commit=BASE,source_commit=SOURCE)
