@@ -14,11 +14,11 @@ def canonical_bytes(message):
     try:return json.dumps(unsigned,sort_keys=True,separators=(",",":"),ensure_ascii=False,allow_nan=False).encode("utf-8")
     except (TypeError,ValueError):raise ArtifactReadDenied("INVALID_REQUEST") from None
 
-def verify_signed_read(message,*,trusted_identity,secret,nonce_claim,now_epoch=None,skew_seconds=300):
+def verify_signed_read(message,*,trusted_identity,secret,nonce_claim,now_epoch=None,skew_seconds=300,expected_operation="artifact.read"):
     """Caller owns trusted SO_PEERCRED/OIDC derivation, scoped key and durable atomic nonce_claim."""
     if not isinstance(message,dict) or set(message)!={"version","operation","request_id","artifact_id","identity","auth"}:
         raise ArtifactReadDenied("INVALID_REQUEST")
-    if message["version"]!=VERSION or message["operation"]!="artifact.read":
+    if expected_operation not in ("artifact.read","artifact.describe") or message["version"]!=VERSION or message["operation"]!=expected_operation:
         raise ArtifactReadDenied("OPERATION_DENIED")
     a=message["auth"]; i=message["identity"]
     if not isinstance(a,dict) or set(a)!={"key_id","issued_at_epoch","nonce","mac_sha256"} or not isinstance(i,dict) or set(i)!={"principal","repository","workflow_ref"}:
