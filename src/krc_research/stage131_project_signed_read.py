@@ -22,7 +22,7 @@ from .stage131_consumer_boundary_checks import validate_artifact_descriptor
 
 PRINCIPAL="K_Science"
 IDENTITY={"principal":PRINCIPAL,"repository":"kolemasakar/K_Science",
- "workflow_ref":"kolemasakar/K_Science/.github/workflows/kscience-krc-stage126-prepare.yml@refs/heads/main"}
+ "workflow_ref":"refs/heads/main"}
 STATE=Path("/home/krcops/krc-project-n39-staging/state")
 SOCKET=Path("/run/krc-project-n39-read/backend.sock")
 NONCE=Path("/var/lib/krc-project-n39-read/nonce.sqlite")
