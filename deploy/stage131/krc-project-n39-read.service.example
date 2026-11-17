@@ -29,9 +29,11 @@ ProtectControlGroups=true
 RestrictAddressFamilies=AF_UNIX
 RestrictSUIDSGID=true
 LockPersonality=true
-ReadWritePaths=/run/krc-project-n39-read /var/lib/krc-project-n39-read
-# Persistent producer files may be read but not changed by this retrieval process.
-ReadOnlyPaths=/home/krcops/krc-project-n39-staging/state
+# SQLite WAL readers may need to create/manage -wal/-shm sidecars.
+# No state ownership or ACL changes; the same trusted krcops owner runs both.
+ReadWritePaths=/run/krc-project-n39-read /var/lib/krc-project-n39-read /home/krcops/krc-project-n39-staging/state
+# SQL mode=ro + query_only. Protect producer files and bytes themselves.
+ReadOnlyPaths=/home/krcops/krc-project-n39-staging/state/consent.sqlite /home/krcops/krc-project-n39-staging/state/requests.sqlite /home/krcops/krc-project-n39-staging/state/artifacts/index.sqlite3 /home/krcops/krc-project-n39-staging/state/artifacts/objects
 TasksMax=24
 MemoryMax=256M
 TimeoutStopSec=25
