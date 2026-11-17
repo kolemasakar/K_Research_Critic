@@ -14,6 +14,12 @@ PROFILE={"purpose":"Synthetic N39 read","policy":"FREE_ONLY_OFFLINE",
  "profile_id":"n39","version":"1","protocol":"KRC Core","topic":"Synthetic"},
  "user_profile_approved":True}}
 
+@pytest.fixture(autouse=True)
+def private_cli_umask():
+ old=os.umask(0o077)
+ try:yield
+ finally:os.umask(old)
+
 def setup(tmp_path):
  root=tmp_path/"state"; p=ProjectResearchRoute(root).propose(PROFILE)
  r=ProjectResearchRoute(root);rid=p["request_id"];digest=p["profile_sha256"]
