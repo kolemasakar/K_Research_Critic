@@ -83,7 +83,11 @@ class SignedArtifactUDSHandler(BaseHTTPRequestHandler):
         self.wfile.write(data)
         self.close_connection=True
     def do_POST(self):
-        if self.path!="/v1/artifacts/read":return self.respond(404,{"error":"NOT_FOUND"})
+        if self.path=="/v1/artifacts/read":
+            dispatch=self.server.boundary.execute
+        elif self.path=="/v1/artifacts/describe" and callable(getattr(self.server.boundary,"describe",None)):
+            dispatch=self.server.boundary.describe
+        else:return self.respond(404,{"error":"NOT_FOUND"})
         if self.headers.get("Content-Type")!="application/json":return self.respond(415,{"error":"UNSUPPORTED_MEDIA_TYPE"})
         lengths=self.headers.get_all("Content-Length",[])
         if self.headers.get_all("Transfer-Encoding",[]) or len(lengths)!=1:
@@ -117,10 +121,10 @@ class SignedArtifactUDSHandler(BaseHTTPRequestHandler):
         try: uid=struct.unpack("3i",self.connection.getsockopt(socket.SOL_SOCKET,socket.SO_PEERCRED,12))[1]
         except (OSError,struct.error):return self.respond(403,{"error":"FORBIDDEN"})
         try:
-            outcome=self.server.boundary.execute(message,peer_uid=uid)
+            outcome=dispatch(message,peer_uid=uid)
         except Exception:
             return self.respond(503,{"error":"BACKEND_UNAVAILABLE"})
-        if outcome["http_status"]!=200:
+        if outcome["http_status"]!=200 or outcome.get("content_type")=="application/json":
             return self.respond(outcome["http_status"],outcome["body"])
         f=outcome.get("body_file")
         try:
