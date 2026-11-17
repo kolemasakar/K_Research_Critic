@@ -103,7 +103,7 @@ class ProjectArtifactAuthority:
         path=self.root/"artifacts"/"objects"/scope["artifact_id"]
         f=tempfile.TemporaryFile(mode="w+b")
         try:
-            try:fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC)
+            try:fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC|os.O_NONBLOCK)
             except FileNotFoundError:deny(404,"NOT_FOUND")
             except OSError:deny(502,"UPSTREAM_INVALID_RESPONSE")
             h=hashlib.sha256();count=0
@@ -142,7 +142,9 @@ class ProjectSignedArtifactBoundary:
         if not self.enabled:return error(404,"NOT_FOUND")
         if peer_uid!=self.peer_uid:return error(403,"FORBIDDEN")
         try:
-            if message["auth"]["key_id"]!=KEY_ID:return error(403,"FORBIDDEN")
+            if not isinstance(message,dict):return error(400,"INVALID_REQUEST")
+            if not isinstance(message.get("auth"),dict):return error(400,"INVALID_REQUEST")
+            if message["auth"].get("key_id")!=KEY_ID:return error(403,"FORBIDDEN")
             scope=verify_signed_read(message,trusted_identity=self.identity,secret=self.key,
                 nonce_claim=self.nonce.claim,expected_operation=operation)
             if operation=="artifact.describe":
@@ -168,8 +170,11 @@ def main():
     if os.geteuid()!=1002 or os.getegid()!=984:
         raise SystemExit("EXPECTED_KRCOPS_UID1002_GID984")
     os.umask(0o077)
-    # Key is root-provisioned 0440 root:krc-sentinel-ipc. No other service uses it.
-    fd=os.open(KEY_PATH,os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC)
+    # Key is a distinct retrieval-only 0440 root:krc-sentinel-ipc file.
+    parent=KEY_PATH.parent.lstat()
+    if not stat.S_ISDIR(parent.st_mode) or (parent.st_uid,parent.st_gid,stat.S_IMODE(parent.st_mode))!=(0,984,0o750):
+        raise SystemExit("KEY_DIRECTORY_MISMATCH")
+    fd=os.open(KEY_PATH,os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC|os.O_NONBLOCK)
     with os.fdopen(fd,"rb") as f:
         st=os.fstat(f.fileno())
         if not stat.S_ISREG(st.st_mode) or (st.st_uid,st.st_gid,stat.S_IMODE(st.st_mode))!=(0,984,0o440):
