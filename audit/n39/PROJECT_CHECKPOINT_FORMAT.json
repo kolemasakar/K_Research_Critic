@@ -1,0 +1,21 @@
+{
+  "schema_version": "KRC_N39_PROJECT_CHECKPOINT_V1",
+  "required": [
+    "journal_id",
+    "sequence",
+    "chain_head_sha256",
+    "previous_chain_head_sha256",
+    "previous_anchor_commit_sha",
+    "source_commit_sha",
+    "recorded_at_utc",
+    "phase"
+  ],
+  "phase": "STATE_CHECKPOINT",
+  "description": "Salted hash chain over observed private project state, not a retroactive approval event. Owner accepts existing protected GitHub branch; independent administrative custody deferred.",
+  "restrictions": [
+    "No raw profile, artifact, identity, secrets or consent reference",
+    "Append-only checkpoints via protected PR; verify previous commit ancestry and exact content before ACK",
+    "Existing historical INTENT/OUTCOME schema stays unchanged",
+    "Publication does not authorize execution, alter consent or deploy services"
+  ]
+}
