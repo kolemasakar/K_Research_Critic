@@ -12,9 +12,14 @@ class SignedArtifactUDSServer(socketserver.ThreadingMixIn, socketserver.UnixStre
         # Acquire before creating a worker thread: slow clients cannot exhaust threads.
         if not self._worker_slots.acquire(blocking=False):
             try:
+                body=b'{"error":"BACKEND_UNAVAILABLE"}'
+                request.settimeout(1)
                 request.sendall(
                     b"HTTP/1.1 503 Service Unavailable\r\n"
-                    b"Content-Length: 0\r\nConnection: close\r\n\r\n"
+                    b"Content-Type: application/json\r\n"
+                    b"Content-Length: "+str(len(body)).encode()+b"\r\n"
+                    b"Cache-Control: no-store\r\nX-Content-Type-Options: nosniff\r\n"
+                    b"Connection: close\r\n\r\n"+body
                 )
             except OSError:
                 pass
