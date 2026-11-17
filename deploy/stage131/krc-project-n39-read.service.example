@@ -1,0 +1,38 @@
+# REVIEW-ONLY. No [Install] section, no autostart, default OFF.
+[Unit]
+Description=KRC N39 private project signed artifact retrieval STAGING candidate
+After=local-fs.target
+ConditionPathExists=/etc/krc-project-n39-read/enable-reviewed-staging
+
+[Service]
+Type=simple
+User=krcops
+Group=krc-sentinel-ipc
+UMask=0077
+RuntimeDirectory=krc-project-n39-read
+RuntimeDirectoryMode=0750
+StateDirectory=krc-project-n39-read
+StateDirectoryMode=0700
+WorkingDirectory=/opt/krc-project-n39-read/current
+Environment=PYTHONPATH=/opt/krc-project-n39-read/current/src
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 -m krc_research.stage131_project_signed_read --enable-reviewed-staging-read
+NoNewPrivileges=true
+CapabilityBoundingSet=
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=read-only
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX
+RestrictSUIDSGID=true
+LockPersonality=true
+ReadWritePaths=/run/krc-project-n39-read /var/lib/krc-project-n39-read
+# Persistent producer files may be read but not changed by this retrieval process.
+ReadOnlyPaths=/home/krcops/krc-project-n39-staging/state
+TasksMax=24
+MemoryMax=256M
+TimeoutStopSec=25
+Restart=no
