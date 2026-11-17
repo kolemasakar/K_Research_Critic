@@ -1,0 +1,11 @@
+{
+  "chain_head_sha256": "022279467911c9a0b3b60c8b629ac673c5c1e0838ee043fe6437058013b70110",
+  "journal_id": "project-6c52018f0ddf6bfb8b8c5f81ea7ff892",
+  "phase": "STATE_CHECKPOINT",
+  "previous_anchor_commit_sha": "17dea84013392c0efda6bdb09f12d6f287283842",
+  "previous_chain_head_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "recorded_at_utc": "2026-11-17T20:27:35Z",
+  "schema_version": "KRC_N39_PROJECT_CHECKPOINT_V1",
+  "sequence": 1,
+  "source_commit_sha": "594a0d872de045c79841c710e766fedeb0b27a98"
+}
