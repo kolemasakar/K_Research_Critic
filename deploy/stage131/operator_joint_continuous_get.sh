@@ -58,9 +58,10 @@ flag(){
  runuser -u krcsentinel -g krc-sentinel-ipc -- env PYTHONPATH="$1:$KREL/src" PYTHONNOUSERSITE=1 "$PY" -s -c 'import sys;from stage127_ingress_entrypoint import load_config;assert load_config(sys.argv[1])["artifact_get_enabled"] is (sys.argv[2]=="on")' "$CONF" "$2"
 }
 no_lease(){
- ! systemctl is-active --quiet krc-stage127-get-lease-expiry.timer
- ! systemctl is-active --quiet krc-stage127-get-lease-expiry.service
- [[ ! -e "$TEMP" ]]
+ if systemctl is-active --quiet krc-stage127-get-lease-expiry.timer; then return 1; fi
+ if systemctl is-active --quiet krc-stage127-get-lease-expiry.service; then return 1; fi
+ [[ ! -e "$TEMP" && ! -L "$TEMP" ]] || return 1
+ return 0
 }
 atomic_config(){
  local tmp
@@ -117,6 +118,10 @@ rollback(){
  systemctl start "$SENT" || return 1
  if ! wait_status 404; then systemctl stop "$SENT"; echo ROLLBACK_NOT_VERIFIED; return 1; fi
  [[ ! -S "$SOCK" ]] || return 1
+ systemctl is-active --quiet "$SENT" || return 1
+ systemctl is-active --quiet krc-research-stage131.service || return 1
+ systemctl is-active --quiet krc-research-v2.service || return 1
+ date -u +%FT%TZ > "$B/rolled-back" || return 1
  echo CONTINUOUS_ROLLBACK_GET_OFF_VERIFIED
 }
 case "$MODE" in
@@ -188,10 +193,14 @@ switch)
 on)
  no_lease
  verify_staged; verify_baseline_units
- [[ -f "$B/switched" && ! -f "$B/on" && ! -e "$MARKER" ]]
+ [[ -f "$B/switched" && ! -f "$B/on" && ! -f "$B/rolled-back" && ! -e "$MARKER" ]]
  [[ $(systemctl show "$SENT" -p WorkingDirectory --value) = "$SREL" ]]
  flag "$SREL" off; wait_status 404
  [[ $(readlink -f "$KBASE/continuous") = "$KREL" ]]
+ cmp -s "$KUNIT" "$KREL/deploy/stage131/krc-project-n39-read-continuous.service.example"
+ cmp -s "$DROP" "$SREL/20-artifact-get-release.conf"
+ (cd "$B" && sha256sum -c baseline.sha256)
+ cmp -s "$CONF" "$B/original.json"
  # Invocation is conditional on prior externally verified POST T3 and joint release decision.
  trap 'rc=$?; trap - EXIT; if ((rc!=0)); then rollback || echo ROLLBACK_REQUIRES_OPERATOR; fi; exit "$rc"' EXIT
  install -o root -g root -m 0600 /dev/null "$MARKER"
