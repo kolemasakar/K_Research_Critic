@@ -32,31 +32,37 @@ status_code() {
 atomic_config() {
   local tmp
   tmp="$(mktemp /etc/krc-sentinel-v2/.stage127-get-XXXXXX)"
-  install -o 987 -g 984 -m "$CONFIG_MODE" "$1" "$tmp"
-  mv -T "$tmp" "$CONF"
+  install -o 987 -g 984 -m "$CONFIG_MODE" "$1" "$tmp" || { rm -f -- "$tmp"; return 1; }
+  mv -T "$tmp" "$CONF" || { rm -f -- "$tmp"; return 1; }
 }
 off() {
   # Restore exact pre-lease config, NOT an example. Preserve all other services.
   if [[ -f "$STATE/original.json" ]]; then
-    CONFIG_MODE="$(cat "$STATE/config-mode")"
-    test "$CONFIG_MODE" = 400 -o "$CONFIG_MODE" = 600
-    (cd "$STATE" && sha256sum -c original.sha256 >/dev/null)
-    atomic_config "$STATE/original.json" || { systemctl stop "$SENT"; return 1; }
-    flag off || { systemctl stop "$SENT"; return 1; }
-    systemctl restart "$SENT" || { systemctl stop "$SENT"; return 1; }
+    CONFIG_MODE="$(cat "$STATE/config-mode")" || return 1
+    [[ "$CONFIG_MODE" = 400 || "$CONFIG_MODE" = 600 ]] || return 1
+    (cd "$STATE" && sha256sum -c original.sha256 >/dev/null) || { systemctl stop "$SENT"; return 1; }
+    if ! cmp -s "$CONF" "$STATE/original.json" || ! flag off || [[ "$(status_code 2>/dev/null || true)" != 404 ]]; then
+      atomic_config "$STATE/original.json" || { systemctl stop "$SENT"; return 1; }
+      flag off || { systemctl stop "$SENT"; return 1; }
+      systemctl restart "$SENT" || { systemctl stop "$SENT"; return 1; }
+    fi
   else
-    flag off
+    flag off || return 1
   fi
-  systemctl stop "$READ"
-  rm -f -- "$MARKER"
-  test ! -S "$SOCK"
-  test "$(status_code)" = 404
-  systemctl is-active --quiet "$SENT"
-  systemctl is-active --quiet krc-research-stage131.service
-  systemctl is-active --quiet krc-research-v2.service
+  systemctl stop "$READ" || return 1
+  rm -f -- "$MARKER" || return 1
+  test ! -S "$SOCK" || return 1
+  if [[ "$(status_code 2>/dev/null || true)" != 404 ]]; then
+    systemctl stop "$SENT"
+    echo ROLLBACK_NOT_VERIFIED_SENTINEL_STOPPED
+    return 1
+  fi
+  systemctl is-active --quiet "$SENT" || return 1
+  systemctl is-active --quiet krc-research-stage131.service || return 1
+  systemctl is-active --quiet krc-research-v2.service || return 1
   systemctl stop "$TIMER.timer" || true
   if [[ -d "$STATE" ]]; then
-    date -u +%FT%TZ > "$STATE/closed-at"
+    date -u +%FT%TZ > "$STATE/closed-at" || return 1
   fi
   echo STAGING_GET_OFF_VERIFIED
 }
@@ -100,7 +106,7 @@ PY
 systemd-run --unit="$TIMER" --on-active=20min --timer-property=AccuracySec=1s --property=Type=oneshot /bin/bash "$SELF" off
 systemctl is-active --quiet "$TIMER.timer"
 # If activation fails, immediate rollback; timer remains a separate fallback.
-trap 'rc=$?; trap - EXIT; if ((rc!=0)); then off || true; fi; exit "$rc"' EXIT
+trap 'rc=$?; trap - EXIT; if ((rc!=0)); then if ! off; then echo ROLLBACK_REQUIRES_OPERATOR; fi; fi; exit "$rc"' EXIT
 install -o root -g root -m 0600 /dev/null "$MARKER"
 systemctl start "$READ"
 for i in {1..50}; do [[ -S "$SOCK" ]] && break; sleep .1; done
