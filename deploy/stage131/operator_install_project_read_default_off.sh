@@ -23,6 +23,8 @@ GET_URL=http://100.118.132.8:19017/staging/v2/artifacts/aaaaaaaaaaaaaaaaaaaaaaaa
 RID=KS-b190d3c43f52c07516170ecebbcd7641
 EXPECTED_SHA=840fcb4faf75519d8a55b0569720e9912d35d969c6ea2165b82086d66225042e
 export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+# Do not import modules from the operator's working directory.
+cd /
 test "$(stat -c '%u:%a' "$0")" = 0:600
 test "$(id -u krcops):$(id -u krcsentinel):$(getent group krc-sentinel-ipc | cut -d: -f3)" = 1002:987:984
 test "$(id -g krcsentinel)" = 984
