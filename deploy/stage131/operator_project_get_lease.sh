@@ -21,7 +21,11 @@ SP=/opt/krc-sentinel-v2/releases/stage127-get-963540fe08055b65f0b25a5a6484a61712
 KP=/opt/krc-project-n39-read/46aebfcd52117d564624fd708709a097bb533362
 PY=/opt/krc-sentinel-v2/venv/bin/python
 URL=http://100.118.132.8:19017/staging/v2/artifacts/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-exec 9>/run/lock/krc-stage127-get-lease.lock
+LOCKDIR=/run/krc-stage127-get-lease-lock
+[[ ! -L "$LOCKDIR" ]]
+install -d -o root -g root -m 0700 "$LOCKDIR"
+test "$(stat -c '%u:%g:%a' "$LOCKDIR")" = 0:0:700
+exec 9>"$LOCKDIR/lock"
 flock -w 90 9
 flag() {
   runuser -u krcsentinel -g krc-sentinel-ipc -- env PYTHONPATH="$SP" PYTHONNOUSERSITE=1 "$PY" -s -c 'import sys;from stage127_ingress_entrypoint import load_config;assert load_config(sys.argv[1])["artifact_get_enabled"] is (sys.argv[2]=="on")' "$CONF" "$1"
@@ -31,7 +35,7 @@ status_code() {
 }
 atomic_config() {
   local tmp
-  tmp="$(mktemp /etc/krc-sentinel-v2/.stage127-get-XXXXXX)"
+  tmp="$(mktemp /etc/krc-sentinel-v2/.stage127-get-XXXXXX)" || return 1
   install -o 987 -g 984 -m "$CONFIG_MODE" "$1" "$tmp" || { rm -f -- "$tmp"; return 1; }
   mv -T "$tmp" "$CONF" || { rm -f -- "$tmp"; return 1; }
 }
@@ -52,6 +56,7 @@ off() {
   systemctl stop "$READ" || return 1
   rm -f -- "$MARKER" || return 1
   test ! -S "$SOCK" || return 1
+  for i in {1..30}; do [[ "$(status_code 2>/dev/null || true)" = 404 ]] && break; sleep .5; done
   if [[ "$(status_code 2>/dev/null || true)" != 404 ]]; then
     systemctl stop "$SENT"
     echo ROLLBACK_NOT_VERIFIED_SENTINEL_STOPPED
