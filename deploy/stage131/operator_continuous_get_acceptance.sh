@@ -182,16 +182,16 @@ boot-after)
  [[ $(cat /proc/sys/kernel/random/boot_id) != "$(cat "$P/boot-before.id")" ]]
  wait_active "$S"; wait_active "$R"; wait_active "$V"
  preflight
- snapshot "$P/boot-after.json"
- cmp -s "$P/boot-before.json" "$P/boot-after.json"
- echo CONTINUOUS_BOOT_AUTOSTART_PASS
- echo NONCE_AND_SCIENCE_STATE_UNCHANGED
  # Restore prior manually-started Stage131 only; do not enable it at boot.
  if ! systemctl is-active --quiet "$L"; then
    systemctl start "$L"
    wait_active "$L"
    echo MANUAL_STAGE131_RESTORED
  fi
+ echo CONTINUOUS_BOOT_AUTOSTART_PASS
+ snapshot "$P/boot-after.json"
+ cmp -s "$P/boot-before.json" "$P/boot-after.json"
+ echo NONCE_AND_SCIENCE_STATE_UNCHANGED
  echo BOOT_LOCAL_ACCEPTANCE_PASS
  ;;
 *) echo 'Usage: crash | boot-before | boot-after'; exit 64 ;;
