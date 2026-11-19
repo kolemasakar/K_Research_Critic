@@ -72,6 +72,70 @@ PY
  )
  echo NONCE_AND_SCIENCE_DB_QUICK_CHECK_PASS
 }
+internal_probe(){
+ # Previously owner-approved technical fixture only; no execution.
+ local mode="$1" meta
+ meta="$(runuser -u krcops -- env PYTHONPATH="$K/src" PYTHONNOUSERSITE=1 /usr/bin/python3 -s - <<'PY'
+import json
+from krc_research.stage131_project_signed_read import STATE,ro,ProjectArtifactAuthority
+rid="KS-b190d3c43f52c07516170ecebbcd7641"
+with ro(STATE/"requests.sqlite") as db:
+ row=db.execute("SELECT state,result FROM requests WHERE principal=? AND request_id=?",("K_Science",rid)).fetchone()
+ assert row and row[0]=="COMPLETE";a=json.loads(row[1])["artifact"]
+d=ProjectArtifactAuthority(STATE).descriptor({"request_id":rid,"artifact_id":a["artifact_id"],"principal":"K_Science"})
+assert d["size_bytes"]==398 and d["sha256"]=="840fcb4faf75519d8a55b0569720e9912d35d969c6ea2165b82086d66225042e"
+print(json.dumps(d))
+PY
+)"
+ # Private short-lived signed message is passed via stdin/stdout only, never printed.
+ local script
+ script="$(cat <<'PY'
+import hashlib,json,os,secrets,socket,sys,time
+from krc_research.stage131_signed_artifact_read import sign_fixture
+from krc_research.stage131_project_signed_read import IDENTITY,KEY_ID,KEY_PATH,SOCKET
+assert (os.getuid(),os.getgid())==(987,984)
+mode=sys.argv[1];d=json.loads(sys.argv[2]);key=KEY_PATH.read_bytes()
+def message():
+ return sign_fixture({"version":"krc-artifact-get/1","operation":"artifact.read","request_id":d["request_id"],
+ "artifact_id":d["artifact_id"],"identity":IDENTITY,"auth":{"key_id":KEY_ID,"issued_at_epoch":int(time.time()),
+ "nonce":secrets.token_hex(24),"mac_sha256":"0"*64}},key)
+def wire(m):
+ body=json.dumps(m,separators=(",",":")).encode()
+ with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as s:
+  s.settimeout(5);s.connect(str(SOCKET))
+  s.sendall(b"POST /v1/artifacts/read HTTP/1.1\r\nHost: localhost\r\nContent-Type: application/json\r\nContent-Length: "+str(len(body)).encode()+b"\r\nConnection: close\r\n\r\n"+body)
+  s.shutdown(socket.SHUT_WR);data=b""
+  while True:
+   p=s.recv(4096)
+   if not p:break
+   data+=p
+   assert len(data)<=8192
+ head,payload=data.split(b"\r\n\r\n",1)
+ headers=dict(x.split(": ",1) for x in head.decode("ascii").split("\r\n")[1:])
+ assert int(headers["Content-Length"])==len(payload)
+ return int(head.split()[1]),headers,payload
+def read_ok(m):
+ status,h,body=wire(m)
+ assert status==200 and len(body)==d["size_bytes"] and hashlib.sha256(body).hexdigest()==d["sha256"]
+ assert h["X-Content-SHA256"]==d["sha256"]
+if mode=="before":
+ m=message();read_ok(m);print(json.dumps(m))
+elif mode=="after":
+ m=json.load(sys.stdin);status,h,b=wire(m)
+ assert status==403 and json.loads(b)=={"error":"FORBIDDEN"}
+ print("LIVE_INTERNAL_NONCE_REPLAY_AFTER_CRASH_403_PASS")
+ read_ok(message())
+ print("LIVE_INTERNAL_FRESH_READ_SHA_200_PASS")
+else:raise ValueError("INVALID_MODE")
+PY
+)"
+ if [[ "$mode" = before ]]; then
+   (set -o noclobber; runuser -u krcsentinel -g krc-sentinel-ipc -- env PYTHONPATH="$D:$K/src" PYTHONNOUSERSITE=1 /opt/krc-sentinel-v2/venv/bin/python -s -c "$script" "$mode" "$meta" > "$P/short-lived-replay.json")
+   echo LIVE_INTERNAL_BEFORE_CRASH_SHA_200_PASS
+ else
+   runuser -u krcsentinel -g krc-sentinel-ipc -- env PYTHONPATH="$D:$K/src" PYTHONNOUSERSITE=1 /opt/krc-sentinel-v2/venv/bin/python -s -c "$script" "$mode" "$meta" < "$P/short-lived-replay.json"
+ fi
+}
 case "${1:-}" in
 crash)
  preflight
@@ -79,9 +143,12 @@ crash)
  [[ ! -e "$P/crash-before.json" && ! -e "$P/crash-after.json" ]]
  r=$(pid "$R"); s=$(pid "$S"); l=$(pid "$L"); v=$(pid "$V"); n=$(restarts "$R")
  [[ "$r" != 0 && "$s" != 0 ]]
+ [[ ! -e "$P/short-lived-replay.json" ]]
+ trap 'rm -f "$P/short-lived-replay.json"' EXIT
+ internal_probe before
  snapshot "$P/crash-before.json"
  # Exactly one deliberate reader crash, no change to configured restart limit.
- systemctl kill --kill-who=main --signal=SIGKILL "$R"
+ systemctl kill --kill-whom=main --signal=SIGKILL "$R"
  for i in {1..45}; do
    new=$(pid "$R")
    if [[ "$new" != 0 && "$new" != "$r" ]] && systemctl is-active --quiet "$R"; then break; fi
@@ -95,7 +162,10 @@ crash)
  cmp -s "$P/crash-before.json" "$P/crash-after.json"
  echo KRC_CRASH_AUTO_RESTART_PASS
  echo NO_BEARER_401_AND_SENTINEL_PID_STABLE
- echo NONCE_AND_SCIENCE_STATE_UNCHANGED
+ echo NONCE_AND_SCIENCE_STATE_UNCHANGED_ACROSS_RESTART
+ internal_probe after
+ rm -f "$P/short-lived-replay.json"
+ trap - EXIT
  ;;
 boot-before)
  preflight
