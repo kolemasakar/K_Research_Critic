@@ -46,7 +46,7 @@ preflight(){
  [[ $(systemctl show "$S" -p WorkingDirectory --value) = "$D" ]]
  cmp -s /etc/systemd/system/krc-project-n39-read.service "$K/deploy/stage131/krc-project-n39-read-continuous.service.example"
  cmp -s /etc/systemd/system/krc-sentinel-stage127.service.d/20-artifact-get-release.conf "$D/20-artifact-get-release.conf"
- ! systemctl is-active --quiet "$T"
+ if systemctl is-active --quiet "$T"; then echo ACTIVE_LEASE_DENIED; return 1; fi
  [[ ! -e /etc/krc-project-n39-read/enable-reviewed-staging ]]
  [[ $(stat -c '%u:%g:%a' /etc/krc-project-n39-read/enable-reviewed-continuous) = 0:0:600 ]]
  [[ -S "$SOCK" && $(stat -c '%u:%g:%a' "$SOCK") = 1002:984:660 ]]
@@ -54,7 +54,8 @@ preflight(){
 }
 snapshot(){
  # Store only fingerprints and counts, never print nonce rows or secrets.
- /usr/bin/python3 - "$1" <<'PY'
+ [[ ! -e "$1" && ! -L "$1" ]]
+ (set -o noclobber; runuser -u krcops -g krc-sentinel-ipc -- /usr/bin/python3 -s - > "$1" <<'PY'
 import hashlib,json,sqlite3,sys
 from pathlib import Path
 def query(p,q):
@@ -66,9 +67,10 @@ science=query("/home/krcops/krc-project-n39-staging/state/science-replay.sqlite"
 # Existing nonce TTL may legitimately prune rows after new admission; no live
 # signed traffic should run during this short local test.
 digest=hashlib.sha256(json.dumps(rows,separators=(",",":")).encode()).hexdigest()
-with open(sys.argv[1],"x") as f:json.dump({"nonce_count":len(rows),"nonce_sha256":digest,"science_count":science},f)
-print("NONCE_INTEGRITY=PASS; SCIENCE_COUNT="+str(science))
+print(json.dumps({"nonce_count":len(rows),"nonce_sha256":digest,"science_count":science},sort_keys=True))
 PY
+ )
+ echo NONCE_AND_SCIENCE_DB_QUICK_CHECK_PASS
 }
 case "${1:-}" in
 crash)
@@ -79,7 +81,7 @@ crash)
  [[ "$r" != 0 && "$s" != 0 ]]
  snapshot "$P/crash-before.json"
  # Exactly one deliberate reader crash, no change to configured restart limit.
- systemctl kill --kill-whom=main --signal=SIGKILL "$R"
+ systemctl kill --kill-who=main --signal=SIGKILL "$R"
  for i in {1..45}; do
    new=$(pid "$R")
    if [[ "$new" != 0 && "$new" != "$r" ]] && systemctl is-active --quiet "$R"; then break; fi
