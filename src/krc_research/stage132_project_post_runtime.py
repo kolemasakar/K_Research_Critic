@@ -86,14 +86,15 @@ def gateway(stop):
 
 def broker(stop):
     from krc_research.stage132_project_post_contract import ProjectPostBoundary
-    from krc_research.stage131_project_read_lifecycle import existing_nonce,producer_preflight,notify_ready
-    from krc_research.stage131_project_signed_read import ro
+    from krc_research.stage131_project_read_lifecycle import existing_nonce,producer_preflight,notify_ready,retrieval_key
+    from krc_research.stage131_project_signed_read import ro,KEY_PATH
     if (os.geteuid(),os.getegid())!=(1002,GID):raise ValueError("BROKER_UID_GID")
     marker_check()
     st=RELAY.parent.lstat()
     if not stat.S_ISDIR(st.st_mode) or (st.st_uid,st.st_gid,stat.S_IMODE(st.st_mode))!=(1002,GID,0o750):
         raise ValueError("RELAY_RUNTIME_DIRECTORY")
     key=read_key(CONF/"broker.key",1002)
+    if key==retrieval_key(KEY_PATH):raise ValueError("KEY_SEPARATION")
     producer_preflight(OWNER_STATE)
     for name,table in (("consent.sqlite","project_profiles"),("science-replay.sqlite","requests")):
         with closing(ro(OWNER_STATE/name)) as db:db.execute("SELECT * FROM "+table+" LIMIT 0")
