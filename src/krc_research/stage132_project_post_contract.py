@@ -4,27 +4,15 @@ Only a verified KRC transport assertion may reach this boundary. The owner
 approval and durable request ledger remain in the existing private project.
 No external approval operation, no caller consent boolean, no fallback.
 """
-import json
-import re
 import sqlite3
 from contextlib import closing
 from krc_research.stage131_project_research_route import ProjectResearchRoute, RouteDenied, PRINCIPAL
 from krc_research.stage131_n39_single_owner_chat_consent import canonical
-from krc_research.stage131_project_signed_read import ProjectArtifactAuthority, ReadDenied, checked, ro
+from krc_research.stage131_project_signed_read import ProjectArtifactAuthority, ReadDenied, ro
 from krc_research.request_ledger119 import LedgerError
 
-OP = "research.profile.validate"
-IDENTITY = {"client":"K_Science","principal":"K_Science","repository":"kolemasakar/K_Science","workflow_ref":"refs/heads/main"}
-MAX_EXTERNAL = 262144
-RID = re.compile(r"KS-[0-9a-f]{32}\Z")
-def denied():
-    return 403, {"error":"OPERATION_DENIED"}
-
-def conflict(rid, code="IDEMPOTENCY_CONFLICT"):
-    return 409, {"request_id":rid,"status":"rejected","error":{"code":code}}
-
-def ambiguous(rid):
-    return 409, {"request_id":rid,"status":"pending_reconciliation","error":{"code":"AMBIGUOUS_REQUEST"}}
+from krc_research.stage132_project_post_wire import (OP,IDENTITY,MAX_EXTERNAL,RID,denied,conflict,ambiguous,valid_pilot_descriptor)
+import time
 
 def validate_payload(payload):
     if not isinstance(payload,dict) or set(payload)!={"critic_profile"}:
@@ -95,6 +83,7 @@ class ProjectPostBoundary:
             if (result["version"],result["request_id"],result["status"],result["delivery"])!=("krc-transport/2",rid,"completed","artifact"):
                 return ambiguous(rid)
             a=result["artifact"]
+            if not valid_pilot_descriptor(a,now=time.time()):return ambiguous(rid)
             authority=ProjectArtifactAuthority(route.root)
             d=authority.descriptor({"request_id":rid,"artifact_id":a["artifact_id"],"principal":PRINCIPAL})
             if d!={**a,"request_id":rid}:
