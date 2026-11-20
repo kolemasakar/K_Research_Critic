@@ -10,7 +10,7 @@ import sqlite3
 from contextlib import closing
 from krc_research.stage131_project_research_route import ProjectResearchRoute, RouteDenied, PRINCIPAL
 from krc_research.stage131_n39_single_owner_chat_consent import canonical
-from krc_research.stage131_project_signed_read import ProjectArtifactAuthority, ReadDenied
+from krc_research.stage131_project_signed_read import ProjectArtifactAuthority, ReadDenied, checked, ro
 from krc_research.request_ledger119 import LedgerError
 
 OP = "research.profile.validate"
@@ -53,7 +53,17 @@ class ProjectPostBoundary:
         try:
             if len(canonical({k:envelope[k] for k in ("request_id","operation","payload")}))>MAX_EXTERNAL:
                 return denied()
-            route=ProjectResearchRoute(self.root)
+            # Fail closed if existing authority is missing; do not provision
+            # or repair private databases through an external request.
+            root=ProjectArtifactAuthority(self.root).root
+            for name,tables in (("consent.sqlite",("approvals","project_profiles","artifacts")),
+                                ("requests.sqlite",("requests",)),
+                                ("artifacts/index.sqlite3",("objects",)),
+                                ("science-replay.sqlite",("requests",))):
+                with closing(ro(root/name)) as db:
+                    for table in tables:
+                        db.execute("SELECT * FROM "+table+" LIMIT 0")
+            route=ProjectResearchRoute(root)
             try: proposal=route.show(rid)
             except RouteDenied as exc:
                 if str(exc)=="MISSING_PROPOSAL":return denied()
@@ -63,11 +73,11 @@ class ProjectPostBoundary:
             # looked up by server-generated ID. Never trust a client digest.
             if profile["operation"]!=OP or profile["policy"]!="FREE_ONLY_OFFLINE":
                 return denied()
-            if canonical(profile["payload"])!=canonical(envelope["payload"]):
-                return conflict(rid)
             status=proposal["status"]
             if status in ("PROPOSED","CANCELLED","EXPIRED","EXPIRED_RUNNING","MISSING"):
                 return denied()
+            if canonical(profile["payload"])!=canonical(envelope["payload"]):
+                return conflict(rid)
             if status in ("RUNNING","COMPLETED"):
                 return ambiguous(rid)
             if status!="APPROVED":
