@@ -16,9 +16,7 @@ import stat
 import struct
 import time
 
-from krc_research.stage132_project_post_contract import OP, IDENTITY, denied, ambiguous
-from krc_research.stage131_n39_single_owner_chat_consent import canonical
-from krc_research.stage131_consumer_boundary_checks import validate_artifact_descriptor
+from krc_research.stage132_project_post_wire import OP, IDENTITY, denied, ambiguous, canonical, valid_pilot_descriptor
 from krc_research.uds_verified123b import VerifiedStage123Handler
 
 DOMAIN="KRC-PROJECT-PILOT-RELAY/1"
@@ -131,7 +129,7 @@ def validate_reply(response,rid):
             return status,b
     if status==200 and set(b)=={"version","request_id","status","delivery","artifact"}:
         if (b["version"],b["request_id"],b["status"],b["delivery"])==("krc-transport/2",rid,"completed","artifact"):
-            if validate_artifact_descriptor(b["artifact"],now_epoch=time.time())=="DESCRIPTOR_VALID_NOT_AUTHORIZED":
+            if valid_pilot_descriptor(b["artifact"],now=time.time()):
                 return status,b
     raise ValueError("REPLY_NOT_CORRELATED")
 
