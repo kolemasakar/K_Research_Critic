@@ -225,6 +225,23 @@ PY
  wait_ingress
  [[ $(pid "$GATE") != "$g" && $(pid "$SENT") != "$s" && $(pid "$READ") = "$r" && $(pid "$LEG") = "$l" ]]
  active "$BROKER"
+ # Actual role-pinned signed legacy gateway path, never using the owner grant.
+ runuser -u krcsentinel -g krc-sentinel-ipc -- env PYTHONPATH="/opt/krc-sentinel-v2/releases/stage127-get-b2a8064027c887065522b4b96f846c3d0540194f" PYTHONNOUSERSITE=1 PYTHONDONTWRITEBYTECODE=1 /opt/krc-sentinel-v2/venv/bin/python -s - <<'PY'
+import secrets
+from identity_assertion import sign_assertion
+from staging_keyring123d import load_local_key
+from krc_uds_client import create_pinned_staging_client,IPCError
+key=load_local_key("/etc/krc-sentinel-v2/transport.key",expected_uid=987)
+identity={"client":"K_Science","principal":"K_Science","repository":"kolemasakar/K_Science","workflow_ref":"refs/heads/main"}
+client=create_pinned_staging_client("/run/krc-research-v2/backend.sock",expected_uid=988,expected_gid=984,expected_socket_gid=984)
+payload={"critic_profile":{"profile_id":"stage132-no-approval-probe","version":"v1","protocol":"KRC Core","topic":"Technical denial only"}}
+for op,p in (("research.profile.validate",payload),("transport.probe",{})):
+ e={"version":"krc-transport/2","identity":identity,"operation":op,"request_id":"KS-"+secrets.token_hex(16),"payload":p}
+ try:client.execute(sign_assertion(e,key=key,key_id="stage126-v1"))
+ except IPCError as exc:assert exc.code=="OPERATION_DENIED"
+ else:raise AssertionError("UNEXPECTED_DISPATCH")
+print("ACTUAL_SIGNED_GATEWAY_PILOT_AND_TRANSPORT_DENIAL_PASS")
+PY
  systemctl enable "$BROKER"
  snapshot > "$P/switch-after.json"
  cmp "$P/switch-before.json" "$P/switch-after.json"
