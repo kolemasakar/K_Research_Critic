@@ -1,0 +1,308 @@
+{
+  "schema": "KRC_N39_PROJECT_READ_WIRE_OBSERVATIONS_V1",
+  "source_sha": "139bd1902e979883cc33641a080f9169c6af2339",
+  "scope": "Synthetic isolated actual Unix HTTP responses; no live owner data; not external acceptance",
+  "responses": [
+    {
+      "body_sha256": "71b24dbf1881b25f4e3f2960418e4ecbeabded8e16f293cdf43953c7045fea4f",
+      "body_utf8": "{\"error\":\"INVALID_REQUEST\"}",
+      "case": "N12",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "27",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 400
+    },
+    {
+      "body_sha256": "540028bbd229cc8ce0f531f84e11296870f9b54faa231abb6f5da8557ae3df31",
+      "body_utf8": "{\"error\":\"NOT_FOUND\"}",
+      "case": "N15",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "21",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 404
+    },
+    {
+      "body_sha256": "540028bbd229cc8ce0f531f84e11296870f9b54faa231abb6f5da8557ae3df31",
+      "body_utf8": "{\"error\":\"NOT_FOUND\"}",
+      "case": "N18",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "21",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 404
+    },
+    {
+      "body_sha256": "540028bbd229cc8ce0f531f84e11296870f9b54faa231abb6f5da8557ae3df31",
+      "body_utf8": "{\"error\":\"NOT_FOUND\"}",
+      "case": "N19",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "21",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 404
+    },
+    {
+      "body_sha256": "540028bbd229cc8ce0f531f84e11296870f9b54faa231abb6f5da8557ae3df31",
+      "body_utf8": "{\"error\":\"NOT_FOUND\"}",
+      "case": "N20_MISSING",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "21",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 404
+    },
+    {
+      "body_sha256": "bae8d75613224eab4f574f2f2b572718f702ecea7d2c5a011d7e23afed16f105",
+      "body_utf8": "{\"error\":\"UPSTREAM_INVALID_RESPONSE\"}",
+      "case": "N20_CONFLICT",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "37",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 502
+    },
+    {
+      "body_sha256": "beb34c3098f742cb693ba3162d730255c3104ded205a251d87aa59e35d66cb91",
+      "body_utf8": "{\"error\":\"GONE\"}",
+      "case": "N21",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "16",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 410
+    },
+    {
+      "body_sha256": "bae8d75613224eab4f574f2f2b572718f702ecea7d2c5a011d7e23afed16f105",
+      "body_utf8": "{\"error\":\"UPSTREAM_INVALID_RESPONSE\"}",
+      "case": "N22",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "37",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 502
+    },
+    {
+      "body_sha256": "bae8d75613224eab4f574f2f2b572718f702ecea7d2c5a011d7e23afed16f105",
+      "body_utf8": "{\"error\":\"UPSTREAM_INVALID_RESPONSE\"}",
+      "case": "N23",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "37",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 502
+    },
+    {
+      "body_sha256": "bae8d75613224eab4f574f2f2b572718f702ecea7d2c5a011d7e23afed16f105",
+      "body_utf8": "{\"error\":\"UPSTREAM_INVALID_RESPONSE\"}",
+      "case": "N24",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "37",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 502
+    },
+    {
+      "body_sha256": "4600ed0f35c0b454d677bd4bbe16359c152178ec1810b30a40abb4ae1e84b5b7",
+      "body_utf8": "{\"error\":\"REQUEST_TOO_LARGE\"}",
+      "case": "N26",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "29",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 413
+    },
+    {
+      "body_sha256": "4e72f7d6ab7b3f41ea639948c0c97c78c0db03ccc56416807f3296e65dc3f9b0",
+      "body_utf8": "{\"error\":\"FORBIDDEN\"}",
+      "case": "N27",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "21",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 403
+    },
+    {
+      "body_sha256": "4e72f7d6ab7b3f41ea639948c0c97c78c0db03ccc56416807f3296e65dc3f9b0",
+      "body_utf8": "{\"error\":\"FORBIDDEN\"}",
+      "case": "N28",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "21",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 403
+    },
+    {
+      "body_sha256": "4e72f7d6ab7b3f41ea639948c0c97c78c0db03ccc56416807f3296e65dc3f9b0",
+      "body_utf8": "{\"error\":\"FORBIDDEN\"}",
+      "case": "N29",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "21",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 403
+    },
+    {
+      "body_sha256": "4e72f7d6ab7b3f41ea639948c0c97c78c0db03ccc56416807f3296e65dc3f9b0",
+      "body_utf8": "{\"error\":\"FORBIDDEN\"}",
+      "case": "N30",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "21",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 403
+    },
+    {
+      "body_sha256": "4e72f7d6ab7b3f41ea639948c0c97c78c0db03ccc56416807f3296e65dc3f9b0",
+      "body_utf8": "{\"error\":\"FORBIDDEN\"}",
+      "case": "N39_CANCEL",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "21",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 403
+    },
+    {
+      "body_sha256": "4e72f7d6ab7b3f41ea639948c0c97c78c0db03ccc56416807f3296e65dc3f9b0",
+      "body_utf8": "{\"error\":\"FORBIDDEN\"}",
+      "case": "N39_MISSING",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "21",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 403
+    },
+    {
+      "body_sha256": "3f8863b137e3dc22afc90053f22778b46a570270ac2d4b1f1ac6b04d4591d602",
+      "body_utf8": "{\"error\":\"BACKEND_UNAVAILABLE\"}",
+      "case": "BACKEND_DB_UNAVAILABLE",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "31",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 503
+    },
+    {
+      "body_sha256": "860fd6783df6d87d394ede82665b56ccd5c1870fab6944717787efb1bb1366f1",
+      "body_utf8": "{\"engine_result\":{\"approval_claimed\":true,\"approval_independently_verified\":false,\"profile_id\":\"fault-fixture\",\"profile_version\":\"1\",\"protocol\":\"KRC Core\",\"schema\":\"KRC-CRITICPROFILE-1\",\"scientific_approval\":false,\"validation\":\"STRUCTURE_VALID\"},\"operation\":\"research.profile.validate\",\"scientific_approval\":false,\"status\":\"PENDING\",\"task_id\":\"KS-4e182b722e4e9d3e637dd60f74577dac-task\"}",
+      "case": "N25_VERIFIED_SPOOL",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "386",
+        "Content-Type": "application/octet-stream",
+        "X-Content-SHA256": "860fd6783df6d87d394ede82665b56ccd5c1870fab6944717787efb1bb1366f1",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 200
+    },
+    {
+      "body_sha256": "bae8d75613224eab4f574f2f2b572718f702ecea7d2c5a011d7e23afed16f105",
+      "body_utf8": "{\"error\":\"UPSTREAM_INVALID_RESPONSE\"}",
+      "case": "N25_NEXT_READ_DENIED",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "37",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 502
+    },
+    {
+      "body_sha256": "03d76feb624d024e86aca142fa76fe552f6f9e99ebb28542837d62e3232111b8",
+      "body_utf8": "{\"artifact_id\":\"831bef1c06c64e3c56d11c449c1e802a1f8cecff636bc35d\",\"filename\":\"research-result.json\",\"media_type\":\"application/json\",\"size_bytes\":386,\"sha256\":\"3f28b7a9066255063ce5fee7d0860ea642d4cf7cae14e5232ccf9f85fcdec197\",\"expires_at_epoch\":1795552717.2545364,\"request_id\":\"KS-b7eac359af36e3c80f02b7239b91fad8\"}",
+      "case": "DESCRIPTOR_200",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "314",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 200
+    },
+    {
+      "body_sha256": "3f28b7a9066255063ce5fee7d0860ea642d4cf7cae14e5232ccf9f85fcdec197",
+      "body_utf8": "{\"engine_result\":{\"approval_claimed\":true,\"approval_independently_verified\":false,\"profile_id\":\"fault-fixture\",\"profile_version\":\"1\",\"protocol\":\"KRC Core\",\"schema\":\"KRC-CRITICPROFILE-1\",\"scientific_approval\":false,\"validation\":\"STRUCTURE_VALID\"},\"operation\":\"research.profile.validate\",\"scientific_approval\":false,\"status\":\"PENDING\",\"task_id\":\"KS-b7eac359af36e3c80f02b7239b91fad8-task\"}",
+      "case": "READ_200",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "386",
+        "Content-Type": "application/octet-stream",
+        "X-Content-SHA256": "3f28b7a9066255063ce5fee7d0860ea642d4cf7cae14e5232ccf9f85fcdec197",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 200
+    },
+    {
+      "body_sha256": "4e72f7d6ab7b3f41ea639948c0c97c78c0db03ccc56416807f3296e65dc3f9b0",
+      "body_utf8": "{\"error\":\"FORBIDDEN\"}",
+      "case": "DURABLE_NONCE_RESTART",
+      "headers": {
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "21",
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "http_status": 403
+    }
+  ]
+}

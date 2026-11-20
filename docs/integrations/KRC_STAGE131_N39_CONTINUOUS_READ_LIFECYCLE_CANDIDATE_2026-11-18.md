@@ -1,0 +1,30 @@
+# KRC continuous read lifecycle candidate and initial external disabled evidence
+Date: 2026-11-18
+Status: KRC SOURCE READY / TARGETED + FULL REGRESSION PASS / TEMPORARY LEASE READY / GET OFF.
+Response to Sentinel PR29 #6991307779, Science #6991308697. Owner authorized temporary test; continuous mode is a future release target, not installed here.
+
+## Continuous lifecycle
+- Source/test pin 549d44868f188c6f6715bd9224c6fa4de29b05cf.
+- New module src/krc_research/stage131_project_read_lifecycle.py: validates UID1002/GID984, root marker mode0600, retrieval key directory and file custody (including single link, 32 bytes), producer read-only schema access and existing durable nonce registry before binding. Refuses missing/corrupt registry instead of silently creating fresh replay state. No research dispatcher, no new ports or human identity check.
+- Binds real Unix listener, sets and checks 0660 socket custody before systemd READY=1 notification through AF_UNIX. Refuses preexisting socket; dedicated systemd runtime directory removed between starts; SIGTERM/SIGINT stops accepting and closes socket. In-flight reads may be interrupted, not automatically retried. Existing HMAC/peer/TTL/cancel/descriptor/spool checks unchanged.
+- Unit deploy/stage131/krc-project-n39-read-continuous.service.example: Type=notify, NotifyAccess=main, TimeoutStartSec=30, Restart=on-failure, RestartSec=5s, StartLimitIntervalSec=300/StartLimitBurst=3 (burst limit, not lifetime total). No Requires/BindsTo/PartOf relationship to Stage127 or POST. Separate root marker enable-reviewed-continuous, explicit install/enable only after permanent release acceptance. Existing unit remains temporary Type=simple/Restart=no. No new symlink/unit/marker installed.
+- KRC service readiness notification is startup readiness, not proof that every future request succeeds. Sentinel must independently retain POST startup and transport even if read service absent, broken or rate-limited; GET failure -> bounded 503/504, no fallback to science execution. No shared service restart chain.
+- DB/nonce integrity failures fail closed. Same existing producer state and persisted nonce/key; no ACL widening, no new database. A crashed reader may need systemd cleanup; restart/boot/real namespace recovery must be tested before permanent activation.
+
+## Verified evidence and archive
+- New lifecycle tests 3; combined 24/24 targeted PASS (15.22s): actual isolated Unix datagram READY and socket request, same nonce rejected after reader restart, missing/corrupt nonce schema and producer schema denied, existing path untouched.
+- Full KRC suite 1206 PASS / 18 SKIP / 0 FAIL (68.95s), exact source pin above.
+- systemd-analyze verify PASS for candidate file in /tmp; /usr/bin/python3 imports CLI PASS. Not actual privileged systemd startup, boot or restart-limit test.
+- Archive /home/krcops/krc-project-n39-read-release-20261118/continuous-candidate.tar (420KiB), SHA256 b2d993847b103561323e914ecb1a08ca96f762be77b9af1ebf924e6cb09edbae.
+- Module SHA256 b1965cc2a05da77b9e69e3b328854242398e19127975d8af7937c77ad757dd99; unit SHA256 93016f92e056b981203266348d6b8d59d7726a54b6e1b46e3f7eb46d56f3b408.
+- Reproduce archive: git archive 549d44868f188c6f6715bd9224c6fa4de29b05cf src/krc_research deploy/stage131/krc-project-n39-read-continuous.service.example deploy/stage131/project_read_contract.schema.json.
+- Source-only candidate for independent partner review. Permanent deployment must use new root-controlled pin and continuous link, same reviewed service name, preserve existing lease unit/config, no overwrite of original immutable dependency. Test rollback to exact temporary unit and GET OFF. Do not enable at boot until joint lifecycle acceptance and separate permanent release.
+
+## Temporary lease readiness
+Science PR8 merged to main 21fee596ecd431303dbe95bf67a14d446d5f02fa; actual run head b32de96449d9e307ad50767dd61a0465848d8586 differs only in unrelated standards document. Verified GitHub Actions workflow_dispatch run 44396037112 job 135126047154, conclusion success; logs GET_PHASE disabled, N01_DISABLED HTTP404, DISABLED_HEAD HTTP404, DISABLED_POST HTTP404; actual ephemeral Tailnet runner succeeded. Link https://github.com/kolemasakar/K_Science/actions/runs/44396037112/job/135126047154 . N01 response evidence observed; complete zero-UDS/audit acceptance remains Sentinel-owned. Do not count other external cases as passed.
+- Installed KRC/Stage127 pins unchanged. Reader inactive PID0, socket absent, GET404; Stage127 PID157909, Stage131 PID46327, Research v2 PID37979 active. Nonce DB four rows quick_check ok. Audit protected head f8fa78c0e7bdbc457a0521f0e53b661845bf390e matches local PUBLISHED receipt. Recurring publisher still not enabled; no new credential provisioning.
+- Root lease script verified on disk SHA256 a609825126fe0a444dabd6a193e2064ab65f46e4107b5959cba8c83bbf74c89e. Disabled external prerequisite now satisfied. Owner already approved temporary test. Run reviewed root script only through authorized SSH operator; GitHub connector lacks new workflow_dispatch and remote command channel denies sudo.
+- After actual ON markers, dispatch exact existing Science main workflow, enabled mode, all POST flags false. Run off immediately after test, verify 404, POST T3 and partner evidence. 20min transient rollback timer normal uptime; no reboot during lease. Permanent deployment not authorized by this test. Production NO-GO.
+
+## Remaining joint acceptance
+Sentinel: review source pin; integrate independent GET availability and nonfatal reader startup failure, verify POST survival boot/read restart and 503/504 behavior. Science: independently review lifecycle fixtures and external receiver; execute enabled probe. KRC: after privileged lease execution verify actual service/custody, then rollback and record external evidence. On-demand audit anchor intact; autonomous recurring publisher not installed. Full external N01-N40 acceptance pending; 48 scientific E2E not authorized. No new scientific dispatch, production changes or external activation by this report.

@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KRC N39 project signed UDS request/descriptor/denial contract v1",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "operation",
+        "request_id",
+        "artifact_id",
+        "identity",
+        "auth"
+      ],
+      "properties": {
+        "version": {
+          "const": "krc-artifact-get/1"
+        },
+        "operation": {
+          "enum": [
+            "artifact.describe",
+            "artifact.read"
+          ]
+        },
+        "request_id": {
+          "type": "string",
+          "pattern": "^KS-[a-f0-9]{32}$"
+        },
+        "artifact_id": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{48}$"
+        },
+        "identity": {
+          "const": {
+            "principal": "K_Science",
+            "repository": "kolemasakar/K_Science",
+            "workflow_ref": "refs/heads/main"
+          }
+        },
+        "auth": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "key_id",
+            "nonce",
+            "issued_at_epoch",
+            "mac_sha256"
+          ],
+          "properties": {
+            "key_id": {
+              "const": "stage131-project-read-v1"
+            },
+            "nonce": {
+              "type": "string",
+              "minLength": 16
+            },
+            "issued_at_epoch": {
+              "type": "integer"
+            },
+            "mac_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      }
+    },
+    "descriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "artifact_id",
+        "filename",
+        "media_type",
+        "size_bytes",
+        "sha256",
+        "expires_at_epoch"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "pattern": "^KS-[a-f0-9]{32}$"
+        },
+        "artifact_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{48}$"
+        },
+        "filename": {
+          "type": "string",
+          "minLength": 1
+        },
+        "media_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 209715200
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expires_at_epoch": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "denial": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "enum": [
+            "INVALID_REQUEST",
+            "FORBIDDEN",
+            "NOT_FOUND",
+            "GONE",
+            "REQUEST_TOO_LARGE",
+            "UPSTREAM_INVALID_RESPONSE",
+            "BACKEND_UNAVAILABLE",
+            "UPSTREAM_TIMEOUT",
+            "REQUEST_TIMEOUT",
+            "UNSUPPORTED_MEDIA_TYPE"
+          ]
+        }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/request"
+    },
+    {
+      "$ref": "#/$defs/descriptor"
+    },
+    {
+      "$ref": "#/$defs/denial"
+    }
+  ]
+}

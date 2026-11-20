@@ -1,0 +1,66 @@
+{
+  "schema_version": "KRC_N39_PROJECT_READ_RELEASE_V1",
+  "enabled": false,
+  "service": "krc-project-n39-read.service",
+  "source_root": "/opt/krc-project-n39-read/current",
+  "runtime": {
+    "uid": 1002,
+    "gid": 984,
+    "user": "krcops",
+    "group": "krc-sentinel-ipc"
+  },
+  "state": {
+    "producer": "/home/krcops/krc-project-n39-staging/state",
+    "producer_mode": "0700",
+    "db_mode": "0600",
+    "read_only": true,
+    "nonce_db": "/var/lib/krc-project-n39-read/nonce.sqlite",
+    "nonce_dir_mode": "0700"
+  },
+  "socket": {
+    "path": "/run/krc-project-n39-read/backend.sock",
+    "directory_mode": "0750",
+    "socket_mode": "0660",
+    "owner_uid": 1002,
+    "group_gid": 984,
+    "allowed_peer_uid": 987,
+    "expected_peer_gid_for_client": 984
+  },
+  "retrieval_key": {
+    "id": "stage131-project-read-v1",
+    "file": "/etc/krc-project-n39-read/retrieval.key",
+    "length_bytes": 32,
+    "owner_uid": 0,
+    "group_gid": 984,
+    "file_mode": "0440",
+    "directory_mode": "0750",
+    "distinct_from_science_and_post": true
+  },
+  "identity": {
+    "principal": "K_Science",
+    "repository": "kolemasakar/K_Science",
+    "workflow_ref": "refs/heads/main"
+  },
+  "routes": [
+    {
+      "method": "POST",
+      "path": "/v1/artifacts/describe",
+      "operation": "artifact.describe"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/artifacts/read",
+      "operation": "artifact.read"
+    }
+  ],
+  "protocol": "krc-artifact-get/1",
+  "limits": {
+    "max_artifact_bytes": 209715200,
+    "worker_slots": 4,
+    "request_deadline_seconds": 20,
+    "nonce_ttl_seconds": 900,
+    "signature_skew_seconds": 300
+  },
+  "activation_marker": "/etc/krc-project-n39-read/enable-reviewed-staging",
+  "note": "Review-only manifest, not runtime configuration input. No live activation or credential provisioning."
+}

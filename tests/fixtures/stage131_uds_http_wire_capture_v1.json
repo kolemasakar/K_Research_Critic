@@ -1,0 +1,47 @@
+{
+  "schema": "KRC_STAGE131_UDS_CAPTURE_V1",
+  "protocol": "request write-half-close required; no dispatch without EOF",
+  "source_kind": "synthetic isolated actual AF_UNIX HTTP",
+  "captures": {
+    "success_200": {
+      "status_line": "HTTP/1.1 200 OK",
+      "headers": {
+        "cache-control": "no-store",
+        "connection": "close",
+        "content-length": "19",
+        "content-type": "application/octet-stream",
+        "x-content-sha256": "ecc91e0baf4ec1c0fcbc64341b656abfa2d47201111d7ed7b5ee0b5883c95431",
+        "x-content-type-options": "nosniff"
+      },
+      "body_hex": "666978747572652d61727469666163742d7631",
+      "body_length": 19,
+      "body_sha256": "ecc91e0baf4ec1c0fcbc64341b656abfa2d47201111d7ed7b5ee0b5883c95431"
+    },
+    "forbidden_403": {
+      "status_line": "HTTP/1.1 403 Forbidden",
+      "headers": {
+        "cache-control": "no-store",
+        "connection": "close",
+        "content-length": "21",
+        "content-type": "application/json",
+        "x-content-type-options": "nosniff"
+      },
+      "body_hex": "7b226572726f72223a22464f5242494444454e227d",
+      "body_length": 21,
+      "body_sha256": "4e72f7d6ab7b3f41ea639948c0c97c78c0db03ccc56416807f3296e65dc3f9b0"
+    },
+    "trailing_400": {
+      "status_line": "HTTP/1.1 400 Bad Request",
+      "headers": {
+        "cache-control": "no-store",
+        "connection": "close",
+        "content-length": "27",
+        "content-type": "application/json",
+        "x-content-type-options": "nosniff"
+      },
+      "body_hex": "7b226572726f72223a22494e56414c49445f52455155455354227d",
+      "body_length": 27,
+      "body_sha256": "71b24dbf1881b25f4e3f2960418e4ecbeabded8e16f293cdf43953c7045fea4f"
+    }
+  }
+}

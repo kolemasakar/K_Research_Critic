@@ -64,3 +64,40 @@ class ConsentCustody128:
                     return False
         except (OSError,ValueError,TypeError,KeyError,sqlite3.Error):
             return False
+
+    def inspect_consumed(self, context):
+        """Read-only recovery evidence, not an authorization to redispatch.
+
+        Trust requires the root-owned original grant file and the durable consumed
+        row. A missing/modified receipt or ambiguous timestamp returns None.
+        """
+        if not isinstance(context,dict):
+            return None
+        ref=context.get("consent_ref")
+        if not isinstance(ref,str) or not 16<=len(ref)<=128 or not ref.isascii() or any(not (c.isalnum() or c in "-_") for c in ref):
+            return None
+        try:
+            path=self.dir/(ref+".json")
+            fd=os.open(str(path),os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC)
+            try:
+                st=os.fstat(fd)
+                if not stat.S_ISREG(st.st_mode) or st.st_uid!=0 or st.st_mode & 0o022 or st.st_size>4096:
+                    return None
+                raw=os.read(fd,4097)
+            finally:
+                os.close(fd)
+            grant=json.loads(raw)
+            if (not isinstance(grant,dict) or set(grant)!={"consent_ref","context_sha256","approver","approved_at","expires_at"}
+                or grant["consent_ref"]!=ref or grant["context_sha256"]!=fingerprint(context)
+                or not isinstance(grant["approver"],str) or not grant["approver"].strip()
+                or type(grant["approved_at"]) is not int or type(grant["expires_at"]) is not int):
+                return None
+            with sqlite3.connect(self.path,timeout=3) as db:
+                row=db.execute("SELECT consumed_at FROM consumed WHERE ref=?",(ref,)).fetchone()
+            if row is None or type(row[0]) is not int or not grant["approved_at"]<=row[0]<grant["expires_at"]:
+                return None
+            return {"consent_ref":ref,"context_sha256":grant["context_sha256"],
+                    "receipt_sha256":hashlib.sha256(raw).hexdigest(),
+                    "approver":grant["approver"],"consumed_at":row[0]}
+        except (OSError,ValueError,TypeError,KeyError,sqlite3.Error):
+            return None

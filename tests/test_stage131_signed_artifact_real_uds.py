@@ -16,7 +16,7 @@ def test_actual_uds_signed_headers_and_bytes():
   ledger=RequestLedger(Path(d)/"ledger.db");q="KS-"+"a"*32;p={"task_id":"t"}
   ledger.admit(principal="K_Science",request_id=q,operation="research.profile.validate",payload=p)
   ledger.complete(principal="K_Science",request_id=q,operation="research.profile.validate",payload=p,result={"status":"completed"})
-  boundary=SignedArtifactReadBoundary(exchange=Exchange(),ledger=ledger,nonce_registry=ArtifactNonceRegistry(Path(d)/"nonce.db"),keyring={"k":KEY},trusted_peer_identities={os.getuid():IDENTITY},enabled=True)
+  boundary=SignedArtifactReadBoundary(exchange=Exchange(),ledger=ledger,nonce_registry=ArtifactNonceRegistry(Path(d)/"nonce.db"),keyring={"k":KEY},trusted_peer_identities={os.getuid():IDENTITY},enabled=True,retrieval_authorizer=lambda **scope: True)
   sock=Path(d)/"server.sock";server=SignedArtifactUDSServer(sock,boundary=boundary)
   thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
   try:
@@ -25,6 +25,7 @@ def test_actual_uds_signed_headers_and_bytes():
    def request():
     s=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM);s.connect(str(sock))
     s.sendall(b"POST /v1/artifacts/read HTTP/1.1\r\nHost: localhost\r\nContent-Type: application/json\r\nContent-Length: "+str(len(raw)).encode()+b"\r\nConnection: close\r\n\r\n"+raw)
+    s.shutdown(socket.SHUT_WR)
     data=b""
     while True:
      chunk=s.recv(256*1024)

@@ -1,0 +1,51 @@
+# REVIEW ONLY: candidate for the same service after permanent release acceptance.
+# Install/enable only after separate permanent release gate. Marker required.
+[Unit]
+Description=KRC N39 private project signed artifact retrieval continuous STAGING candidate
+After=local-fs.target
+ConditionPathExists=/etc/krc-project-n39-read/enable-reviewed-continuous
+StartLimitIntervalSec=300
+StartLimitBurst=3
+
+[Service]
+Type=notify
+NotifyAccess=main
+TimeoutStartSec=30
+User=krcops
+Group=krc-sentinel-ipc
+UMask=0077
+RuntimeDirectory=krc-project-n39-read
+RuntimeDirectoryMode=0750
+StateDirectory=krc-project-n39-read
+StateDirectoryMode=0700
+WorkingDirectory=/opt/krc-project-n39-read/continuous
+Environment=PYTHONPATH=/opt/krc-project-n39-read/continuous/src
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 -m krc_research.stage131_project_read_lifecycle --enable-reviewed-continuous
+NoNewPrivileges=true
+CapabilityBoundingSet=
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=read-only
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX
+RestrictSUIDSGID=true
+LockPersonality=true
+# SQLite WAL readers may need to create/manage -wal/-shm sidecars.
+# No state ownership or ACL changes; the same trusted krcops owner runs both.
+ReadWritePaths=/run/krc-project-n39-read /var/lib/krc-project-n39-read /home/krcops/krc-project-n39-staging/state
+# SQL mode=ro + query_only. Protect producer files and bytes themselves.
+ReadOnlyPaths=/home/krcops/krc-project-n39-staging/state/consent.sqlite /home/krcops/krc-project-n39-staging/state/requests.sqlite /home/krcops/krc-project-n39-staging/state/artifacts/index.sqlite3 /home/krcops/krc-project-n39-staging/state/artifacts/objects
+TasksMax=24
+MemoryMax=256M
+TimeoutStopSec=25
+Restart=on-failure
+RestartSec=5s
+RuntimeDirectoryPreserve=no
+
+[Install]
+WantedBy=multi-user.target
+

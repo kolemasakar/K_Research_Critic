@@ -1,0 +1,10 @@
+# Continuous Stage127 post-switch T3 checkpoint
+Date: 2026-11-19
+Disposition: SWITCH_LIVE_PASS / EXTERNAL_POST_T3_PASS / CONTINUOUS_ON_JOINT_GATE_PENDING.
+
+Actual owner switch output: CONTINUOUS_CANDIDATE_SWITCHED_GET_OFF and REQUIRE_REAL_POST_T3_BEFORE_ON.
+Independent KRC host verification at 05:21:37 UTC: Stage127 new pin b2a8064027c887065522b4b96f846c3d0540194f active PID162711, KRC reader unit Type=notify, symlink exact 549d44868f188c6f6715bd9224c6fa4de29b05cf. Unit SHA256 93016f92e056b981203266348d6b8d59d7726a54b6e1b46e3f7eb46d56f3b408 and drop-in SHA256 4fb63880d5b5ba47ad4e7d73d79cd30a34a9984388eb50ecd7e2b2d94fc7f504 match staged files. KRC Stage131/Research v2 PIDs46327/37979 unchanged. GET404, reader inactive/socket absent, lease inactive.
+
+Actual Science main workflow_dispatch run 44465139220 job135360991727, head7197a96d402a2b3a46cb4b51164c5d43ba48b6b7, success completed 05:26:19 UTC. Independent KRC inspection of real emitted log lines (not echoed script): wrong audience 403 UNAUTHORIZED; first valid transport.probe 403 OPERATION_DENIED at 05:26:17 UTC; reused JTI with different request ID 403 UNAUTHORIZED. OIDC diagnostic and Tailnet join passed; all other probe and GET steps skipped. No scientific operation dispatch. https://github.com/kolemasakar/K_Science/actions/runs/44465139220/job/135360991727
+
+Fresh actual host observation 05:33:22 UTC: same Stage127 new-pin PID162711, original services unchanged, reader inactive, timer inactive, GET404. New-pin POST regression gate satisfied on KRC side. Owner approved continuous STAGING installation; no repeated approval needed. Sentinel and Science independent post-switch ACK/joint ON gate still requested as in reviewed operator procedure. Upon joint gate, authorized operator executes sudo bash /var/backups/krc-n39-continuous.sh on. This activates persistent scoped GET, checks actual reader readiness and local listener continuity during reader restart, and installs boot links. Actual authenticated GET recovery/503, POST during outage and boot acceptance remain separate runtime tests. No routine OFF, no reboot or production authorization; no full N01-N40 claim.

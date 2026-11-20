@@ -11,13 +11,14 @@ import hashlib
 
 class SignedArtifactReadBoundary:
     def __init__(self, *, exchange, ledger, nonce_registry, keyring, trusted_peer_identities,
-                 enabled=False, max_inline_bytes=1024*1024, max_artifact_bytes=200*1024*1024):
+                 enabled=False, max_inline_bytes=1024*1024, max_artifact_bytes=200*1024*1024, retrieval_authorizer=None):
         self.exchange=exchange
         self.ledger=ledger
         self.nonce_registry=nonce_registry
         self.keyring=keyring
         self.trusted_peer_identities=trusted_peer_identities
         self.enabled=enabled
+        self.retrieval_authorizer=retrieval_authorizer
         self.max_inline_bytes=max_inline_bytes
         self.max_artifact_bytes=max_artifact_bytes
 
@@ -46,6 +47,15 @@ class SignedArtifactReadBoundary:
             row=db.execute("SELECT state FROM requests WHERE principal=? AND request_id=?",
                            (principal,request_id)).fetchone()
         if row is None or row[0]!="COMPLETE":return err(404,"NOT_FOUND")
+        # N39 fail-closed: completed execution consent is historical provenance,
+        # not a current retrieval grant. No custody write or science dispatch here.
+        try:
+            if not callable(self.retrieval_authorizer) or self.retrieval_authorizer(
+                principal=principal, request_id=request_id, artifact_id=scope["artifact_id"]
+            ) is not True:
+                return err(403,"FORBIDDEN")
+        except Exception:
+            return err(403,"FORBIDDEN")
         # The temporary spool is private, unlinked, bounded and fully verified
         # before an HTTP adapter may send headers or the first byte.
         spool=tempfile.TemporaryFile(mode="w+b")
