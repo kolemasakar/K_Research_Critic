@@ -7,4 +7,4 @@ Environment=PYTHONNOUSERSITE=1
 Environment=PYTHONDONTWRITEBYTECODE=1
 ExecStart=
 ExecStart=/opt/krc-research-v2/.venv/bin/python -s -m krc_research.stage132_project_post_runtime gateway --enable-reviewed-staging-post
-ReadOnlyPaths=/run/krc-project-n39-post
+ReadOnlyPaths=-/run/krc-project-n39-post
