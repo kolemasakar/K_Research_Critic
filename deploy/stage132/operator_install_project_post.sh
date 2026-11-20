@@ -83,6 +83,15 @@ verify_release(){
 rollback(){
  trap - EXIT
  echo STAGE132_ROLLBACK_BEGIN
+ if [[ ! -e "$P/cutover-started" ]]; then
+   rm -f "$MARK"
+   systemctl disable --now "$BROKER" || return 1
+   systemctl daemon-reload || return 1
+   active "$GATE" && active "$SENT" && active "$READ" && get401 || return 1
+   touch "$P/rolled-back"
+   echo STAGE132_ROLLBACK_PRE_CUTOVER_NO_INGRESS_RESTART
+   return 0
+ fi
  systemctl stop "$SENT" || return 1
  systemctl stop "$GATE" || return 1
  if [[ -e "$DROP" ]]; then
@@ -203,6 +212,7 @@ PY
  runuser -u krcresearch -g krc-sentinel-ipc -- test ! -r "$DRAFT/consent.sqlite"
  [[ $(pid "$GATE") = "$g" && $(pid "$SENT") = "$s" && $(pid "$READ") = "$r" ]]
  # Planned brief ingress interruption ONLY for gateway cutover.
+ touch "$P/cutover-started"
  systemctl stop "$SENT"
  systemctl stop "$GATE"
  install -d -o root -g root -m 0755 "$DIR"
