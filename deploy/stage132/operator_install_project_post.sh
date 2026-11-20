@@ -176,6 +176,28 @@ os.chmod(p,0o600)
 PY
  install -o root -g root -m 0644 "$REL/deploy/krc-project-n39-post.service.example" "$UNIT"
  verify_release
+ # Verify actual old configuration and role-separated imports before any stop.
+ runuser -u krcresearch -g krc-sentinel-ipc -- env PYTHONPATH="$REL/gateway-src:/opt/krc-research-v2/src" PYTHONNOUSERSITE=1 PYTHONDONTWRITEBYTECODE=1 /opt/krc-research-v2/.venv/bin/python -s - <<'PY'
+from krc_research.stage132_project_post_runtime import OLD_CONFIG,OLD_SOCKET,OLD_STATE,CONF,read_key
+from krc_research.staging_entrypoint124 import load_config,secret
+import krc_research.staging_service123c as legacy
+from pathlib import Path
+assert Path(legacy.__file__).is_relative_to("/opt/krc-research-v2/src")
+c=load_config(OLD_CONFIG)
+assert (c["socket_path"],c["state_root"],c["peer_uid"],c["principal"],c["client"],c["repository"],c["workflow_ref"],c["key_id"])==(str(OLD_SOCKET),str(OLD_STATE),987,"K_Science","K_Science","kolemasakar/K_Science","refs/heads/main","stage126-v1")
+k=read_key(CONF/"gateway.key",988)
+assert k!=secret(c["transport_key_file"]) and k!=secret(c["science_key_file"])
+print("LEGACY_CONFIG_AND_GATEWAY_ROLE_IMPORT_PASS")
+PY
+ runuser -u krcops -g krc-sentinel-ipc -- env PYTHONPATH="$REL/src:/opt/krc-project-n39-read/549d44868f188c6f6715bd9224c6fa4de29b05cf/src" PYTHONNOUSERSITE=1 PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 -s - <<'PY'
+from krc_research.stage132_project_post_runtime import CONF,read_key,OWNER_STATE,NONCE
+from krc_research.stage131_project_read_lifecycle import retrieval_key,producer_preflight,existing_nonce
+from krc_research.stage131_project_signed_read import KEY_PATH
+assert read_key(CONF/"broker.key",1002)!=retrieval_key(KEY_PATH)
+producer_preflight(OWNER_STATE)
+existing_nonce(NONCE)
+print("BROKER_ROLE_IMPORT_STATE_AND_KEY_SEPARATION_PASS")
+PY
  systemd-analyze verify "$UNIT"
  snapshot > "$P/stage-after.json"
  cmp "$P/stage-before.json" "$P/stage-after.json"
