@@ -43,6 +43,13 @@ def private_root(path):
         raise RouteDenied("UNSAFE_STATE")
     return p
 
+def engine_payload(op, payload):
+    # Legacy engine flag is derived from the approved immutable profile.
+    # The durable owner claim remains mandatory before dispatch.
+    if op == "research.evidence.preflight" and "user_profile_approved" not in payload:
+        return {**payload, "user_profile_approved": True}
+    return payload
+
 class ProjectResearchRoute:
     def __init__(self, root):
         self.root=private_root(root)
@@ -63,7 +70,7 @@ class ProjectResearchRoute:
         op=profile["operation"]
         if op not in OPS:
             raise RouteDenied("OFFLINE_OPERATION_NOT_ENABLED")
-        if not Draft202012Validator(_schema_for(op),format_checker=FormatChecker()).is_valid(profile["payload"]):
+        if not Draft202012Validator(_schema_for(op),format_checker=FormatChecker()).is_valid(engine_payload(op, profile["payload"])):
             raise RouteDenied("INVALID_PAYLOAD")
         raw=canonical(profile)
         if len(raw)>MAX_PROFILE: raise RouteDenied("PROFILE_TOO_LARGE")
@@ -103,7 +110,7 @@ class ProjectResearchRoute:
         if proposal["profile_sha256"]!=digest: raise RouteDenied("PROFILE_MISMATCH")
         if proposal["status"]!="APPROVED": raise RouteDenied("APPROVAL_REQUIRED_OR_ALREADY_USED")
         profile=proposal["profile"]
-        op,payload=profile["operation"],profile["payload"]
+        op,payload=profile["operation"],engine_payload(profile["operation"],profile["payload"])
         if op not in OPS: raise RouteDenied("OFFLINE_OPERATION_NOT_ENABLED")
         admitted=self.requests.admit(principal=PRINCIPAL,request_id=rid,operation=op,payload=profile)
         if admitted["decision"]!="EXECUTE": raise RouteDenied("REQUEST_ALREADY_ADMITTED")

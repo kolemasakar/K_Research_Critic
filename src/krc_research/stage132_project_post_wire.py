@@ -7,6 +7,17 @@ import math
 import re
 
 OP = "research.profile.validate"
+PREFLIGHT = "research.evidence.preflight"
+INSPECTION = "research.inspection.review"
+OFFLINE_OPS = frozenset((OP, PREFLIGHT, INSPECTION))
+BIBLIOGRAPHY = "research.bibliography.audit"
+DEFAULT_OPS = frozenset((OP,))
+
+def checked_ops(operations):
+    ops = frozenset(operations)
+    if not ops or not ops <= OFFLINE_OPS:
+        raise ValueError("INVALID_OFFLINE_OPERATION_ALLOWLIST")
+    return ops
 IDENTITY = {"client":"K_Science","principal":"K_Science","repository":"kolemasakar/K_Science","workflow_ref":"refs/heads/main"}
 MAX_EXTERNAL = 262144
 RID = re.compile(r"KS-[0-9a-f]{32}\Z")

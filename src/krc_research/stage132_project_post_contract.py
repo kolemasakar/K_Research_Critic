@@ -13,6 +13,27 @@ from krc_research.request_ledger119 import LedgerError
 
 from krc_research.stage132_project_post_wire import (OP,IDENTITY,MAX_EXTERNAL,RID,denied,conflict,ambiguous,valid_pilot_descriptor)
 import time
+from jsonschema import Draft202012Validator, FormatChecker
+from krc_research.private_dispatch_adapter import _schema_for
+from krc_research.stage132_project_post_wire import PREFLIGHT, INSPECTION, DEFAULT_OPS, checked_ops
+
+def valid_operation_payload(op, payload):
+    if op == OP:
+        return validate_payload(payload)
+    if not isinstance(payload, dict):
+        return False
+    if op == PREFLIGHT:
+        if "user_profile_approved" in payload:
+            return False
+        candidate = {**payload, "user_profile_approved": True}
+    elif op == INSPECTION:
+        receipt = payload.get("receipt")
+        if not isinstance(receipt, dict) or receipt.get("trace_verified", False) is not False:
+            return False
+        candidate = payload
+    else:
+        return False
+    return Draft202012Validator(_schema_for(op), format_checker=FormatChecker()).is_valid(candidate)
 
 def validate_payload(payload):
     if not isinstance(payload,dict) or set(payload)!={"critic_profile"}:
@@ -23,9 +44,10 @@ def validate_payload(payload):
             and cp["protocol"] in ("KRC Core","Scholarly Research"))
 
 class ProjectPostBoundary:
-    def __init__(self, root, *, enabled=False):
+    def __init__(self, root, *, enabled=False, enabled_operations=DEFAULT_OPS):
         self.root=root
         self.enabled=enabled is True
+        self.enabled_operations=checked_ops(enabled_operations)
     def execute(self, envelope, *, trusted_principal):
         if not self.enabled or trusted_principal!=PRINCIPAL:
             return denied()
@@ -36,7 +58,8 @@ class ProjectPostBoundary:
         rid=envelope["request_id"]
         if not isinstance(rid,str) or not RID.fullmatch(rid):
             return denied()
-        if envelope["operation"]!=OP or not validate_payload(envelope["payload"]):
+        op=envelope["operation"]
+        if not isinstance(op,str) or op not in self.enabled_operations or not valid_operation_payload(op,envelope["payload"]):
             return denied()
         try:
             if len(canonical({k:envelope[k] for k in ("request_id","operation","payload")}))>MAX_EXTERNAL:
@@ -59,7 +82,7 @@ class ProjectPostBoundary:
             profile=proposal["profile"]
             # The approved full immutable profile, including purpose/policy, is
             # looked up by server-generated ID. Never trust a client digest.
-            if profile["operation"]!=OP or profile["policy"]!="FREE_ONLY_OFFLINE":
+            if profile["operation"]!=op or profile["policy"]!="FREE_ONLY_OFFLINE":
                 return denied()
             status=proposal["status"]
             if status in ("PROPOSED","CANCELLED","EXPIRED","EXPIRED_RUNNING","MISSING"):
