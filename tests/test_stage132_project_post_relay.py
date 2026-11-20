@@ -6,7 +6,7 @@ repositories. No live listener, key, approval, state or provider is used.
 import contextlib
 import copy
 import hashlib
-import http.client
+import http.client as http_client
 import json
 import os
 import threading
@@ -101,7 +101,7 @@ def chain(tmp_path):
         def http_call(method,path,body=None,token=None,headers=None):
             hh={"Authorization":"Bearer "+(token or uuid.uuid4().hex),"Connection":"close",**(headers or {})}
             if body is not None:hh["Content-Type"]="application/json";body=json.dumps(body).encode()
-            c=http.client.HTTPConnection("127.0.0.1",http.server_address[1],timeout=20)
+            c=http_client.HTTPConnection("127.0.0.1",http.server_address[1],timeout=20)
             try:
                 c.request(method,path,body=body,headers=hh)
                 out=c.getresponse();return out.status,dict(out.getheaders()),out.read()
