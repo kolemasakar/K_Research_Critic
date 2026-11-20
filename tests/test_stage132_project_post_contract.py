@@ -9,7 +9,7 @@ import pytest
 from krc_research.stage131_project_research_route import ProjectResearchRoute
 from krc_research.stage131_project_signed_read import ProjectArtifactAuthority,ReadDenied
 from krc_research.replay_registry import ReplayRegistry
-from stage132_project_post_contract import ProjectPostBoundary,IDENTITY,OP
+from krc_research.stage132_project_post_contract import ProjectPostBoundary,IDENTITY,OP
 
 PROFILE={"purpose":"Synthetic test only","operation":OP,"policy":"FREE_ONLY_OFFLINE",
          "payload":{"critic_profile":{"profile_id":"test-pilot","version":"v1",
