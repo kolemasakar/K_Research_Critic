@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KRC Stage132 pilot external POST body v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "request_id",
+    "operation",
+    "payload"
+  ],
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "pattern": "^KS-[0-9a-f]{32}$"
+    },
+    "operation": {
+      "const": "research.profile.validate"
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "critic_profile"
+      ],
+      "properties": {
+        "critic_profile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "profile_id",
+            "version",
+            "protocol",
+            "topic"
+          ],
+          "properties": {
+            "profile_id": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "protocol": {
+              "enum": [
+                "KRC Core",
+                "Scholarly Research"
+              ]
+            },
+            "topic": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          }
+        }
+      }
+    }
+  }
+}
