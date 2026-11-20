@@ -1,0 +1,46 @@
+# REVIEW ONLY. Source runtime candidate; no live installation.
+[Unit]
+Description=KRC private project one-shot scientific POST broker (STAGING pilot)
+After=local-fs.target
+ConditionPathExists=/etc/krc-stage132-post/enable-reviewed-staging-post
+StartLimitIntervalSec=300
+StartLimitBurst=3
+
+[Service]
+Type=notify
+NotifyAccess=main
+TimeoutStartSec=30
+User=krcops
+Group=krc-sentinel-ipc
+UMask=0077
+RuntimeDirectory=krc-project-n39-post
+RuntimeDirectoryMode=0750
+StateDirectory=krc-project-n39-post
+StateDirectoryMode=0700
+WorkingDirectory=/opt/krc-stage132-post/current
+Environment=PYTHONPATH=/opt/krc-stage132-post/current/src:/opt/krc-project-n39-read/549d44868f188c6f6715bd9224c6fa4de29b05cf/src
+Environment=PYTHONNOUSERSITE=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 -s -m krc_research.stage132_project_post_runtime broker --enable-reviewed-staging-post
+NoNewPrivileges=true
+CapabilityBoundingSet=
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=read-only
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX
+RestrictSUIDSGID=true
+LockPersonality=true
+ReadWritePaths=/run/krc-project-n39-post /var/lib/krc-project-n39-post /home/krcops/krc-project-n39-staging/state
+TasksMax=24
+MemoryMax=256M
+TimeoutStopSec=25
+Restart=on-failure
+RestartSec=5s
+RuntimeDirectoryPreserve=no
+
+[Install]
+WantedBy=multi-user.target
