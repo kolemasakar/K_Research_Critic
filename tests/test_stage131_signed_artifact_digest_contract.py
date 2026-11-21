@@ -21,7 +21,7 @@ def run(pieces,fail=False):
         payload={"source":"fixture"}
         ledger.admit(principal="K_Science",request_id=REQ,operation="research.profile.validate",payload=payload)
         ledger.complete(principal="K_Science",request_id=REQ,operation="research.profile.validate",payload=payload,result={"status":"completed"})
-        b=SignedArtifactReadBoundary(exchange=Source(pieces,fail),ledger=ledger,nonce_registry=ArtifactNonceRegistry(Path(d)/"nonce.sqlite",clock=lambda:1000),keyring={"k":KEY},trusted_peer_identities={100:IDENTITY},enabled=True,retrieval_authorizer=lambda **scope: True)
+        b=SignedArtifactReadBoundary(exchange=Source(pieces,fail),ledger=ledger,nonce_registry=ArtifactNonceRegistry(Path(d)/"nonce.sqlite",clock=lambda:1000),keyring={"k":KEY},trusted_peer_identities={100:IDENTITY},enabled=True,retrieval_authorizer=lambda **scope: scope.get("principal")=="K_Science" and scope.get("artifact_id")=="b"*48)
         msg={"version":"krc-artifact-get/1","operation":"artifact.read","request_id":REQ,"artifact_id":"b"*48,"identity":IDENTITY,"auth":{"key_id":"k","issued_at_epoch":1000,"nonce":"nonce-1234567890123456","mac_sha256":"0"*64}}
         result=b.execute(sign_fixture(msg,KEY),peer_uid=100,now_epoch=1000)
         if "body_file" in result:

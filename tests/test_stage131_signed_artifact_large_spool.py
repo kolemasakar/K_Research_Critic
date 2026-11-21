@@ -13,7 +13,7 @@ def make(d,exchange):
     q="KS-"+"a"*32
     l.admit(principal="K_Science",request_id=q,operation="research.profile.validate",payload=p)
     l.complete(principal="K_Science",request_id=q,operation="research.profile.validate",payload=p,result={"status":"completed"})
-    b=SignedArtifactReadBoundary(exchange=exchange,ledger=l,nonce_registry=ArtifactNonceRegistry(Path(d)/"nonce.sqlite",clock=lambda:1000),keyring={"k":KEY},trusted_peer_identities={123:ID},enabled=True,retrieval_authorizer=lambda **scope: True)
+    b=SignedArtifactReadBoundary(exchange=exchange,ledger=l,nonce_registry=ArtifactNonceRegistry(Path(d)/"nonce.sqlite",clock=lambda:1000),keyring={"k":KEY},trusted_peer_identities={123:ID},enabled=True,retrieval_authorizer=lambda **scope: scope.get("principal")=="K_Science" and scope.get("artifact_id")=="b"*48)
     m={"version":"krc-artifact-get/1","operation":"artifact.read","request_id":q,"artifact_id":"b"*48,"identity":ID,"auth":{"key_id":"k","issued_at_epoch":1000,"nonce":"1234567890123456","mac_sha256":"0"*64}}
     return b,sign_fixture(m,KEY)
 class Large:

@@ -18,7 +18,7 @@ class Exchange:
         if self.error:raise ExchangeError(self.error)
         yield b"verified "
         yield b"synthetic"
-def setup(d,*,error=None,enable=True,complete=True):
+def setup(d,*,error=None,enable=True,complete=True,authorize=True):
     ledger=RequestLedger(Path(d)/"request.sqlite")
     req={"task_id":"dummy"}
     claim=ledger.admit(principal="K_Science",request_id=BASE["request_id"],
@@ -28,7 +28,11 @@ def setup(d,*,error=None,enable=True,complete=True):
     return SignedArtifactReadBoundary(exchange=Exchange(error),ledger=ledger,
         nonce_registry=ArtifactNonceRegistry(Path(d)/"nonce.sqlite",clock=lambda:1000),
         keyring={"synthetic-only":KEY},trusted_peer_identities={123:IDENTITY},
-        enabled=enable,retrieval_authorizer=lambda **scope: True)
+        enabled=enable, retrieval_authorizer=(
+            (lambda **scope: scope == {"principal":"K_Science",
+                                        "request_id":BASE["request_id"],
+                                        "artifact_id":BASE["artifact_id"]})
+            if authorize else None))
 def request():return sign_fixture(BASE,KEY)
 def test_signed_read_success_and_denials():
     with tempfile.TemporaryDirectory() as d:
@@ -50,3 +54,10 @@ def test_corrupt_and_wrong_key():
     with tempfile.TemporaryDirectory() as d:
         altered=request();altered["artifact_id"]="c"*48
         assert setup(d).execute(altered,peer_uid=123,now_epoch=1000)["http_status"]==403
+
+def test_completed_ledger_alone_does_not_grant_get():
+    with tempfile.TemporaryDirectory() as d:
+        b=setup(d,authorize=False)
+        r=b.execute(request(),peer_uid=123,now_epoch=1000)
+        assert r["http_status"]==403
+        assert "body_bytes" not in r and "body_file" not in r
