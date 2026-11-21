@@ -15,6 +15,7 @@ Working tree: /home/krcops/stage133-unified-acceptance-20261121 (isolated; does 
 - Ordinary-order unified regression before extra explicit framing tests: 1182 PASS,17 SKIPPED,0 FAIL in 56.65 s.
 - Reverse-file-order unified regression after extra two strict framing tests: 1184 PASS,17 SKIPPED,0 FAIL in 73.62 s.
 - Forward-order unified regression with same final test inventory: 1184 PASS,17 SKIPPED,0 FAIL in 60.53 s.
+- Separate preinstalled Python 3.12 / pytest 9.0.3 remediation-probe environment: 1184 PASS,17 SKIPPED,0 FAIL in 59.98 s (independent dependency/pytest environment; same source and host).
 - Independent focused N39+UDS historical fixtures: 14 PASS.
 - Extra test: Content-Length followed by undeclared bytes => 400 before any dispatch; proof of no premature dispatch until write-half-close => dispatch exactly once after EOF.
 - Runtime opt-in synthetic fixture remains explicit default-off. Stage133 scientific approval remains false.
