@@ -28,7 +28,7 @@ FREE_ONLY_OFFLINE prohibits provider network calls. Enabling metadata requires a
 References: https://www.crossref.org/documentation/retrieve-metadata/rest-api/access-and-authentication/ ; https://dev.europepmc.org/RestfulWebService .
 
 ## Tests and status
-Initial KRC source full regression: 1110 PASS,17 SKIPPED,0 FAIL.
-Stage132+133 isolated suite after validation and runtime opt-in tests: 66 PASS,0 FAIL (synthetic identities; actual local UNIX/HTTP POST and GET).
+Final KRC source-only full regression with Stage133 code overlay (separate test process): 1110 PASS,17 SKIPPED,0 FAIL on 2026-11-21.
+Stage132+133 isolated suite after validation, runtime opt-in and mocked bibliography-provider tests: 71 PASS,0 FAIL (synthetic identities; actual local UNIX/HTTP POST and GET, no external provider calls).
 Combined single-process source regression in either test order: 1167 PASS,18 SKIPPED,3 FAIL. When Stage131 runs first, Stage132 GET returns 502 UPSTREAM_FAILURE in three cases. When Stage133 runs first, Stage131 signed artifact UDS tests time out in three cases. This combined mode is NOT accepted; investigate shared-process/module/fixture interactions and repeat isolation tests before rollout. These results do not invalidate separate suites but must not be called a combined PASS.
 New external Stage133 E2E: 0 confirmed. K_Science has not enabled new-operation client. Production NO-GO.
