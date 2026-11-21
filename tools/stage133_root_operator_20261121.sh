@@ -26,7 +26,7 @@ die(){ echo "STAGE133_DENIED:$*" >&2; exit 77; }
 [[ "$0" == "$SELF" && -f "$SELF" && ! -L "$SELF" ]] || die REVIEWED_OPERATOR_LOCATION_REQUIRED
 [[ "$(stat -c '%u:%g:%a' "$SELF")" == '0:0:600' ]] || die OPERATOR_CUSTODY
 phase=${1:-}
-[[ "$phase" == stage || "$phase" == activate || "$phase" == verify || "$phase" == rollback ]] || die UNKNOWN_PHASE
+[[ "$phase" == stage || "$phase" == activate || "$phase" == verify || "$phase" == rollback || "$phase" == recover ]] || die UNKNOWN_PHASE
 
 install -d -o root -g root -m 0700 "$BACK"
 exec 9>"$BACK/operator.lock"
@@ -79,6 +79,14 @@ wait_socket(){
    sleep 1
  done
  return 1
+}
+restore_transport(){
+ # Stage127 Requires the gateway. Stopping gateway stops Stage127 with
+ # SIGTERM (success), so Restart=on-failure cannot restart it automatically.
+ if ! is_active "$SENT"; then
+   systemctl start "$SENT" || return 1
+ fi
+ expect_active "$SENT" || return 1
 }
 read_health(){
  is_active "$BROKER" && is_active "$GATE" && is_active "$READER" && is_active "$SENT"
@@ -199,6 +207,7 @@ restore_stage132(){
  wait_socket "$BROKER" "$SOCK" '1002:984:660' || return 1
  systemctl start "$GATE" || return 1
  wait_socket "$GATE" "$OLD_SOCK" '988:984:660' || return 1
+ restore_transport || return 1
  read_health || return 1
  wait_ingress_401 || return 1
  touch "$BACK/rolled-back"
@@ -289,6 +298,7 @@ activate)
  wait_socket "$BROKER" "$SOCK" '1002:984:660'
  systemctl start "$GATE"
  wait_socket "$GATE" "$OLD_SOCK" '988:984:660'
+ restore_transport
  touch "$BACK/activated"
  verify_enabled_roles
  trap - ERR
@@ -299,6 +309,25 @@ verify)
  [[ -f "$BACK/activated" ]] || die NOT_ACTIVATED
  verify_enabled_roles
  echo STAGE133_INSTALLED_STATE_VERIFY_PASS
+ ;;
+recover)
+ # A prior operator version restored both original Stage132 units but failed
+ # its post-rollback health check because it did not restart dependent Stage127.
+ # Recover without stopping any of the existing three active KRC services.
+ [[ -f "$BACK/staged" && -f "$BACK/activated" && ! -e "$BACK/rolled-back" ]] || die NO_INCOMPLETE_ROLLBACK
+ [[ ! -e "$BACK/first-attempt-failed-20261121" ]] || die ALREADY_RECOVERED
+ [[ ! -e "$MARK" && ! -L "$MARK" ]] || die STAGE133_STILL_ENABLED
+ verify_release
+ baseline_units
+ cmp -s "$BACK/original-broker.service" "$UNIT" || die BROKER_NOT_RESTORED
+ cmp -s "$BACK/original-gateway.conf" "$DROP" || die GATEWAY_NOT_RESTORED
+ is_active "$BROKER" && is_active "$GATE" && is_active "$READER" || die CORE_SERVICES_NOT_RESTORED
+ restore_transport || die TRANSPORT_RECOVERY_FAILED
+ read_health
+ wait_ingress_401 || die STAGE127_401_RECOVERY_FAILED
+ mv "$BACK/activated" "$BACK/first-attempt-failed-20261121"
+ touch "$BACK/recovered"
+ echo STAGE133_RECOVERY_STAGE132_FOUR_SERVICES_AND_GET401_PASS
  ;;
 rollback)
  [[ -f "$BACK/staged" && -f "$BACK/original-broker.service" && -f "$BACK/original-gateway.conf" ]] || die NO_REVIEWED_ROLLBACK_SOURCE

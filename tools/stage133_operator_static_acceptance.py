@@ -31,6 +31,21 @@ def run():
     assert "sudo " not in source
     assert source.count("systemctl daemon-reload")==2
     assert source.count("restore_stage132")>=2
+    assert "recover)" in source
+    assert "restore_transport()" in source
+    assert source.count(' restore_transport')>=3
+    assert 'systemctl start "$SENT" || return 1' in source
+    assert "STAGE133_RECOVERY_STAGE132_FOUR_SERVICES_AND_GET401_PASS" in source
+    assert "Requires the gateway" in source
+    # A gateway stop terminates the Sentinel ingress via Requires=; guard
+    # BOTH the activation and rollback path, not just post-success verification.
+    activation=source.split('activate)\n',1)[1].split('\nverify)\n',1)[0]
+    rollback=source.split('restore_stage132(){',1)[1].split('\ncase "$phase" in',1)[0]
+    assert activation.index(' restore_transport')<activation.index(' touch "$BACK/activated"')
+    assert rollback.index(' restore_transport')<rollback.index(' read_health')
+    recovery=source.split('recover)\n',1)[1].split('\nrollback)\n',1)[0]
+    assert 'systemctl stop' not in recovery
+    assert 'restore_transport' in recovery
     assert source.count("<<'PY'")==8, source.count("<<'PY'")
     start=source.index("/usr/bin/python3 - \"$ARCHIVE\" \"$REL\" <<'PY'\n")
     code=source[start:].split("\n",1)[1].split("\nPY\n",1)[0]
