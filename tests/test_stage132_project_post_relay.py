@@ -130,6 +130,7 @@ def test_complete_post_get_science_receiver(chain):
     assert http("POST","/staging/v2/execute",req,token="post-two")[0]==409
     a=d["artifact"];get_path="/staging/v2/artifacts/"+a["artifact_id"]
     st,h,b=http("GET",get_path,headers={"X-KRC-Request-ID":p["request_id"]})
+    assert st==200, ("GET_RESPONSE",st,b[:256])
     out=pilot.accept_profile_result(d,b,displayed_profile=PROFILE,expected_request_id=p["request_id"],
         expected_task_id=p["request_id"]+"-task",now_epoch=time.time(),headers=h,http_status=st)
     assert out["status"]=="PILOT_RESULT_SHAPE_VERIFIED" and out["scientific_approval"] is False
@@ -176,7 +177,8 @@ def test_expanded_offline_actual_wire(chain):
     assert status==200
     d=json.loads(raw); a=d["artifact"]
     status,_,raw=http("GET","/staging/v2/artifacts/"+a["artifact_id"],headers={"X-KRC-Request-ID":p["request_id"]})
-    assert status==200 and len(raw)==a["size_bytes"] and hashlib.sha256(raw).hexdigest()==a["sha256"]
+    assert status==200, ("GET_RESPONSE",status,raw[:256])
+    assert len(raw)==a["size_bytes"] and hashlib.sha256(raw).hexdigest()==a["sha256"]
     result=json.loads(raw)
     assert validate_operation_result(result,task_id=p["request_id"]+"-task",operation=req["operation"])=="SEMANTIC_SHAPE_VALID_ONLY_NOT_SCIENTIFIC_APPROVAL"
     assert http("POST","/staging/v2/execute",req)[0]==409 and count(r)==1

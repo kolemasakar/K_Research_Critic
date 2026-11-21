@@ -16,24 +16,14 @@ import time
 from jsonschema import Draft202012Validator, FormatChecker
 from krc_research.private_dispatch_adapter import _schema_for
 from krc_research.stage132_project_post_wire import PREFLIGHT, INSPECTION, DEFAULT_OPS, checked_ops
+from krc_research.stage133_science_input import validate_external_science_payload
 
 def valid_operation_payload(op, payload):
     if op == OP:
         return validate_payload(payload)
     if not isinstance(payload, dict):
         return False
-    if op == PREFLIGHT:
-        if "user_profile_approved" in payload:
-            return False
-        candidate = {**payload, "user_profile_approved": True}
-    elif op == INSPECTION:
-        receipt = payload.get("receipt")
-        if not isinstance(receipt, dict) or receipt.get("trace_verified", False) is not False:
-            return False
-        candidate = payload
-    else:
-        return False
-    return Draft202012Validator(_schema_for(op), format_checker=FormatChecker()).is_valid(candidate)
+    return validate_external_science_payload(op, payload)
 
 def validate_payload(payload):
     if not isinstance(payload,dict) or set(payload)!={"critic_profile"}:

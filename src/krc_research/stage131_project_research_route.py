@@ -25,6 +25,8 @@ from .stage131_consumer_boundary_checks import validate_science_result
 from .request_ledger119 import RequestLedger
 from .replay_registry import ReplayRegistry
 from .artifact_stage117 import HardenedExchange
+from .stage133_science_input import validate_external_science_payload
+from .stage131_science_semantic_contract import validate_operation_result
 
 PRINCIPAL="K_Science"
 CHANNEL="KRC-personal-project"
@@ -72,6 +74,9 @@ class ProjectResearchRoute:
             raise RouteDenied("OFFLINE_OPERATION_NOT_ENABLED")
         if not Draft202012Validator(_schema_for(op),format_checker=FormatChecker()).is_valid(engine_payload(op, profile["payload"])):
             raise RouteDenied("INVALID_PAYLOAD")
+        if op in ("research.evidence.preflight", "research.inspection.review"):
+            if not validate_external_science_payload(op, profile["payload"]):
+                raise RouteDenied("INVALID_SCIENCE_PAYLOAD")
         raw=canonical(profile)
         if len(raw)>MAX_PROFILE: raise RouteDenied("PROFILE_TOO_LARGE")
         rid="KS-"+secrets.token_hex(16)
@@ -130,6 +135,11 @@ class ProjectResearchRoute:
             principal=PRINCIPAL,profile_ref=digest,evidence_refs=[],consent_ref=rid)
         if validate_science_result(result,expected_task_id=task,expected_operation=op)!="VALID_SHAPE_ONLY":
             raise RouteDenied("INVALID_SCIENCE_RESULT")
+        if op in ("research.evidence.preflight", "research.inspection.review"):
+            try:
+                validate_operation_result(result, task_id=task, operation=op)
+            except ValueError as exc:
+                raise RouteDenied("INVALID_SCIENCE_SEMANTICS") from exc
         if not self.consent.can_continue(rid): raise RouteDenied("CANCELLED_OR_EXPIRED")
         artifact=self.exchange.store_bytes(canonical(result),principal=PRINCIPAL,request_id=rid,
             filename="research-result.json",media_type="application/json")
