@@ -5,7 +5,9 @@ from krc_research.stage131_bibliography_http import fetch_json_metadata,Provider
 
 URL="https://api.crossref.org/works/10.1000%2Ftest"
 class Response:
-    def __init__(self,data):self.data=data
+    def __init__(self,data):
+        self.data=data
+        self.headers={"Content-Type":"application/json","Content-Encoding":"identity"}
     def __enter__(self):return self
     def __exit__(self,*args):pass
     def read(self,n):return self.data[:n]
