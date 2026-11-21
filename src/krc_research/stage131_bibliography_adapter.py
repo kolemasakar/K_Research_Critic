@@ -6,6 +6,7 @@ No scientific execution, no full-text download, no provider credentials.
 import re
 from urllib.parse import quote
 from .stage131_bibliography_probe import classify_crossref, classify_europe_pmc, europe_pmc_query_url
+from .stage131_bibliography_http import ProviderHTTPError
 
 _DOI = re.compile(r"^10\.[0-9]{4,9}/[^\s?#]{1,220}$", re.ASCII)
 def lookup_doi_metadata(doi, *, fetch_json=None, allow_network=False, timeout_seconds=5):
@@ -24,12 +25,24 @@ def lookup_doi_metadata(doi, *, fetch_json=None, allow_network=False, timeout_se
         try:
             payload=fetch_json(url, timeout_seconds)
             sources[provider]=(classify_crossref if provider=="crossref" else classify_europe_pmc)(doi,payload)
+        except ProviderHTTPError as exc:
+            sources[provider]={
+                "status":("PROVIDER_RATE_LIMITED" if exc.status==429
+                          else "PROVIDER_NOT_FOUND" if exc.status==404
+                          else "PROVIDER_UNAVAILABLE"),
+                "http_status":exc.status,
+            }
         except (TimeoutError,ConnectionError,OSError) as exc:
             sources[provider]={"status":"PROVIDER_UNAVAILABLE","error_type":type(exc).__name__}
         except ValueError as exc:
             sources[provider]={"status":"INVALID_PROVIDER_RESPONSE","error_type":type(exc).__name__}
-    if any(v["status"] not in ("METADATA_ONLY",) for v in sources.values()):
-        verdict="REVIEW_REQUIRED"
-    else:
+    crossref=sources["crossref"]["status"]
+    epmc=sources["europe_pmc"]["status"]
+    if crossref=="METADATA_ONLY" and epmc=="METADATA_ONLY":
         verdict="TWO_PROVIDER_DOI_MATCH_METADATA_ONLY"
+    elif crossref=="METADATA_ONLY" and epmc in ("NOT_FOUND","PROVIDER_NOT_FOUND"):
+        # Europe PMC is not a comprehensive engineering publication index.
+        verdict="COVERAGE_GAP_METADATA_ONLY"
+    else:
+        verdict="REVIEW_REQUIRED"
     return {"status":verdict,"doi":doi,"sources":sources,"full_text_verified":False,"experimental_independence_verified":False}
