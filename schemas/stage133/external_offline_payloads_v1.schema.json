@@ -1,0 +1,315 @@
+{
+  "contract_status": "SOURCE_CANDIDATE_DEFAULT_OFF",
+  "note": "Scientific validation and owner execution consent are separate. No bibliography authorization.",
+  "operations": {
+    "research.evidence.preflight": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "claims": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "claim_id": {
+                "pattern": "^C[0-9]{2,}$",
+                "type": "string"
+              },
+              "evidence": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "access": {
+                      "enum": [
+                        "FULL_TEXT",
+                        "METHODS_RESULTS_EXCERPT",
+                        "ABSTRACT_ONLY",
+                        "METADATA_ONLY",
+                        "INACCESSIBLE",
+                        "UNKNOWN"
+                      ]
+                    },
+                    "inspected_methods_results": {
+                      "type": "boolean"
+                    },
+                    "origin_id": {
+                      "type": "string"
+                    },
+                    "primary_url": {
+                      "type": "string"
+                    },
+                    "provenance_verified": {
+                      "type": "boolean"
+                    },
+                    "scope_matched": {
+                      "type": "boolean"
+                    },
+                    "source_id": {
+                      "type": "string"
+                    },
+                    "support": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "source_id",
+                    "origin_id",
+                    "access",
+                    "support",
+                    "inspected_methods_results",
+                    "scope_matched",
+                    "provenance_verified",
+                    "primary_url"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 64,
+                "type": "array"
+              },
+              "required": {
+                "maximum": 64,
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "claim_id",
+              "required",
+              "evidence"
+            ],
+            "type": "object"
+          },
+          "maxItems": 128,
+          "type": "array"
+        },
+        "manuscript_gate": {
+          "additionalProperties": false,
+          "properties": {
+            "citations_validated": {
+              "type": "boolean"
+            },
+            "detector_authorized": {
+              "type": "boolean"
+            },
+            "detector_check_status": {
+              "enum": [
+                "NOT_RUN",
+                "UNAVAILABLE",
+                "COMPLETED"
+              ]
+            },
+            "detector_run_records": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "checked_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "input_hash": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "provider": {
+                    "maxLength": 4096,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "provider",
+                  "checked_at",
+                  "input_hash"
+                ],
+                "type": "object"
+              },
+              "maxItems": 32,
+              "type": "array"
+            },
+            "human_author_approved": {
+              "type": "boolean"
+            },
+            "journal_policy_checked": {
+              "type": "boolean"
+            },
+            "novelty_reviewed": {
+              "type": "boolean"
+            },
+            "primary_sources_inspected": {
+              "type": "boolean"
+            },
+            "rights_and_ai_disclosure_done": {
+              "type": "boolean"
+            },
+            "scientific_methods_audited": {
+              "type": "boolean"
+            },
+            "search_audit_reproducible": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "journal_policy_checked",
+            "search_audit_reproducible",
+            "primary_sources_inspected",
+            "novelty_reviewed",
+            "citations_validated",
+            "scientific_methods_audited",
+            "rights_and_ai_disclosure_done",
+            "human_author_approved"
+          ],
+          "type": "object"
+        },
+        "search_runs": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "executed_at": {
+                "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "exported_records": {
+                "minimum": 0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "filter_description": {
+                "maxLength": 4096,
+                "type": "string"
+              },
+              "hit_count": {
+                "minimum": 0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "provider": {
+                "maxLength": 4096,
+                "minLength": 1,
+                "type": "string"
+              },
+              "query": {
+                "maxLength": 4096,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "provider",
+              "query",
+              "executed_at",
+              "hit_count",
+              "exported_records"
+            ],
+            "type": "object"
+          },
+          "maxItems": 128,
+          "type": "array"
+        }
+      },
+      "required": [
+        "manuscript_gate"
+      ],
+      "type": "object"
+    },
+    "research.inspection.review": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "receipt": {
+          "additionalProperties": false,
+          "properties": {
+            "checked_at": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "document_sha256": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "doi": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "evidence_relation": {
+              "enum": [
+                "SUPPORTS",
+                "CONTRADICTS",
+                "INSUFFICIENT"
+              ]
+            },
+            "external_trace_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "inspected_sections": {
+              "items": {
+                "maxLength": 4096,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 128,
+              "minItems": 1,
+              "type": "array"
+            },
+            "inspector_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "method": {
+              "enum": [
+                "FULL_TEXT",
+                "METHODS_RESULTS_EXCERPT"
+              ]
+            },
+            "origin_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "passage_locators": {
+              "items": {
+                "maxLength": 4096,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 128,
+              "minItems": 1,
+              "type": "array"
+            },
+            "source_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "trace_verified": {
+              "const": false
+            }
+          },
+          "required": [
+            "source_id",
+            "origin_id",
+            "doi",
+            "document_sha256",
+            "inspected_sections",
+            "passage_locators",
+            "checked_at",
+            "inspector_id",
+            "method",
+            "evidence_relation",
+            "external_trace_id"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "receipt"
+      ],
+      "type": "object"
+    }
+  },
+  "version": "KRC-STAGE133-EXTERNAL-OFFLINE-PAYLOADS/1"
+}

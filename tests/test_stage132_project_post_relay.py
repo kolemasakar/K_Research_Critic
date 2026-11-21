@@ -41,7 +41,7 @@ def running(server):
         assert not t.is_alive()
 
 @pytest.fixture
-def chain(tmp_path):
+def chain(tmp_path,request):
     # The installed companion sources are deliberately an explicit dependency,
     # supplied via PYTHONPATH by the isolated integration test runner.
     auth=pytest.importorskip("authenticated_admission123d")
@@ -55,14 +55,19 @@ def chain(tmp_path):
     try:
         r=ProjectResearchRoute(tmp_path/"private")
         ReplayRegistry(r.root/"science-replay.sqlite")
-        p=r.propose(copy.deepcopy(PROFILE))
+        from test_stage133_offline_expansion import PAYLOADS
+        from krc_research.stage132_project_post_wire import OFFLINE_OPS
+        op=getattr(request,"param",OP)
+        profile=copy.deepcopy(PROFILE) if op==OP else {"operation":op,"payload":copy.deepcopy(PAYLOADS[op]),"purpose":"Synthetic wire fixture","policy":"FREE_ONLY_OFFLINE"}
+        enabled_ops=OFFLINE_OPS if op!=OP else {OP}
+        p=r.propose(profile)
         registry=ArtifactNonceRegistry(tmp_path/"relay-nonce.sqlite")
-        relay=RelayAuthority(boundary=ProjectPostBoundary(r.root,enabled=True),
+        relay=RelayAuthority(boundary=ProjectPostBoundary(r.root,enabled=True,enabled_operations=enabled_ops),
                              registry=registry,key=RELAY,peer_uid=UID,peer_gid=GID)
         relay_path=tmp_path/"relay.sock"
         relay_srv=RelayServer(relay_path,authority=relay)
         os.chmod(relay_path,0o660)
-        relay_client=RelayClient(relay_path,key=RELAY,expected_uid=UID,expected_gid=GID)
+        relay_client=RelayClient(relay_path,key=RELAY,expected_uid=UID,expected_gid=GID,enabled_operations=enabled_ops)
         legacy_path=tmp_path/"legacy.sock"
         claims={tuple(IDENTITY[k] for k in ("client","principal","repository","workflow_ref"))}
         gateway=make_staging_server(legacy_path,tmp_path/"legacy",
@@ -106,7 +111,7 @@ def chain(tmp_path):
                 c.request(method,path,body=body,headers=hh)
                 out=c.getresponse();return out.status,dict(out.getheaders()),out.read()
             finally:c.close()
-        request={"request_id":p["request_id"],"operation":OP,"payload":copy.deepcopy(PROFILE["payload"])}
+        request={"request_id":p["request_id"],"operation":op,"payload":copy.deepcopy(profile["payload"])}
         with running(relay_srv),running(gateway),running(reader),running(http):
             yield r,p,request,http_call,relay,relay_client
     finally:os.umask(old)
@@ -125,6 +130,7 @@ def test_complete_post_get_science_receiver(chain):
     assert http("POST","/staging/v2/execute",req,token="post-two")[0]==409
     a=d["artifact"];get_path="/staging/v2/artifacts/"+a["artifact_id"]
     st,h,b=http("GET",get_path,headers={"X-KRC-Request-ID":p["request_id"]})
+    assert st==200, ("GET_RESPONSE",st,b[:256])
     out=pilot.accept_profile_result(d,b,displayed_profile=PROFILE,expected_request_id=p["request_id"],
         expected_task_id=p["request_id"]+"-task",now_epoch=time.time(),headers=h,http_status=st)
     assert out["status"]=="PILOT_RESULT_SHAPE_VERIFIED" and out["scientific_approval"] is False
@@ -160,3 +166,19 @@ def test_relay_peer_mac_nonce_before_owner_approval(chain):
     # Previously denied valid signed relay message cannot become an execution.
     assert relay.accept(m,credentials=(UID,GID))[0]==403 and count(r)==0
     assert relay.accept(make_message(e,RELAY),credentials=(UID,GID))[0]==200 and count(r)==1
+
+@pytest.mark.parametrize("chain",["research.evidence.preflight","research.inspection.review"],indirect=True)
+def test_expanded_offline_actual_wire(chain):
+    from krc_research.stage131_science_semantic_contract import validate_operation_result
+    r,p,req,http,_,_=chain
+    assert http("POST","/staging/v2/execute",req)[0]==403
+    approve(r,p)
+    status,_,raw=http("POST","/staging/v2/execute",req)
+    assert status==200
+    d=json.loads(raw); a=d["artifact"]
+    status,_,raw=http("GET","/staging/v2/artifacts/"+a["artifact_id"],headers={"X-KRC-Request-ID":p["request_id"]})
+    assert status==200, ("GET_RESPONSE",status,raw[:256])
+    assert len(raw)==a["size_bytes"] and hashlib.sha256(raw).hexdigest()==a["sha256"]
+    result=json.loads(raw)
+    assert validate_operation_result(result,task_id=p["request_id"]+"-task",operation=req["operation"])=="SEMANTIC_SHAPE_VALID_ONLY_NOT_SCIENTIFIC_APPROVAL"
+    assert http("POST","/staging/v2/execute",req)[0]==409 and count(r)==1

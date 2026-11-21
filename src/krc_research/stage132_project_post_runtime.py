@@ -14,6 +14,7 @@ from krc_research.stage132_project_post_relay import RelayClient, RelayAuthority
 
 CONF=Path("/etc/krc-stage132-post")
 MARKER=CONF/"enable-reviewed-staging-post"
+STAGE133_MARKER=CONF/"enable-reviewed-stage133-offline"
 RELAY=Path("/run/krc-project-n39-post/backend.sock")
 NONCE=Path("/var/lib/krc-project-n39-post/relay.sqlite")
 OWNER_STATE=Path("/home/krcops/krc-project-n39-staging/state")
@@ -21,6 +22,17 @@ OLD_CONFIG=Path("/etc/krc-research-v2/staging.json")
 OLD_SOCKET=Path("/run/krc-research-v2/backend.sock")
 OLD_STATE=Path("/var/lib/krc-research-v2")
 GID=984
+
+from krc_research.stage132_project_post_wire import DEFAULT_OPS, OFFLINE_OPS
+
+def reviewed_offline_operations(requested=False):
+    # Explicit second operator gate; never infer activation from source files.
+    if not requested:
+        return DEFAULT_OPS
+    st=STAGE133_MARKER.lstat()
+    if not stat.S_ISREG(st.st_mode) or (st.st_uid,stat.S_IMODE(st.st_mode),st.st_nlink)!=(0,0o600,1):
+        raise ValueError("STAGE133_MARKER_CUSTODY")
+    return OFFLINE_OPS
 
 def marker_check():
     st=CONF.lstat()
@@ -69,7 +81,7 @@ def compose_gateway(c,*,transport,science,relay):
         claim_allowlist=claims,science_secret=science)
     return attach_pilot(server,relay)
 
-def gateway(stop):
+def gateway(stop, *, enabled_operations=DEFAULT_OPS):
     from krc_research.staging_entrypoint124 import load_config,secret
     if (os.geteuid(),os.getegid())!=(988,GID):raise ValueError("GATEWAY_UID_GID")
     marker_check()
@@ -81,10 +93,10 @@ def gateway(stop):
     transport=secret(c["transport_key_file"])
     science=secret(c["science_key_file"])
     if key==transport or key==science:raise ValueError("KEY_SEPARATION")
-    relay=RelayClient(RELAY,key=key,expected_uid=1002,expected_gid=GID)
+    relay=RelayClient(RELAY,key=key,expected_uid=1002,expected_gid=GID,enabled_operations=enabled_operations)
     serve(compose_gateway(c,transport=transport,science=science,relay=relay),OLD_SOCKET,stop=stop)
 
-def broker(stop):
+def broker(stop, *, enabled_operations=DEFAULT_OPS):
     from krc_research.stage132_project_post_contract import ProjectPostBoundary
     from krc_research.stage131_project_read_lifecycle import existing_nonce,producer_preflight,notify_ready,retrieval_key
     from krc_research.stage131_project_signed_read import ro,KEY_PATH
@@ -99,7 +111,7 @@ def broker(stop):
     for name,table in (("consent.sqlite","project_profiles"),("science-replay.sqlite","requests")):
         with closing(ro(OWNER_STATE/name)) as db:db.execute("SELECT * FROM "+table+" LIMIT 0")
     registry=existing_nonce(NONCE)
-    boundary=ProjectPostBoundary(OWNER_STATE,enabled=True)
+    boundary=ProjectPostBoundary(OWNER_STATE,enabled=True,enabled_operations=enabled_operations)
     authority=RelayAuthority(boundary=boundary,registry=registry,key=key,peer_uid=988,peer_gid=GID)
     server=RelayServer(RELAY,authority=authority)
     if not os.environ.get("NOTIFY_SOCKET"):
@@ -110,12 +122,14 @@ def main():
     parser=argparse.ArgumentParser()
     parser.add_argument("role",choices=("broker","gateway"))
     parser.add_argument("--enable-reviewed-staging-post",action="store_true")
+    parser.add_argument("--enable-stage133-offline-operations",action="store_true")
     a=parser.parse_args()
     if not a.enable_reviewed_staging_post:raise SystemExit("DISABLED")
     os.umask(0o077)
     stop=threading.Event()
     signal.signal(signal.SIGTERM,lambda *_:stop.set())
     signal.signal(signal.SIGINT,lambda *_:stop.set())
-    (broker if a.role=="broker" else gateway)(stop)
+    (broker if a.role=="broker" else gateway)(
+        stop,enabled_operations=reviewed_offline_operations(a.enable_stage133_offline_operations))
 
 if __name__=="__main__":main()

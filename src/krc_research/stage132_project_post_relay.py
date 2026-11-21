@@ -16,7 +16,7 @@ import stat
 import struct
 import time
 
-from krc_research.stage132_project_post_wire import OP, IDENTITY, denied, ambiguous, canonical, valid_pilot_descriptor
+from krc_research.stage132_project_post_wire import OP, IDENTITY, denied, ambiguous, canonical, valid_pilot_descriptor, OFFLINE_OPS, BIBLIOGRAPHY, DEFAULT_OPS, checked_ops
 from krc_research.uds_verified123b import VerifiedStage123Handler
 
 DOMAIN="KRC-PROJECT-PILOT-RELAY/1"
@@ -93,7 +93,7 @@ class RelayAuthority:
             unsigned={k:v for k,v in message.items() if k!="mac"}
             if not hmac.compare_digest(message["mac"],hmac.new(self.key,canonical(unsigned),hashlib.sha256).hexdigest()):return denied()
             e=message["envelope"]
-            if not isinstance(e,dict) or e.get("identity")!=IDENTITY or e.get("operation")!=OP:return denied()
+            if not isinstance(e,dict) or e.get("identity")!=IDENTITY or e.get("operation") not in self.boundary.enabled_operations:return denied()
             if not self.registry.claim(KEY_ID,message["nonce"],IDENTITY["principal"]):return denied()
             return self.boundary.execute(e,trusted_principal=IDENTITY["principal"])
         except Exception:return denied()
@@ -134,13 +134,14 @@ def validate_reply(response,rid):
     raise ValueError("REPLY_NOT_CORRELATED")
 
 class RelayClient:
-    def __init__(self,path,*,key,expected_uid,expected_gid):
+    def __init__(self,path,*,key,expected_uid,expected_gid,enabled_operations=DEFAULT_OPS):
         check_key(key)
         self.path,self.key=path,key
         self.uid,self.gid=expected_uid,expected_gid
+        self.enabled_operations=checked_ops(enabled_operations)
     def execute(self,envelope):
         rid=envelope.get("request_id")
-        if envelope.get("identity")!=IDENTITY or envelope.get("operation")!=OP or not isinstance(rid,str) or not RID.fullmatch(rid):return denied()
+        if envelope.get("identity")!=IDENTITY or envelope.get("operation") not in self.enabled_operations or not isinstance(rid,str) or not RID.fullmatch(rid):return denied()
         deadline=time.monotonic()+MAX_SECONDS
         try:
             st=os.lstat(self.path)
@@ -161,8 +162,13 @@ class PilotGatewayBoundary:
         self.legacy,self.relay=legacy,relay
         self.exchange=legacy.exchange
     def execute(self,envelope,*,trusted_principal):
-        if envelope.get("operation")!=OP:
+        op=envelope.get("operation")
+        if op==BIBLIOGRAPHY:
+            return denied()[1]
+        if op not in OFFLINE_OPS:
             return self.legacy.execute(envelope,trusted_principal=trusted_principal)
+        if op not in self.relay.enabled_operations:
+            return denied()[1]
         if trusted_principal!=IDENTITY["principal"]:return denied()[1]
         return self.relay.execute(envelope)[1]
 
