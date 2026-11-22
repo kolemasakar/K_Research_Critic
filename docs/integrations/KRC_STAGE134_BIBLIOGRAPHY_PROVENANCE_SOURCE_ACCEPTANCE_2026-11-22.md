@@ -89,3 +89,20 @@ source-ID collision, shared ancestry, cycles, unknown parent, and explicit
 non-promotion of invented source independence. Existing Stage134 hardening tests
 and broader project source regression must be run on the exact branch snapshot
 before promotion. Source-only acceptance is not operational acceptance.
+
+## Verified source-only test acceptance (2026-11-22)
+
+- Source base: reviewed Stage134 PR36 commit 642c26e44ace6af501c72b7e4ab2aae899394efe;
+  exactly six changed source/schema/test/doc files verified by Git blob SHA.
+- Complete KRC isolated-worktree test run (Python 3.12, unprivileged krcops,
+  PYTHONNOUSERSITE=1, PYTHONDONTWRITEBYTECODE=1, no provider API):
+  **1349 passed, 24 skipped, 0 failed** in 76.94 seconds.
+  Skipped tests are not claimed as accepted.
+- Focused Stage134 provenance + existing transport-hardening tests rerun
+  after ASCII cleanup: **82 passed, 0 failed** in 1.06 seconds.
+- Two JSON Schemas pass Draft202012Validator.check_schema.
+- All six files ASCII-only and GitHub Git blob SHA equal to source review tree.
+- All four installed staging services remained ACTIVE with NRestarts=0;
+  installed /opt tree, credentials, running science operations and consent
+  are untouched. No external provider smoke, authorized production execution,
+  independent reviewer, or installed cross-UID Stage134 E2E was attempted.
