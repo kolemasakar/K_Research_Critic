@@ -46,3 +46,12 @@ def lookup_doi_metadata(doi, *, fetch_json=None, allow_network=False, timeout_se
     else:
         verdict="REVIEW_REQUIRED"
     return {"status":verdict,"doi":doi,"sources":sources,"full_text_verified":False,"experimental_independence_verified":False}
+
+def audit_doi_provenance_offline(bundle):
+    """Source-only Stage134 metadata/lineage audit; always NO_SEND.
+
+    This interface does not grant access to any provider and cannot turn
+    client-declared provenance into trusted evidence.
+    """
+    from .stage134_bibliography_provenance import audit_stage134_provenance
+    return audit_stage134_provenance(bundle)

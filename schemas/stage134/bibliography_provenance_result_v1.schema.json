@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:krc:stage134:bibliography-provenance-result:1",
+  "title": "KRC Stage134 offline bibliography evidence audit output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "doi",
+    "input_sha256",
+    "metadata_status",
+    "metadata_field_checks",
+    "provider_snapshots",
+    "provenance_status",
+    "lineage_groups",
+    "scientific_independence",
+    "shortfalls",
+    "decision"
+  ],
+  "properties": {
+    "version": {
+      "const": "KRC-STAGE134-BIBLIOGRAPHY-PROVENANCE-RESULT/1"
+    },
+    "doi": {
+      "type": "string"
+    },
+    "input_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "metadata_status": {
+      "enum": [
+        "TWO_PROVIDER_FIELDS_MATCH_METADATA_ONLY",
+        "METADATA_CONFLICT_REVIEW",
+        "INCOMPLETE_METADATA_REVIEW",
+        "COVERAGE_GAP_METADATA_ONLY",
+        "PARTIAL_METADATA_ONLY",
+        "DOI_MISMATCH"
+      ]
+    },
+    "metadata_field_checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "year"
+      ],
+      "properties": {
+        "title": {
+          "enum": [
+            "MATCH",
+            "MISMATCH",
+            "MISSING",
+            "NOT_CHECKED"
+          ]
+        },
+        "year": {
+          "enum": [
+            "MATCH",
+            "MISMATCH",
+            "MISSING",
+            "NOT_CHECKED"
+          ]
+        }
+      }
+    },
+    "provider_snapshots": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "provider",
+          "url",
+          "captured_at",
+          "payload_sha256",
+          "doi_status",
+          "integrity_status"
+        ],
+        "properties": {
+          "provider": {
+            "enum": [
+              "crossref",
+              "europe_pmc"
+            ]
+          },
+          "url": {
+            "type": "string"
+          },
+          "captured_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "payload_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "doi_status": {
+            "enum": [
+              "MATCH",
+              "MISMATCH",
+              "NOT_FOUND"
+            ]
+          },
+          "integrity_status": {
+            "const": "CANONICAL_PAYLOAD_HASH_MATCH_ONLY"
+          }
+        }
+      }
+    },
+    "provenance_status": {
+      "const": "PROVIDER_ORIGIN_NOT_AUTHENTICATED"
+    },
+    "lineage_groups": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source_ids",
+          "origin_ids",
+          "claimed_inspected_sources"
+        ],
+        "properties": {
+          "source_ids": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,79}$"
+            }
+          },
+          "origin_ids": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,79}$"
+            }
+          },
+          "claimed_inspected_sources": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "scientific_independence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "verified_origin_count",
+        "scientific_truth_verified",
+        "full_text_verified"
+      ],
+      "properties": {
+        "status": {
+          "const": "NOT_ESTABLISHED_FROM_METADATA_OR_DECLARED_LINEAGE"
+        },
+        "verified_origin_count": {
+          "const": 0
+        },
+        "scientific_truth_verified": {
+          "const": false
+        },
+        "full_text_verified": {
+          "const": false
+        }
+      }
+    },
+    "shortfalls": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "decision": {
+      "const": "HUMAN_EVIDENCE_REVIEW_REQUIRED"
+    }
+  }
+}
