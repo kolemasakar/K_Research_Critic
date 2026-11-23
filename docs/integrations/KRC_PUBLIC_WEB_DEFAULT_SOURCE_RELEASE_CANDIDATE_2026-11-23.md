@@ -83,3 +83,25 @@ information already authorizes public read-only search.
 
 Release candidate PASS does not certify that source-only changes have
 been promoted to a currently running service.
+
+## Release candidate live Stage131 DOI smoke
+
+Source commit db1a201eeb7281511609fadd800df16d436b481c,
+without installing it into any running service:
+
+- Called lookup_doi_metadata("10.1016/j.proeng.2013.03.022")
+  with NO allow_network=True flag, NO per-query owner consent and NO
+  provider_approved flag.
+- Actual default HTTPS Crossref: METADATA_ONLY.
+- Actual default HTTPS Europe PMC: NOT_FOUND.
+- Conservative merged status: COVERAGE_GAP_METADATA_ONLY.
+- Scientific independence and full-text verification: False.
+- Explicit allow_network=False composition result: PROVIDER_DISABLED
+  (deliberate, caller-selected reproducibility mode only).
+- Default-on public internet source smoke: PASS; process exit 0.
+- This smoke is not the installed service's Stage131 route, no
+  K_Science signed operation, no PDF fetch or local owner-computer use.
+
+Combined pre-deployment result: SOURCE_ONLY_RELEASE_CANDIDATE_PASS.
+Production deployment, signed Stage134 E2E and formal security review
+remain separate.
