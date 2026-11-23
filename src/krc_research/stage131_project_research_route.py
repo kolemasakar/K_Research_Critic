@@ -145,7 +145,9 @@ class ProjectResearchRoute:
         def dispatch(operation,envelope,principal):
             if not self.consent.can_continue(rid): raise RouteDenied("CANCELLED_OR_EXPIRED")
             return science(operation,envelope,principal)
-        signer=KRCInternalScienceSigner(science_key=key,authorizer=authorize,dispatcher=dispatch)
+        signer=KRCInternalScienceSigner(
+            science_key=key,authorizer=authorize,dispatcher=dispatch,
+            bibliography_enabled=(self.stage134_enabled and op==STAGE134_BIBLIOGRAPHY))
         result=signer.execute(request_id=rid,task_id=task,operation=op,payload=payload,
             principal=PRINCIPAL,profile_ref=digest,evidence_refs=[],consent_ref=rid)
         if validate_science_result(result,expected_task_id=task,expected_operation=op)!="VALID_SHAPE_ONLY":
