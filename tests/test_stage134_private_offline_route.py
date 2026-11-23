@@ -169,3 +169,44 @@ def test_approved_bundle_has_zero_provider_network_scope():
     result = audit_offline_bundles(x["offline_bundles"])
     assert result["network_requests"] == 0
     assert result["records"][0]["decision"] == "HUMAN_EVIDENCE_REVIEW_REQUIRED"
+
+@pytest.mark.parametrize("mutator", [
+    lambda e: e.update(network_requests=False),
+    lambda e: e.update(independent_experimental_origins_verified=False),
+    lambda e: e["records"][0].update(metadata_status="SCIENTIFICALLY_VERIFIED"),
+    lambda e: e["records"][0].update(doi="https://doi.org/10.1000/demo"),
+    lambda e: e["records"][0]["scientific_independence"].update(verified_origin_count=1),
+    lambda e: e["records"][0].update(provenance_status="PROVIDER_AUTHENTICATED"),
+    lambda e: e["records"][0].update(decision="APPROVED"),
+    lambda e: e["records"][0]["provider_snapshots"][0].update(
+        integrity_status="CRYPTOGRAPHICALLY_AUTHENTICATED"),
+    lambda e: e["records"][0]["provider_snapshots"].append(
+        copy.deepcopy(e["records"][0]["provider_snapshots"][0])),
+    lambda e: e["records"][0]["metadata_field_checks"].update(title="SCIENTIFIC_PASS"),
+])
+def test_forged_output_semantics_denied(mutator):
+    from krc_research.stage134_offline_bibliography_route import (
+        validate_offline_bibliography_result,
+    )
+    engine = audit_offline_bundles([bundle()])
+    mutator(engine)
+    assert validate_offline_bibliography_result(engine) is False
+
+
+def test_external_stage133_gateway_keeps_bibliography_disabled(tmp_path):
+    from krc_research.stage132_project_post_contract import ProjectPostBoundary
+    from krc_research.stage132_project_post_wire import (
+        BIBLIOGRAPHY, IDENTITY, OP,
+    )
+    r = ProjectResearchRoute(tmp_path / "state", enable_stage134_offline=True)
+    p = r.propose(profile())
+    rid, sha = p["request_id"], p["profile_sha256"]
+    r.decide(rid, sha, "APPROVE")
+    request = {"version": "krc-transport/2", "identity": IDENTITY,
+               "request_id": rid, "operation": BIBLIOGRAPHY,
+               "payload": profile()["payload"]}
+    assert ProjectPostBoundary(r.root, enabled=True).execute(
+        request, trusted_principal="K_Science") == (403, {"error": "OPERATION_DENIED"})
+    with pytest.raises(ValueError, match="INVALID_OFFLINE_OPERATION_ALLOWLIST"):
+        ProjectPostBoundary(r.root, enabled=True, enabled_operations={OP, BIBLIOGRAPHY})
+    assert r.show(rid)["status"] == "APPROVED"
