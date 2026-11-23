@@ -51,3 +51,21 @@ installed KRC approval ledger. Cross-project E2E and production remain NO_GO.
 Once the eight-request budget is exhausted or a provider call fails, record
 results and outstanding errors. Every new network permission needs a separate
 owner decision and approved server route.
+
+## Execution checkpoint - 2026-11-23 18:13:35 UTC
+
+- Scope exhausted: 8/8 unique one-shot HTTPS GETs, HTTP 200, zero retries.
+- Crossref DOI/title/year matches: 4/4 versus K_Science pinned PDF identity manifest.
+- Europe PMC exact DOI search: 4/4 returned valid JSON with hitCount=0;
+  classify as COVERAGE_GAP_METADATA_ONLY, NOT DOI invalidity.
+- Pure KRC Stage134 offline provenance audits: 4/4 returned
+  COVERAGE_GAP_METADATA_ONLY and HUMAN_EVIDENCE_REVIEW_REQUIRED.
+- All eight response raw-byte SHA256 and canonical-payload SHA256 fingerprints
+  recorded in minimized JSON receipts (no full response bodies in GitHub).
+- Canonical observation log:
+  docs/integrations/STAGE134_OWNER_ONESHOT_REAL_PROVIDER_RECEIPTS_2026-11-23.json
+- No request ledger, owner consent record, Stage134 server dispatch, original
+  article file or owner local-computer disk was modified. Source-only operation.
+- This one-time owner authorization is consumed. Do not send more queries
+  without a new explicit decision and appropriately reviewed route.
+- Production remains NO_GO; scientific independence remains unverified.
