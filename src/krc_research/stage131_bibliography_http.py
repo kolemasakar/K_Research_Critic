@@ -1,8 +1,9 @@
-"""Offline-by-default bounded metadata HTTP transport for Crossref and Europe PMC.
+"""Bounded FREE_ONLY public metadata transport for Crossref and Europe PMC.
 
-This transport does not fetch PDFs or perform scientific checks. Network use is
-permitted ONLY when caller explicitly activates its parent metadata policy;
-the default KRC scientific route remains OFFLINE and denies bibliography.
+Public research may use this transport by default without owner approval per
+DOI. This transport does not fetch PDFs or authorize scientific execution.
+HTTPS/URL safety, response size, timeouts and retry controls remain mandatory.
+Signed private science dispatch has its own independent authorization boundary.
 """
 import json
 import re
