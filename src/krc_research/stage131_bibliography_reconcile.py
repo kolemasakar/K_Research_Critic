@@ -7,8 +7,13 @@ def reconcile_metadata(doi, crossref_payload, europe_pmc_payload):
     if not isinstance(c,dict) or not isinstance(results,list):
         return {"status":"INVALID_PROVIDER_RESPONSE","doi":doi}
     e=next((v for v in results if isinstance(v,dict) and isinstance(v.get("doi"),str) and v["doi"].casefold()==doi.casefold()),None)
-    if not isinstance(c.get("DOI"),str) or c["DOI"].casefold()!=doi.casefold() or e is None:
-        return {"status":"DOI_MISMATCH_OR_ABSENT","doi":doi}
+    if not isinstance(c.get("DOI"),str) or c["DOI"].casefold()!=doi.casefold():
+        return {"status":"DOI_MISMATCH","doi":doi,
+                "full_text_verified":False,"experimental_independence_verified":False}
+    if e is None:
+        return {"status":"COVERAGE_GAP_METADATA_ONLY","doi":doi,
+                "field_checks":{"title":"NOT_CHECKED","year":"NOT_CHECKED"},
+                "full_text_verified":False,"experimental_independence_verified":False}
     def norm(v):
         return " ".join(str(v).casefold().split()) if v is not None else ""
     a=c.get("title")
