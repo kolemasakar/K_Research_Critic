@@ -72,3 +72,31 @@ Provenance and scientific truth:
   including searches beyond the four DOI examples when requested.
   Additional providers can be integrated using safe source adapters,
   without a new owner consent solely because the source is online.
+
+## Verified acceptance and live read-only smoke
+
+Source-only review/tests on authorized KRC VM, not HP-OMEN:
+
+- Focused Stage131/133/134 adapter, safe composition and signed route
+  regression: 67 PASS / 0 FAIL (commit
+  1f2105c8195f657ddb512e4d9b156bdfcb598be6).
+- Full KRC source test suite with corrected default fetcher:
+  1377 PASS / 24 SKIPPED / 0 FAIL (commit
+  78501fda4d28d042589aacb5b64c4590f750d618).
+- A genuine free public HTTPS smoke used the corrected default call:
+  lookup_doi_metadata("10.1016/j.proeng.2013.03.022").
+  No allow_network=True flag, provider_approved flag, separate
+  consent grant or injected test callback was used.
+  Live Crossref returned METADATA_ONLY and Europe PMC NOT_FOUND;
+  combined result COVERAGE_GAP_METADATA_ONLY, correct and expected.
+  FULL_TEXT_VERIFIED=False and INDEPENDENCE_VERIFIED=False.
+  Live smoke: PASS; no paid API, credentials, PDF download, or
+  owner local disk access.
+- This was ordinary public bibliography research (2 direct public
+  provider queries), NOT reuse of the prior eight-request engineering
+  scope and NOT signed external Stage134 execution.
+- Existing installed KRC/Sentinel runtime, external signed Stage127
+  allowlists and production services were not redeployed.
+
+SOURCE IMPLEMENTATION TESTED / LIVE PUBLIC METADATA READ PASS /
+DEPLOYMENT NOT PERFORMED / PRODUCTION CHANGES NO.
