@@ -1,5 +1,23 @@
 # Stage134 offline bibliography owner-approval route: source acceptance
 
+## Architectural clarification: KRC research network is not offline-only
+
+Per the owner directive on 2026-11-23, OFFLINE in the title refers
+**only to this reproducible signed private Stage134 snapshot test route**.
+It is not a restriction on KRC's fundamental public internet research.
+Free public web searches, Crossref/OpenAlex/Europe PMC lookups and
+independent fact-checking are permitted as routine research by default.
+This document's external E2E restrictions apply to signed scientific
+execution and deployment, not to the research engine's public reads.
+
+Canonical owner policy:
+https://github.com/kolemasakar/K_Research_Critic/blob/main/docs/RESEARCH_NETWORK_ACCESS_POLICY_2026-11-23.md
+
+Source implementation correction:
+docs/integrations/STAGE134_PUBLIC_INTERNET_RESEARCH_CORRECTION_2026-11-23.md
+
+---
+
 Date: 2026-11-23
 Disposition: SOURCE_ONLY_OFFLINE_SIGNED_PRIVATE_ACCEPTED /
 EXTERNAL_WIRE_NOT_ENABLED / NOT_INSTALLED / NO_NETWORK / PRODUCTION_NO_GO.
