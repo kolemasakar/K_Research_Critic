@@ -27,7 +27,19 @@ def test_artifact_read_scoped_and_expired(tmp_path):
     with pytest.raises(Stage131GateDenied,match="EXPIRED"):
         artifact_read_gate(store,obj,authenticated_principal="K_Science",expected_principal="K_Science",request_id="REQ-1",now_epoch=105)
 
-def test_bibliography_default_off():
+def test_public_bibliography_default_on_without_owner_approval():
+    seen=[]
+    def fetch(url,timeout):
+        seen.append(url)
+        if "crossref" in url:
+            return {"message":{"DOI":"10.1000/example","title":["Test"]}}
+        return {"resultList":{"result":[]}}
+    out=bibliography_metadata_gate("10.1000/example",fetcher=fetch)
+    assert out["status"]=="COVERAGE_GAP_METADATA_ONLY" and len(seen)==2
+    # Legacy provider_approved argument cannot block ordinary public lookup.
+    assert bibliography_metadata_gate("10.1000/example",provider_approved=False,fetcher=fetch)["status"]=="COVERAGE_GAP_METADATA_ONLY"
+    assert len(seen)==4
+
+def test_explicit_offline_bibliography_mode_remains_available():
     def forbidden(*args):raise AssertionError("NETWORK")
-    assert bibliography_metadata_gate("10.1000/example",fetcher=forbidden)["status"]=="PROVIDER_DISABLED"
-    assert bibliography_metadata_gate("10.1000/example",provider_approved=True,fetcher=forbidden)["status"]=="PROVIDER_DISABLED"
+    assert bibliography_metadata_gate("10.1000/example",allow_network=False,fetcher=forbidden)["status"]=="PROVIDER_DISABLED"
