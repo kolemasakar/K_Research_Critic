@@ -3,9 +3,19 @@ from krc_research.stage131_bibliography_adapter import lookup_doi_metadata
 
 DOI="10.1088/1757-899X/365/3/032058"
 
-def test_disabled_default_never_fetches():
+def test_explicit_offline_mode_never_fetches():
     def forbidden(*args): raise AssertionError("called network")
-    assert lookup_doi_metadata(DOI,fetch_json=forbidden)["status"]=="PROVIDER_DISABLED"
+    assert lookup_doi_metadata(DOI,fetch_json=forbidden,allow_network=False)["status"]=="PROVIDER_DISABLED"
+
+def test_public_lookup_default_reads_injected_free_provider():
+    seen=[]
+    def fake(url,timeout):
+        seen.append(url)
+        if "crossref" in url:return {"message":{"DOI":DOI,"title":["test"]}}
+        return {"resultList":{"result":[{"doi":DOI}]}}
+    out=lookup_doi_metadata(DOI,fetch_json=fake)
+    assert out["status"]=="TWO_PROVIDER_DOI_MATCH_METADATA_ONLY"
+    assert len(seen)==2 and not out["experimental_independence_verified"]
 
 def test_both_doi_matches_metadata_only():
     def fake(url,timeout):
