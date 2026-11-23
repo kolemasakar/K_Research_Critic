@@ -100,6 +100,6 @@ def test_absence_from_europe_pmc_is_coverage_gap_not_disproof():
     assert reconcile["status"]=="COVERAGE_GAP_METADATA_ONLY"
     assert reconcile["field_checks"]["title"]=="NOT_CHECKED"
 
-def test_network_disabled_before_injected_callback():
+def test_explicit_offline_call_never_uses_provider_callback():
     def forbidden(*a,**kw):raise AssertionError("PROVIDER_CALLED")
-    assert lookup_doi_metadata("10.1000/demo",fetch_json=forbidden)["status"]=="PROVIDER_DISABLED"
+    assert lookup_doi_metadata("10.1000/demo",fetch_json=forbidden,allow_network=False)["status"]=="PROVIDER_DISABLED"
