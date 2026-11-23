@@ -193,3 +193,7 @@ maintenance releases
 ```
 
 General modular multi-agent platform development belongs to the separate `K_Supervisor` project.
+
+## Owner storage rule (2026-11-23)
+
+**DO NOT access, read, write, scan, cache or otherwise use the owner's local-computer disks without a direct owner instruction for that specific task.** GitHub is the default repository for approved artifacts; restricted content must not be placed in public repositories without separate permission. See [Owner storage policy](docs/OWNER_STORAGE_POLICY_2026-11-23.md).
