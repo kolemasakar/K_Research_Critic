@@ -197,3 +197,16 @@ General modular multi-agent platform development belongs to the separate `K_Supe
 ## Owner storage rule (2026-11-23)
 
 **DO NOT access, read, write, scan, cache or otherwise use the owner's local-computer disks without a direct owner instruction for that specific task.** GitHub is the default repository for approved artifacts; restricted content must not be placed in public repositories without separate permission. See [Owner storage policy](docs/OWNER_STORAGE_POLICY_2026-11-23.md).
+
+## Owner rule: public internet research (2026-11-23)
+
+KRC performs ordinary public internet searches, primary-source checks and
+FREE_ONLY scholarly metadata lookups as core read-only research tasks without
+requiring a separate owner grant per query or DOI. This does not bypass
+inter-project science execution consent, paid-resource restrictions,
+HTTPS/SSRF safeguards or publication-review rules.
+
+The canonical [Research network access policy](docs/RESEARCH_NETWORK_ACCESS_POLICY_2026-11-23.md)
+is an owner architectural requirement. Owner-computer [local-disk restrictions](docs/OWNER_STORAGE_POLICY_2026-11-23.md)
+remain mandatory.
+
