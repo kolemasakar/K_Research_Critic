@@ -1,5 +1,24 @@
 # Stage134 owner-directed bounded public metadata lookup
 
+## Superseding owner rule: ordinary public research is always available
+
+The owner explicitly corrected the network policy on 2026-11-23.
+This document records a historical, *single engineering acceptance run*
+of eight HTTPS requests, NOT a globally imposed limit on research.
+The old wording that new public network permissions always require
+a separate owner decision applies only to any replay/extension of this
+exact controlled engineering test, NOT to ordinary KRC read-only
+web searching, public provider lookup or fact-checking.
+
+Canonical policy:
+https://github.com/kolemasakar/K_Research_Critic/blob/main/docs/RESEARCH_NETWORK_ACCESS_POLICY_2026-11-23.md
+
+Normal KRC FREE_ONLY public internet research is allowed by default.
+The separate signed Stage127 research.bibliography.audit activation
+continues to require the normal cross-project execution controls.
+
+---
+
 Date: 2026-11-23
 Status: OWNER_DIRECTED_ONE_SHOT_METADATA_READ_ONLY / NOT_KRC_SIGNED_EXECUTION / PRODUCTION_NO_GO.
 
