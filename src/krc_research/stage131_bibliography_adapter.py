@@ -1,21 +1,27 @@
-"""Stage131 opt-in metadata-only DOI adapter. Does not dispatch network by default.
+"""Stage131 public bibliography lookup: READ-ONLY INTERNET RESEARCH BY DEFAULT.
 
-Caller must explicitly pass a fetch_json(url, timeout_seconds) function and allow_network=True.
-No scientific execution, no full-text download, no provider credentials.
+Public FREE_ONLY metadata lookup does not require separate owner approval per DOI.
+Only signed scientific execution requires a separate immutable approved profile.
+No paid fallback, source-content publishing or scientific truth attestation.
+For deterministic/offline callers, explicitly set allow_network=False or inject a fake.
 """
 import re
 from urllib.parse import quote
 from .stage131_bibliography_probe import classify_crossref, classify_europe_pmc, europe_pmc_query_url
-from .stage131_bibliography_http import ProviderHTTPError
+from .stage131_bibliography_http import ProviderHTTPError, fetch_json_metadata
 
 _DOI = re.compile(r"^10\.[0-9]{4,9}/[^\s?#]{1,220}$", re.ASCII)
-def lookup_doi_metadata(doi, *, fetch_json=None, allow_network=False, timeout_seconds=5):
+def lookup_doi_metadata(doi, *, fetch_json=None, allow_network=True, timeout_seconds=5):
     if not isinstance(doi,str) or not _DOI.fullmatch(doi):
         raise ValueError("INVALID_DOI")
-    if not allow_network or fetch_json is None:
+    if allow_network is False:
         return {"status":"PROVIDER_DISABLED","doi":doi,"sources":{}}
-    if not isinstance(timeout_seconds,(int,float)) or not (0 < timeout_seconds <= 10):
+    if allow_network is not True:
+        raise ValueError("INVALID_NETWORK_MODE")
+    if not isinstance(timeout_seconds,(int,float)) or isinstance(timeout_seconds,bool) or not (0 < timeout_seconds <= 10):
         raise ValueError("INVALID_TIMEOUT")
+    if fetch_json is None:
+        fetch_json = fetch_json_metadata
     urls = {
         "crossref":"https://api.crossref.org/works/"+quote(doi,safe=""),
         "europe_pmc":europe_pmc_query_url(doi),
