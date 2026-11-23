@@ -126,3 +126,30 @@ owner approval of the exact full immutable payload. The previous
    independent scientific evidence. PRODUCTION_NO_GO.
 
 No further provider network requests are authorized by this report.
+
+## Independent K_Science source-only ACK
+
+K_Science draft PR17 added an independently implemented read-only
+KRC-BIB-PROV-1 client and negative tests. Its new and historical
+Stage134 bibliography source tests passed 55/55.
+
+Two synthetic end-to-end private VM source-chain tests used the actual
+KRC private consent ledger, owner-approved immutable profile, internal
+science signer, durable request ledger and artifact store. The independent
+K_Science client checked the exact authorized result envelope,
+response headers, artifact expiry and SHA256.
+
+- Europe PMC no-match: PASS, raw artifact SHA256
+  c511f63f7872f157da0297c5fd16c321419fa918198a10700390ba10d2faa476.
+- Two matching provider metadata fixtures: PASS, raw artifact SHA256
+  a4de94f9b6db18baa4feac58da3eb848bab241ef582e15ed40d5212c2bc3c186.
+- Both tests confirmed scientific_approval=false, no live provider
+  network, one-shot consent and no replay. The private isolated VM
+  temporary states were discarded; installed runtime was unchanged.
+
+K_Science report:
+https://github.com/kolemasakar/K_Science/blob/science/stage134-real-corpus-20261123/docs/integrations/stage127-science-e2e/STAGE134_BIBLIOGRAPHY_PROVENANCE_SOURCE_ACK_2026-11-23.md
+
+This upgrades ONLY the cross-project source-level semantic ACK.
+The Stage127 external transport still rejects bibliography.audit;
+no live provider data bundle or production E2E was signed or run.
