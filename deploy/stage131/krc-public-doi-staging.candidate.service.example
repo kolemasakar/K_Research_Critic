@@ -1,0 +1,31 @@
+# KRC owner-approved separate staging-only user service template.
+# Install as ~/.config/systemd/user/krc-public-doi-staging.service
+# under krcops. Never replace an installed /opt KRC/Sentinel unit.
+[Unit]
+Description=KRC read-only scholarly MCP DOI staging (candidate)
+After=network.target
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+Type=simple
+WorkingDirectory=/home/krcops/krc-stage131-doi-staging/releases/8359fcfc3dea888e92e5e3a84545cd2c803e6c94
+Environment=PYTHONPATH=/home/krcops/krc-stage131-doi-staging/releases/8359fcfc3dea888e92e5e3a84545cd2c803e6c94/src
+Environment=KRC_PRIVATE_RESEARCH_PORT=19147
+Environment=PYTHONNOUSERSITE=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=KRC_SENTINEL_SCIENCE_KEY_FILE=
+ExecStart=/opt/krc-public-mcp/venv/bin/python -B -m krc_research.mcp_private_server
+Restart=on-failure
+RestartSec=2
+TimeoutStartSec=20
+TimeoutStopSec=12
+KillMode=control-group
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+# No [Install] section: explicit operator-controlled staging only.

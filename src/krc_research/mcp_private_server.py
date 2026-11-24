@@ -8,6 +8,7 @@ from mcp.server.fastmcp import FastMCP
 from krc_research.offline_acceptance import evaluate_payload
 from krc_research.public_metadata_adapters import reconcile_doi, crossref_editorial_updates
 from krc_research.bibliography_audit import audit_bibliography
+from krc_research.public_doi_workflow import krc_public_doi_check as _krc_public_doi_check
 from krc_research.inspection_receipts import InspectionReceipt, audit_receipt
 from krc_research.replay_registry import ReplayRegistry
 from krc_research.science_dispatch import handle_science_request
@@ -33,6 +34,16 @@ def krc_scholarly_preflight(payload: dict) -> dict:
 def krc_doi_metadata(doi: str) -> dict:
     """Crossref/EuropePMC metadata only. Never implies full-text inspection."""
     return reconcile_doi(doi)
+
+@mcp.tool()
+def krc_public_doi_check(doi: str) -> dict:
+    """FREE_ONLY Crossref/Europe PMC public DOI check; no per-query consent.
+
+    The result is metadata-only and cannot authorize research.bibliography.audit,
+    certify independent scientific evidence or approve a publication.
+    """
+    return _krc_public_doi_check(doi)
+
 
 @mcp.tool()
 def krc_doi_updates(doi: str) -> dict:
