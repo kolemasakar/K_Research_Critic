@@ -12,7 +12,7 @@ from .stage131_bibliography_http import ProviderHTTPError, fetch_json_metadata
 
 _DOI = re.compile(r"^10\.[0-9]{4,9}/[^\s?#]{1,220}$", re.ASCII)
 def lookup_doi_metadata(doi, *, fetch_json=None, allow_network=True, timeout_seconds=5):
-    if not isinstance(doi,str) or not _DOI.fullmatch(doi):
+    if not isinstance(doi,str) or not _DOI.fullmatch(doi) or any(ch.isspace() or ord(ch)<32 or ord(ch)==127 for ch in doi):
         raise ValueError("INVALID_DOI")
     if allow_network is False:
         return {"status":"PROVIDER_DISABLED","doi":doi,"sources":{}}
@@ -53,11 +53,3 @@ def lookup_doi_metadata(doi, *, fetch_json=None, allow_network=True, timeout_sec
         verdict="REVIEW_REQUIRED"
     return {"status":verdict,"doi":doi,"sources":sources,"full_text_verified":False,"experimental_independence_verified":False}
 
-def audit_doi_provenance_offline(bundle):
-    """Source-only Stage134 metadata/lineage audit; always NO_SEND.
-
-    This interface does not grant access to any provider and cannot turn
-    client-declared provenance into trusted evidence.
-    """
-    from .stage134_bibliography_provenance import audit_stage134_provenance
-    return audit_stage134_provenance(bundle)
