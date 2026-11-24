@@ -74,10 +74,10 @@ def test_europe_pmc_nonmatching_nonempty_record_is_not_coverage_gap():
 
 
 @pytest.mark.parametrize("bad", [
-    "10.1000/abc\\x00def",
-    "10.1000/abc\\x1fdef",
-    "10.1000/abc\\x7fdef",
-    "10.1000/abc\\u00a0def",
+    "10.1000/abc" + chr(0) + "def",
+    "10.1000/abc" + chr(31) + "def",
+    "10.1000/abc" + chr(127) + "def",
+    "10.1000/abc" + chr(160) + "def",
 ])
 def test_doi_controls_and_unicode_whitespace_denied(bad):
     with pytest.raises(ValueError,match="INVALID_DOI"):
