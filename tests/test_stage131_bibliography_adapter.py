@@ -62,3 +62,23 @@ def test_wrong_doi_fails_closed():
 def test_bad_input_and_timeout():
     with pytest.raises(ValueError):lookup_doi_metadata("invalid")
     with pytest.raises(ValueError):lookup_doi_metadata(DOI,fetch_json=lambda *_:{},allow_network=True,timeout_seconds=0)
+
+
+def test_europe_pmc_nonmatching_nonempty_record_is_not_coverage_gap():
+    def fake(url,timeout):
+        if "crossref" in url:return {"message":{"DOI":DOI}}
+        return {"resultList":{"result":[{"doi":"10.1000/different"}]}}
+    out=lookup_doi_metadata(DOI,fetch_json=fake)
+    assert out["sources"]["europe_pmc"]["status"]=="DOI_MISMATCH"
+    assert out["status"]=="REVIEW_REQUIRED"
+
+
+@pytest.mark.parametrize("bad", [
+    "10.1000/abc" + chr(0) + "def",
+    "10.1000/abc" + chr(31) + "def",
+    "10.1000/abc" + chr(127) + "def",
+    "10.1000/abc" + chr(160) + "def",
+])
+def test_doi_controls_and_unicode_whitespace_denied(bad):
+    with pytest.raises(ValueError,match="INVALID_DOI"):
+        lookup_doi_metadata(bad,fetch_json=lambda *args: None)

@@ -40,7 +40,8 @@ def _safe_url(url):
             raise ValueError("PROVIDER_URL_DENIED")
         encoded=parts.path.removeprefix("/works/")
         doi=unquote(encoded)
-        if (not _DOI.fullmatch(doi) or quote(doi,safe="")!=encoded
+        if (not _DOI.fullmatch(doi) or any(ch.isspace() or ord(ch)<32 or ord(ch)==127 for ch in doi)
+            or quote(doi,safe="")!=encoded
             or any(part in ("..",".") for part in doi.split("/"))):
             raise ValueError("PROVIDER_URL_DENIED")
         return "crossref"
@@ -52,7 +53,8 @@ def _safe_url(url):
         raise ValueError("PROVIDER_URL_DENIED")
     args=dict(pairs)
     doi=args["query"][4:] if args["query"].startswith("DOI:") else ""
-    if (not _DOI.fullmatch(doi) or args["format"]!="json"
+    if (not _DOI.fullmatch(doi) or any(ch.isspace() or ord(ch)<32 or ord(ch)==127 for ch in doi)
+        or args["format"]!="json"
         or args["pageSize"]!="1" or any(part in ("..",".") for part in doi.split("/"))):
         raise ValueError("PROVIDER_URL_DENIED")
     return "europe_pmc"
