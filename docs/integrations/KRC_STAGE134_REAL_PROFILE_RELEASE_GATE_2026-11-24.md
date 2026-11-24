@@ -249,3 +249,25 @@ KSCIENCE_AMENDED_CLIENT_ACK_PASS /
 ISOLATED_REPLAY409_PASS /
 EXTERNAL_STAGE127_SIGNED_E2E_NOT_RUN /
 REAL_OWNER_PROFILE_STILL_PROPOSED.
+
+## 8. Independent DOI/title/year crosscheck against K_Science manifest
+
+Read the exact K_Science source-register JSON blob
+7dd6a631e2c1003952acfcda8a092a0f027ee3d5 from PR17
+and compared all four original Crossref byte files again
+without making any new provider requests.
+
+- KSC-REAL-01 / Schabowicz 2014: DOI, normalized title, year PASS.
+- KSC-REAL-02 / Jain et al. 2013: DOI, normalized title, year PASS.
+- KSC-REAL-03 / Volker-Shokouhi 2015: DOI, normalized title, year PASS.
+- KSC-REAL-04 / Breysse 2012: DOI, normalized title, year PASS.
+
+TOTAL 4/4 REAL_CROSSREF_METADATA_DOI_TITLE_YEAR_MANIFEST_MATCH.
+Punctuation and typography were normalized for title comparison,
+while each provider JSON SHA256 still refers to the exact unmodified
+original bytes. Source registers are user-supplied catalog claims,
+not publisher cryptographic attestations, PDF full-text
+inspection, independent specimen verification or scientific approval.
+
+These observations do not change the PROPOSED owner profile state
+or the default-denied external Stage134 operation.
