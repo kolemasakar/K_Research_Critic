@@ -103,3 +103,13 @@ def test_absence_from_europe_pmc_is_coverage_gap_not_disproof():
 def test_explicit_offline_call_never_uses_provider_callback():
     def forbidden(*a,**kw):raise AssertionError("PROVIDER_CALLED")
     assert lookup_doi_metadata("10.1000/demo",fetch_json=forbidden,allow_network=False)["status"]=="PROVIDER_DISABLED"
+
+@pytest.mark.parametrize("bad", [
+    "https://api.crossref.org/works/10.1000%2Fabc%00def",
+    "https://api.crossref.org/works/10.1000%2Fabc%C2%A0def",
+    "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI%3A10.1000%2Fabc%00def&format=json&pageSize=1",
+    "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI%3A10.1000%2Fabc%C2%A0def&format=json&pageSize=1",
+])
+def test_url_encoded_doi_controls_rejected(bad):
+    with pytest.raises(ValueError, match="PROVIDER_URL_DENIED"):
+        _safe_url(bad)
