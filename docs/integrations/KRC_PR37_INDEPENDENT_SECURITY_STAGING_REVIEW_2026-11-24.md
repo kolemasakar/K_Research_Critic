@@ -125,3 +125,21 @@ krc-sentinel-stage127 all ACTIVE, NRestarts=0, no mutations.
 Conclusion: PR37 SOURCE SECURITY + ISOLATED STAGING PASS;
 no completed live deployment, installed-state change or Production
 release is claimed.
+
+## Final pinned source live smoke 2026-11-24
+
+On the same code commit d7b48468c858f841f57ca44c25e3bb67232ecf61,
+a genuine default-on FREE_ONLY public HTTPS lookup of
+10.1016/j.proeng.2013.03.022 ran without separate provider
+consent or injected HTTP callback:
+
+- Crossref result: METADATA_ONLY.
+- Europe PMC result: NOT_FOUND (empty DOI search).
+- Aggregate: COVERAGE_GAP_METADATA_ONLY.
+- full_text_verified=false; experimental_independence_verified=false.
+- Exit 0; FINAL_REVIEWED_CANDIDATE_PUBLIC_METADATA_SMOKE_PASS.
+
+The four installed KRC/Sentinel units were then checked read-only:
+ACTIVE and NRestarts=0. No service process, /opt release, database,
+credential, signed external operation allowlist or owner local
+computer disk was changed.
