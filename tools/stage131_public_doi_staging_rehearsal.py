@@ -12,8 +12,9 @@ The caller explicitly provides two approved local VM source snapshots.
 This tool does not access user-owned local computer disks, modify installed
 services, create consent/authorization, or enable signed bibliography.audit.
 It runs three short-lived HTTP servers on the same ephemeral 127.0.0.1 port
-and verifies release/rollback behavior. One candidate DOI lookup may send
-bounded FREE_ONLY Crossref and Europe PMC HTTPS metadata requests.
+and verifies release/rollback behavior. Provider replies are deterministic
+in-memory fixtures; live public HTTPS smoke is a separate test, so a transient
+upstream timeout cannot falsify the stage-switch/rollback result.
 """
 from __future__ import annotations
 
@@ -34,7 +35,19 @@ SERVER_CODE = r'''
 import json, os, sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlsplit
-from krc_research.stage131_bibliography_adapter import lookup_doi_metadata
+import krc_research.stage131_bibliography_adapter as adapter
+
+# The deterministic fixture affects only the child staging HTTP process.
+# Production KRC and its installed public research provider remain untouched.
+def fixture(url, timeout_seconds):
+    doi = os.environ["STAGING_TEST_DOI"]
+    if url.startswith("https://api.crossref.org/works/"):
+        return {"message": {"DOI": doi, "title": ["Concrete"]}}
+    if url.startswith("https://www.ebi.ac.uk/europepmc/webservices/rest/search?"):
+        return {"resultList": {"result": []}}
+    raise ValueError("STAGING_PROVIDER_URL_DENIED")
+
+adapter.fetch_json_metadata = fixture
 
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, *_args):
@@ -73,7 +86,7 @@ class Handler(BaseHTTPRequestHandler):
             self.reply(400, {"error": "INVALID_REQUEST"})
             return
         try:
-            result = lookup_doi_metadata(values["doi"][0], timeout_seconds=6)
+            result = adapter.lookup_doi_metadata(values["doi"][0], timeout_seconds=6)
         except ValueError:
             self.reply(400, {"error": "INVALID_DOI"})
             return
@@ -116,6 +129,7 @@ def phase(label: str, source: Path, source_pin: str, port: int, expected: str, *
         PYTHONNOUSERSITE="1",
         PYTHONDONTWRITEBYTECODE="1",
         no_proxy="127.0.0.1,localhost",
+        STAGING_TEST_DOI=DOI,
     )
     # Each stage has a separate process and an isolated import path.
     process = subprocess.Popen(
@@ -161,6 +175,7 @@ def phase(label: str, source: Path, source_pin: str, port: int, expected: str, *
             "status=" + result["status"],
             "invalid_doi_http=" + str(invalid_status),
             "source=" + source_pin,
+            "provider_fixture=YES",
             flush=True,
         )
     finally:
