@@ -13,9 +13,12 @@ OFFLINE_OPS = frozenset((OP, PREFLIGHT, INSPECTION))
 BIBLIOGRAPHY = "research.bibliography.audit"
 DEFAULT_OPS = frozenset((OP,))
 
-def checked_ops(operations):
+def checked_ops(operations, *, enable_stage134=False):
+    # Stage134 requires an independent, explicit release gate. Adding the
+    # operation name to a client list cannot activate it by itself.
     ops = frozenset(operations)
-    if not ops or not ops <= OFFLINE_OPS:
+    allowed = (OFFLINE_OPS | {BIBLIOGRAPHY}) if enable_stage134 is True else OFFLINE_OPS
+    if not ops or not ops <= allowed:
         raise ValueError("INVALID_OFFLINE_OPERATION_ALLOWLIST")
     return ops
 IDENTITY = {"client":"K_Science","principal":"K_Science","repository":"kolemasakar/K_Science","workflow_ref":"refs/heads/main"}
