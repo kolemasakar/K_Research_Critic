@@ -206,3 +206,46 @@ Overall:
 STAGE134_CODE_QA_PASS / REAL_METADATA_PROFILE_CREATED /
 CONSENT_PROPOSED_ONLY / ROOT_PRIVILEGED_DEPLOYMENT_PENDING /
 EXTERNAL_STAGE134_SIGNED_E2E_NOT_RUN / PRODUCTION_NO_GO.
+
+## 7. Actual four-real-Crossref source POST/GET interop
+
+After full source acceptance and real Crossref capture, a separate
+private, mode0700 isolated VM test re-used the exact captured FOUR
+Crossref payloads, the final amended K_Science PR17 client and
+the current Stage134 signed POST boundary source.
+
+- Same immutable private full profile SHA256:
+  5f5866fd563758cfa305b9a28c5cbb8862903feb617581266bc2f57b3b84dad7.
+- Source POST with no approval: HTTP 403, PASS.
+- A completely separate synthetic test-only consent database was
+  then APPROVED. The real live KRC PROPOSED owner request was
+  NOT approved, edited, consumed or replayed.
+- Source ProjectPostBoundary with explicit test-only Stage134
+  operation flag: POST 200, PASS.
+- Actual KRC internal signer and request ledger, artifact store,
+  ProjectArtifactAuthority GET, raw result byte length and
+  SHA256: PASS.
+- Final amended Science client with exact pinned KRC input/result
+  schemas authenticated the received bundle/result shape and the
+  descriptor/header/body digest: PASS.
+- FOUR real Crossref publications: four PARTIAL_METADATA_ONLY
+  outcomes; science_approval=false; independent_origins_verified=0.
+- Artifact body SHA256:
+  92745440c3ff3e52eb635fb752e67e06a11c999b030a448197dc0cefc609004d.
+- Second POST of the same synthetic test request: HTTP 409, PASS.
+- Zero provider network calls during this local replay.
+- Actual external Stage127/Sentinel OIDC POST/GET was NOT performed.
+
+Initial ad hoc diagnostic before this successful test used an
+incorrect permissive umask, causing the existing source read-only
+database custody check to reject a test requests.sqlite file.
+The source server itself already sets umask 077. Repeating with
+umask 077 reproduced the proper operational file protection and
+passed all local Stage134 POST/GET checks without weakening custody.
+
+Disposition:
+REAL_CROSSREF_SOURCE_POST200_AND_GET_SHA_PASS /
+KSCIENCE_AMENDED_CLIENT_ACK_PASS /
+ISOLATED_REPLAY409_PASS /
+EXTERNAL_STAGE127_SIGNED_E2E_NOT_RUN /
+REAL_OWNER_PROFILE_STILL_PROPOSED.
