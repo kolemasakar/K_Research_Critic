@@ -134,11 +134,12 @@ def validate_reply(response,rid):
     raise ValueError("REPLY_NOT_CORRELATED")
 
 class RelayClient:
-    def __init__(self,path,*,key,expected_uid,expected_gid,enabled_operations=DEFAULT_OPS):
+    def __init__(self,path,*,key,expected_uid,expected_gid,enabled_operations=DEFAULT_OPS,
+                 enable_stage134=False):
         check_key(key)
         self.path,self.key=path,key
         self.uid,self.gid=expected_uid,expected_gid
-        self.enabled_operations=checked_ops(enabled_operations)
+        self.enabled_operations=checked_ops(enabled_operations,enable_stage134=enable_stage134)
     def execute(self,envelope):
         rid=envelope.get("request_id")
         if envelope.get("identity")!=IDENTITY or envelope.get("operation") not in self.enabled_operations or not isinstance(rid,str) or not RID.fullmatch(rid):return denied()
@@ -163,9 +164,9 @@ class PilotGatewayBoundary:
         self.exchange=legacy.exchange
     def execute(self,envelope,*,trusted_principal):
         op=envelope.get("operation")
-        if op==BIBLIOGRAPHY:
+        if op==BIBLIOGRAPHY and op not in self.relay.enabled_operations:
             return denied()[1]
-        if op not in OFFLINE_OPS:
+        if op not in OFFLINE_OPS and op!=BIBLIOGRAPHY:
             return self.legacy.execute(envelope,trusted_principal=trusted_principal)
         if op not in self.relay.enabled_operations:
             return denied()[1]
