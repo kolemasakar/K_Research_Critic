@@ -25,7 +25,12 @@ def artifact_read_gate(exchange, descriptor, *, authenticated_principal,
     # Exchange re-verifies principal, request_id, clock and SHA against stored bytes.
     return exchange.get_bytes(descriptor["artifact_id"],principal=authenticated_principal,request_id=request_id)
 
-def bibliography_metadata_gate(doi, *, provider_approved=False, allow_network=False, fetcher=fetch_json_metadata):
-    if provider_approved is not True or allow_network is not True:
-        return {"status":"PROVIDER_DISABLED","doi":doi,"sources":{}}
-    return lookup_doi_metadata(doi,allow_network=True,fetch_json=fetcher)
+def bibliography_metadata_gate(doi, *, provider_approved=None, allow_network=True, fetcher=fetch_json_metadata):
+    """Ordinary FREE_ONLY public research: no per-DOI approval required.
+
+    provider_approved is a deprecated compatibility argument. It does not
+    authorize or prohibit a public read-only lookup. allow_network=False is
+    available to offline tests or callers deliberately disabling network I/O.
+    This function never submits a signed science request or grants consent.
+    """
+    return lookup_doi_metadata(doi,allow_network=allow_network,fetch_json=fetcher)

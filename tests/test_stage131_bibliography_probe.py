@@ -14,7 +14,8 @@ def test_metadata_not_promoted_to_fulltext():
 
 def test_doi_mismatch_fail_closed():
     assert classify_crossref("10.1038/nature12373",{"message":{"DOI":"10.1038/other"}})["status"]=="DOI_MISMATCH"
-    assert classify_europe_pmc("10.1038/nature12373",{"resultList":{"result":[{"doi":"10.1038/other"}]}})["status"]=="NOT_FOUND"
+    assert classify_europe_pmc("10.1038/nature12373",{"resultList":{"result":[{"doi":"10.1038/other"}]}})["status"]=="DOI_MISMATCH"
+    assert classify_europe_pmc("10.1038/nature12373",{"resultList":{"result":[]}})["status"]=="NOT_FOUND"
 
 def test_malformed_provider_data_denied():
     with pytest.raises(ValueError):classify_crossref("10.1038/nature12373",{"message":None})

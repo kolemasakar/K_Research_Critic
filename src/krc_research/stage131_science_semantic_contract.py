@@ -29,14 +29,20 @@ def validate_operation_result(obj, *, task_id, operation):
         _require(e["final_publication_status"]==expected_publication and obj["status"]==("REVISE" if expected_status=="REVISE" else "PENDING"),"PUBLICATION_STATUS_MISMATCH")
         _require(e["historical_report"] is None or isinstance(e["historical_report"],dict),"INVALID_HISTORICAL_REPORT")
     elif operation=="research.bibliography.audit":
-        _require(e.get("schema")=="KRC-BIB-1" and isinstance(e.get("records"),list),"INVALID_BIBLIOGRAPHY")
-        rows=e["records"]; n=e.get("count")
-        _require(type(n) is int and 1<=n<=24 and n==len(rows),"BIBLIOGRAPHY_COUNT_MISMATCH")
-        required={"doi","metadata_status","has_recorded_updates","updates_status","retraction_clearance","methods_results_verified","experimental_origins_verified","providers"}
-        _require(all(isinstance(row,dict) and set(row)==required and row["metadata_status"] in ("TWO_PROVIDER_MATCH","PARTIAL") and row["retraction_clearance"]=="NOT_ESTABLISHED" and row["methods_results_verified"] is False and type(row["experimental_origins_verified"]) is int and row["experimental_origins_verified"]==0 and isinstance(row["providers"],dict) for row in rows),"INVALID_BIBLIOGRAPHY_RECORD")
-        _require(e.get("retraction_clearance")=="NOT_ESTABLISHED" and e.get("full_texts_inspected")==0,"UNVERIFIED_BIBLIOGRAPHY_PROMOTION")
-        _require(type(e.get("two_provider_metadata_matches")) is int and e["two_provider_metadata_matches"]==sum(x["metadata_status"]=="TWO_PROVIDER_MATCH" for x in rows),"METADATA_COUNT_MISMATCH")
-        _require(type(e.get("updates_detected")) is int and e["updates_detected"]==sum(x["has_recorded_updates"] is True for x in rows),"UPDATE_COUNT_MISMATCH")
+        if e.get("schema")=="KRC-BIB-PROV-1":
+            from .stage134_offline_bibliography_route import validate_offline_bibliography_result
+            _require(obj["status"]=="PENDING" and
+                     validate_offline_bibliography_result(e),
+                     "INVALID_STAGE134_OFFLINE_BIBLIOGRAPHY")
+        else:
+            _require(e.get("schema")=="KRC-BIB-1" and isinstance(e.get("records"),list),"INVALID_BIBLIOGRAPHY")
+            rows=e["records"]; n=e.get("count")
+            _require(type(n) is int and 1<=n<=24 and n==len(rows),"BIBLIOGRAPHY_COUNT_MISMATCH")
+            required={"doi","metadata_status","has_recorded_updates","updates_status","retraction_clearance","methods_results_verified","experimental_origins_verified","providers"}
+            _require(all(isinstance(row,dict) and set(row)==required and row["metadata_status"] in ("TWO_PROVIDER_MATCH","PARTIAL") and row["retraction_clearance"]=="NOT_ESTABLISHED" and row["methods_results_verified"] is False and type(row["experimental_origins_verified"]) is int and row["experimental_origins_verified"]==0 and isinstance(row["providers"],dict) for row in rows),"INVALID_BIBLIOGRAPHY_RECORD")
+            _require(e.get("retraction_clearance")=="NOT_ESTABLISHED" and e.get("full_texts_inspected")==0,"UNVERIFIED_BIBLIOGRAPHY_PROMOTION")
+            _require(type(e.get("two_provider_metadata_matches")) is int and e["two_provider_metadata_matches"]==sum(x["metadata_status"]=="TWO_PROVIDER_MATCH" for x in rows),"METADATA_COUNT_MISMATCH")
+            _require(type(e.get("updates_detected")) is int and e["updates_detected"]==sum(x["has_recorded_updates"] is True for x in rows),"UPDATE_COUNT_MISMATCH")
     elif operation=="research.inspection.review":
         _require(set(e)=={"receipt_sha256","eligible_for_independent_claim_review","shortfalls","scientific_truth_verified"},"RECEIPT_FIELDS")
         _require(isinstance(e["receipt_sha256"],str) and len(e["receipt_sha256"])==64 and all(c in "0123456789abcdef" for c in e["receipt_sha256"]),"RECEIPT_HASH")

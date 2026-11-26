@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:krc:stage134:bibliography-provenance-input:1",
+  "title": "KRC Stage134 offline bibliography metadata provenance input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "policy",
+    "doi",
+    "captures",
+    "sources"
+  ],
+  "properties": {
+    "version": {
+      "const": "KRC-STAGE134-BIBLIOGRAPHY-PROVENANCE/1"
+    },
+    "policy": {
+      "const": "FREE_ONLY_OFFLINE"
+    },
+    "doi": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 195
+    },
+    "captures": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "provider",
+          "url",
+          "captured_at",
+          "payload",
+          "payload_sha256"
+        ],
+        "properties": {
+          "provider": {
+            "enum": [
+              "crossref",
+              "europe_pmc"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "captured_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "payload": {
+            "type": "object"
+          },
+          "payload_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source_id",
+          "origin_id",
+          "document_sha256",
+          "access",
+          "derived_from"
+        ],
+        "properties": {
+          "source_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,79}$"
+          },
+          "origin_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,79}$"
+          },
+          "document_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "access": {
+            "enum": [
+              "METADATA_ONLY",
+              "ABSTRACT_ONLY",
+              "METHODS_RESULTS_EXCERPT",
+              "FULL_TEXT"
+            ]
+          },
+          "derived_from": {
+            "type": "array",
+            "maxItems": 16,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,79}$"
+            }
+          }
+        }
+      }
+    }
+  }
+}

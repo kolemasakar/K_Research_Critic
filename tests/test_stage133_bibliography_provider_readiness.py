@@ -7,10 +7,20 @@ from krc_research.stage131_bibliography_http import fetch_json_metadata, Provide
 
 DOI="10.1088/1757-899X/365/3/032058"
 
-def test_disabled_gate_never_calls_injected_provider():
+def test_explicit_offline_gate_never_calls_injected_provider():
     def forbidden(*args,**kwargs):
         raise AssertionError("NETWORK_MUST_NOT_RUN")
-    assert lookup_doi_metadata(DOI,fetch_json=forbidden)["status"]=="PROVIDER_DISABLED"
+    assert lookup_doi_metadata(DOI,fetch_json=forbidden,allow_network=False)["status"]=="PROVIDER_DISABLED"
+
+def test_public_provider_access_does_not_require_owner_grant():
+    called=[]
+    def fake(url,timeout):
+        called.append(url)
+        return ({"message":{"DOI":DOI,"title":["test"]}} if "crossref" in url
+                else {"resultList":{"result":[]}})
+    out=lookup_doi_metadata(DOI,fetch_json=fake)
+    assert len(called)==2 and out["status"]=="COVERAGE_GAP_METADATA_ONLY"
+    assert out["full_text_verified"] is False
 
 def test_metadata_two_providers_only_is_not_scientific_approval():
     seen=[]

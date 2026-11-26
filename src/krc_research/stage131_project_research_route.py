@@ -27,6 +27,10 @@ from .replay_registry import ReplayRegistry
 from .artifact_stage117 import HardenedExchange
 from .stage133_science_input import validate_external_science_payload
 from .stage131_science_semantic_contract import validate_operation_result
+from .stage134_offline_bibliography_route import (
+    OPERATION as STAGE134_BIBLIOGRAPHY,
+    validate_stage134_offline_payload, audit_offline_bundles,
+)
 
 PRINCIPAL="K_Science"
 CHANNEL="KRC-personal-project"
@@ -53,7 +57,9 @@ def engine_payload(op, payload):
     return payload
 
 class ProjectResearchRoute:
-    def __init__(self, root):
+    def __init__(self, root, *, enable_stage134_offline=False):
+        # Explicit source-only opt-in; default installed route is unchanged.
+        self.stage134_enabled = enable_stage134_offline is True
         self.root=private_root(root)
         self.verifier=ProjectChannelVerifier()
         self.consent=SingleOwnerConsentLedger(self.root/"consent.sqlite",verifier=self.verifier,authorized_principal=PRINCIPAL)
@@ -70,10 +76,14 @@ class ProjectResearchRoute:
         if not isinstance(profile["purpose"],str) or not profile["purpose"].strip() or profile["policy"]!="FREE_ONLY_OFFLINE":
             raise RouteDenied("INVALID_POLICY")
         op=profile["operation"]
-        if op not in OPS:
+        if op not in OPS and not (self.stage134_enabled and op==STAGE134_BIBLIOGRAPHY):
             raise RouteDenied("OFFLINE_OPERATION_NOT_ENABLED")
         if not Draft202012Validator(_schema_for(op),format_checker=FormatChecker()).is_valid(engine_payload(op, profile["payload"])):
             raise RouteDenied("INVALID_PAYLOAD")
+        if op == STAGE134_BIBLIOGRAPHY:
+            # Reject untrusted/oversize snapshots and legacy DOI-only provider
+            # requests before the owner is even offered an approval profile.
+            validate_stage134_offline_payload(profile["payload"])
         if op in ("research.evidence.preflight", "research.inspection.review"):
             if not validate_external_science_payload(op, profile["payload"]):
                 raise RouteDenied("INVALID_SCIENCE_PAYLOAD")
@@ -116,12 +126,17 @@ class ProjectResearchRoute:
         if proposal["status"]!="APPROVED": raise RouteDenied("APPROVAL_REQUIRED_OR_ALREADY_USED")
         profile=proposal["profile"]
         op,payload=profile["operation"],engine_payload(profile["operation"],profile["payload"])
-        if op not in OPS: raise RouteDenied("OFFLINE_OPERATION_NOT_ENABLED")
+        if op not in OPS and not (self.stage134_enabled and op==STAGE134_BIBLIOGRAPHY):
+            raise RouteDenied("OFFLINE_OPERATION_NOT_ENABLED")
+        if op == STAGE134_BIBLIOGRAPHY:
+            validate_stage134_offline_payload(profile["payload"])
         admitted=self.requests.admit(principal=PRINCIPAL,request_id=rid,operation=op,payload=profile)
         if admitted["decision"]!="EXECUTE": raise RouteDenied("REQUEST_ALREADY_ADMITTED")
         task=rid+"-task"
         key=secrets.token_bytes(32) # local ephemeral internal key; never exposed
-        science=ScienceAdapter122(secret=key,allowed_principals={PRINCIPAL})
+        science=ScienceAdapter122(
+            secret=key,allowed_principals={PRINCIPAL},
+            bibliography_fn=audit_offline_bundles if op==STAGE134_BIBLIOGRAPHY else None)
         science.seen=ReplayRegistry(self.root/"science-replay.sqlite")
         expected={"request_id":rid,"task_id":task,"operation":op,"principal":PRINCIPAL,
                   "profile_ref":digest,"evidence_refs":[],"payload_sha256":hashlib.sha256(canonical(payload)).hexdigest(),"consent_ref":rid}
@@ -130,12 +145,15 @@ class ProjectResearchRoute:
         def dispatch(operation,envelope,principal):
             if not self.consent.can_continue(rid): raise RouteDenied("CANCELLED_OR_EXPIRED")
             return science(operation,envelope,principal)
-        signer=KRCInternalScienceSigner(science_key=key,authorizer=authorize,dispatcher=dispatch)
+        signer=KRCInternalScienceSigner(
+            science_key=key,authorizer=authorize,dispatcher=dispatch,
+            bibliography_enabled=(self.stage134_enabled and op==STAGE134_BIBLIOGRAPHY))
         result=signer.execute(request_id=rid,task_id=task,operation=op,payload=payload,
             principal=PRINCIPAL,profile_ref=digest,evidence_refs=[],consent_ref=rid)
         if validate_science_result(result,expected_task_id=task,expected_operation=op)!="VALID_SHAPE_ONLY":
             raise RouteDenied("INVALID_SCIENCE_RESULT")
-        if op in ("research.evidence.preflight", "research.inspection.review"):
+        if op in ("research.evidence.preflight", "research.inspection.review",
+                  STAGE134_BIBLIOGRAPHY):
             try:
                 validate_operation_result(result, task_id=task, operation=op)
             except ValueError as exc:

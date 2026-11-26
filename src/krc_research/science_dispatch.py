@@ -22,7 +22,14 @@ def handle_science_request(message:dict,*,secret:bytes,signature:str,seen:set,
         if "manuscript_gate" not in request:
             raise ValueError("Missing canonical scientific acceptance schema")
     elif operation=="research.bibliography.audit":
-        if "dois" not in request: raise ValueError("DOI list required")
+        # New immutable snapshot route never falls back to provider fetching.
+        if "offline_bundles" in request:
+            if bibliography_fn is audit_bibliography:
+                raise ValueError("OFFLINE_BIBLIOGRAPHY_ADAPTER_REQUIRED")
+            if set(request) != {"offline_bundles"}:
+                raise ValueError("INVALID_OFFLINE_BIBLIOGRAPHY_PAYLOAD")
+        elif set(request) != {"dois"}:
+            raise ValueError("DOI list required")
     elif operation=="research.inspection.review":
         if "receipt" not in request: raise ValueError("Receipt required")
     else:
@@ -37,7 +44,8 @@ def handle_science_request(message:dict,*,secret:bytes,signature:str,seen:set,
     elif operation=="research.evidence.preflight":
         result=evaluate_payload(request)
     elif operation=="research.bibliography.audit":
-        result=bibliography_fn(request["dois"])
+        result=bibliography_fn(request["offline_bundles"] if "offline_bundles" in request
+                               else request["dois"])
     else:
         result=audit_receipt(InspectionReceipt(**request["receipt"]))
     return {"task_id":auth["task_id"],"operation":operation,

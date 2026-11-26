@@ -12,7 +12,8 @@ def classify_europe_pmc(doi, payload):
     items=payload.get("resultList",{}).get("result",[])
     if not isinstance(items,list):raise ValueError("INVALID_PROVIDER_RESPONSE")
     matches=[x for x in items if isinstance(x,dict) and str(x.get("doi","")).casefold()==doi.casefold()]
-    if not matches:return {"status":"NOT_FOUND","access":"NONE","doi":doi}
+    if not matches:
+        return {"status":"DOI_MISMATCH" if items else "NOT_FOUND","access":"NONE","doi":doi}
     item=matches[0]
     return {"status":"METADATA_ONLY","access":"OA_INDICATED" if item.get("isOpenAccess")=="Y" else "OA_NOT_INDICATED","doi":doi}
 

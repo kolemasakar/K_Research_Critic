@@ -15,7 +15,8 @@ from krc_research.stage132_project_post_wire import (OP,IDENTITY,MAX_EXTERNAL,RI
 import time
 from jsonschema import Draft202012Validator, FormatChecker
 from krc_research.private_dispatch_adapter import _schema_for
-from krc_research.stage132_project_post_wire import PREFLIGHT, INSPECTION, DEFAULT_OPS, checked_ops
+from krc_research.stage132_project_post_wire import PREFLIGHT, INSPECTION, BIBLIOGRAPHY, DEFAULT_OPS, checked_ops
+from krc_research.stage134_offline_bibliography_route import validate_stage134_offline_payload
 from krc_research.stage133_science_input import validate_external_science_payload
 
 def valid_operation_payload(op, payload):
@@ -23,6 +24,12 @@ def valid_operation_payload(op, payload):
         return validate_payload(payload)
     if not isinstance(payload, dict):
         return False
+    if op == BIBLIOGRAPHY:
+        try:
+            validate_stage134_offline_payload(payload)
+            return True
+        except (ValueError, TypeError, KeyError, OverflowError):
+            return False
     return validate_external_science_payload(op, payload)
 
 def validate_payload(payload):
@@ -34,10 +41,12 @@ def validate_payload(payload):
             and cp["protocol"] in ("KRC Core","Scholarly Research"))
 
 class ProjectPostBoundary:
-    def __init__(self, root, *, enabled=False, enabled_operations=DEFAULT_OPS):
+    def __init__(self, root, *, enabled=False, enabled_operations=DEFAULT_OPS,
+                 enable_stage134=False):
         self.root=root
         self.enabled=enabled is True
-        self.enabled_operations=checked_ops(enabled_operations)
+        self.stage134_enabled = enable_stage134 is True
+        self.enabled_operations=checked_ops(enabled_operations, enable_stage134=self.stage134_enabled)
     def execute(self, envelope, *, trusted_principal):
         if not self.enabled or trusted_principal!=PRINCIPAL:
             return denied()
@@ -64,7 +73,7 @@ class ProjectPostBoundary:
                 with closing(ro(root/name)) as db:
                     for table in tables:
                         db.execute("SELECT * FROM "+table+" LIMIT 0")
-            route=ProjectResearchRoute(root)
+            route=ProjectResearchRoute(root, enable_stage134_offline=(op==BIBLIOGRAPHY and self.stage134_enabled))
             try: proposal=route.show(rid)
             except RouteDenied as exc:
                 if str(exc)=="MISSING_PROPOSAL":return denied()
